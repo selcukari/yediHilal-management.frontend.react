@@ -5,4 +5,9 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
+  define: {
+    "process.env": {
+    "import.meta.env.VITE_FIREBASECONFIG_DATABASE_URL": JSON.stringify(process.env.VITE_FIREBASECONFIG_DATABASE_URL),
+    }
+  },
 });
