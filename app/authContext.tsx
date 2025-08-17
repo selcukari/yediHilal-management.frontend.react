@@ -47,9 +47,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const response = await api.get(
         `/managementUser/login?email=${email}&password=${password}`
       );
+
+
       
       const getUser = response.data;
-      
+      console.log('getuser:', response)
       if (getUser?.errors) {
         throw new Error('Kullanıcı bulunamadı veya şifre yanlış.');
       }

@@ -5,7 +5,7 @@ import { getWithExpiry } from '../utils/useLocalStorage'
 
 // Axios instance oluşturma
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL, // Vite ortam değişkeni
+  baseURL: import.meta.env.VITE_APP_API, // Vite ortam değişkeni
 });
 
 // Request interceptor - Angular'daki AuthInterceptor gibi
