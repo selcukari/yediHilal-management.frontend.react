@@ -1,6 +1,6 @@
 // All packages except `@mantine/hooks` require styles imports
 import '@mantine/core/styles.css';
-import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from '@mantine/core';
+import { ColorSchemeScript, MantineProvider, mantineHtmlProps, createTheme } from '@mantine/core';
 import {
   isRouteErrorResponse,
   Links,
@@ -26,6 +26,12 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+// Mantine tema konfigürasyonu
+const theme = createTheme({
+  fontFamily: 'Inter, sans-serif',
+  primaryColor: 'blue',
+});
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" {...mantineHtmlProps}>
@@ -37,9 +43,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <MantineProvider>
-            {children}
-          </MantineProvider>
+        <MantineProvider theme={theme}>
+          {children}
+        </MantineProvider>
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -49,9 +55,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-      <AuthProvider>
-        <Outlet />
-      </AuthProvider>
+    <AuthProvider>
+      <Outlet />
+    </AuthProvider>
   );
 }
 

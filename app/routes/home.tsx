@@ -1,15 +1,8 @@
-import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
-
-export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
-  ];
-}
+import { Text } from '@mantine/core';
 
 export default function Home() {
-  return (
-          <Welcome />
-         );
+  return (<div>
+            <Text size="xl" fw={500} mb="md">Hoş Geldiniz</Text>
+            <Text>Bu ana içerik alanıdır. Sol menüden diğer sayfalara geçiş yapabilirsiniz.</Text>
+          </div>);
 }
