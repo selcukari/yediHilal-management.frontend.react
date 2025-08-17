@@ -1,13 +1,17 @@
-import { Container, Paper, TextInput, PasswordInput, Button, Title, Text, Alert } from '@mantine/core';
+import {
+  Container, Paper, TextInput, PasswordInput, Button, Title, Text, Alert,
+  LoadingOverlay } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useDisclosure } from '@mantine/hooks';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useAuth } from '../authContext';
 
 export default function Login() {
   const [error, setError] = useState('');
-  const { login, loading: authLoading } = useAuth();
+  const { login, loading: authLoading, isLoggedIn } = useAuth();
   const navigate = useNavigate();
+  const [visible, { open, close }] = useDisclosure(false);
 
   const form = useForm({
     initialValues: {
@@ -21,16 +25,29 @@ export default function Login() {
 
   const handleSubmit = async (values: typeof form.values) => {
     try {
-      setError('');
+      open()
       await login(values.email, values.password);
-      navigate('/');
+
+      if (isLoggedIn) {
+        navigate('/');
+      }
+
+      close()
     } catch (error: any) {
-      setError('Giriş başarısız. E-posta ve şifrenizi kontrol edin. ' + error.message);
+      close()
+      setError('Giriş başarısız. E-posta ve şifrenizi kontrol edin. ');
+      console.error('Giriş başarısız. E-posta ve şifrenizi kontrol edin. ' + error.message);
     }
   };
 
   return (
     <Container size={420} my={40}>
+      <LoadingOverlay
+        visible={visible}
+        zIndex={1000}
+        overlayProps={{ radius: 'sm', blur: 2 }}
+        loaderProps={{ color: 'pink', type: 'bars' }}
+      />
       <Title ta="center" mb="md">Giriş Yap</Title>
       <Text size="sm" ta="center" mb="xl">
         Devam etmek için e-posta ve şifrenizi giriniz
