@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
   define: {
     "process.env": {
-    "import.meta.env.VITE_FIREBASECONFIG_DATABASE_URL": JSON.stringify(process.env.VITE_FIREBASECONFIG_DATABASE_URL),
+    "import.meta.env.VITE_APP_API": JSON.stringify(process.env.VITE_APP_API),
     }
   },
 });
