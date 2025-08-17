@@ -10,6 +10,7 @@ import {
   ScrollRestoration,
 } from "react-router";
 import { AuthProvider } from './authContext';
+import { Layout as AppLayout } from './components';
 import type { Route } from "./+types/root";
 import "./app.css";
 
@@ -56,7 +57,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <AuthProvider>
-      <Outlet />
+      <AppLayout />
     </AuthProvider>
   );
 }
@@ -78,14 +79,16 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <main className="pt-16 p-4 container mx-auto">
-      <h1>{message}</h1>
-      <p>{details}</p>
-      {stack && (
-        <pre className="w-full p-4 overflow-x-auto">
-          <code>{stack}</code>
-        </pre>
-      )}
-    </main>
+    <AppLayout>
+      <div className="pt-16 p-4 container mx-auto">
+        <h1>{message}</h1>
+        <p>{details}</p>
+        {stack && (
+          <pre className="w-full p-4 overflow-x-auto">
+            <code>{stack}</code>
+          </pre>
+        )}
+      </div>
+    </AppLayout>
   );
 }
