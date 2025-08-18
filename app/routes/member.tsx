@@ -8,7 +8,7 @@ import {
   Button,
   Paper,
 } from '@mantine/core';
-import { Country } from '../components/country'
+import { Country, Area, Province } from '../components'
 
 export default function Member() {
 
@@ -37,15 +37,15 @@ export default function Member() {
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
                 <Grid.Col span={4}>
-                  <Country/>
+                  <Country isRequired={true}/>
                 </Grid.Col>
 
                 <Grid.Col span={4}>
-                  <Country/>
+                  <Area/>
                 </Grid.Col>
 
                 <Grid.Col span={4}>
-                  <Country/>
+                  <Province/>
                 </Grid.Col>
               </Grid>
             </Paper>
