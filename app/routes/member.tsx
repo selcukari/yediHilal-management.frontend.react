@@ -8,7 +8,7 @@ import {
   Button,
   Paper,
 } from '@mantine/core';
-import { Country, Area, Province } from '../components'
+import { Country, Province } from '../components'
 
 export default function Member() {
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
@@ -61,11 +61,11 @@ export default function Member() {
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
                 <Grid.Col span={4}>
-                  <Country isRequired={true} onCountryChange={onCountrySelected} countrySelectedName={onCountrySelectedName} />
+                  <Country isRequired={true} onCountryChange={onCountrySelected}/>
                 </Grid.Col>
 
                 <Grid.Col span={4}>
-                  <Area isRequired={true}/>
+                  <Province/>
                 </Grid.Col>
 
                 <Grid.Col span={4}>

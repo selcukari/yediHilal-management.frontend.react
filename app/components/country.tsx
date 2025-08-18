@@ -7,12 +7,11 @@ interface CountryProps {
   isDisabled?: boolean;
   model?: string | null;
   onCountryChange: (val: string | null) => void;
-  countrySelectedName: (val: string | null) => void;
 }
 
 
 export function Country({ isRequired = false, isDisabled = false, model = null,
-  onCountryChange, countrySelectedName
+  onCountryChange,
  }: CountryProps) {
   const [country, setCountry] = useState<string | null>(model);
   const [countries, setCountries] = useState<{ value: string; label: string }[]>([]);
@@ -56,13 +55,6 @@ export function Country({ isRequired = false, isDisabled = false, model = null,
 
       onCountryChange(country)
       setError(null);
-
-      const selectedCountry = countries.find(country => country.value == value);
-      if (selectedCountry) {
-        countrySelectedName(selectedCountry.label);
-      } else {
-        countrySelectedName(null);
-      }
     }
   };
 
