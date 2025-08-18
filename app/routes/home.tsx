@@ -1,14 +1,14 @@
 import React from 'react';
 import {
-  Container,
+  Container, Grid,
   Stack,
   Group,
   Title,
   Text,
   Button,
   Paper,
-  AppShell,
 } from '@mantine/core';
+import { Country } from '../components/country'
 
 const sectionTitles = {
   dashboard: 'Dashboard',
@@ -43,39 +43,19 @@ export default function Home() {
             }}
           >
             <Paper shadow="xs" p="lg" withBorder>
-              <Stack gap="sm">
-                <Title order={4}>Kart 1</Title>
-                <Text size="sm" c="dimmed">
-                  Bu bir örnek içerik kartıdır. Burada Home sayfasına özel içerik gösterilebilir.
-                </Text>
-                <Button size="sm" variant="light">
-                  Detaylar
-                </Button>
-              </Stack>
-            </Paper>
+              <Grid>
+                <Grid.Col span={4}>
+                  <Country/>
+                </Grid.Col>
 
-            <Paper shadow="xs" p="lg" withBorder>
-              <Stack gap="sm">
-                <Title order={4}>Kart 2</Title>
-                <Text size="sm" c="dimmed">
-                  Bu ikinci örnek kartdır. Mantine bileşenleri ile güzel bir tasarım oluşturduk.
-                </Text>
-                <Button size="sm" variant="light">
-                  Düzenle
-                </Button>
-              </Stack>
-            </Paper>
+                <Grid.Col span={4}>
+                  <Country/>
+                </Grid.Col>
 
-            <Paper shadow="xs" p="lg" withBorder>
-              <Stack gap="sm">
-                <Title order={4}>Kart 3</Title>
-                <Text size="sm" c="dimmed">
-                  Responsive tasarım sayesinde kartlar farklı ekran boyutlarında düzgün görünür.
-                </Text>
-                <Button size="sm" variant="light">
-                  İncele
-                </Button>
-              </Stack>
+                <Grid.Col span={4}>
+                  <Country/>
+                </Grid.Col>
+              </Grid>
             </Paper>
           </div>
 
