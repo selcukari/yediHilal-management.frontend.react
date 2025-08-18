@@ -6,10 +6,14 @@ interface CountryProps {
   isRequired?: boolean;
   isDisabled?: boolean;
   model?: string | null;
+  onCountryChange: (val: string | null) => void;
+  countrySelectedName: (val: string | null) => void;
 }
 
 
-export function Country({ isRequired = false, isDisabled = false, model = null }: CountryProps) {
+export function Country({ isRequired = false, isDisabled = false, model = null,
+  onCountryChange, countrySelectedName
+ }: CountryProps) {
   const [country, setCountry] = useState<string | null>(model);
   const [countries, setCountries] = useState<{ value: string; label: string }[]>([]);
   const [error, setError] = useState<string | null>(isRequired ? 'Ülke alanı gereklidir.' : null);
@@ -19,6 +23,13 @@ export function Country({ isRequired = false, isDisabled = false, model = null }
   useEffect(() => {
     fetchCountryData();
   }, []);
+
+  useEffect(() => {
+    if (country) {
+      setError(null);
+    } else {
+    }
+  }, [country]);
 
   const fetchCountryData = async () => {
     try {
@@ -40,9 +51,18 @@ export function Country({ isRequired = false, isDisabled = false, model = null }
   };
 
   const handleChange = (value: string | null) => {
-    setCountry(value);
     if (value) {
+      setCountry(value);
+
+      onCountryChange(country)
       setError(null);
+
+      const selectedCountry = countries.find(country => country.value == value);
+      if (selectedCountry) {
+        countrySelectedName(selectedCountry.label);
+      } else {
+        countrySelectedName(null);
+      }
     }
   };
 

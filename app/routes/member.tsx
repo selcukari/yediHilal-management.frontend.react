@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import {
   Container, Grid,
   Stack,
@@ -11,6 +11,30 @@ import {
 import { Country, Area, Province } from '../components'
 
 export default function Member() {
+  const [selectedArea, setSelectedArea] = useState<string | null>(null);
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
+  const [selectedCountryName, setSelectedCountryName] = useState<string | null>(null);
+  const [selectedAreaName, setSelectedAreaName] = useState<string | null>(null);
+  const [selectedProvinceName, setSelectedProvinceName] = useState<string | null>(null);
+
+
+  const onCountrySelected = (countryValue: string | null): void => {
+    setSelectedCountry(countryValue);
+
+    setSelectedArea(null);
+    setSelectedProvince(null);
+  }
+  const onCountrySelectedName = (countryName: string | null): void => {
+    setSelectedCountryName(countryName);
+
+    setSelectedArea(null);
+    setSelectedProvinceName(null);
+  }
+  const onAreaSelected = (areaValue: string | null): void => {
+    setSelectedArea(areaValue);
+    setSelectedProvince(null);
+  }
 
   return (
       <Container size="xl">
@@ -37,7 +61,7 @@ export default function Member() {
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
                 <Grid.Col span={4}>
-                  <Country isRequired={true}/>
+                  <Country isRequired={true} onCountryChange={onCountrySelected} countrySelectedName={onCountrySelectedName} />
                 </Grid.Col>
 
                 <Grid.Col span={4}>
