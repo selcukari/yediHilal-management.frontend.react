@@ -41,7 +41,7 @@ export default function Member() {
                 </Grid.Col>
 
                 <Grid.Col span={4}>
-                  <Area/>
+                  <Area isRequired={true}/>
                 </Grid.Col>
 
                 <Grid.Col span={4}>

@@ -16,16 +16,12 @@ export function Country({ isRequired = false, isDisabled = false }: CountryProps
   const service = useCountryService('management');
 
   useEffect(() => {
-    console.log('Component ilk açıldığında çalıştı ✅');
     fetchCountryData();
   }, []);
 
   const fetchCountryData = async () => {
     try {
-      // örnek: API’den veriyi çek
       const response = await service.getCountries();
-
-      console.log('reponse:', response)
 
       if (response) {
         setCountries(
@@ -43,7 +39,6 @@ export function Country({ isRequired = false, isDisabled = false }: CountryProps
   };
 
   const handleChange = (value: string | null) => {
-    console.log("value:", value)
     setCountry(value);
     if (value) {
       setError(null);
@@ -61,6 +56,7 @@ export function Country({ isRequired = false, isDisabled = false }: CountryProps
       nothingFoundMessage="Nothing found..."
       onChange={handleChange}
       error={error}
+      required
     />
   );
 }
