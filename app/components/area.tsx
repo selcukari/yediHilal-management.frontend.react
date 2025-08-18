@@ -27,6 +27,7 @@ export function Area({ isRequired = false }: AreaProps) {
       nothingFoundMessage="Nothing found..."
       onChange={handleChange}
       error={error}
+      required
     />
   );
 }

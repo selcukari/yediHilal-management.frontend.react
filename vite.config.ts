@@ -10,4 +10,12 @@ export default defineConfig({
     "import.meta.env.VITE_APP_API": JSON.stringify(process.env.VITE_APP_API),
     }
   },
+  server: {
+    proxy: {
+      '/.well-known': {
+        target: 'http://localhost', // or any dummy endpoint
+        rewrite: (path) => '', // ignore the request
+      },
+    },
+  },
 });

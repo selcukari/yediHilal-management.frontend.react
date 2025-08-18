@@ -1,6 +1,6 @@
 // src/services/auth.ts
 import { createContext, useContext, useState, useEffect } from 'react';
-import api from './services/api';
+import { createApi } from './services/api';
 import { setWithExpiry, getWithExpiry } from './utils/useLocalStorage';
 
 type User = {
@@ -22,6 +22,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User>(null);
   const [loading, setLoading] = useState(true);
+
+  const api = createApi();
 
   // Başlangıçta kullanıcıyı yükle
   useEffect(() => {

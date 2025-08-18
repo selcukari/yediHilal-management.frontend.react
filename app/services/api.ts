@@ -1,39 +1,29 @@
-// src/services/api.ts
 import axios from 'axios';
-import { useAuth } from '../authContext';
-import { getWithExpiry } from '../utils/useLocalStorage'
 
-// Axios instance oluşturma
-const api = axios.create({
-  baseURL: import.meta.env.VITE_APP_API, // Vite ortam değişkeni
-});
+export const createApi = (token?: string, onUnauthorized?: () => void) => {
+  const api = axios.create({
+    baseURL: import.meta.env.VITE_APP_API,
+  });
 
-// Request interceptor - Angular'daki AuthInterceptor gibi
-api.interceptors.request.use(
-  (config: any) => {
-    const token = localStorage.getItem('token') || getWithExpiry('currentUser')?.token;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+  // Request interceptor
+  api.interceptors.request.use(
+    (config) => {
+      if (token) config.headers.Authorization = `Bearer ${token}`;
+      return config;
+    },
+    (error) => Promise.reject(error)
+  );
+
+  // Response interceptor
+  api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (error.response?.status === 401 && onUnauthorized) {
+        onUnauthorized();
+      }
+      return Promise.reject(error);
     }
-    return config;
-  },
-  (error: any) => {
-    return Promise.reject(error);
-  }
-);
+  );
 
-// Response interceptor - Hata yönetimi için
-api.interceptors.response.use(
-  (response: any) => response,
-  (error: any) => {
-    if (error.response?.status === 401) {
-      // Token süresi dolmuşsa veya geçersizse
-      const { logout } = useAuth();
-      logout();
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
-
-export default api;
+  return api;
+};
