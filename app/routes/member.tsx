@@ -18,9 +18,9 @@ export default function Member() {
           {/* Sayfa Başlığı */}
           <Group justify="space-between" align="center">
             <div>
-              <Title order={2}>Home Page</Title>
+              <Title order={2}>Üye Sayfası</Title>
               <Text size="sm" c="dimmed">
-                Hoş geldiniz! Burada Home Page sayfası içeriği görüntüleniyor.
+                Toolbar Filtreleme Alanı
               </Text>
             </div>
             <Button variant="filled">Yeni Ekle</Button>

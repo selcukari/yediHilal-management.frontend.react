@@ -5,11 +5,12 @@ import { useCountryService } from '../services/countryService'
 interface CountryProps {
   isRequired?: boolean;
   isDisabled?: boolean;
+  model?: string | null;
 }
 
 
-export function Country({ isRequired = false, isDisabled = false }: CountryProps) {
-  const [country, setCountry] = useState<string | null>(null);
+export function Country({ isRequired = false, isDisabled = false, model = null }: CountryProps) {
+  const [country, setCountry] = useState<string | null>(model);
   const [countries, setCountries] = useState<{ value: string; label: string }[]>([]);
   const [error, setError] = useState<string | null>(isRequired ? 'Ülke alanı gereklidir.' : null);
   
@@ -50,6 +51,7 @@ export function Country({ isRequired = false, isDisabled = false }: CountryProps
       label="Ülke"
       placeholder="Ülke Seçiniz"
       data={countries}
+      value={country}
       searchable
       maxDropdownHeight={200}
       disabled={isDisabled}
