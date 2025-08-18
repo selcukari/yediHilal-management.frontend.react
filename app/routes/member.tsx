@@ -10,15 +10,7 @@ import {
 } from '@mantine/core';
 import { Country } from '../components/country'
 
-const sectionTitles = {
-  dashboard: 'Dashboard',
-  users: 'Kullanıcılar',
-  documents: 'Dökümanlar',
-  reports: 'Raporlar',
-  settings: 'Ayarlar',
-};
-
-export default function Home() {
+export default function Member() {
 
   return (
       <Container size="xl">
