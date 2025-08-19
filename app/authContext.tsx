@@ -5,7 +5,7 @@ import { setWithExpiry, getWithExpiry } from './utils/useLocalStorage';
 
 interface AuthContextType {
   currentUser: any;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
   isLoggedIn: boolean;
@@ -31,8 +31,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   useEffect(() => {
-        console.log("11-currentUser:", currentUser)
-
     if (!currentUser) {
     const storedUser = getWithExpiry('currentUser');
     if (storedUser) {
@@ -50,7 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   }, []);
 
-  const login = async (email: string, password: string): Promise<void> => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     setLoading(true);
     try {
       const response = await api.get(`/managementUser/login?email=${email}&password=${password}`);
@@ -62,6 +60,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       setCurrentUser(getUser.data);
       setWithExpiry('currentUser', JSON.stringify(getUser.data), 86400000 * 7);
+
+      return true;
     } catch (error: any) {
       setCurrentUser(null);
       localStorage.removeItem('currentUser');

@@ -26,9 +26,10 @@ export default function Login() {
   const handleSubmit = async (values: typeof form.values) => {
     try {
       open()
-      await login(values.email, values.password);
+      const response = await login(values.email, values.password);
 
-      if (isLoggedIn) {
+      console.log("handleSubmit:isLoggedIn:", isLoggedIn)
+      if (response || isLoggedIn) {
         navigate('/');
       }
 

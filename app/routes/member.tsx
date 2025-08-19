@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   Container, Grid,
   Stack,
@@ -9,30 +9,15 @@ import {
   Paper,
 } from '@mantine/core';
 import { Country, Province } from '../components'
+import MemberAdd, { type DialogControllerRef } from '../components/memberAdd';
 
 export default function Member() {
-  const [selectedArea, setSelectedArea] = useState<string | null>(null);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
-  const [selectedCountryName, setSelectedCountryName] = useState<string | null>(null);
-  const [selectedAreaName, setSelectedAreaName] = useState<string | null>(null);
-  const [selectedProvinceName, setSelectedProvinceName] = useState<string | null>(null);
-
+  const memberAddRef = useRef<DialogControllerRef>(null);
 
   const onCountrySelected = (countryValue: string | null): void => {
     setSelectedCountry(countryValue);
-
-    setSelectedArea(null);
-    setSelectedProvince(null);
-  }
-  const onCountrySelectedName = (countryName: string | null): void => {
-    setSelectedCountryName(countryName);
-
-    setSelectedArea(null);
-    setSelectedProvinceName(null);
-  }
-  const onAreaSelected = (areaValue: string | null): void => {
-    setSelectedArea(areaValue);
     setSelectedProvince(null);
   }
 
@@ -47,7 +32,7 @@ export default function Member() {
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
-            <Button variant="filled">Yeni Ekle</Button>
+            <Button variant="filled" onClick={() => memberAddRef.current?.open()}>Yeni Ekle</Button>
           </Group>
 
           {/* İçerik Kartları */}
@@ -133,6 +118,8 @@ export default function Member() {
             </Stack>
           </Paper>
         </Stack>
+
+        <MemberAdd ref={memberAddRef} />
       </Container>
   );
 }

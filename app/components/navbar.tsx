@@ -14,6 +14,7 @@ import {
   IconUser,
   IconSettings,
 } from '@tabler/icons-react';
+import { useAuth } from '~/authContext';
 
 interface NavbarProps {
   opened: boolean;
@@ -21,6 +22,8 @@ interface NavbarProps {
 }
 
 export function Navbar({ opened, toggle }: NavbarProps) {
+  const { isLoggedIn, logout } = useAuth();
+  
   return (
     <AppShell.Header>
       <Group h="100%" px="md" justify="space-between">
@@ -41,7 +44,9 @@ export function Navbar({ opened, toggle }: NavbarProps) {
             Bildirimler
           </Button>
           
-          <Menu shadow="md" width={200}>
+          
+          { isLoggedIn &&
+            <Menu shadow="md" width={200}>
             <Menu.Target>
               <Button variant="subtle" leftSection={<Avatar size="sm" />}>
                 Profil
@@ -61,14 +66,16 @@ export function Navbar({ opened, toggle }: NavbarProps) {
 
               <Menu.Item
                 color="red"
+                onClick={logout}
                 leftSection={<IconLogout size={14} />}
               >
                 Çıkış Yap
               </Menu.Item>
             </Menu.Dropdown>
-          </Menu>
+            </Menu>
+          }
 
-          <Button>Giriş Yap</Button>
+          { !isLoggedIn && <Button>Giriş Yap</Button> }
         </Group>
       </Group>
     </AppShell.Header>
