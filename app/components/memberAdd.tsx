@@ -71,7 +71,6 @@ const MemberAdd = forwardRef<DialogControllerRef>((_, ref) => {
         }
 
         return null;
-
       },
       dateOfBirth: (value) => {
         if (!value) return undefined;
