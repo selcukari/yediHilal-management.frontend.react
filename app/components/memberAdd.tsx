@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, TextInput, Button, Stack, Grid, Select } from '@mantine/core';
+import { Modal, TextInput, Button, Stack, Grid, Select, Group, Switch, MultiSelect } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 
@@ -16,12 +16,16 @@ type FormValues = {
   countryCode: string;
   phone: string;
   dateOfBirth: number;
-  referans: string
+  reference: string;
+  isActive: boolean;
+  isSms: boolean;
+  isMail: boolean;
+  modulRoles: string[];
 };
 
 const MemberAdd = forwardRef<DialogControllerRef>((_, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
-  const [isDisabledReferans, setIsDisabledReferans] = useState(false);
+  const [isDisabledReference, setIsDisabledReference] = useState(false);
   const [isDisabledCountryCode, setIsDisabledCountryCode] = useState(false);
   const [isDisabledPhone, setIsDisabledPhone] = useState(false);
 
@@ -33,7 +37,11 @@ const MemberAdd = forwardRef<DialogControllerRef>((_, ref) => {
       countryCode: '90',
       phone: '',
       dateOfBirth: 0,
-      referans: ''
+      reference: '',
+      isActive: true,
+      isSms: true,
+      isMail: true,
+      modulRoles: []
     },
     validate: {
       fullName: (value) => (value.trim().length < 5 ? 'İsim en az 5 karakter olmalı' : null),
@@ -67,15 +75,15 @@ const MemberAdd = forwardRef<DialogControllerRef>((_, ref) => {
   // Phone alanını izle ve değişiklik olduğunda isDisabledSelect'i güncelle
   useEffect(() => {
     const phoneValue = form.values.phone;
-    setIsDisabledReferans(!!phoneValue?.trim()); // Eğer phone değeri varsa true, yoksa false
+    setIsDisabledReference(!!phoneValue?.trim()); // Eğer phone değeri varsa true, yoksa false
   }, [form.values.phone]);
 
-  // referans alanını izle ve değişiklik olduğunda setIsDisabledCountryCode, setIsDisabledPhone'i güncelle
+  // reference alanını izle ve değişiklik olduğunda setIsDisabledCountryCode, setIsDisabledPhone'i güncelle
   useEffect(() => {
-    const referansValue = form.values.referans;
-    setIsDisabledCountryCode(!!referansValue?.trim()); // Eğer referans değeri varsa true, yoksa false
-    setIsDisabledPhone(!!referansValue?.trim()); // Eğer referans değeri varsa true, yoksa false
-  }, [form.values.referans]);
+    const referenceValue = form.values.reference;
+    setIsDisabledCountryCode(!!referenceValue?.trim()); // Eğer reference değeri varsa true, yoksa false
+    setIsDisabledPhone(!!referenceValue?.trim()); // Eğer reference değeri varsa true, yoksa false
+  }, [form.values.reference]);
 
   const handleSubmit = (values: FormValues) => {
     console.log('Form gönderildi:', values);
@@ -145,9 +153,9 @@ const MemberAdd = forwardRef<DialogControllerRef>((_, ref) => {
               data={[{value: "1", label: 'React' }, {value:"2", label:'Angular'}, {value: "3", label: 'Vue'}]}
               searchable
               maxDropdownHeight={200}
-              disabled={isDisabledReferans}
+              disabled={isDisabledReference}
               nothingFoundMessage="Nothing found..."
-              {...form.getInputProps('referans')}
+              {...form.getInputProps('reference')}
             />
           </Grid.Col>
 
@@ -164,6 +172,42 @@ const MemberAdd = forwardRef<DialogControllerRef>((_, ref) => {
               label="Email"
               placeholder="Email giriniz"
               {...form.getInputProps('email')}
+            />
+          </Grid.Col>
+
+          <Grid.Col span={6}>
+            <fieldset style={{ border: '1px solid #e9ecef', borderRadius: '8px', padding: '16px' }}>
+              <legend style={{ padding: '0 8px', fontWeight: 600 }}>Durum Ayarları</legend>
+              <Group gap="lg">
+                <Switch 
+                  label="Üye Durumu" 
+                  checked={form.values.isActive}
+                  onChange={(event) => form.setFieldValue('isActive', event.currentTarget.checked)}
+                />
+                <Switch 
+                  label="Sms Durumu" 
+                  checked={form.values.isSms}
+                  onChange={(event) => form.setFieldValue('isSms', event.currentTarget.checked)}
+                />
+                <Switch 
+                  label="Mail Durumu" 
+                  checked={form.values.isMail}
+                  onChange={(event) => form.setFieldValue('isMail', event.currentTarget.checked)}
+                />
+              </Group>
+            </fieldset>
+          </Grid.Col>
+
+          <Grid.Col span={6}>
+            <MultiSelect
+              label="Modül Rolleri"
+              placeholder="modül rolleri seciniz"
+              data={[{ value: "1", label: 'React'}, { value: "4", label: 'React1'}, { value: "2", label: 'Reac2t'}, { value: "3", label: 'Reac3t'}]}
+              searchable
+              clearable
+              maxDropdownHeight={200}
+              {...form.getInputProps('moduleRoles')}
+              nothingFoundMessage="Nothing found..."
             />
           </Grid.Col>
           

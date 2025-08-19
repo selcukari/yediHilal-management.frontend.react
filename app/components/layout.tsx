@@ -5,6 +5,7 @@ import { Navbar } from './navbar';
 import { Sidebar } from './sidebar';
 import { Footer } from './footer';
 import { MainContent } from './mainContent';
+import { AuthProvider } from '../authContext'
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -25,7 +26,9 @@ export function Layout({ children }: LayoutProps = {}) {
       footer={{ height: 60 }}
       padding="md"
     >
-      <Navbar opened={opened} toggle={toggle} />
+      <AuthProvider>
+        <Navbar opened={opened} toggle={toggle} />
+      </AuthProvider>
       <Sidebar active={activeSection} setActive={setActiveSection} />
       {children ? (
         <AppShell.Main>
