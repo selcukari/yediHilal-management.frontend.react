@@ -7,11 +7,17 @@ import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../components/confirmModal';
 import { CountrySelect } from './addOrEdit/countrySelect';
 import { ProvinceSelect } from './addOrEdit/provinceSelect';
+import { useMemberService } from '../services/memberService';
+import { toast } from '../utils/toastMessages';
 
 export type DialogControllerRef = {
   open: () => void;
   close: () => void;
 };
+
+interface MemberAddProps {
+  onSaveSuccess?: () => void; // Yeni prop
+}
 
 type FormValues = {
   fullName: string;
@@ -24,17 +30,19 @@ type FormValues = {
   isActive: boolean;
   isSms: boolean;
   isMail: boolean;
-  country: string;
-  province: string;
-  modulRoles: string[];
+  countryId: string;
+  provinceId: string;
+  moduleRoles: string[];
 };
 
-const MemberAdd = forwardRef<DialogControllerRef>((_, ref) => {
+const MemberAdd = forwardRef<DialogControllerRef, MemberAddProps>(({onSaveSuccess}, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
   const [isDisabledReference, setIsDisabledReference] = useState(false);
   const [isDisabledCountryCode, setIsDisabledCountryCode] = useState(false);
   const [isDisabledPhone, setIsDisabledPhone] = useState(false);
 
+  const service = useMemberService('management');
+  
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
   const form = useForm<FormValues>({
@@ -46,12 +54,12 @@ const MemberAdd = forwardRef<DialogControllerRef>((_, ref) => {
       phone: '',
       dateOfBirth: 0,
       reference: '',
-      country: '',
-      province: '',
+      countryId: '1',
+      provinceId: '',
       isActive: true,
       isSms: true,
       isMail: true,
-      modulRoles: []
+      moduleRoles: []
     },
     validate: {
       fullName: (value) => (value.trim().length < 5 ? 'İsim en az 5 karakter olmalı' : null),
@@ -99,19 +107,49 @@ const MemberAdd = forwardRef<DialogControllerRef>((_, ref) => {
     setIsDisabledPhone(!!referenceValue?.trim()); // Eğer reference değeri varsa true, yoksa false
   }, [form.values.reference]);
 
-  const handleSubmit = (values: FormValues) => {
+  const handleSubmit = async (values: FormValues) => {
     // Burada API çağrısı yapabilirsiniz
-    close();
-    form.reset();
+    console.log("handleSubmit:values:", values)
+
+    const newMemberValue = {
+      ...values,
+      moduleRoles: (values.moduleRoles?.length > 0 ? values.moduleRoles.join(',') : undefined),
+      provinceId: values.provinceId ? parseInt(values.provinceId) : undefined,
+      countryId: values.countryId ? parseInt(values.countryId) : undefined,
+    }
+
+    const result = await service.addMember(newMemberValue);
+
+    if (result === true) {
+
+      toast.success('İşlem başarılı!');
+      
+      // onSaveSuccess event'ini tetikle
+      if (onSaveSuccess) {
+        onSaveSuccess();
+      }
+      
+      close();
+      form.reset();
+
+      return;
+    }
+    if (result?.data === false && result?.errors) {
+
+      toast.warning(result.errors[0]);
+
+    } else {
+      toast.error('Bir hata oluştu!');
+    }
   };
 
    // Ülke değiştiğinde ili sıfırla
   useEffect(() => {
-    if (form.values.country) {
+    if (form.values.countryId) {
       // Ülke değiştiğinde ili resetle
-      form.setFieldValue('province', '');
+      form.setFieldValue('provinceId', '');
     }
-  }, [form.values.country]);
+  }, [form.values.countryId]);
 
   const confirmDialogHandleConfirm = () => {
     console.log('İşlem onaylandı');
@@ -182,7 +220,7 @@ const MemberAdd = forwardRef<DialogControllerRef>((_, ref) => {
               form={form} 
               label="İl" 
               placeholder="İl Seçiniz" 
-              countryId={form.values.country}
+              countryId={form.values.countryId}
             />
           </Grid.Col>
 

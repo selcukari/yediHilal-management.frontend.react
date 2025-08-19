@@ -8,12 +8,18 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      navigate("/login");
-    } else {
-      navigate("/")
+    console.log("sdfdf:", location.pathname)
+    if (!loading && !isLoggedIn) {
+      // Sadece giriş yapmamış kullanıcıları login'e yönlendir
+      navigate("/login", { 
+        replace: true,
+        state: { from: location.pathname }
+      });
     }
-  }, [isLoggedIn, navigate]);
+
+    if (location.pathname === '/login') setTimeout(() => {navigate("/")}, 1500);
+
+  }, [isLoggedIn, loading, navigate, location]);
 
   if (loading) {
     return <LoadingOverlay
@@ -24,6 +30,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
           />;
   }
 
+  // Giriş yapmışsa children'ı render et
   return <>{children}</>;
 }
 

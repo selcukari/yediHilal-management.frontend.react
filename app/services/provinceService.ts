@@ -5,10 +5,16 @@ export function useProvinceService(controller: string) {
   const { getCurrentToken, logout } = useAuth();
   const api = createApi(getCurrentToken() ?? undefined, logout);
 
-  const getProvinces = async () => {
+  const turkeyCountryId = 1;
+
+  const getProvinces = async (countryId?: string) => {
 
     try {
-      const res = await api.get(`/${controller}/getProvinces`);
+      const res = await api.get(`/${controller}/getProvincesByCountry`, {
+         params: {
+          ...(countryId ? { countryId: parseInt(countryId)} : { countryId: turkeyCountryId }),
+        }
+      });
 
       return res.data.data;
     } catch (error: any) {

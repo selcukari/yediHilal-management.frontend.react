@@ -1,5 +1,7 @@
 import { Select } from '@mantine/core';
+import { useEffect, useState } from 'react';
 import type { UseFormReturnType } from '@mantine/form';
+import { useCountryService } from '../../services/countryService'
 
 interface CountrySelectProps {
   form: UseFormReturnType<any>;
@@ -8,32 +10,49 @@ interface CountrySelectProps {
   required?: boolean;
 }
 
-const countryData = [
-  { value: "1", label: 'Türkiye' },
-  { value: "2", label: 'Abd' },
-  { value: "3", label: 'Azerbeycan' },
-  { value: "4", label: 'Almanya' },
-  { value: "5", label: 'Fransa' },
-  { value: "6", label: 'İngiltere' },
-  // Daha fazla ülke ekleyebilirsiniz
-];
-
 export function CountrySelect({ 
   form, 
   label = "Ülke", 
   placeholder = "Ülke Seçiniz", 
   required = false 
 }: CountrySelectProps) {
+
+  const [countries, setCountries] = useState<{ value: string; label: string }[]>([]);
+
+  const service = useCountryService('management');
+
+  useEffect(() => {
+    fetchCountryData();
+  }, []);
+
+  const fetchCountryData = async () => {
+    try {
+      const response = await service.getCountries();
+
+      if (response) {
+        setCountries(
+          response.map((c: any) => ({
+            value: String(c.id),
+            label: c.name,
+          }))
+        );
+      } else {
+        console.error('No countries data found');
+      }
+    } catch (error: any) {
+      console.error('Error fetching countries:', error.message);
+    }
+  };
   return (
     <Select
       label={label}
       placeholder={placeholder}
-      data={countryData}
+      data={countries}
       searchable
       maxDropdownHeight={200}
       nothingFoundMessage="Ülke bulunamadı..."
       required={required}
-      {...form.getInputProps('country')}
+      {...form.getInputProps('countryId')}
     />
   );
 }

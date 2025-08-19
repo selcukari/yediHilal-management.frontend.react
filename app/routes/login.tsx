@@ -29,8 +29,11 @@ export default function Login() {
       const response = await login(values.email, values.password);
 
       console.log("handleSubmit:isLoggedIn:", isLoggedIn)
-      if (response || isLoggedIn) {
-        navigate('/');
+      if (isLoggedIn) {
+
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
       }
 
       close()

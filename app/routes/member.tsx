@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Container, Grid,
   Stack,
@@ -20,6 +20,22 @@ export default function Member() {
     setSelectedCountry(countryValue);
     setSelectedProvince(null);
   }
+
+  const fetchMembers = async () => {
+    try {
+      console.log('Üyeler yeniden çekiliyor...');
+      // API'den üye listesini çekme işlemi
+      // const response = await api.get('/members');
+      // setMembers(response.data);
+    } catch (error) {
+      console.error('Üyeler çekilirken hata:', error);
+    }
+  };
+
+  const handleSaveSuccess = () => {
+    console.log('Yeni üye eklendi, veriler yenileniyor...');
+    fetchMembers(); // Verileri yeniden çek
+  };
 
   return (
       <Container size="xl">
@@ -46,7 +62,7 @@ export default function Member() {
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
                 <Grid.Col span={4}>
-                  <Country isRequired={true} onCountryChange={onCountrySelected}/>
+                  <Country onCountryChange={onCountrySelected}/>
                 </Grid.Col>
 
                 <Grid.Col span={4}>
@@ -119,7 +135,7 @@ export default function Member() {
           </Paper>
         </Stack>
 
-        <MemberAdd ref={memberAddRef} />
+        <MemberAdd ref={memberAddRef} onSaveSuccess={handleSaveSuccess} />
       </Container>
   );
 }

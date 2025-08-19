@@ -1,5 +1,6 @@
 // All packages except `@mantine/hooks` require styles imports
 import '@mantine/core/styles.css';
+import '@mantine/notifications/styles.css'; 
 import { ColorSchemeScript, MantineProvider, mantineHtmlProps, createTheme } from '@mantine/core';
 import {
   isRouteErrorResponse,
@@ -9,6 +10,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
+import { Notifications } from '@mantine/notifications';
 import { AuthProvider } from './authContext';
 import { Layout as AppLayout } from './components';
 import ProtectedRoute from './protectedRoute'
@@ -56,7 +58,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return (
+  return (<>
+  <MantineProvider theme={theme}>
+    <Notifications position="top-right" />
     <AuthProvider>
       <AppLayout>
         <ProtectedRoute>
@@ -64,7 +68,8 @@ export default function App() {
         </ProtectedRoute>
         </AppLayout>
     </AuthProvider>
-  );
+    </MantineProvider>
+  </>);
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
