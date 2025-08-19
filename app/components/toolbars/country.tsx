@@ -1,6 +1,6 @@
 import { Select } from '@mantine/core';
 import { useState, useEffect } from 'react';
-import { useCountryService } from '../services/countryService'
+import { useCountryService } from '../../services/countryService'
 
 interface CountryProps {
   isRequired?: boolean;
@@ -70,7 +70,7 @@ export function Country({ isRequired = false, isDisabled = false, model = null,
       nothingFoundMessage="Nothing found..."
       onChange={handleChange}
       error={error}
-      required
+      required={isRequired}
     />
   );
 }

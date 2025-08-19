@@ -5,6 +5,8 @@ import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../components/confirmModal';
+import { CountrySelect } from './addOrEdit/countrySelect';
+import { ProvinceSelect } from './addOrEdit/provinceSelect';
 
 export type DialogControllerRef = {
   open: () => void;
@@ -103,12 +105,23 @@ const MemberAdd = forwardRef<DialogControllerRef>((_, ref) => {
     form.reset();
   };
 
-  const handleConfirm = () => {
+   // Ülke değiştiğinde ili sıfırla
+  useEffect(() => {
+    if (form.values.country) {
+      // Ülke değiştiğinde ili resetle
+      form.setFieldValue('province', '');
+    }
+  }, [form.values.country]);
+
+  const confirmDialogHandleConfirm = () => {
     console.log('İşlem onaylandı');
     // Silme işlemini burada yapın
+    confirmModalRef.current?.close();
+    close();
+    form.reset();
   };
 
-  const handleCancel = () => {
+  const confirmDialogHandleCancel = () => {
     console.log('İşlem iptal edildi');
   };
 
@@ -159,26 +172,17 @@ const MemberAdd = forwardRef<DialogControllerRef>((_, ref) => {
           </Grid.Col>
 
           <Grid.Col span={6}>
-            <Select
-              label="Ülke"
-              placeholder="Ülke Seçiniz"
-              data={[{value: "1", label: 'Türkiye' }, {value:"2", label:'Abd'}, {value: "3", label: 'Azerbeycan'}]}
-              searchable
-              maxDropdownHeight={200}
-              nothingFoundMessage="Nothing found..."
-              {...form.getInputProps('country')}
+            <CountrySelect 
+              form={form} 
             />
           </Grid.Col>
 
           <Grid.Col span={6}>
-            <Select
-              label="İl"
-              placeholder="İl Seçiniz"
-              data={[{value: "1", label: 'Mersin' }, {value:"2", label:'Ankara'}, {value: "3", label: 'Van'}]}
-              searchable
-              maxDropdownHeight={200}
-              nothingFoundMessage="Nothing found..."
-              {...form.getInputProps('province')}
+            <ProvinceSelect 
+              form={form} 
+              label="İl" 
+              placeholder="İl Seçiniz" 
+              countryId={form.values.country}
             />
           </Grid.Col>
 
@@ -256,7 +260,7 @@ const MemberAdd = forwardRef<DialogControllerRef>((_, ref) => {
             <MultiSelect
               label="Modül Rolleri"
               placeholder="modül rolleri seciniz"
-              data={[{ value: "1", label: 'React'}, { value: "4", label: 'React1'}, { value: "2", label: 'Reac2t'}, { value: "3", label: 'Reac3t'}]}
+              data={[{ value: "user", label: 'Kullanıcı'}, { value: "member", label: 'Üye'}, { value: "2", label: 'Reac2t'}, { value: "3", label: 'Reac3t'}]}
               searchable
               clearable
               maxDropdownHeight={200}
@@ -280,8 +284,8 @@ const MemberAdd = forwardRef<DialogControllerRef>((_, ref) => {
       {/* confirm Dialog */}
     <ConfirmModal 
       ref={confirmModalRef}
-      onConfirm={handleConfirm}
-      onCancel={handleCancel}
+      onConfirm={confirmDialogHandleConfirm}
+      onCancel={confirmDialogHandleCancel}
     />
   </>);
 });
