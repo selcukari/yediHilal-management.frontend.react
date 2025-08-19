@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { useNavigate } from "react-router";
 import { createApi } from './services/api';
 import { setWithExpiry, getWithExpiry } from './utils/useLocalStorage';
 
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const api = createApi();
+  const navigate = useNavigate();
 
   const [currentUser, setCurrentUser] = useState<any>(() => {
     const storedUser = getWithExpiry("currentUser");
@@ -74,6 +76,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setCurrentUser(null);
     localStorage.removeItem('currentUser');
+
+    navigate("login")
   };
 
   const getCurrentToken = () => {

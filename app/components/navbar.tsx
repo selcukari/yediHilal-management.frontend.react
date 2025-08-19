@@ -45,7 +45,7 @@ export function Navbar({ opened, toggle }: NavbarProps) {
           </Button>
           
           
-          { isLoggedIn &&
+          { isLoggedIn ? (
             <Menu shadow="md" width={200}>
             <Menu.Target>
               <Button variant="subtle" leftSection={<Avatar size="sm" />}>
@@ -72,10 +72,9 @@ export function Navbar({ opened, toggle }: NavbarProps) {
                 Çıkış Yap
               </Menu.Item>
             </Menu.Dropdown>
-            </Menu>
-          }
+            </Menu>) : (
 
-          { !isLoggedIn && <Button>Giriş Yap</Button> }
+          <Button>Giriş Yap</Button>)}
         </Group>
       </Group>
     </AppShell.Header>

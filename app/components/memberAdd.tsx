@@ -20,6 +20,8 @@ type FormValues = {
   isActive: boolean;
   isSms: boolean;
   isMail: boolean;
+  country: string;
+  province: string;
   modulRoles: string[];
 };
 
@@ -38,6 +40,8 @@ const MemberAdd = forwardRef<DialogControllerRef>((_, ref) => {
       phone: '',
       dateOfBirth: 0,
       reference: '',
+      country: '',
+      province: '',
       isActive: true,
       isSms: true,
       isMail: true,
@@ -60,9 +64,14 @@ const MemberAdd = forwardRef<DialogControllerRef>((_, ref) => {
         return /^[0-9]+$/.test(value) ? null : 'Geçersiz ülkekodu';
       },
       phone: (value) => {
-        if (!value?.trim()) return null;
 
-        return /^[0-9]+$/.test(value) ? null : 'Sadece rakam girebilirsiniz';
+        if (!form.values.reference) {
+
+          return /^[0-9]+$/.test(value) ? null : 'Sadece rakam girebilirsiniz';
+        }
+
+        return null;
+
       },
       dateOfBirth: (value) => {
         if (!value) return undefined;
@@ -125,6 +134,30 @@ const MemberAdd = forwardRef<DialogControllerRef>((_, ref) => {
               label="Kimlik"
               placeholder="Kimlik numarası giriniz"
               {...form.getInputProps('identificationNumber')}
+            />
+          </Grid.Col>
+
+          <Grid.Col span={6}>
+            <Select
+              label="Ülke"
+              placeholder="Ülke Seçiniz"
+              data={[{value: "1", label: 'Türkiye' }, {value:"2", label:'Abd'}, {value: "3", label: 'Azerbeycan'}]}
+              searchable
+              maxDropdownHeight={200}
+              nothingFoundMessage="Nothing found..."
+              {...form.getInputProps('country')}
+            />
+          </Grid.Col>
+
+          <Grid.Col span={6}>
+            <Select
+              label="İl"
+              placeholder="İl Seçiniz"
+              data={[{value: "1", label: 'Mersin' }, {value:"2", label:'Ankara'}, {value: "3", label: 'Van'}]}
+              searchable
+              maxDropdownHeight={200}
+              nothingFoundMessage="Nothing found..."
+              {...form.getInputProps('province')}
             />
           </Grid.Col>
 
