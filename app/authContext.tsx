@@ -1,15 +1,10 @@
-// src/services/auth.ts
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { createApi } from './services/api';
 import { setWithExpiry, getWithExpiry } from './utils/useLocalStorage';
 
-type User = {
-  token?: string;
-  // Diğer kullanıcı özellikleri
-} | null;
 
 interface AuthContextType {
-  currentUser: User;
+  currentUser: any;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   loading: boolean;
@@ -19,47 +14,54 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [currentUser, setCurrentUser] = useState<User>(null);
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
-
   const api = createApi();
 
-  // Başlangıçta kullanıcıyı yükle
-  useEffect(() => {
-    const initializeAuth = async () => {
-      const storedUser = getWithExpiry('currentUser');
-      if (storedUser) {
-        try {
-          const user = typeof storedUser === "string" ? JSON.parse(storedUser) : storedUser;
-          setCurrentUser(user);
-        } catch (error) {
-          console.error('Error parsing stored user:', error);
-          localStorage.removeItem('currentUser');
-        }
+  const [currentUser, setCurrentUser] = useState<any>(() => {
+    const storedUser = getWithExpiry("currentUser");
+    if (storedUser) {
+      try {
+        return JSON.parse(storedUser);
+      } catch {
+        localStorage.removeItem("currentUser");
       }
-      setLoading(false);
-    };
-    initializeAuth();
+    }
+    return null;
+  });
+
+  useEffect(() => {
+        console.log("11-currentUser:", currentUser)
+
+    if (!currentUser) {
+    const storedUser = getWithExpiry('currentUser');
+    if (storedUser) {
+      try {
+        const user =  JSON.parse(storedUser);
+        setCurrentUser(user);
+
+      } catch (error) {
+        console.error('Error parsing stored user:', error);
+        localStorage.removeItem('currentUser');
+        setCurrentUser(null);
+      }
+    }
+  }
+    setLoading(false);
   }, []);
 
   const login = async (email: string, password: string): Promise<void> => {
     setLoading(true);
     try {
-      const response = await api.get(
-        `/managementUser/login?email=${email}&password=${password}`
-      );
-
-
-      
+      const response = await api.get(`/managementUser/login?email=${email}&password=${password}`);
       const getUser = response.data;
-      console.log('getuser:', response)
+
       if (getUser?.errors) {
         throw new Error('Kullanıcı bulunamadı veya şifre yanlış.');
       }
-      
+
       setCurrentUser(getUser.data);
-      setWithExpiry('currentUser', JSON.stringify(getUser.data), 86400000 * 7); // 7 gün TTL
+      setWithExpiry('currentUser', JSON.stringify(getUser.data), 86400000 * 7);
     } catch (error: any) {
       setCurrentUser(null);
       localStorage.removeItem('currentUser');
@@ -74,32 +76,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('currentUser');
   };
 
-  const isLoggedIn = currentUser !== null;
-
   const getCurrentToken = () => {
     return currentUser?.token || null;
   };
 
   return (
-    <AuthContext.Provider 
-      value={{ 
-        currentUser, 
-        login, 
-        logout, 
-        loading,
-        isLoggedIn,
-        getCurrentToken
-      }}
-    >
+    <AuthContext.Provider value={{
+      currentUser,
+      login,
+      logout,
+      loading,
+      isLoggedIn: !!currentUser,
+      getCurrentToken,
+    }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export const useAuth = () => {
+export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
-};
+}

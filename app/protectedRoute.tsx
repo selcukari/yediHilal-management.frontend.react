@@ -1,14 +1,22 @@
-import { Navigate, Outlet } from 'react-router';
+import { useEffect, type ReactNode } from "react";
+import { useNavigate } from "react-router";
 import { useAuth } from './authContext';
 
-const ProtectedRoute = () => {
+export function ProtectedRoute({ children }: { children: ReactNode }) {
   const { isLoggedIn, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate("/login");
+    }
+  }, [isLoggedIn, navigate]);
 
   if (loading) {
-    return <div>Yükleniyor...</div>;
+    return <div>Loading...</div>;
   }
 
-  return isLoggedIn ? <Outlet /> : <Navigate to="/login" replace />;
-};
+  return <>{children}</>;
+}
 
 export default ProtectedRoute;

@@ -11,6 +11,7 @@ import {
 } from "react-router";
 import { AuthProvider } from './authContext';
 import { Layout as AppLayout } from './components';
+import ProtectedRoute from './protectedRoute'
 import type { Route } from "./+types/root";
 import "./app.css";
 
@@ -58,7 +59,9 @@ export default function App() {
   return (
     <AuthProvider>
       <AppLayout>
-        <Outlet></Outlet>
+        <ProtectedRoute>
+          <Outlet></Outlet>
+        </ProtectedRoute>
         </AppLayout>
     </AuthProvider>
   );
