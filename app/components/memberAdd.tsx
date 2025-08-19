@@ -1,8 +1,10 @@
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { Modal, TextInput, Button, Stack, Grid, Select, Group, Switch, MultiSelect } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
+import { isEquals } from '~/utils/isEquals';
+import ConfirmModal, { type ConfirmModalRef } from '../components/confirmModal';
 
 export type DialogControllerRef = {
   open: () => void;
@@ -30,6 +32,8 @@ const MemberAdd = forwardRef<DialogControllerRef>((_, ref) => {
   const [isDisabledReference, setIsDisabledReference] = useState(false);
   const [isDisabledCountryCode, setIsDisabledCountryCode] = useState(false);
   const [isDisabledPhone, setIsDisabledPhone] = useState(false);
+
+  const confirmModalRef = useRef<ConfirmModalRef>(null);
 
   const form = useForm<FormValues>({
     initialValues: {
@@ -94,23 +98,41 @@ const MemberAdd = forwardRef<DialogControllerRef>((_, ref) => {
   }, [form.values.reference]);
 
   const handleSubmit = (values: FormValues) => {
-    console.log('Form gönderildi:', values);
     // Burada API çağrısı yapabilirsiniz
     close();
     form.reset();
   };
+
+  const handleConfirm = () => {
+    console.log('İşlem onaylandı');
+    // Silme işlemini burada yapın
+  };
+
+  const handleCancel = () => {
+    console.log('İşlem iptal edildi');
+  };
+
+  const dialogClose = () => {
+     if (!isEquals(form.getInitialValues(), form.getValues())) {
+
+      confirmModalRef.current?.open();
+    } else {
+      // Eğer form boşsa direkt kapat
+      close();
+      form.reset();
+    }
+  }
 
   useImperativeHandle(ref, () => ({
     open,
     close,
   }));
 
-  return (
+  return (<>
     <Modal
       opened={opened}
       onClose={() => {
-        close();
-        form.reset();
+        dialogClose();
       }}
       title="Yeni Üye Ekle"
       centered
@@ -244,7 +266,7 @@ const MemberAdd = forwardRef<DialogControllerRef>((_, ref) => {
           </Grid.Col>
           
           <Grid.Col span={6} offset={4}>
-            <Button variant="filled" size="xs" radius="xs" mr={2} leftSection={<IconCancel size={14} />}color="red">
+            <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
               İptal
             </Button>
             <Button type="submit" variant="filled" size="xs"  leftSection={<IconCheck size={14} />} radius="xs">
@@ -255,7 +277,13 @@ const MemberAdd = forwardRef<DialogControllerRef>((_, ref) => {
         </Stack>
       </form>
     </Modal>
-  );
+      {/* confirm Dialog */}
+    <ConfirmModal 
+      ref={confirmModalRef}
+      onConfirm={handleConfirm}
+      onCancel={handleCancel}
+    />
+  </>);
 });
 
 export default MemberAdd;
