@@ -1,33 +1,29 @@
 import { Select } from '@mantine/core';
 import { useEffect, useState } from 'react';
-import type { UseFormReturnType } from '@mantine/form';
 import { useProvinceService } from '../../services/provinceService'
 
-interface ProvinceSelectProps {
-  form: UseFormReturnType<any>;
-  label?: string;
-  placeholder?: string;
-  required?: boolean;
-  countryId?: string;
+interface ProvinceProps {
+  isRequired?: boolean;
+  isDisabled?: boolean;
+  countryId?: string | null;
+  onProvinceChange: (val: string | null) => void;
 }
 
-export function ProvinceSelect({ 
-  form, 
-  label = "İl", 
-  placeholder = "İl Seçiniz", 
-  required = false,
-  countryId 
-}: ProvinceSelectProps) {
-
+export function Province({ 
+ isRequired = false, countryId, isDisabled = false, onProvinceChange,
+}: ProvinceProps) {
   const [provinces, setProvinces] = useState<{ value: string; label: string }[]>([]);
+  const [province, setProvince] = useState<string | null>("");
+  const [error, setError] = useState<string | null>(isRequired ? 'Ülke alanı gereklidir.' : null);
   
   const service = useProvinceService('management');
   
   useEffect(() => {
     fetchProvinceData(countryId);
+    setProvince("");
   }, [countryId]);
 
-  const fetchProvinceData = async (countryId?: string) => {
+  const fetchProvinceData = async (countryId?: string | null) => {
     try {
 
       const getProvinces = await service.getProvinces(countryId);
@@ -46,17 +42,26 @@ export function ProvinceSelect({
       console.error('Error fetching getProvinces:', error.message);
     }
   }
+
+  const handleChange = (value: string | null) => {
+    onProvinceChange(value)
+    setProvince(value);
+  };
   
   return (
     <Select
-      label={label}
-      placeholder={placeholder}
+      label="İl"
+      placeholder="İl Seçiniz"
       data={provinces}
+      value={province}
       searchable
+      disabled={isDisabled}
       maxDropdownHeight={200}
-      nothingFoundMessage="İl bulunamadı"
-      required={required}
-      {...form.getInputProps('provinceId')}
+      nothingFoundMessage="İl bulunamadı..."
+      required={isRequired}
+      error={error}
+      onChange={handleChange}
+      clearable
     />
   );
 }

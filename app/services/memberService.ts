@@ -12,12 +12,19 @@ interface UserDataParams {
   isSms: boolean;
   isMail: boolean;
   email?: string;
-  reference?: string;
+  referenceId?: number;
   moduleRoles?: string
   dateOfBirth?: number;
   createdDate?: string;
   updateDate?: string;
 }
+
+type MemberParams = {
+  countryId?: string | null;
+  isActive: boolean;
+  provinceId?: string | null;
+  searchText?: string;
+};
 
 export function useMemberService(controller: string) {
   const { getCurrentToken, logout } = useAuth();
@@ -37,5 +44,20 @@ export function useMemberService(controller: string) {
     }
   };
 
-  return { addMember };
+  
+  const members = async (params: MemberParams) => {
+    try {
+
+      const res = await api.get(`/${controller}/getMembersBy`,{
+        params
+      });
+
+      return res.data.data;
+    } catch (error: any) {
+      console.log("error:", error)
+      return error.response.data;
+    }
+  };
+
+  return { addMember, members };
 }

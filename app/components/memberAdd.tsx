@@ -26,7 +26,7 @@ type FormValues = {
   countryCode: string;
   phone: string;
   dateOfBirth: number;
-  reference: string;
+  referenceId: string;
   isActive: boolean;
   isSms: boolean;
   isMail: boolean;
@@ -53,7 +53,7 @@ const MemberAdd = forwardRef<DialogControllerRef, MemberAddProps>(({onSaveSucces
       countryCode: '90',
       phone: '',
       dateOfBirth: 0,
-      reference: '',
+      referenceId: '',
       countryId: '1',
       provinceId: '',
       isActive: true,
@@ -79,7 +79,7 @@ const MemberAdd = forwardRef<DialogControllerRef, MemberAddProps>(({onSaveSucces
       },
       phone: (value) => {
 
-        if (!form.values.reference) {
+        if (!form.values.referenceId) {
 
           return /^[0-9]+$/.test(value) ? null : 'Sadece rakam girebilirsiniz';
         }
@@ -102,10 +102,10 @@ const MemberAdd = forwardRef<DialogControllerRef, MemberAddProps>(({onSaveSucces
 
   // reference alanını izle ve değişiklik olduğunda setIsDisabledCountryCode, setIsDisabledPhone'i güncelle
   useEffect(() => {
-    const referenceValue = form.values.reference;
+    const referenceValue = form.values.referenceId;
     setIsDisabledCountryCode(!!referenceValue?.trim()); // Eğer reference değeri varsa true, yoksa false
     setIsDisabledPhone(!!referenceValue?.trim()); // Eğer reference değeri varsa true, yoksa false
-  }, [form.values.reference]);
+  }, [form.values.referenceId]);
 
   const handleSubmit = async (values: FormValues) => {
     // Burada API çağrısı yapabilirsiniz
@@ -116,6 +116,7 @@ const MemberAdd = forwardRef<DialogControllerRef, MemberAddProps>(({onSaveSucces
       moduleRoles: (values.moduleRoles?.length > 0 ? values.moduleRoles.join(',') : undefined),
       provinceId: values.provinceId ? parseInt(values.provinceId) : undefined,
       countryId: values.countryId ? parseInt(values.countryId) : undefined,
+      referenceId: values.referenceId ? parseInt(values.referenceId) : undefined,
     }
 
     const result = await service.addMember(newMemberValue);
@@ -251,7 +252,7 @@ const MemberAdd = forwardRef<DialogControllerRef, MemberAddProps>(({onSaveSucces
               maxDropdownHeight={200}
               disabled={isDisabledReference}
               nothingFoundMessage="Nothing found..."
-              {...form.getInputProps('reference')}
+              {...form.getInputProps('referenceId')}
             />
           </Grid.Col>
 

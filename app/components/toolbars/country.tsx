@@ -5,15 +5,13 @@ import { useCountryService } from '../../services/countryService'
 interface CountryProps {
   isRequired?: boolean;
   isDisabled?: boolean;
-  model?: string | null;
   onCountryChange: (val: string | null) => void;
 }
 
-
-export function Country({ isRequired = false, isDisabled = false, model = null,
+export function Country({ isRequired = false, isDisabled = false,
   onCountryChange,
  }: CountryProps) {
-  const [country, setCountry] = useState<string | null>(model);
+  const [county, setCountry] = useState<string | null>("1");
   const [countries, setCountries] = useState<{ value: string; label: string }[]>([]);
   const [error, setError] = useState<string | null>(isRequired ? 'Ülke alanı gereklidir.' : null);
   
@@ -22,13 +20,6 @@ export function Country({ isRequired = false, isDisabled = false, model = null,
   useEffect(() => {
     fetchCountryData();
   }, []);
-
-  useEffect(() => {
-    if (country) {
-      setError(null);
-    } else {
-    }
-  }, [country]);
 
   const fetchCountryData = async () => {
     try {
@@ -50,12 +41,8 @@ export function Country({ isRequired = false, isDisabled = false, model = null,
   };
 
   const handleChange = (value: string | null) => {
-    if (value) {
-      setCountry(value);
-
-      onCountryChange(country)
-      setError(null);
-    }
+    onCountryChange(value)
+    setCountry(value);
   };
 
   return (
@@ -63,11 +50,11 @@ export function Country({ isRequired = false, isDisabled = false, model = null,
       label="Ülke"
       placeholder="Ülke Seçiniz"
       data={countries}
-      value={country}
+      value={county}
       searchable
       maxDropdownHeight={200}
       disabled={isDisabled}
-      nothingFoundMessage="Nothing found..."
+      nothingFoundMessage="ülke bulunamadı..."
       onChange={handleChange}
       error={error}
       required={isRequired}

@@ -7,7 +7,7 @@ export function useProvinceService(controller: string) {
 
   const turkeyCountryId = 1;
 
-  const getProvinces = async (countryId?: string) => {
+  const getProvinces = async (countryId?: string | null) => {
 
     try {
       const res = await api.get(`/${controller}/getProvincesByCountry`, {

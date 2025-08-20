@@ -1,34 +1,168 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { IconSearch, IconFilter, IconEdit, IconTrash } from '@tabler/icons-react';
 import {
-  Container, Grid,
-  Stack,
-  Group,
-  Title,
-  Text,
-  Button,
-  Paper,
+  Container, Grid, TextInput, Switch, Stack, Group, Title, Text, Button, Paper, Table, Badge,
+  ActionIcon, LoadingOverlay,
 } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { Country, Province } from '../components'
 import MemberAdd, { type DialogControllerRef } from '../components/memberAdd';
+import { useMemberService } from '../services/memberService';
+import { toast } from '../utils/toastMessages';
+import { formatDate } from '../utils/formatDate';
+
+type filterModels = {
+  countryId?: string | null;
+  provinceId?: string | null;
+  searchText?: string;
+  isActive: boolean;
+}
 
 export default function Member() {
-  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
-  const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
+  const [resultData, setResultData] = useState<any[]>([]);
+  const [selectedCountry, setSelectedCountry] = useState<string | null | undefined>(null);
+  const [filterModel, setFilterModel] = useState<filterModels>({ isActive: true, countryId: '1' });
+  const [visible, { open, close }] = useDisclosure(false);
+  
+  const [rowHeaders, setRowHeaders] = useState([
+    { field: 'id', header: 'Id' },
+    { field: 'fullName', header: 'Ad Soyad' },
+    { field: 'phone', header: 'Telefon' },
+    { field: 'email', header: 'Mail' },
+    { field: 'isSms', header: 'Sms' },
+    { field: 'isMail', header: 'Mail' },
+    { field: 'identificationNumber', header: 'Kimlik' },
+    { field: 'referenceFullName', header: 'Referans İsmi' },
+    { field: 'referencePhone', header: 'Referans Telefon' },
+    { field: 'dateOfBirth', header: 'Doğum Yılı' },
+    { field: 'countryName', header: 'Ülke' },
+    { field: 'provinceName', header: 'İl' },
+    { field: 'createdDate', header: 'İlk Kayıt' },
+    { field: 'updateDate', header: 'Güncelleme' },
+    { field: 'actions', header: 'İşlemler' },
+  ]);
+
   const memberAddRef = useRef<DialogControllerRef>(null);
+
+  const service = useMemberService('management');
+
+  useEffect(() => {
+    setTimeout(() => {
+      fetchMembers();
+    }, 1500);
+  }, []);
+
+  const renderBoolean = (value: boolean) => {
+    return (
+      <Badge color={value ? 'green' : 'red'}>
+        {value ? 'Evet' : 'Hayır'}
+      </Badge>
+    );
+  };
+
+  const handleEdit = (id: number) => {
+    console.log('Edit:', id);
+  };
+
+  const handleDelete = (id: number) => {
+    console.log('Delete:', id);
+  };
+
+  const rowsTable = resultData.map((item) => (
+    <Table.Tr key={item.id}>
+      {rowHeaders.map((header) => {
+        if (header.field === 'actions') {
+          return (
+            <Table.Td key={header.field}>
+              <Group gap="xs">
+                <ActionIcon 
+                  variant="light" 
+                  color="blue"
+                  onClick={() => handleEdit(item.id)}
+                >
+                  <IconEdit size={16} />
+                </ActionIcon>
+                <ActionIcon 
+                  variant="light" 
+                  color="red"
+                  onClick={() => handleDelete(item.id)}
+                >
+                  <IconTrash size={16} />
+                </ActionIcon>
+              </Group>
+            </Table.Td>
+          );
+        }
+
+        if (header.field === 'isSms' || header.field === 'isMail') {
+          return (
+            <Table.Td key={header.field}>
+              {renderBoolean(item[header.field])}
+            </Table.Td>
+          );
+        }
+
+        if (header.field === 'referencePhone') {
+          return (
+            <Table.Td key={header.field}>
+              {item["referenceFullName"] ? `${item["referenceCountryCode"]}${item[header.field]}`: "-"}
+            </Table.Td>
+          );
+        }
+
+        return (
+          <Table.Td key={header.field}>
+            {item[header.field] || '-'}
+          </Table.Td>
+        );
+      })}
+    </Table.Tr>
+  ));
 
   const onCountrySelected = (countryValue: string | null): void => {
     setSelectedCountry(countryValue);
-    setSelectedProvince(null);
+
+    setFilterModel((prev) => ({
+      ...prev,
+      countryId: countryValue,
+    }));
   }
 
+  const onProvinceChange = (provinceValue: string | null): void => {
+    setFilterModel((prev) => ({
+      ...prev,
+      provinceId: provinceValue,
+    }));
+  };
+
   const fetchMembers = async () => {
-    try {
-      console.log('Üyeler yeniden çekiliyor...');
-      // API'den üye listesini çekme işlemi
-      // const response = await api.get('/members');
-      // setMembers(response.data);
-    } catch (error) {
-      console.error('Üyeler çekilirken hata:', error);
+     open();
+
+    const params: filterModels = {
+      ...filterModel,
+      ...(filterModel.searchText && filterModel.searchText.length > 3 ? { searchText: filterModel.searchText } : {})
+    }
+     try {
+
+      const getMembers = await service.members(params);
+      if (getMembers) {
+        setResultData(getMembers.map((item: any) => ({
+          ...item,
+          createdDate: formatDate(item.createdDate),
+          updateDate: formatDate(item.updateDate),
+          phone: (item.countryCode && item.phone) ? `${item.countryCode}${item.phone}` : undefined
+        })));
+       
+      } else {
+        toast.info('Hiçbir veri yok!');
+
+        setResultData([]);
+      }
+        close();
+    } catch (error: any) {
+      console.error('Error fetching getMembers:', error.message);
+        toast.error(`Üye yüklenirken hata: ${error.message}`);
+      close();
     }
   };
 
@@ -39,6 +173,12 @@ export default function Member() {
 
   return (
       <Container size="xl">
+        <LoadingOverlay
+          visible={visible}
+          zIndex={1000}
+          overlayProps={{ radius: 'sm', blur: 2 }}
+          loaderProps={{ color: 'pink', type: 'bars' }}
+        />
         <Stack gap="lg">
           {/* Sayfa Başlığı */}
           <Group justify="space-between" align="center">
@@ -66,11 +206,38 @@ export default function Member() {
                 </Grid.Col>
 
                 <Grid.Col span={4}>
-                  <Province/>
+                  <Province onProvinceChange={onProvinceChange} countryId={selectedCountry}/>
                 </Grid.Col>
 
                 <Grid.Col span={4}>
-                  <Province/>
+                  <TextInput
+                    label="Ad soyad veya telefon"
+                    placeholder="text giriniz"
+                    leftSection={<IconSearch size={18} />}
+                    onChange={(event) => setFilterModel(prev => ({
+                      ...prev,
+                      searchText: event.currentTarget?.value}))}
+                  />
+                </Grid.Col>
+
+                <Grid.Col span={4}>
+                  <Switch 
+                    label="Üye Durumu" 
+                    checked={filterModel.isActive}
+                    onChange={(event) => {
+                      console.log("Switch changed:", event.currentTarget.checked);
+                      setFilterModel(prev => ({
+                      ...prev,
+                      isActive: event.currentTarget?.checked
+                    }))}}
+                  />
+                </Grid.Col>
+                <Grid.Col span={4}>
+                  <Button
+                    leftSection={<IconFilter size={14} />}
+                    onClick={fetchMembers}>
+                    Filtrele
+                  </Button>
                 </Grid.Col>
               </Grid>
             </Paper>
@@ -80,57 +247,18 @@ export default function Member() {
           <Paper shadow="xs" p="lg" withBorder>
             <Stack gap="md">
               <Title order={4}>Son İşlemler</Title>
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid #e9ecef' }}>
-                      <th style={{ padding: '12px', textAlign: 'left', fontWeight: 600 }}>
-                        ID
-                      </th>
-                      <th style={{ padding: '12px', textAlign: 'left', fontWeight: 600 }}>
-                        İsim
-                      </th>
-                      <th style={{ padding: '12px', textAlign: 'left', fontWeight: 600 }}>
-                        Durum
-                      </th>
-                      <th style={{ padding: '12px', textAlign: 'left', fontWeight: 600 }}>
-                        Tarih
-                      </th>
-                      <th style={{ padding: '12px', textAlign: 'left', fontWeight: 600 }}>
-                        İşlemler
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[1, 2, 3, 4].map((item) => (
-                      <tr key={item} style={{ borderBottom: '1px solid #f1f3f4' }}>
-                        <td style={{ padding: '12px' }}>{item}</td>
-                        <td style={{ padding: '12px' }}>Örnek İtem {item}</td>
-                        <td style={{ padding: '12px' }}>
-                          <Text size="sm" c="green">
-                            Aktif
-                          </Text>
-                        </td>
-                        <td style={{ padding: '12px' }}>
-                          <Text size="sm" c="dimmed">
-                            2025-01-15
-                          </Text>
-                        </td>
-                        <td style={{ padding: '12px' }}>
-                          <Group gap="xs">
-                            <Button size="xs" variant="light">
-                              Düzenle
-                            </Button>
-                            <Button size="xs" variant="light" color="red">
-                              Sil
-                            </Button>
-                          </Group>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <Table.ScrollContainer minWidth={500} maxHeight={300}>
+                <Table striped highlightOnHover withColumnBorders>
+                  <Table.Thead>
+                    <Table.Tr>
+                      {rowHeaders.map((header) => (
+                        <Table.Th key={header.field}>{header.header}</Table.Th>
+                      ))}
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>{rowsTable}</Table.Tbody>
+                </Table>
+              </Table.ScrollContainer>
             </Stack>
           </Paper>
         </Stack>
