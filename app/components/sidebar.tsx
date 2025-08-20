@@ -16,6 +16,7 @@ import {
   IconChartBar,
   IconChevronRight,
 } from '@tabler/icons-react';
+import { useNavigate, useLocation } from 'react-router';
 
 interface SidebarProps {
   active: string;
@@ -23,14 +24,31 @@ interface SidebarProps {
 }
 
 const menuItems = [
-  { icon: IconDashboard, label: 'Dashboard', key: 'dashboard' },
-  { icon: IconUsers, label: 'Kullanıcılar', key: 'users' },
-  { icon: IconFileText, label: 'Dökümanlar', key: 'documents' },
-  { icon: IconChartBar, label: 'Raporlar', key: 'reports' },
-  { icon: IconSettings, label: 'Ayarlar', key: 'settings' },
+  { icon: IconDashboard, label: 'Üye Yönetimi', key: 'dashboard', link: '/' },
+  { icon: IconUsers, label: 'Kullanıcılar', key: 'users', link: '/users' },
+  { icon: IconFileText, label: 'Dökümanlar', key: 'documents', link: '/documents' },
+  { icon: IconChartBar, label: 'Raporlar', key: 'reports', link: '/reports' },
+  { icon: IconSettings, label: 'Ayarlar', key: 'settings', link: '/settings' },
 ];
 
 export function Sidebar({ active, setActive }: SidebarProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // URL'e göre aktif menüyü belirle
+  React.useEffect(() => {
+    const currentPath = location.pathname;
+    const activeItem = menuItems.find(item => item.link === currentPath);
+    if (activeItem) {
+      setActive(activeItem.key);
+    }
+  }, [location.pathname, setActive]);
+
+  const handleMenuItemClick = (key: string, link: string) => {
+    setActive(key);
+    navigate(link);
+  };
+
   return (
     <AppShell.Navbar p="md">
       <AppShell.Section grow component={ScrollArea}>
@@ -46,7 +64,7 @@ export function Sidebar({ active, setActive }: SidebarProps) {
               label={item.label}
               leftSection={<item.icon size="1rem" stroke={1.5} />}
               rightSection={<IconChevronRight size="0.8rem" stroke={1.5} />}
-              onClick={() => setActive(item.key)}
+              onClick={() => handleMenuItemClick(item.key, item.link)}
               variant="filled"
             />
           ))}

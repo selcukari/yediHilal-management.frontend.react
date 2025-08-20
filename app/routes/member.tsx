@@ -10,6 +10,7 @@ import MemberAdd, { type DialogControllerRef } from '../components/memberAdd';
 import { useMemberService } from '../services/memberService';
 import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
+import { useAuth } from '~/authContext';
 
 type filterModels = {
   countryId?: string | null;
@@ -43,13 +44,16 @@ export default function Member() {
   ]);
 
   const memberAddRef = useRef<DialogControllerRef>(null);
+  const { isLoggedIn } = useAuth();
 
   const service = useMemberService('management');
 
   useEffect(() => {
-    setTimeout(() => {
-      fetchMembers();
-    }, 1500);
+    if (isLoggedIn) {
+      setTimeout(() => {
+        fetchMembers();
+      }, 1500);
+    }
   }, []);
 
   const renderBoolean = (value: boolean) => {
