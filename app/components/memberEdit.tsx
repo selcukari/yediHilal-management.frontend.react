@@ -4,22 +4,23 @@ import { Modal, TextInput, Button, Stack, Grid, Select, Group, Switch, MultiSele
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
-import ConfirmModal, { type ConfirmModalRef } from '../components/confirmModal';
+import ConfirmModal, { type ConfirmModalRef } from './confirmModal';
 import { CountrySelect } from './addOrEdit/countrySelect';
 import { ProvinceSelect } from './addOrEdit/provinceSelect';
 import { useMemberService } from '../services/memberService';
 import { toast } from '../utils/toastMessages';
 
-export type MemberAddDialogControllerRef = {
-  open: () => void;
+export type MemberEditDialogControllerRef = {
+  openDialog: (value: FormValues) => void;
   close: () => void;
 };
 
-interface MemberAddProps {
+interface MemberEditProps {
   onSaveSuccess?: () => void; // Yeni prop
 }
 
 type FormValues = {
+  id: number;
   fullName: string;
   identificationNumber: string;
   email: string;
@@ -32,9 +33,11 @@ type FormValues = {
   isMail: boolean;
   countryId: string;
   provinceId: string;
+  createdDate?: string;
+  updateDate?: string;
 };
 
-const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onSaveSuccess}, ref) => {
+const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({onSaveSuccess}, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
   const [isDisabledReference, setIsDisabledReference] = useState(false);
   const [isDisabledCountryCode, setIsDisabledCountryCode] = useState(false);
@@ -46,6 +49,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
 
   const form = useForm<FormValues>({
     initialValues: {
+      id: 0,
       fullName: '',
       identificationNumber: '',
       email: '',
@@ -58,6 +62,8 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
       isActive: true,
       isSms: true,
       isMail: true,
+      createdDate: "",
+      updateDate: "",
     },
     validate: {
       fullName: (value) => (value.trim().length < 5 ? 'İsim en az 5 karakter olmalı' : null),
@@ -92,6 +98,21 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
     },
   });
 
+   const openDialog = (value: FormValues) => {
+
+    if (value) {
+      form.reset();
+      // Önce initial values'ı set et
+      form.setValues((value));
+
+      form.setInitialValues((value));
+      // Sonra form values'larını set et
+
+      open();
+
+    }
+  }
+
   // Phone alanını izle ve değişiklik olduğunda isDisabledSelect'i güncelle
   useEffect(() => {
     const phoneValue = form.values.phone;
@@ -116,7 +137,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
       referenceId: values.referenceId ? parseInt(values.referenceId) : undefined,
     }
 
-    const result = await service.addMember(newMemberValue);
+    const result = await service.updateMember(newMemberValue);
 
     if (result === true) {
 
@@ -126,9 +147,9 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
       if (onSaveSuccess) {
         onSaveSuccess();
       }
+      form.reset();
       
       close();
-      form.reset();
 
       return;
     }
@@ -143,18 +164,17 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
 
    // Ülke değiştiğinde ili sıfırla
   useEffect(() => {
-    if (form.values.countryId) {
+    if (form.values.countryId != form.getInitialValues().countryId) {
       // Ülke değiştiğinde ili resetle
-      form.setFieldValue('provinceId', '');
+      form.setFieldValue('provinceId', "");
     }
   }, [form.values.countryId]);
 
   const confirmDialogHandleConfirm = () => {
-    console.log('İşlem onaylandı');
     // Silme işlemini burada yapın
     confirmModalRef.current?.close();
-    close();
     form.reset();
+    close();
   };
 
   const confirmDialogHandleCancel = () => {
@@ -167,13 +187,13 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
       confirmModalRef.current?.open();
     } else {
       // Eğer form boşsa direkt kapat
-      close();
       form.reset();
+      close();
     }
   }
 
   useImperativeHandle(ref, () => ({
-    open,
+    openDialog,
     close,
   }));
 
@@ -194,6 +214,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
               <TextInput
                 label="Ad Soyad"
                 placeholder="İsim giriniz"
+                value={form.values.fullName}
                 required
                 {...form.getInputProps('fullName')}
               />
@@ -202,14 +223,15 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
           <Grid.Col span={6}>
             <TextInput
               label="Kimlik"
+              value={form.values.identificationNumber}
               placeholder="Kimlik numarası giriniz"
               {...form.getInputProps('identificationNumber')}
             />
           </Grid.Col>
 
           <Grid.Col span={6}>
-            <CountrySelect 
-              form={form} 
+            <CountrySelect
+              form={form}
             />
           </Grid.Col>
 
@@ -217,7 +239,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
             <ProvinceSelect 
               form={form} 
               label="İl" 
-              placeholder="İl Seçiniz" 
+              placeholder="İl Seçiniz"
               countryId={form.values.countryId}
             />
           </Grid.Col>
@@ -226,6 +248,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
             <TextInput
               label="Ülke Kodu"
               placeholder="Ülke kodu giriniz"
+              value={form.values.countryCode}
               disabled={isDisabledCountryCode}
               {...form.getInputProps('countryCode')}
             />
@@ -235,6 +258,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
             <TextInput
               label="Telefon"
               placeholder="505 555 5555"
+              value={form.values.phone}
               disabled={isDisabledPhone}
               {...form.getInputProps('phone')}
             />
@@ -244,6 +268,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
             <Select
               label="Referans"
               placeholder="Referans Seçiniz"
+              value={form.values.referenceId}
               data={[{value: "1", label: 'React' }, {value:"2", label:'Angular'}, {value: "3", label: 'Vue'}]}
               searchable
               maxDropdownHeight={200}
@@ -257,6 +282,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
             <TextInput
               label="Doğum Tarih"
               placeholder="Doğum Tarihini giriniz"
+              value={form.values.dateOfBirth}
               {...form.getInputProps('dateOfBirth')}
             />
           </Grid.Col>
@@ -265,6 +291,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
             <TextInput
               label="Email"
               placeholder="Email giriniz"
+              value={form.values.email}
               {...form.getInputProps('email')}
             />
           </Grid.Col>
@@ -283,7 +310,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
                   checked={form.values.isSms}
                   onChange={(event) => form.setFieldValue('isSms', event.currentTarget.checked)}
                 />
-                <Switch 
+                <Switch
                   label="Mail Durumu" 
                   checked={form.values.isMail}
                   onChange={(event) => form.setFieldValue('isMail', event.currentTarget.checked)}
@@ -313,4 +340,4 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
   </>);
 });
 
-export default MemberAdd;
+export default MemberEdit;

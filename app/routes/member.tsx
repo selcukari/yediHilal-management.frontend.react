@@ -6,7 +6,8 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Country, Province } from '../components'
-import MemberAdd, { type DialogControllerRef } from '../components/memberAdd';
+import MemberAdd, { type MemberAddDialogControllerRef } from '../components/memberAdd';
+import MemberEdit, { type MemberEditDialogControllerRef } from '../components/memberEdit';
 import { useMemberService } from '../services/memberService';
 import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
@@ -43,7 +44,8 @@ export default function Member() {
     { field: 'actions', header: 'İşlemler' },
   ]);
 
-  const memberAddRef = useRef<DialogControllerRef>(null);
+  const memberAddRef = useRef<MemberAddDialogControllerRef>(null);
+  const memberEditRef = useRef<MemberEditDialogControllerRef>(null);
   const { isLoggedIn } = useAuth();
 
   const service = useMemberService('management');
@@ -64,8 +66,25 @@ export default function Member() {
     );
   };
 
-  const handleEdit = (id: number) => {
-    console.log('Edit:', id);
+  const handleEdit = (item: any) => {
+    console.log('Edit:', item);
+    memberEditRef.current?.openDialog({
+      id: item.id,
+      fullName: item.fullName,
+      identificationNumber: item.identificationNumber,
+      email: item.email,
+      countryCode: item.countryCode,
+      phone: item.phone,
+      dateOfBirth: item.dateOfBirth,
+      isActive: item.isActive,
+      isSms: item.isSms,
+      isMail: item.isMail,
+      referenceId: item.referenceId ? item.referenceId.toString() : '',
+      countryId: item.countryId.toString(),
+      provinceId: item.provinceId?.toString(),
+      createdDate: item.createdDate,
+      updateDate: item.updateDate,
+    });
   };
 
   const handleDelete = (id: number) => {
@@ -82,7 +101,7 @@ export default function Member() {
                 <ActionIcon 
                   variant="light" 
                   color="blue"
-                  onClick={() => handleEdit(item.id)}
+                  onClick={() => handleEdit(item)}
                 >
                   <IconEdit size={16} />
                 </ActionIcon>
@@ -268,6 +287,7 @@ export default function Member() {
         </Stack>
 
         <MemberAdd ref={memberAddRef} onSaveSuccess={handleSaveSuccess} />
+        <MemberEdit ref={memberEditRef} onSaveSuccess={handleSaveSuccess} />
       </Container>
   );
 }

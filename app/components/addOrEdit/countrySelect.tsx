@@ -43,11 +43,13 @@ export function CountrySelect({
       console.error('Error fetching countries:', error.message);
     }
   };
+
   return (
     <Select
       label={label}
       placeholder={placeholder}
       data={countries}
+      value={form.values.countryId}
       searchable
       maxDropdownHeight={200}
       nothingFoundMessage="Ülke bulunamadı..."

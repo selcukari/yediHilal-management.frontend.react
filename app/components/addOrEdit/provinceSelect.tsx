@@ -16,7 +16,7 @@ export function ProvinceSelect({
   label = "İl", 
   placeholder = "İl Seçiniz", 
   required = false,
-  countryId 
+  countryId,
 }: ProvinceSelectProps) {
 
   const [provinces, setProvinces] = useState<{ value: string; label: string }[]>([]);

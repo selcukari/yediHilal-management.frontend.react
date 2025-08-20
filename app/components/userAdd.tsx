@@ -4,13 +4,13 @@ import { Modal, TextInput, Button, Stack, Grid, Select, Group, Switch, MultiSele
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
-import ConfirmModal, { type ConfirmModalRef } from '../components/confirmModal';
+import ConfirmModal, { type ConfirmModalRef } from './confirmModal';
 import { CountrySelect } from './addOrEdit/countrySelect';
 import { ProvinceSelect } from './addOrEdit/provinceSelect';
 import { useMemberService } from '../services/memberService';
 import { toast } from '../utils/toastMessages';
 
-export type MemberAddDialogControllerRef = {
+export type DialogControllerRef = {
   open: () => void;
   close: () => void;
 };
@@ -32,9 +32,10 @@ type FormValues = {
   isMail: boolean;
   countryId: string;
   provinceId: string;
+  moduleRoles: string[];
 };
 
-const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onSaveSuccess}, ref) => {
+const MemberAdd = forwardRef<DialogControllerRef, MemberAddProps>(({onSaveSuccess}, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
   const [isDisabledReference, setIsDisabledReference] = useState(false);
   const [isDisabledCountryCode, setIsDisabledCountryCode] = useState(false);
@@ -58,6 +59,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
       isActive: true,
       isSms: true,
       isMail: true,
+      moduleRoles: []
     },
     validate: {
       fullName: (value) => (value.trim().length < 5 ? 'İsim en az 5 karakter olmalı' : null),
@@ -111,6 +113,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
 
     const newMemberValue = {
       ...values,
+      moduleRoles: (values.moduleRoles?.length > 0 ? values.moduleRoles.join(',') : undefined),
       provinceId: values.provinceId ? parseInt(values.provinceId) : undefined,
       countryId: values.countryId ? parseInt(values.countryId) : undefined,
       referenceId: values.referenceId ? parseInt(values.referenceId) : undefined,
@@ -292,6 +295,19 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
             </fieldset>
           </Grid.Col>
 
+          <Grid.Col span={6}>
+            <MultiSelect
+              label="Modül Rolleri"
+              placeholder="modül rolleri seciniz"
+              data={[{ value: "user", label: 'Kullanıcı'}, { value: "member", label: 'Üye'}, { value: "2", label: 'Reac2t'}, { value: "3", label: 'Reac3t'}]}
+              searchable
+              clearable
+              maxDropdownHeight={200}
+              {...form.getInputProps('moduleRoles')}
+              nothingFoundMessage="Nothing found..."
+            />
+          </Grid.Col>
+          
           <Grid.Col span={6} offset={4}>
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
               İptal

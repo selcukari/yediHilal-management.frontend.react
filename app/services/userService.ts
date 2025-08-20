@@ -13,6 +13,7 @@ interface UserDataParams {
   isMail: boolean;
   email?: string;
   referenceId?: number;
+  moduleRoles?: string
   dateOfBirth?: string;
   createdDate?: string;
   updateDate?: string;
@@ -30,18 +31,6 @@ export function useMemberService(controller: string) {
   const api = createApi(getCurrentToken() ?? undefined, logout);
 
   const turkeyCountryId = 1;
-
-  const updateMember = async (params: UserDataParams) => {
-
-    try {
-      const res = await api.put(`/${controller}/updateMember`, params);
-
-      return res.data.data;
-    } catch (error: any) {
-      console.log("error:", error)
-      return error.response.data;
-    }
-  };
 
   const addMember = async (params: UserDataParams) => {
 
@@ -70,5 +59,5 @@ export function useMemberService(controller: string) {
     }
   };
 
-  return { addMember, members, updateMember };
+  return { addMember, members };
 }
