@@ -5,7 +5,7 @@ import { Navbar } from './navbar';
 import { Sidebar } from './sidebar';
 import { Footer } from './footer';
 import { MainContent } from './mainContent';
-import { AuthProvider } from '../authContext'
+import { AuthProvider } from '../../authContext'
 
 interface LayoutProps {
   children?: React.ReactNode;
