@@ -1,11 +1,11 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { IconSearch, IconFilter, IconEdit, IconTrash } from '@tabler/icons-react';
 import {
   Container, Grid, TextInput, Switch, Stack, Group, Title, Text, Button, Paper, Table, Badge,
   ActionIcon, LoadingOverlay,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Country, Province } from '../components'
+import { Country, Province, MenuActionButton } from '../components'
 import MemberAdd, { type MemberAddDialogControllerRef } from '../components/memberAdd';
 import MemberEdit, { type MemberEditDialogControllerRef } from '../components/memberEdit';
 import ConfirmModalMessage, { type ConfirmModalMessageRef } from '../components/confirmModalMessage';
@@ -13,6 +13,9 @@ import { useMemberService } from '../services/memberService';
 import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
 import { useAuth } from '~/authContext';
+import { type PdfTableColumn } from '../utils/repor/exportToPdf';
+import { calculateColumnWidthMember } from '../utils/repor/calculateColumnWidth';
+import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToExcel';
 
 type filterModels = {
   countryId?: string | null;
@@ -21,12 +24,18 @@ type filterModels = {
   isActive: boolean;
 }
 
+interface Column {
+  field: string;
+  header: string;
+}
+
 export default function Member() {
   const [resultData, setResultData] = useState<any[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<string | null | undefined>(null);
   const [filterModel, setFilterModel] = useState<filterModels>({ isActive: true, countryId: '1' });
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null); // Silinecek öğenin ID'sini tut
-
+  const [selectedCountryName, setSelectedCountryName] = useState<string>('Türkiye'); // Yeni state
+  const [selectedProvinceName, setSelectedProvinceName] = useState<string>(''); // Yeni state
   const [visible, { open, close }] = useDisclosure(false);
   
   const [rowHeaders, setRowHeaders] = useState([
@@ -150,7 +159,8 @@ export default function Member() {
     </Table.Tr>
   ));
 
-  const onCountrySelected = (countryValue: string | null): void => {
+  const onCountrySelected = (countryValue: string | null, countryName?: string): void => {
+    setSelectedCountryName(countryName || '');
     setSelectedCountry(countryValue);
 
     setFilterModel((prev) => ({
@@ -159,7 +169,9 @@ export default function Member() {
     }));
   }
 
-  const onProvinceChange = (provinceValue: string | null): void => {
+  const onProvinceChange = (provinceValue: string | null, provinceName?: string): void => {
+    setSelectedProvinceName(provinceName || '');
+
     setFilterModel((prev) => ({
       ...prev,
       provinceId: provinceValue,
@@ -228,6 +240,44 @@ export default function Member() {
     toast.info('İşlem iptal edildi.');
   };
 
+   // useMemo hook'u ile sütunları önbelleğe alıyoruz
+  const pdfTableColumns = useMemo((): PdfTableColumn[] => {
+
+    const newCols: Column[] = rowHeaders.filter(col =>
+      col.field != 'updateDate' && col.field != 'countryCode' && col.field != 'actions');
+
+    return newCols.map(col => ({
+      key: col.field,
+      title: col.header,
+      // İsteğe bağlı olarak genişlik ayarları ekleyebilirsiniz
+      width: calculateColumnWidthMember(col.field) // Özel genişlik hesaplama fonksiyonu
+    }));
+  }, [rowHeaders]);
+
+
+ // useMemo hook'u ile sütunları önbelleğe alıyoruz
+  const excelTableColumns = useMemo((): ColumnDefinition[] => {
+
+    const newCols: Column[] = rowHeaders.filter(col =>
+      col.field != 'updateDate' && col.field != 'countryCode');
+
+    return newCols.map(col => ({
+      key: col.field as keyof ValueData,
+      header: col.header,
+      // İsteğe bağlı olarak genişlik ayarları ekleyebilirsiniz
+    }));
+  }, [rowHeaders]);
+
+  const reportTitle = useMemo((): string => {
+    const isActiveText = filterModel.isActive ? 'Aktif' : 'Pasif';
+
+    if (selectedCountryName && selectedProvinceName) {
+      return `${selectedCountryName}/${selectedProvinceName}/${isActiveText} Üye Raporu`;
+    }
+
+    return `${selectedCountryName}/Tüm İller/${isActiveText} Üye Raporu`;
+  }, [selectedCountryName, filterModel.isActive, selectedProvinceName]);
+
   return (
       <Container size="xl">
         <LoadingOverlay
@@ -295,6 +345,15 @@ export default function Member() {
                     onClick={fetchMembers}>
                     Filtrele
                   </Button>
+                </Grid.Col>
+                <Grid.Col span={4}>
+                  <MenuActionButton
+                  reportTitle={reportTitle}
+                  excelColumns={excelTableColumns}
+                  valueData={resultData}
+                  pdfColumns={pdfTableColumns}
+                  type={2}
+                  />
                 </Grid.Col>
               </Grid>
             </Paper>

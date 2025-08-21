@@ -6,7 +6,7 @@ interface ProvinceProps {
   isRequired?: boolean;
   isDisabled?: boolean;
   countryId?: string | null;
-  onProvinceChange: (val: string | null) => void;
+  onProvinceChange: (val: string | null, name?: string) => void;
 }
 
 export function Province({ 
@@ -44,7 +44,7 @@ export function Province({
   }
 
   const handleChange = (value: string | null) => {
-    onProvinceChange(value)
+    onProvinceChange(value, value ? provinces.find(p => p.value == value)?.label : undefined);
     setProvince(value);
   };
   

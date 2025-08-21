@@ -5,7 +5,7 @@ import { useCountryService } from '../../services/countryService'
 interface CountryProps {
   isRequired?: boolean;
   isDisabled?: boolean;
-  onCountryChange: (val: string | null) => void;
+  onCountryChange: (val: string | null, name?: string) => void;
 }
 
 export function Country({ isRequired = false, isDisabled = false,
@@ -41,7 +41,7 @@ export function Country({ isRequired = false, isDisabled = false,
   };
 
   const handleChange = (value: string | null) => {
-    onCountryChange(value)
+    onCountryChange(value, value ? countries.find(c => c.value == value)?.label : undefined);
     setCountry(value);
   };
 
