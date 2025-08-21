@@ -8,6 +8,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { Country, Province } from '../components'
 import MemberAdd, { type MemberAddDialogControllerRef } from '../components/memberAdd';
 import MemberEdit, { type MemberEditDialogControllerRef } from '../components/memberEdit';
+import ConfirmModalMessage, { type ConfirmModalMessageRef } from '../components/confirmModalMessage';
 import { useMemberService } from '../services/memberService';
 import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
@@ -24,6 +25,8 @@ export default function Member() {
   const [resultData, setResultData] = useState<any[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<string | null | undefined>(null);
   const [filterModel, setFilterModel] = useState<filterModels>({ isActive: true, countryId: '1' });
+  const [selectedItemId, setSelectedItemId] = useState<number | null>(null); // Silinecek öğenin ID'sini tut
+
   const [visible, { open, close }] = useDisclosure(false);
   
   const [rowHeaders, setRowHeaders] = useState([
@@ -46,6 +49,8 @@ export default function Member() {
 
   const memberAddRef = useRef<MemberAddDialogControllerRef>(null);
   const memberEditRef = useRef<MemberEditDialogControllerRef>(null);
+  const confirmModalMessageRef = useRef<ConfirmModalMessageRef>(null);
+
   const { isLoggedIn } = useAuth();
 
   const service = useMemberService('management');
@@ -75,7 +80,7 @@ export default function Member() {
       email: item.email,
       countryCode: item.countryCode,
       phone: item.phone,
-      dateOfBirth: item.dateOfBirth,
+      dateOfBirth: item.dateOfBirth ? item.dateOfBirth.toString() : '',
       isActive: item.isActive,
       isSms: item.isSms,
       isMail: item.isMail,
@@ -89,6 +94,8 @@ export default function Member() {
 
   const handleDelete = (id: number) => {
     console.log('Delete:', id);
+    setSelectedItemId(id);
+    confirmModalMessageRef.current?.open()
   };
 
   const rowsTable = resultData.map((item) => (
@@ -194,6 +201,31 @@ export default function Member() {
     fetchMembers(); // Verileri yeniden çek
   };
 
+  const confirmModalMessageHandleConfirm = async (messageText: string) => {
+    console.log('İşlem onaylandı');
+    // Burada silme işlemini yap
+    if (selectedItemId) {
+      const result = await service.deleteMember(selectedItemId, messageText);
+
+      if (result) {
+        toast.success('Üye başarıyla silindi!');
+        fetchMembers(); // Verileri yeniden çek
+      } else {
+        toast.error('Üye silinirken hata oluştu!');
+      }
+    }
+    
+    confirmModalMessageRef.current?.close();
+    setSelectedItemId(null); // ID'yi temizle
+  };
+
+  const confirmModalMessageHandleCancel = () => {
+    console.log('İşlem iptal edildi');
+    confirmModalMessageRef.current?.close();
+    setSelectedItemId(null); // ID'yi temizle
+    toast.info('İşlem iptal edildi.');
+  };
+
   return (
       <Container size="xl">
         <LoadingOverlay
@@ -285,7 +317,9 @@ export default function Member() {
             </Stack>
           </Paper>
         </Stack>
-
+        {/* Dialoglar */}
+        <ConfirmModalMessage ref={confirmModalMessageRef}
+          onConfirm={confirmModalMessageHandleConfirm} onCancel={confirmModalMessageHandleCancel} />
         <MemberAdd ref={memberAddRef} onSaveSuccess={handleSaveSuccess} />
         <MemberEdit ref={memberEditRef} onSaveSuccess={handleSaveSuccess} />
       </Container>

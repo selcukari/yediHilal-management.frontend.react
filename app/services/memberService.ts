@@ -31,6 +31,18 @@ export function useMemberService(controller: string) {
 
   const turkeyCountryId = 1;
 
+  const deleteMember = async (userId: number, deleteMessageTitle: string) => {
+
+    try {
+      const res = await api.put(`/${controller}/deleteMember?id=${userId}&deleteMessageTitle=${deleteMessageTitle}`, null);
+
+      return res.data.data;
+    } catch (error: any) {
+      console.log("error:", error)
+      return error.response.data;
+    }
+  };
+
   const updateMember = async (params: UserDataParams) => {
 
     try {
@@ -70,5 +82,5 @@ export function useMemberService(controller: string) {
     }
   };
 
-  return { addMember, members, updateMember };
+  return { addMember, members, updateMember, deleteMember };
 }

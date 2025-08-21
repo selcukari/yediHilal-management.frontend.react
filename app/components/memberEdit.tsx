@@ -203,7 +203,7 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
       onClose={() => {
         dialogClose();
       }}
-      title="Yeni Üye Ekle"
+      title="Üye Düzenle"
       centered
       size="700"
     >

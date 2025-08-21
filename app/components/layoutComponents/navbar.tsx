@@ -14,7 +14,7 @@ import {
   IconUser,
   IconSettings,
 } from '@tabler/icons-react';
-import { useAuth } from '../authContext';
+import { useAuth } from '../../authContext';
 
 interface NavbarProps {
   opened: boolean;
