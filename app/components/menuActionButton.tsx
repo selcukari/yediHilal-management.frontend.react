@@ -2,7 +2,7 @@ import { Menu, Button } from '@mantine/core';
 import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
 import { IconSearch, IconFileTypePdf, IconFileExcel } from '@tabler/icons-react';
 import { type PdfConfig, type PdfTableColumn, PdfHelperService } from '../utils/repor/exportToPdf';
-import { type ColumnDefinition } from '../utils/repor/exportToExcel';
+import { type ColumnDefinition, exportToExcel } from '../utils/repor/exportToExcel';
 
 export type MenuActionButtonRef = {
   open: () => void;
@@ -33,8 +33,6 @@ export function MenuActionButton({
   const pdfHelperService = new PdfHelperService();
 
   const exportPdf = () => {
-    console.log('Exporting PDF with columns:', pdfColumns, 'and data:', valueData);
-    console.log('Exporting PDF with reportTitle:', reportTitle);
 
     const config: PdfConfig = {
       title: `YediHilal ${reportTitle}`,
@@ -52,11 +50,12 @@ export function MenuActionButton({
   };
 
   const exportExcel = () => {
-    console.log('ExportexportExcel with columns:', excelColumns, 'and data:', valueData);
+
+    exportToExcel(valueData, excelColumns, `yediHilal-${reportTitle.toLocaleLowerCase().replace(/\//g,'-').replace(/ /g, '-')}`);
   };
 
   return (
-    <Menu>
+    <Menu disabled={valueData.length < 1} shadow="md" width={200}>
       <Menu.Target>
         <Button>{menuTitle}</Button>
       </Menu.Target>

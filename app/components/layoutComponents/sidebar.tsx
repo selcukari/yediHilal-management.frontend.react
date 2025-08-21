@@ -1,20 +1,9 @@
 import React from 'react';
 import {
-  NavLink,
-  Text,
-  Stack,
-  Divider,
-  Group,
-  ScrollArea,
-  AppShell,
+  NavLink, Flex,  Text,  Stack,  Divider,  Group,  ScrollArea,  AppShell,
 } from '@mantine/core';
 import {
-  IconDashboard,
-  IconUsers,
-  IconSettings,
-  IconFileText,
-  IconChartBar,
-  IconChevronRight,
+  IconUser,  IconDashboard,  IconUsers,  IconSettings,  IconFileText,  IconChartBar,  IconChevronRight,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
 
@@ -22,10 +11,10 @@ interface SidebarProps {
   active: string;
   setActive: (key: string) => void;
 }
-
+// IconDashboard
 const menuItems = [
-  { icon: IconDashboard, label: 'Üye Yönetimi', key: 'dashboard', link: '/' },
-  { icon: IconUsers, label: 'Kullanıcılar', key: 'users', link: '/users' },
+  { icon: IconUsers, label: 'Üye Yönetimi', key: 'dashboard', link: '/' },
+  { icon: IconUser, label: 'Kullanıcılar', key: 'users', link: '/users' },
   { icon: IconFileText, label: 'Dökümanlar', key: 'documents', link: '/documents' },
   { icon: IconChartBar, label: 'Raporlar', key: 'reports', link: '/reports' },
   { icon: IconSettings, label: 'Ayarlar', key: 'settings', link: '/settings' },
@@ -53,9 +42,17 @@ export function Sidebar({ active, setActive }: SidebarProps) {
     <AppShell.Navbar p="md">
       <AppShell.Section grow component={ScrollArea}>
         <Stack gap="xs">
-          <Text size="xs" tt="uppercase" fw={700} c="dimmed" mb="sm">
-            Menü
-          </Text>
+          <Flex
+            gap="md"
+            justify="center"
+            align="flex-start"
+            direction="row"
+            wrap="wrap"
+          >
+            <Text size="xs" tt="uppercase" fw={700} c="dimmed" mb="sm" >
+              Menü
+            </Text>
+          </Flex>
           
           {menuItems.map((item) => (
             <NavLink

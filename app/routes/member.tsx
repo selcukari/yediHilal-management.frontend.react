@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { IconSearch, IconFilter, IconEdit, IconTrash } from '@tabler/icons-react';
 import {
   Container, Grid, TextInput, Switch, Stack, Group, Title, Text, Button, Paper, Table, Badge,
-  ActionIcon, LoadingOverlay,
+  ActionIcon, LoadingOverlay, Flex,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Country, Province, MenuActionButton } from '../components'
@@ -259,7 +259,7 @@ export default function Member() {
   const excelTableColumns = useMemo((): ColumnDefinition[] => {
 
     const newCols: Column[] = rowHeaders.filter(col =>
-      col.field != 'updateDate' && col.field != 'countryCode');
+      col.field != 'updateDate' && col.field != 'countryCode' && col.field != 'actions');
 
     return newCols.map(col => ({
       key: col.field as keyof ValueData,
@@ -347,13 +347,22 @@ export default function Member() {
                   </Button>
                 </Grid.Col>
                 <Grid.Col span={4}>
-                  <MenuActionButton
-                  reportTitle={reportTitle}
-                  excelColumns={excelTableColumns}
-                  valueData={resultData}
-                  pdfColumns={pdfTableColumns}
-                  type={2}
-                  />
+                  <Flex
+                    mih={50}
+                    gap="md"
+                    justify="flex-end"
+                    align="flex-start"
+                    direction="row"
+                    wrap="wrap"
+                  >
+                    <MenuActionButton
+                    reportTitle={reportTitle}
+                    excelColumns={excelTableColumns}
+                    valueData={resultData}
+                    pdfColumns={pdfTableColumns}
+                    type={2}
+                    />
+                  </Flex>
                 </Grid.Col>
               </Grid>
             </Paper>
@@ -362,7 +371,7 @@ export default function Member() {
           {/* Örnek Tablo */}
           <Paper shadow="xs" p="lg" withBorder>
             <Stack gap="md">
-              <Title order={4}>Son İşlemler</Title>
+              <Title order={4}>Son Üyeler</Title>
               <Table.ScrollContainer minWidth={500} maxHeight={300}>
                 <Table striped highlightOnHover withColumnBorders>
                   <Table.Thead>

@@ -1,21 +1,7 @@
 import * as XLSX from 'xlsx';
 
 export interface ValueData {
-  id: number;
-  fullName: string;
-  identificationNumber?: string;
-  telephone: string;
-	dateOfBirth?: number;
-  email: string;
-  countryCode?: string;
-  createdDate: string;
-  updateDate?: string;
-  countryName: string;
-  provinceName: string;
-  isSms?: boolean;
-  isMail?: boolean;
-  areaName: string;
-	roleName?: string;
+  [key: string]: any;
 }
 
 export interface ColumnDefinition {
