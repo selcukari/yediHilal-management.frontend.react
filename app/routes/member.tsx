@@ -87,6 +87,7 @@ export default function Member() {
       referenceId: item.referenceId ? item.referenceId.toString() : '',
       countryId: item.countryId.toString(),
       provinceId: item.provinceId?.toString(),
+      deleteMessageTitle: item.deleteMessageTitle?.toString(),
       createdDate: item.createdDate,
       updateDate: item.updateDate,
     });

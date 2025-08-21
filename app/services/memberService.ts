@@ -16,6 +16,7 @@ interface UserDataParams {
   dateOfBirth?: string;
   createdDate?: string;
   updateDate?: string;
+  deleteMessageTitle?: string;
 }
 
 type MemberParams = {

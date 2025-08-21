@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, TextInput, Button, Stack, Grid, Select, Group, Switch, MultiSelect } from '@mantine/core';
+import { Modal, TextInput, Button, Stack, Grid, Select, Group, Switch, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
@@ -35,6 +35,7 @@ type FormValues = {
   provinceId: string;
   createdDate?: string;
   updateDate?: string;
+  deleteMessageTitle?: string;
 };
 
 const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({onSaveSuccess}, ref) => {
@@ -64,6 +65,7 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
       isMail: true,
       createdDate: "",
       updateDate: "",
+      deleteMessageTitle: '',
     },
     validate: {
       fullName: (value) => (value.trim().length < 5 ? 'İsim en az 5 karakter olmalı' : null),
@@ -94,7 +96,16 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
         if (!value) return undefined;
 
         return /^[0-9]+$/.test(value.toString()) ? null : 'Sadece rakam girebilirsiniz';
-      }
+      },
+      deleteMessageTitle: (value) => {
+
+        if (!form.values.isActive) {
+
+          return value ? null : 'Mesaj alanı gereklidir.';
+        }
+
+        return null;
+      },
     },
   });
 
@@ -318,6 +329,17 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
               </Group>
             </fieldset>
           </Grid.Col>
+
+          <Grid.Col span={6}>
+            <Textarea
+              mt="md"
+              label="Silme nedeni"
+              placeholder="messaj..."
+              withAsterisk
+              disabled={form.values.isActive}
+              {...form.getInputProps('deleteMessageTitle')}
+            />
+            </Grid.Col>
 
           <Grid.Col span={6} offset={4}>
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
