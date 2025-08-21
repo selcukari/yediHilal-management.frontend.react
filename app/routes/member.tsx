@@ -32,7 +32,7 @@ export default function Member() {
   const [rowHeaders, setRowHeaders] = useState([
     { field: 'id', header: 'Id' },
     { field: 'fullName', header: 'Ad Soyad' },
-    { field: 'phone', header: 'Telefon' },
+    { field: 'phoneWithCountryCode', header: 'Telefon' },
     { field: 'email', header: 'Mail' },
     { field: 'isSms', header: 'Sms' },
     { field: 'isMail', header: 'Mail' },
@@ -181,7 +181,7 @@ export default function Member() {
           ...item,
           createdDate: formatDate(item.createdDate),
           updateDate: formatDate(item.updateDate),
-          phone: (item.countryCode && item.phone) ? `${item.countryCode}${item.phone}` : undefined
+          phoneWithCountryCode: (item.countryCode && item.phone) ? `${item.countryCode}${item.phone}` : undefined
         })));
        
       } else {
