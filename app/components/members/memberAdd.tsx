@@ -4,11 +4,11 @@ import { Modal, TextInput, Button, Stack, Grid, Select, Group, Switch, Textarea 
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
-import ConfirmModal, { type ConfirmModalRef } from '../components/confirmModal';
-import { CountrySelect } from './addOrEdit/countrySelect';
-import { ProvinceSelect } from './addOrEdit/provinceSelect';
-import { useMemberService } from '../services/memberService';
-import { toast } from '../utils/toastMessages';
+import ConfirmModal, { type ConfirmModalRef } from '../../components/confirmModal';
+import { CountrySelect } from '../addOrEdit/countrySelect';
+import { ProvinceSelect } from '../addOrEdit/provinceSelect';
+import { useMemberService } from '../../services/memberService';
+import { toast } from '../../utils/toastMessages';
 
 export type MemberAddDialogControllerRef = {
   open: () => void;
