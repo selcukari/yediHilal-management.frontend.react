@@ -6,8 +6,8 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Country, Province, MenuActionButton } from '../components'
-import MemberAdd, { type MemberAddDialogControllerRef } from '../components/memberAdd';
-import MemberEdit, { type MemberEditDialogControllerRef } from '../components/memberEdit';
+import MemberAdd, { type MemberAddDialogControllerRef } from '../components/members/memberAdd';
+import MemberEdit, { type MemberEditDialogControllerRef } from '../components/members/memberEdit';
 import ConfirmModalMessage, { type ConfirmModalMessageRef } from '../components/confirmModalMessage';
 import { useMemberService } from '../services/memberService';
 import { toast } from '../utils/toastMessages';
