@@ -198,8 +198,9 @@ export default function Member() {
   };
 
   const handleSaveSuccess = () => {
-    console.log('Yeni üye eklendi, veriler yenileniyor...');
-    fetchMembers(); // Verileri yeniden çek
+    setTimeout(() => {
+      fetchMembers();
+    }, 1500);
   };
 
   const confirmModalMessageHandleConfirm = async (messageText: string) => {

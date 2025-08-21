@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
+import { omit } from 'ramda';
 import { Modal, TextInput, Button, Stack, Grid, Select, Group, Switch, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
@@ -142,7 +143,8 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
     console.log("handleSubmit:values:", values)
 
     const newMemberValue = {
-      ...values,
+      ...omit(['createdDate', 'updateDate'], values),
+      deleteMessageTitle: (values.isActive ? undefined : (values.deleteMessageTitle ? values.deleteMessageTitle.trim() : undefined )),
       provinceId: values.provinceId ? parseInt(values.provinceId) : undefined,
       countryId: values.countryId ? parseInt(values.countryId) : undefined,
       referenceId: values.referenceId ? parseInt(values.referenceId) : undefined,
@@ -339,7 +341,7 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
               disabled={form.values.isActive}
               {...form.getInputProps('deleteMessageTitle')}
             />
-            </Grid.Col>
+          </Grid.Col>
 
           <Grid.Col span={6} offset={4}>
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">

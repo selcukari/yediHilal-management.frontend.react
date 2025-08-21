@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, TextInput, Button, Stack, Grid, Select, Group, Switch, MultiSelect } from '@mantine/core';
+import { Modal, TextInput, Button, Stack, Grid, Select, Group, Switch, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
@@ -32,6 +32,7 @@ type FormValues = {
   isMail: boolean;
   countryId: string;
   provinceId: string;
+  deleteMessageTitle?: string;
 };
 
 const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onSaveSuccess}, ref) => {
@@ -58,6 +59,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
       isActive: true,
       isSms: true,
       isMail: true,
+      deleteMessageTitle: '',
     },
     validate: {
       fullName: (value) => (value.trim().length < 5 ? 'İsim en az 5 karakter olmalı' : null),
@@ -88,7 +90,16 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
         if (!value) return undefined;
 
         return /^[0-9]+$/.test(value.toString()) ? null : 'Sadece rakam girebilirsiniz';
-      }
+      },
+      deleteMessageTitle: (value) => {
+
+        if (!form.values.isActive) {
+
+          return value ? null : 'Mesaj alanı gereklidir.';
+        }
+
+        return null;
+      },
     },
   });
 
@@ -106,11 +117,10 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
   }, [form.values.referenceId]);
 
   const handleSubmit = async (values: FormValues) => {
-    // Burada API çağrısı yapabilirsiniz
-    console.log("handleSubmit:values:", values)
 
     const newMemberValue = {
       ...values,
+      deleteMessageTitle: (values.isActive ? undefined : (values.deleteMessageTitle ? values.deleteMessageTitle.trim() : undefined )),
       provinceId: values.provinceId ? parseInt(values.provinceId) : undefined,
       countryId: values.countryId ? parseInt(values.countryId) : undefined,
       referenceId: values.referenceId ? parseInt(values.referenceId) : undefined,
@@ -118,7 +128,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
 
     const result = await service.addMember(newMemberValue);
 
-    if (result === true) {
+    if (result) {
 
       toast.success('İşlem başarılı!');
       
@@ -290,6 +300,17 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
                 />
               </Group>
             </fieldset>
+          </Grid.Col>
+
+          <Grid.Col span={6}>
+            <Textarea
+              mt="md"
+              label="Silme nedeni"
+              placeholder="messaj..."
+              withAsterisk
+              disabled={form.values.isActive}
+              {...form.getInputProps('deleteMessageTitle')}
+            />
           </Grid.Col>
 
           <Grid.Col span={6} offset={4}>
