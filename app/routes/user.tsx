@@ -272,12 +272,7 @@ export default function User() {
 
   return (
       <Container size="xl">
-        <LoadingOverlay
-          visible={visible}
-          zIndex={1000}
-          overlayProps={{ radius: 'sm', blur: 2 }}
-          loaderProps={{ color: 'pink', type: 'bars' }}
-        />
+        <LoadingOverlay visible={visible} zIndex={1000} overlayProps={{ radius: 'sm', blur: 2 }} loaderProps={{ color: 'pink', type: 'bars' }}/>
         <Stack gap="lg">
           {/* Sayfa Başlığı */}
           <Group justify="space-between" align="center">
@@ -287,19 +282,11 @@ export default function User() {
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
-            <Button variant="filled" 
-            onClick={() => userAddRef.current?.open()}
-            >Yeni Ekle</Button>
+            <Button variant="filled" onClick={() => userAddRef.current?.open()}>Yeni Ekle</Button>
           </Group>
 
           {/* İçerik Kartları */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-              gap: '1rem',
-            }}
-          >
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
                 <Grid.Col span={4}>
@@ -323,7 +310,6 @@ export default function User() {
 
                 <Grid.Col span={4}>
                   <Role onRoleChange={onRoleChange}></Role>
-
                 </Grid.Col>
 
                 <Grid.Col span={4}>
@@ -347,14 +333,7 @@ export default function User() {
                 </Grid.Col>
                 { false && 
                 <Grid.Col span={4}>
-                  <Flex
-                    mih={50}
-                    gap="md"
-                    justify="flex-end"
-                    align="flex-start"
-                    direction="row"
-                    wrap="wrap"
-                  >
+                  <Flex mih={50} gap="md" direction="row" wrap="wrap">
                     <MenuActionButton
                     reportTitle={reportTitle}
                     excelColumns={excelTableColumns}
