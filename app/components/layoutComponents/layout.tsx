@@ -15,7 +15,7 @@ export function Layout({ children }: LayoutProps = {}) {
   const [opened, { toggle }] = useDisclosure();
   const [activeSection, setActiveSection] = useState('dashboard');
 
-  return (<AuthProvider>
+  return (
     <AppShell
       header={{ height: 70 }}
       navbar={{
@@ -26,8 +26,10 @@ export function Layout({ children }: LayoutProps = {}) {
       footer={{ height: 60 }}
       padding="md"
     >
+      <AuthProvider>
         <Navbar opened={opened} toggle={toggle} />
-      <Sidebar active={activeSection} setActive={setActiveSection} />
+        <Sidebar active={activeSection} setActive={setActiveSection} />
+      </AuthProvider>
       {children ? (
         <AppShell.Main>
           {children}
@@ -36,6 +38,6 @@ export function Layout({ children }: LayoutProps = {}) {
         <MainContent activeSection={activeSection} />
       )}
       <Footer />
-    </AppShell></AuthProvider>
+    </AppShell>
   );
 }

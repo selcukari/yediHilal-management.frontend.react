@@ -23,7 +23,7 @@ interface NavbarProps {
 
 export function Navbar({ opened, toggle }: NavbarProps) {
   const { isLoggedIn, logout } = useAuth();
-  
+
   return (
     <AppShell.Header>
       <Group h="100%" px="md" justify="space-between">

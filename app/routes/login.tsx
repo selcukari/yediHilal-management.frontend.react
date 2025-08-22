@@ -3,13 +3,11 @@ import {
   LoadingOverlay } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
-import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useAuth } from '../authContext';
 import { toast } from '~/utils/toastMessages';
 
 export default function Login() {
-  const [error, setError] = useState('');
   const { login, loading: authLoading, isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const [visible, { open, close }] = useDisclosure(false);
@@ -34,6 +32,7 @@ export default function Login() {
 
         setTimeout(() => {
           navigate("/");
+          window.location.reload(); // Sayfayı yenile ile gorunmeyen menuler gelmemesi icin
         }, 1000);
       } else {
         close()
