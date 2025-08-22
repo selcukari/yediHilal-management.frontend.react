@@ -3,7 +3,7 @@ import {
   NavLink, Flex,  Text,  Stack,  Divider,  Group,  ScrollArea,  AppShell,
 } from '@mantine/core';
 import {
-  IconUser,  IconDashboard,  IconUsers,  IconSettings,  IconFileText,  IconChartBar,  IconChevronRight,
+  IconUser,  IconMail,  IconUsers,  IconSettings,  IconMessage,  IconChartBar,  IconChevronRight,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
 import { useAuth } from '~/authContext';
@@ -17,7 +17,8 @@ interface SidebarProps {
 const menuItems = [
   { icon: IconUsers, label: 'Üye Yönetimi', key: 'dashboard', link: '/' },
   { icon: IconUser, label: 'Kullanıcılar', key: 'users', link: '/users' },
-  { icon: IconFileText, label: 'Dökümanlar', key: 'documents', link: '/documents' },
+  { icon: IconMail, label: 'Gön. Mail Lis.', key: 'mails', link: '/mails' },
+  { icon: IconMessage, label: 'Gön. Mail Lis.', key: 'sms', link: '/sms' },
   { icon: IconChartBar, label: 'Raporlar', key: 'reports', link: '/reports' },
   { icon: IconSettings, label: 'Ayarlar', key: 'settings', link: '/settings' },
 ];

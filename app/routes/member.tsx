@@ -68,7 +68,7 @@ export default function Member() {
     if (isLoggedIn) {
       setTimeout(() => {
         fetchMembers();
-      }, 1500);
+      }, 1000);
     }
   }, []);
 
@@ -371,7 +371,7 @@ export default function Member() {
           {/* Örnek Tablo */}
           <Paper shadow="xs" p="lg" withBorder>
             <Stack gap="md">
-              <Title order={4}>Son Üyeler</Title>
+              <Title order={4}>Son Üyeler({rowsTable?.length || 0})</Title>
               <Table.ScrollContainer minWidth={500} maxHeight={300}>
                 <Table striped highlightOnHover withColumnBorders>
                   <Table.Thead>

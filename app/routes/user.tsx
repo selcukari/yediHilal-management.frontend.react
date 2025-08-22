@@ -371,7 +371,7 @@ export default function User() {
           {/* Örnek Tablo */}
           <Paper shadow="xs" p="lg" withBorder>
             <Stack gap="md">
-              <Title order={4}>Son Kullanıcılar</Title>
+              <Title order={4}>Son Kullanıcılar({rowsTable?.length || 0})</Title>
               <Table.ScrollContainer minWidth={500} maxHeight={300}>
                 <Table striped highlightOnHover withColumnBorders>
                   <Table.Thead>
