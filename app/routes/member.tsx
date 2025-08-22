@@ -216,7 +216,6 @@ export default function Member() {
   };
 
   const confirmModalMessageHandleConfirm = async (messageText: string) => {
-    console.log('İşlem onaylandı');
     // Burada silme işlemini yap
     if (selectedItemId) {
       const result = await service.deleteMember(selectedItemId, messageText);
@@ -234,7 +233,6 @@ export default function Member() {
   };
 
   const confirmModalMessageHandleCancel = () => {
-    console.log('İşlem iptal edildi');
     confirmModalMessageRef.current?.close();
     setSelectedItemId(null); // ID'yi temizle
     toast.info('İşlem iptal edildi.');
@@ -318,7 +316,7 @@ export default function Member() {
 
                 <Grid.Col span={4}>
                   <TextInput
-                    label="Ad soyad veya telefon"
+                    label="Ad soyad veya telefon Ara"
                     placeholder="text giriniz"
                     leftSection={<IconSearch size={18} />}
                     onChange={(event) => setFilterModel(prev => ({

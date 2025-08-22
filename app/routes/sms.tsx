@@ -4,10 +4,9 @@ import {
   Container, Grid, TextInput, Stack, Group, Title, Text, Paper, Table, LoadingOverlay,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useMailService } from '../services/mailService';
+import { useSmsService } from '../services/smsService';
 import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
-import { useAuth } from '~/authContext';
 
 interface Column {
   field: string;
@@ -21,37 +20,27 @@ export default function Mail() {
   
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
     { field: 'id', header: 'id' },
-    { field: 'subject', header: 'Konu' },
-    { field: 'body', header: 'İçerik' },
-    { field: 'count', header: 'Alıcı Sayısı' },
+    { field: 'message', header: 'Mesaj' },
     { field: 'toUsers', header: 'Alıcı İsimleri' },
-    { field: 'toEmails', header: 'Alıcı E-Postaları' },
+    { field: 'toPhoneNumbers', header: 'Alıcı Tel. Num.' },
+    { field: 'count', header: 'Alıcı Sayısı' },
     { field: 'createdDate', header: 'Gönderim Tarihi' },
   ]);
 
-  const { isLoggedIn } = useAuth();
-
-  const service = useMailService('managementUser');
+  const service = useSmsService('managementUser');
 
   // Filtrelenmiş veriler
   const filteredUsers = useMemo(() => {
     if (!searchText) return resultData;
     
-    return resultData.filter(mail =>
-      mail.subject.toLowerCase().includes(searchText.toLowerCase()) ||
-      mail.body.toLowerCase().includes(searchText.toLowerCase())
-    );
+    return resultData.filter(sms => sms.message.toLowerCase().includes(searchText.toLowerCase()));
   }, [resultData, searchText]);
 
   useEffect(() => {
-    if (isLoggedIn) {
-      setTimeout(() => {
-        fetchMails();
-      }, 1000);
-    }
+    setTimeout(() => {
+      fetchSms();
+    }, 1000);
   }, []);
-
-
 
   const rowsTable = filteredUsers.map((item) => (
     <Table.Tr key={item.id}>
@@ -88,20 +77,19 @@ export default function Mail() {
     </Table.Tr>
   ));
 
-  const fetchMails = async () => {
+  const fetchSms = async () => {
      open();
 
     const params: number = 2; // 1: user, 2: member
      try {
 
-      const getMails = await service.getRoles(params);
+      const getMails = await service.getSms(params);
       if (getMails) {
         setResultData(getMails.map((mail: any) => ({
           id: mail.id,
-          subject: mail.subject,
-          toEmails: mail.toEmails,
+          message: mail.message,
           toUsers: mail.toUsers,
-          body: mail.body,
+          toPhoneNumbers: mail.toPhoneNumbers,
           count: mail.count,
           createdDate: formatDate(mail.createdDate),
         })));
@@ -151,7 +139,7 @@ export default function Mail() {
 
                 <Grid.Col span={4}>
                   <TextInput
-                    label="Konu veya içerik Ara"
+                    label="Mesaj Ara"
                     placeholder="text giriniz"
                     leftSection={<IconSearch size={18} />}
                     value={searchText}
@@ -166,7 +154,7 @@ export default function Mail() {
           {/* Örnek Tablo */}
           <Paper shadow="xs" p="lg" withBorder>
             <Stack gap="md">
-              <Title order={4}>Son Mailler({rowsTable?.length || 0})</Title>
+              <Title order={4}>Son Smsler({rowsTable?.length || 0})</Title>
               <Table.ScrollContainer minWidth={500} maxHeight={300}>
                 <Table striped highlightOnHover withColumnBorders>
                   <Table.Thead>

@@ -312,7 +312,7 @@ export default function User() {
 
                 <Grid.Col span={4}>
                   <TextInput
-                    label="Ad soyad veya telefon"
+                    label="Ad soyad veya telefon Ara"
                     placeholder="text giriniz"
                     leftSection={<IconSearch size={18} />}
                     onChange={(event) => setFilterModel(prev => ({
