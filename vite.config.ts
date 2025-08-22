@@ -8,6 +8,8 @@ export default defineConfig({
   define: {
     "process.env": {
     "import.meta.env.VITE_APP_API": JSON.stringify(process.env.VITE_APP_API),
+    "import.meta.env.VITE_APP_API_BASE_CONTROLLER": JSON.stringify(process.env.VITE_APP_API_BASE_CONTROLLER),
+    "import.meta.env.VITE_APP_API_USER_CONTROLLER": JSON.stringify(process.env.VITE_APP_API_USER_CONTROLLER),
     }
   },
 });

@@ -62,7 +62,7 @@ export default function Member() {
 
   const { isLoggedIn } = useAuth();
 
-  const service = useMemberService('management');
+  const service = useMemberService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
 
   useEffect(() => {
     if (isLoggedIn) {

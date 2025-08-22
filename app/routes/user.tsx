@@ -61,7 +61,7 @@ export default function User() {
 
   const { isLoggedIn } = useAuth();
 
-  const service = useUserService('managementUser');
+  const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
   useEffect(() => {
     if (isLoggedIn) {

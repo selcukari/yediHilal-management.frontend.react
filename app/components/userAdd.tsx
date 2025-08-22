@@ -41,7 +41,7 @@ const MemberAdd = forwardRef<DialogControllerRef, MemberAddProps>(({onSaveSucces
   const [isDisabledCountryCode, setIsDisabledCountryCode] = useState(false);
   const [isDisabledPhone, setIsDisabledPhone] = useState(false);
 
-  const service = useMemberService('management');
+  const service = useMemberService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 

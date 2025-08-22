@@ -16,7 +16,7 @@ export function Province({
   const [province, setProvince] = useState<string | null>("");
   const [error, setError] = useState<string | null>(isRequired ? 'Ülke alanı gereklidir.' : null);
   
-  const service = useProvinceService('management');
+  const service = useProvinceService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
   
   useEffect(() => {
     fetchProvinceData(countryId);

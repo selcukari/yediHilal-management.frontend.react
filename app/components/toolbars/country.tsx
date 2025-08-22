@@ -15,7 +15,7 @@ export function Country({ isRequired = false, isDisabled = false,
   const [countries, setCountries] = useState<{ value: string; label: string }[]>([]);
   const [error, setError] = useState<string | null>(isRequired ? 'Ülke alanı gereklidir.' : null);
   
-  const service = useCountryService('management');
+  const service = useCountryService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
 
   useEffect(() => {
     fetchCountryData();

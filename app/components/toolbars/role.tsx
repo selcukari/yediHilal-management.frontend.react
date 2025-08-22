@@ -10,7 +10,7 @@ export function Role({ onRoleChange }: RoleProps) {
   const [role, setRole] = useState<string | null>("");
   const [roles, setRoles] = useState<{ value: string; label: string }[]>([]);
   
-  const service = useRoleService('managementUser');
+  const service = useRoleService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
   useEffect(() => {
     fetchRoleData();

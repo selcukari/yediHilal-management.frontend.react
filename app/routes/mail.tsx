@@ -31,7 +31,7 @@ export default function Mail() {
 
   const { isLoggedIn } = useAuth();
 
-  const service = useMailService('managementUser');
+  const service = useMailService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
   // Filtrelenmiş veriler
   const filteredUsers = useMemo(() => {

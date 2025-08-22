@@ -27,7 +27,7 @@ export default function Mail() {
     { field: 'createdDate', header: 'Gönderim Tarihi' },
   ]);
 
-  const service = useSmsService('managementUser');
+  const service = useSmsService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
   // Filtrelenmiş veriler
   const filteredUsers = useMemo(() => {

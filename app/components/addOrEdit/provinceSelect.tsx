@@ -21,7 +21,7 @@ export function ProvinceSelect({
 
   const [provinces, setProvinces] = useState<{ value: string; label: string }[]>([]);
   
-  const service = useProvinceService('management');
+  const service = useProvinceService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
   
   useEffect(() => {
     fetchProvinceData(countryId);

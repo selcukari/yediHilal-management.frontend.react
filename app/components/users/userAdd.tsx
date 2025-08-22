@@ -38,7 +38,7 @@ type FormValues = {
 const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
-  const service = useUserService('managementUser');
+  const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 

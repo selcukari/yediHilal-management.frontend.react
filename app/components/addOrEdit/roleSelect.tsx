@@ -11,7 +11,7 @@ interface RoleSelectProps {
 export function RoleSelect({ form, required = false, }: RoleSelectProps) {
   const [roles, setRoles] = useState<{ value: string; label: string }[]>([]);
   
-  const service = useRoleService('managementUser');
+  const service = useRoleService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
   useEffect(() => {
     fetchRoleData();
