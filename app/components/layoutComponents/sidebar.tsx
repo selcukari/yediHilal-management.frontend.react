@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect } from 'react';
 import {
   NavLink, Flex,  Text,  Stack,  Divider,  Group,  ScrollArea,  AppShell,
 } from '@mantine/core';
@@ -6,6 +6,8 @@ import {
   IconUser,  IconDashboard,  IconUsers,  IconSettings,  IconFileText,  IconChartBar,  IconChevronRight,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
+import { useAuth } from '~/authContext';
+import { toast } from '../../utils/toastMessages';
 
 interface SidebarProps {
   active: string;
@@ -21,11 +23,13 @@ const menuItems = [
 ];
 
 export function Sidebar({ active, setActive }: SidebarProps) {
+  const { isLoggedIn, currentUser } = useAuth();
+  
   const navigate = useNavigate();
   const location = useLocation();
 
   // URL'e göre aktif menüyü belirle
-  React.useEffect(() => {
+  useEffect(() => {
     const currentPath = location.pathname;
     const activeItem = menuItems.find(item => item.link === currentPath);
     if (activeItem) {
@@ -35,12 +39,18 @@ export function Sidebar({ active, setActive }: SidebarProps) {
 
   const handleMenuItemClick = (key: string, link: string) => {
     setActive(key);
+
+    if (currentUser?.roleId == 3 && link != '/') {
+      toast.error('Bu işlem için yetkiniz bulunmamaktadır.');
+      
+      return;
+    }
     navigate(link);
   };
 
   return (
     <AppShell.Navbar p="md">
-      <AppShell.Section grow component={ScrollArea}>
+      { isLoggedIn && <AppShell.Section grow component={ScrollArea}>
         <Stack gap="xs">
           <Flex
             gap="md"
@@ -66,14 +76,13 @@ export function Sidebar({ active, setActive }: SidebarProps) {
             />
           ))}
         </Stack>
-      </AppShell.Section>
-
-      <AppShell.Section>
+      </AppShell.Section> }
+      { isLoggedIn && <AppShell.Section>
         <Divider my="sm" />
         <Group justify="center">
           <Text size="xs" c="dimmed">v1.0.0</Text>
         </Group>
-      </AppShell.Section>
+      </AppShell.Section> }
     </AppShell.Navbar>
   );
 }

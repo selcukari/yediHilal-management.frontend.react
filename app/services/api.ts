@@ -21,7 +21,7 @@ export const createApi = (token?: string, onUnauthorized?: () => void) => {
       if (error.response?.status === 401 && onUnauthorized) {
         onUnauthorized();
       }
-      return Promise.reject(error);
+      return Promise.reject(error.response?.data);
     }
   );
 

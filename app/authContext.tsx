@@ -67,7 +67,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error: any) {
       setCurrentUser(null);
       localStorage.removeItem('currentUser');
-      throw error;
+
+      return !!error.data;
     } finally {
       setLoading(false);
     }

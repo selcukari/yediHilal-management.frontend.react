@@ -1,11 +1,12 @@
 import {
-  Container, Paper, TextInput, PasswordInput, Button, Title, Text, Alert,
+  Container, Paper, TextInput, PasswordInput, Button, Title, Text,
   LoadingOverlay } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useAuth } from '../authContext';
+import { toast } from '~/utils/toastMessages';
 
 export default function Login() {
   const [error, setError] = useState('');
@@ -28,19 +29,20 @@ export default function Login() {
       open()
       const response = await login(values.email, values.password);
 
-      console.log("handleSubmit:isLoggedIn:", isLoggedIn)
-      if (isLoggedIn) {
+      if (response == true) {
+        close()
 
         setTimeout(() => {
           navigate("/");
         }, 1000);
+      } else {
+        close()
+        toast.error('Giriş başarısız. E-posta ve şifrenizi kontrol edin.');
       }
 
-      close()
     } catch (error: any) {
       close()
-      setError('Giriş başarısız. E-posta ve şifrenizi kontrol edin. ');
-      console.error('Giriş başarısız. E-posta ve şifrenizi kontrol edin. ' + error.message);
+      toast.error('Giriş başarısız. E-posta ve şifrenizi kontrol edin.');
     }
   };
 
@@ -58,12 +60,6 @@ export default function Login() {
       </Text>
 
       <Paper withBorder shadow="md" p={30} radius="md">
-        {error && (
-          <Alert color="red" mb="md">
-            {error}
-          </Alert>
-        )}
-        
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <TextInput
             label="E-posta"
