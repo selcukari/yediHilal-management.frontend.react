@@ -37,6 +37,7 @@ type FormValues = {
 
 const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onSaveSuccess}, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
+  const [isDisabledSelect, setIsDisabledSelect] = useState(false);
   const [isDisabledReference, setIsDisabledReference] = useState(false);
   const [isDisabledCountryCode, setIsDisabledCountryCode] = useState(false);
   const [isDisabledPhone, setIsDisabledPhone] = useState(false);
@@ -117,7 +118,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
   }, [form.values.referenceId]);
 
   const handleSubmit = async (values: FormValues) => {
-
+    setIsDisabledSelect(true);
     const newMemberValue = {
       ...values,
       deleteMessageTitle: (values.isActive ? undefined : (values.deleteMessageTitle ? values.deleteMessageTitle.trim() : undefined )),
@@ -139,6 +140,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
       
       close();
       form.reset();
+      setIsDisabledSelect(false);
 
       return;
     }
@@ -149,6 +151,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
     } else {
       toast.error('Bir hata oluştu!');
     }
+    setIsDisabledSelect(false);
   };
 
    // Ülke değiştiğinde ili sıfırla
@@ -317,7 +320,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
               İptal
             </Button>
-            <Button type="submit" variant="filled" size="xs"  leftSection={<IconCheck size={14} />} radius="xs">
+            <Button type="submit" variant="filled" size="xs" disabled={isDisabledSelect}  leftSection={<IconCheck size={14} />} radius="xs">
               Kaydet
             </Button>
           </Grid.Col>

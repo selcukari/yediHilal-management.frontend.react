@@ -183,7 +183,7 @@ export default function Member() {
 
     const params: filterModels = {
       ...filterModel,
-      ...(filterModel.searchText && filterModel.searchText.length > 3 ? { searchText: filterModel.searchText } : {})
+      searchText: (filterModel.searchText && filterModel.searchText.length > 3 ? filterModel.searchText : undefined),
     }
      try {
 
@@ -271,7 +271,7 @@ export default function Member() {
   const reportTitle = useMemo((): string => {
     const isActiveText = filterModel.isActive ? 'Aktif' : 'Pasif';
 
-    if (selectedCountryName && selectedProvinceName) {
+    if (selectedProvinceName) {
       return `${selectedCountryName}/${selectedProvinceName}/${isActiveText} Üye Raporu`;
     }
 

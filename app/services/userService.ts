@@ -9,14 +9,11 @@ interface UserDataParams {
   provinceId?: number;
   identificationNumber?: string;
   telephone?: string;
-  isSms: boolean;
-  isMail: boolean;
   email?: string;
-  referenceId?: number;
-  moduleRoles?: string
   dateOfBirth?: string;
   createdDate?: string;
   updateDate?: string;
+  deleteMessageTitle?: string;
 }
 
 type MemberParams = {
@@ -26,16 +23,40 @@ type MemberParams = {
   searchText?: string;
 };
 
-export function useMemberService(controller: string) {
+export function useUserService(controller: string) {
   const { getCurrentToken, logout } = useAuth();
   const api = createApi(getCurrentToken() ?? undefined, logout);
 
   const turkeyCountryId = 1;
 
-  const addMember = async (params: UserDataParams) => {
+  const updateUser = async (params: UserDataParams) => {
 
     try {
-      const res = await api.post(`/${controller}/addMember`, params);
+      const res = await api.put(`/${controller}/updateUser`, params);
+
+      return res.data.data;
+    } catch (error: any) {
+      console.log("error:", error)
+      return error.response.data;
+    }
+  };
+
+  const deleteUser = async (userId: number, deleteMessageTitle: string) => {
+
+    try {
+      const res = await api.put(`/${controller}/deleteUser?id=${userId}&deleteMessageTitle=${deleteMessageTitle}`, null);
+
+      return res.data.data;
+    } catch (error: any) {
+      console.log("error:", error)
+      return error.response.data;
+    }
+  };
+
+  const addUser = async (params: UserDataParams) => {
+
+    try {
+      const res = await api.post(`/${controller}/addUser`, params);
 
       return res.data.data;
     } catch (error: any) {
@@ -45,10 +66,10 @@ export function useMemberService(controller: string) {
   };
 
   
-  const members = async (params: MemberParams) => {
+  const users = async (params: MemberParams) => {
     try {
 
-      const res = await api.get(`/${controller}/getMembersBy`,{
+      const res = await api.get(`/${controller}/getUsersBy`,{
         params
       });
 
@@ -59,5 +80,5 @@ export function useMemberService(controller: string) {
     }
   };
 
-  return { addMember, members };
+  return { addUser, users, deleteUser, updateUser };
 }

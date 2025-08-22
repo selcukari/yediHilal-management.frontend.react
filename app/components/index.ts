@@ -5,4 +5,5 @@ export { Footer } from './layoutComponents/footer';
 export { Country } from './toolbars/country';
 export { Province } from './toolbars/province';
 export { MainContent } from './layoutComponents/mainContent';
+export { Role } from './toolbars/role';
 export { MenuActionButton } from '../components/menuActionButton';
