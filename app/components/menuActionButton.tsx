@@ -78,7 +78,7 @@ export function MenuActionButton({
     const newUserData = valueData?.filter(value => value.isSms && value.phone) || []
 
     smsSendRef.current?.openDialog({
-      toUsers: newUserData.map(value => value.fullName),
+      toUsers: newUserData.map(value => value.fullName), toCountryCodes: newUserData.map(value => value.countryCode),
       toPhoneNumbers: newUserData.map(value => value.phone), type: 2, count: newUserData.length || 0
    });
   };
@@ -96,22 +96,11 @@ export function MenuActionButton({
       </Menu.Target>
 
       <Menu.Dropdown>
-        <Menu.Item
-          leftSection={<IconFileTypePdf size={14} />}
-          onClick={exportPdf}
-        >Rapor-Pdf</Menu.Item>
-        <Menu.Item
-          leftSection={<IconFileExcel size={14} />}
-          onClick={exportExcel}
-        >Rapor-Excel</Menu.Item>
-        <Menu.Item
-          leftSection={<IconSearch size={14} />}
-          disabled
-        >
-          Search
-        </Menu.Item>
+        <Menu.Item leftSection={<IconFileTypePdf size={14} />} onClick={exportPdf} >Rapor-Pdf</Menu.Item>
+        <Menu.Item leftSection={<IconFileExcel size={14} />} onClick={exportExcel} >Rapor-Excel</Menu.Item>
+        <Menu.Item leftSection={<IconSearch size={14} />} disabled>Search </Menu.Item>
         <Menu.Item leftSection={<IconSend2 size={14} />} onClick={sendMail}>Mail-Gönder</Menu.Item>
-        <Menu.Item leftSection={<IconMessage size={14} />} onClick={sendSms}>Sms-Gönder</Menu.Item> 
+        <Menu.Item leftSection={<IconMessage size={14} />} onClick={sendSms} disabled>Sms-Gönder</Menu.Item> 
       </Menu.Dropdown>
     </Menu>
     <MailSend ref={mailSendRef} />

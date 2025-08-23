@@ -1,9 +1,14 @@
 import { createApi } from './api';
 import { useAuth } from '~/authContext';
 
+interface PhoneNumbersWithCountryCode {
+  telephone: string;
+  countryCode: string;
+}
 interface SmsParams {
   message: string;
   toUsers: Array<string>;
+  toPhoneNumbersWithCountryCode: Array<PhoneNumbersWithCountryCode>;
   count: number;
   type: number;
 }

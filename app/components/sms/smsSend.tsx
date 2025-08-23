@@ -1,5 +1,6 @@
 import { forwardRef, useImperativeHandle, useState, useRef, useMemo } from 'react';
 import { useDisclosure } from '@mantine/hooks';
+import { omit } from 'ramda';
 import { Modal, Textarea, Button, Stack, Grid, LoadingOverlay, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
@@ -13,9 +14,14 @@ export type SmsSendDialogControllerRef = {
   close: () => void;
 };
 
+interface PhoneNumbersWithCountryCode {
+  telephone: string;
+  countryCode: string;
+}
 type ValueParams = {
   toUsers: Array<string>;
   toPhoneNumbers: Array<string>;
+  toCountryCodes: Array<string>;
   type: number;
   count: number;
 }
@@ -27,7 +33,7 @@ type FormValues = {
 const SmsSend = forwardRef<SmsSendDialogControllerRef, unknown>((_props, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
   const [visibleLoading, openLoading] = useDisclosure(false);
-  const [valueParams, setValueParams] = useState<ValueParams>({ toUsers: [], toPhoneNumbers: [], type: 2, count: 0 });
+  const [valueParams, setValueParams] = useState<ValueParams>({ toUsers: [], toPhoneNumbers: [], toCountryCodes: [], type: 2, count: 0 });
 
   const service = useSmsService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   
@@ -63,7 +69,11 @@ const SmsSend = forwardRef<SmsSendDialogControllerRef, unknown>((_props, ref) =>
 
     const newValue = {
       ...values,
-      ...valueParams,
+      ...omit(['toPhoneNumbers', 'toCountryCodes'], valueParams),
+      toPhoneNumbersWithCountryCode: valueParams.toPhoneNumbers.map((phone, index) => ({
+        telephone: phone,
+        countryCode: valueParams.toCountryCodes[index] || ""
+      }))
     }
     const result = await service.sendSms(newValue);
 
@@ -142,9 +152,7 @@ const SmsSend = forwardRef<SmsSendDialogControllerRef, unknown>((_props, ref) =>
               <Textarea mt="md" withAsterisk
                 label="Mesaj"
                 placeholder="Mesaj giriniz"
-                required
-                  minRows={5}
-                  maxRows={10}
+                required autosize minRows={10} maxRows={15}
                 {...form.getInputProps('message')}
               />
           </Grid.Col>
