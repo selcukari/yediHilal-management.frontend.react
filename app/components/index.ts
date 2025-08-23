@@ -7,3 +7,4 @@ export { Province } from './toolbars/province';
 export { MainContent } from './layoutComponents/mainContent';
 export { Role } from './toolbars/role';
 export { MenuActionButton } from '../components/menuActionButton';
+export { RichTextEditorTiptap } from './richTextEditorTiptap';
