@@ -1,8 +1,11 @@
-import { Menu, Button } from '@mantine/core';
-import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
-import { IconSearch, IconFileTypePdf, IconFileExcel } from '@tabler/icons-react';
+import { useRef } from 'react';
+import { Menu, Button, LoadingOverlay } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { IconSearch, IconFileTypePdf, IconMessage, IconSend2, IconFileExcel } from '@tabler/icons-react';
 import { type PdfConfig, type PdfTableColumn, PdfHelperService } from '../utils/repor/exportToPdf';
 import { type ColumnDefinition, exportToExcel } from '../utils/repor/exportToExcel';
+import { useMailService } from '~/services/mailService';
+import MailSend, { type MailSendDialogControllerRef } from '../components/mail/mailSend';
 
 export type MenuActionButtonRef = {
   open: () => void;
@@ -31,8 +34,15 @@ export function MenuActionButton({
   type,
 }: MenuActionButtonProps) {
   const pdfHelperService = new PdfHelperService();
+  const [visible, { open, close }] = useDisclosure(false);
+
+  const mailSendRef = useRef<MailSendDialogControllerRef>(null);
+  
+  const mailService = useMailService(import.meta.env.VITE_APP_API_USE_CONTROLLER);
+
 
   const exportPdf = () => {
+    open();
 
     const config: PdfConfig = {
       title: `YediHilal ${reportTitle}`,
@@ -47,14 +57,37 @@ export function MenuActionButton({
     };
 
     pdfHelperService.generatePdf(valueData, pdfColumns, config);
+    close();
   };
 
   const exportExcel = () => {
-
+    open();
     exportToExcel(valueData, excelColumns, `yediHilal-${reportTitle.toLocaleLowerCase().replace(/\//g,'-').replace(/ /g, '-')}`);
+    close();
   };
 
-  return (
+  const sendMail = () => {
+    const newUserData = valueData?.filter(value => value.isMail && value.email) || []
+
+    mailSendRef.current?.openDialog({
+      toUsers: newUserData.map(value => value.fullName),
+      toEmails: newUserData.map(value => value.email), type: 2,
+   });
+
+  };
+  const sendSms = () => {
+    open();
+    console.log('Sms gönderme işlemi tetiklendi');
+    close();
+  };
+
+  return (<>
+    <LoadingOverlay
+      visible={visible}
+      zIndex={1000}
+      overlayProps={{ radius: 'sm', blur: 2 }}
+      loaderProps={{ color: 'pink', type: 'bars' }}
+    />
     <Menu disabled={valueData.length < 1} shadow="md" width={200}>
       <Menu.Target>
         <Button>{menuTitle}</Button>
@@ -75,11 +108,10 @@ export function MenuActionButton({
         >
           Search
         </Menu.Item>
-        <Menu.Item>Dashboard3</Menu.Item>
-        <Menu.Item>Dashboard4</Menu.Item>
-
-       
+        <Menu.Item leftSection={<IconSend2 size={14} />} onClick={sendMail}>Mail-Gönder</Menu.Item>
+        <Menu.Item leftSection={<IconMessage size={14} />} onClick={sendSms}>Sms-Gönder</Menu.Item> 
       </Menu.Dropdown>
     </Menu>
-  );
+    <MailSend ref={mailSendRef} />
+  </>);
 };

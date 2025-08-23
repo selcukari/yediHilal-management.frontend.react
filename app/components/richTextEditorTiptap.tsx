@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { Text } from '@mantine/core';
 import Highlight from '@tiptap/extension-highlight';
 import Underline from '@tiptap/extension-underline';
 import { useEditor } from '@tiptap/react';
@@ -9,16 +11,32 @@ import { RichTextEditor } from '@mantine/tiptap';
 
 interface RichTextEditorTiptapProps {
   form: UseFormReturnType<any>;
+  required?: boolean;
 }
 
-function RichTextEditorTiptap({form}: RichTextEditorTiptapProps) {
+function RichTextEditorTiptap({form, required=false}: RichTextEditorTiptapProps) {
+  const [error, setError] = useState("İçerik en az 10 karakter olmalıdır.");
   const editor = useEditor({
     extensions: [StarterKit, Underline, Highlight, Placeholder.configure({ placeholder: 'içerik mesajı...' })],
     content: "",
+     onUpdate: ({ editor }) => {
+       const html = editor.getHTML();
+       form.setFieldValue('body', html);
+
+       // Real-time validation
+      if (required) {
+        const textContent = editor.getText().trim();
+        if (textContent.length > 10) {
+          setError('');
+        } else {
+          setError("İçerik en az 10 karakter olmalıdır.");
+        }
+      }
+     },
   });
 
-  return (
-    <RichTextEditor editor={editor} variant="subtle"
+  return (<>
+    <RichTextEditor editor={editor} variant="subtle" style={{ height: '500px' }}
       {...form.getInputProps('body')}>
       <RichTextEditor.Toolbar sticky stickyOffset="var(--docs-header-height)">
         <RichTextEditor.ControlsGroup>
@@ -36,23 +54,14 @@ function RichTextEditorTiptap({form}: RichTextEditorTiptapProps) {
           <RichTextEditor.H4 />
         </RichTextEditor.ControlsGroup>
 
-        <RichTextEditor.ControlsGroup>
+        {/* <RichTextEditor.ControlsGroup>
           <RichTextEditor.BulletList />
           <RichTextEditor.OrderedList />
-          <RichTextEditor.Subscript />
-          <RichTextEditor.Superscript />
-        </RichTextEditor.ControlsGroup>
+        </RichTextEditor.ControlsGroup> */}
 
         <RichTextEditor.ControlsGroup>
           <RichTextEditor.Link />
           <RichTextEditor.Unlink />
-        </RichTextEditor.ControlsGroup>
-
-        <RichTextEditor.ControlsGroup>
-          <RichTextEditor.AlignLeft />
-          <RichTextEditor.AlignCenter />
-          <RichTextEditor.AlignJustify />
-          <RichTextEditor.AlignRight />
         </RichTextEditor.ControlsGroup>
 
         <RichTextEditor.ControlsGroup>
@@ -64,7 +73,12 @@ function RichTextEditorTiptap({form}: RichTextEditorTiptapProps) {
 
       <RichTextEditor.Content />
     </RichTextEditor>
-  );
+    {required && (
+        <Text style={{ color: 'red' }}>
+          {error}
+        </Text>
+      )}
+    </>);
 }
 
 export { RichTextEditorTiptap };
