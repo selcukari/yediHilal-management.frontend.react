@@ -94,7 +94,7 @@ export default function Mail() {
     const params: number = 2; // 1: user, 2: member
      try {
 
-      const getMails = await service.getRoles(params);
+      const getMails = await service.getMails(params);
       if (getMails) {
         setResultData(getMails.map((mail: any) => ({
           id: mail.id,
