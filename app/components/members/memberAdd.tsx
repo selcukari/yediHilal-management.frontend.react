@@ -199,6 +199,10 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
       title="Yeni Üye Ekle"
       centered
       size="700"
+      overlayProps={{
+        backgroundOpacity: 0.55,
+        blur: 3,
+      }}
     >
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap="md">

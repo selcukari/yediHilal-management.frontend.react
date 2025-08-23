@@ -6,6 +6,7 @@ import { type PdfConfig, type PdfTableColumn, PdfHelperService } from '../utils/
 import { type ColumnDefinition, exportToExcel } from '../utils/repor/exportToExcel';
 import { useMailService } from '~/services/mailService';
 import MailSend, { type MailSendDialogControllerRef } from '../components/mail/mailSend';
+import SmsSend, { type SmsSendDialogControllerRef } from '../components/sms/smsSend';
 
 export type MenuActionButtonRef = {
   open: () => void;
@@ -37,10 +38,8 @@ export function MenuActionButton({
   const [visible, { open, close }] = useDisclosure(false);
 
   const mailSendRef = useRef<MailSendDialogControllerRef>(null);
+  const smsSendRef = useRef<SmsSendDialogControllerRef>(null);
   
-  const mailService = useMailService(import.meta.env.VITE_APP_API_USE_CONTROLLER);
-
-
   const exportPdf = () => {
     open();
 
@@ -71,14 +70,17 @@ export function MenuActionButton({
 
     mailSendRef.current?.openDialog({
       toUsers: newUserData.map(value => value.fullName),
-      toEmails: newUserData.map(value => value.email), type: 2,
+      toEmails: newUserData.map(value => value.email), type: 2, count: newUserData.length || 0
    });
 
   };
-  const sendSms = () => {
-    open();
-    console.log('Sms gönderme işlemi tetiklendi');
-    close();
+  const sendSms = () => { // sms gönderme işlemi burada phone ulke kodu ile birlikte olabilir
+    const newUserData = valueData?.filter(value => value.isSms && value.phone) || []
+
+    smsSendRef.current?.openDialog({
+      toUsers: newUserData.map(value => value.fullName),
+      toPhoneNumbers: newUserData.map(value => value.phone), type: 2, count: newUserData.length || 0
+   });
   };
 
   return (<>
@@ -113,5 +115,6 @@ export function MenuActionButton({
       </Menu.Dropdown>
     </Menu>
     <MailSend ref={mailSendRef} />
+    <SmsSend ref={smsSendRef} />
   </>);
 };

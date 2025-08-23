@@ -55,6 +55,10 @@ const ConfirmModalMessage = forwardRef<ConfirmModalMessageRef, ConfirmModalMessa
       onClose={close}
       title={headerTitle}
       centered
+      overlayProps={{
+        backgroundOpacity: 0.55,
+        blur: 3,
+      }}
     >
       {message}
       <Textarea
@@ -68,7 +72,7 @@ const ConfirmModalMessage = forwardRef<ConfirmModalMessageRef, ConfirmModalMessa
         onChange={(event) => {
           const value = event.currentTarget.value;
           setMessageText(value);
-          setError(value.trim() ? null : 'Mesaj alanı gereklidir.');
+          setError(value.trim()?.length > 5 ? null : 'En az 5 karakter gereklidir.');
         }}
       />
       <Group mt="lg" justify="flex-end">

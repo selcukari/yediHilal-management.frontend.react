@@ -1,52 +1,44 @@
 import { forwardRef, useImperativeHandle, useState, useRef, useMemo } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, TextInput, Button, Stack, Grid, LoadingOverlay, Text } from '@mantine/core';
+import { Modal, Textarea, Button, Stack, Grid, LoadingOverlay, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
-import { useMailService } from '../../services/mailService';
-import { RichTextEditorTiptap } from '../richTextEditorTiptap';
+import { useSmsService } from '../../services/smsService';
 import { toast } from '../../utils/toastMessages';
 
-export type MailSendDialogControllerRef = {
+export type SmsSendDialogControllerRef = {
   openDialog: (value: ValueParams) => void;
   close: () => void;
 };
 
 type ValueParams = {
   toUsers: Array<string>;
-  toEmails: Array<string>;
+  toPhoneNumbers: Array<string>;
   type: number;
   count: number;
 }
 
 type FormValues = {
-  subject: string;
-  body: string;
+  message: string;
 };
 
-const MailSend = forwardRef<MailSendDialogControllerRef, unknown>((_props, ref) => {
+const SmsSend = forwardRef<SmsSendDialogControllerRef, unknown>((_props, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
   const [visibleLoading, openLoading] = useDisclosure(false);
-  const [valueParams, setValueParams] = useState<ValueParams>({ toUsers: [], toEmails: [], type: 2, count: 0 });
+  const [valueParams, setValueParams] = useState<ValueParams>({ toUsers: [], toPhoneNumbers: [], type: 2, count: 0 });
 
-  const service = useMailService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+  const service = useSmsService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
   const form = useForm<FormValues>({
     initialValues: {
-      subject: "",
-      body: "",
+      message: "",
     },
     validate: {
-      subject: (value) => (value.trim().length < 5 ? 'İsim en az 5 karakter olmalı' : null),
-      body: (value) => {
-        const textContent = value.replace(/<[^>]*>/g, '').trim();
-
-        return textContent.length < 10 ? 'Adres en az 10 karakter olmalı' : null;
-      }
+      message: (value) => (value.trim().length < 10 ? 'Mesaj en az 10 karakter olmalı' : null),
     },
   });
 
@@ -73,7 +65,7 @@ const MailSend = forwardRef<MailSendDialogControllerRef, unknown>((_props, ref) 
       ...values,
       ...valueParams,
     }
-    const result = await service.sendMail(newValue);
+    const result = await service.sendSms(newValue);
 
     if (result === true) {
 
@@ -135,7 +127,7 @@ const MailSend = forwardRef<MailSendDialogControllerRef, unknown>((_props, ref) 
       onClose={() => {
         dialogClose();
       }}
-      title="Mail Gönder"
+      title="Mesaj Gönder"
       centered
       size="600"
       overlayProps={{
@@ -147,23 +139,15 @@ const MailSend = forwardRef<MailSendDialogControllerRef, unknown>((_props, ref) 
         <Stack gap="md" align="stretch" justify="center">
           <Grid columns={6} justify="center">
             <Grid.Col span={5}>
-              <TextInput
-                label="Konu"
-                placeholder="Konu giriniz"
-                value={form.values.subject}
+              <Textarea mt="md" withAsterisk
+                label="Mesaj"
+                placeholder="Mesaj giriniz"
                 required
-                {...form.getInputProps('subject')}
+                  minRows={5}
+                  maxRows={10}
+                {...form.getInputProps('message')}
               />
           </Grid.Col>
-
-          <Grid.Col span={5}>
-            <Text>İçerik <span style={{ color: 'red' }}>*</span></Text>
-            <RichTextEditorTiptap
-              form={form}
-              required={true}
-              {...form.getInputProps('body')}
-            />
-          </Grid.Col> 
 
           <Grid.Col span={6} style={{ textAlign: 'center' }}>
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
@@ -186,4 +170,4 @@ const MailSend = forwardRef<MailSendDialogControllerRef, unknown>((_props, ref) 
   </>);
 });
 
-export default MailSend;
+export default SmsSend;

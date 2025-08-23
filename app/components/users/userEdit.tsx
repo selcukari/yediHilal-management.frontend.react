@@ -194,6 +194,10 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
       title="Üye Düzenle"
       centered
       size="700"
+      overlayProps={{
+        backgroundOpacity: 0.55,
+        blur: 3,
+      }}
     >
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap="md">
