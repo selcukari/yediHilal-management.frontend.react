@@ -81,7 +81,6 @@ export default function Member() {
   };
 
   const handleEdit = (item: any) => {
-    console.log('Edit:', item);
     memberEditRef.current?.openDialog({
       id: item.id,
       fullName: item.fullName,
@@ -103,7 +102,6 @@ export default function Member() {
   };
 
   const handleDelete = (id: number) => {
-    console.log('Delete:', id);
     setSelectedItemId(id);
     confirmModalMessageRef.current?.open()
   };
@@ -330,7 +328,6 @@ export default function Member() {
                     label="Üye Durumu" 
                     checked={filterModel.isActive}
                     onChange={(event) => {
-                      console.log("Switch changed:", event.currentTarget.checked);
                       setFilterModel(prev => ({
                       ...prev,
                       isActive: event.currentTarget?.checked

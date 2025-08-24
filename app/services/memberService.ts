@@ -30,8 +30,6 @@ export function useMemberService(controller: string) {
   const { getCurrentToken, logout } = useAuth();
   const api = createApi(getCurrentToken() ?? undefined, logout);
 
-  const turkeyCountryId = 1;
-
   const deleteMember = async (userId: number, deleteMessageTitle: string) => {
 
     try {
@@ -39,7 +37,6 @@ export function useMemberService(controller: string) {
 
       return res.data.data;
     } catch (error: any) {
-      console.log("error:", error)
       return error.response.data;
     }
   };
@@ -51,7 +48,6 @@ export function useMemberService(controller: string) {
 
       return res.data.data;
     } catch (error: any) {
-      console.log("error:", error)
       return error.response.data;
     }
   };
@@ -63,7 +59,6 @@ export function useMemberService(controller: string) {
 
       return res.data.data;
     } catch (error: any) {
-      console.log("error:", error)
       return error.response.data;
     }
   };
@@ -78,7 +73,6 @@ export function useMemberService(controller: string) {
 
       return res.data.data;
     } catch (error: any) {
-      console.log("error:", error)
       return error.response.data;
     }
   };

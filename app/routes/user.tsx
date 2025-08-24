@@ -65,7 +65,6 @@ export default function User() {
 
   useEffect(() => {
     if (isLoggedIn) {
-      console.log('User component 1');
       setTimeout(() => {
         fetchUsers();
       }, 1500);
@@ -73,7 +72,6 @@ export default function User() {
   }, []);
 
   const handleEdit = (item: any) => {
-    console.log('Edit:', item);
      userEditRef.current?.openDialog({
       id: item.id,
       fullName: item.fullName,
@@ -95,7 +93,6 @@ export default function User() {
   };
 
   const handleDelete = (id: number) => {
-    console.log('Delete:', id);
     setSelectedItemId(id);
     confirmModalMessageRef.current?.open()
   };
@@ -202,8 +199,6 @@ export default function User() {
   };
 
   const confirmModalMessageHandleConfirm = async (messageText: string) => {
-    console.log('İşlem onaylandı');
-    // Burada silme işlemini yap
     if (selectedItemId) {
       const result = await service.deleteUser(selectedItemId, messageText);
 
@@ -220,7 +215,6 @@ export default function User() {
   };
 
   const confirmModalMessageHandleCancel = () => {
-    console.log('İşlem iptal edildi');
     confirmModalMessageRef.current?.close();
     setSelectedItemId(null); // ID'yi temizle
     toast.info('İşlem iptal edildi.');
@@ -318,7 +312,6 @@ export default function User() {
                     label="Kullanıcı Durumu" 
                     checked={filterModel.isActive}
                     onChange={(event) => {
-                      console.log("Switch changed:", event.currentTarget.checked);
                       setFilterModel(prev => ({
                       ...prev,
                       isActive: event.currentTarget?.checked

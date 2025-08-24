@@ -175,7 +175,6 @@ private addTable(
     startY: 35, // Tablonun başlangıç pozisyonu
     tableWidth: 'auto', // Tablo genişliği ayarı
     willDrawCell: (data: any) => {
-      console.log("data:", data)
      if (data.section === 'body') {
         if (data.cell.raw === 'Evet') {
           doc.setTextColor(0, 128, 0); // Yeşil

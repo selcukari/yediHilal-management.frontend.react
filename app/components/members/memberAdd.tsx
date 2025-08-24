@@ -163,8 +163,6 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
   }, [form.values.countryId]);
 
   const confirmDialogHandleConfirm = () => {
-    console.log('İşlem onaylandı');
-    // Silme işlemini burada yapın
     confirmModalRef.current?.close();
     close();
     form.reset();

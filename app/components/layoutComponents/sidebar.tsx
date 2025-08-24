@@ -15,12 +15,12 @@ interface SidebarProps {
 }
 // IconDashboard
 const menuItems = [
-  { icon: IconUsers, label: 'Üye Yönetimi', key: 'dashboard', link: '/' },
-  { icon: IconUser, label: 'Kullanıcılar', key: 'users', link: '/users' },
-  { icon: IconMail, label: 'Gön. Mail Lis.', key: 'mails', link: '/mails' },
-  { icon: IconMessage, label: 'Gön. Mail Lis.', key: 'sms', link: '/sms' },
-  { icon: IconChartBar, label: 'Raporlar', key: 'reports', link: '/reports' },
-  { icon: IconSettings, label: 'Ayarlar', key: 'settings', link: '/settings' },
+  { icon: IconUsers, label: 'Üye Yönetimi', key: 'member', link: '/' },
+  { icon: IconUser, label: 'Kullanıcılar', key: 'user', link: '/users' },
+  { icon: IconMail, label: 'Gön. Mail Lis.', key: 'mail', link: '/mails' },
+  { icon: IconMessage, label: 'Gön. Sms Lis.', key: 'sms', link: '/sms' },
+  { icon: IconChartBar, label: 'Raporlar', key: 'report', link: '/reports' },
+  { icon: IconSettings, label: 'Ayarlar', key: 'setting', link: '/settings' },
 ];
 
 export function Sidebar({ active, setActive }: SidebarProps) {
@@ -40,7 +40,11 @@ export function Sidebar({ active, setActive }: SidebarProps) {
 
   const handleMenuItemClick = (key: string, link: string) => {
     setActive(key);
-    console.log("currentUser:", currentUser);
+
+    if(currentUser.moduleRoles?.includes(key)) {
+      navigate(link);
+      return;
+    }
 
     if (currentUser?.roleId == 3 && link != '/') {
       toast.error('Bu işlem için yetkiniz bulunmamaktadır.');
