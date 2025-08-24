@@ -16,7 +16,7 @@ interface UserDataParams {
   deleteMessageTitle?: string;
 }
 
-type MemberParams = {
+type UserParams = {
   countryId?: string | null;
   isActive: boolean;
   provinceId?: string | null;
@@ -66,7 +66,7 @@ export function useUserService(controller: string) {
   };
 
   
-  const users = async (params: MemberParams) => {
+  const users = async (params: UserParams) => {
     try {
 
       const res = await api.get(`/${controller}/getUsersBy`,{

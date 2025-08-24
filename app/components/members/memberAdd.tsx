@@ -96,7 +96,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
 
         if (!form.values.isActive) {
 
-          return value ? null : 'Mesaj alanı gereklidir.';
+          return value && value.trim().length > 5 ? null : 'Mesaj en az 5 karakter olmalı.';
         }
 
         return null;
