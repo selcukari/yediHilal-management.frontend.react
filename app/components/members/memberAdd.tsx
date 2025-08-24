@@ -9,6 +9,7 @@ import { CountrySelect } from '../addOrEdit/countrySelect';
 import { ProvinceSelect } from '../addOrEdit/provinceSelect';
 import { useMemberService } from '../../services/memberService';
 import { toast } from '../../utils/toastMessages';
+import { MemberTypeSelect } from '../addOrEdit/memberTypeSelect';
 
 export type MemberAddDialogControllerRef = {
   open: () => void;
@@ -30,6 +31,7 @@ type FormValues = {
   isActive: boolean;
   isSms: boolean;
   isMail: boolean;
+  typeId: string;
   countryId: string;
   provinceId: string;
   deleteMessageTitle?: string;
@@ -55,6 +57,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
       phone: '',
       dateOfBirth: '',
       referenceId: '',
+      typeId: '1',
       countryId: '1',
       provinceId: '',
       isActive: true,
@@ -101,6 +104,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
 
         return null;
       },
+      typeId: (value) => (value ? null : 'Üye tipi alanı zorunlu'),
     },
   });
 
@@ -118,10 +122,13 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
   }, [form.values.referenceId]);
 
   const handleSubmit = async (values: FormValues) => {
+    const typeIdVoluntarily = 1;
+
     setIsDisabledSelect(true);
     const newMemberValue = {
       ...values,
       deleteMessageTitle: (values.isActive ? undefined : (values.deleteMessageTitle ? values.deleteMessageTitle.trim() : undefined )),
+      typeId: values.typeId ? parseInt(values.typeId) : typeIdVoluntarily,
       provinceId: values.provinceId ? parseInt(values.provinceId) : undefined,
       countryId: values.countryId ? parseInt(values.countryId) : undefined,
       referenceId: values.referenceId ? parseInt(values.referenceId) : undefined,
@@ -220,6 +227,13 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
               placeholder="Kimlik numarası giriniz"
               {...form.getInputProps('identificationNumber')}
             />
+          </Grid.Col>
+
+          <Grid.Col span={6}>
+            <MemberTypeSelect
+              form={form}
+              required={true}
+            ></MemberTypeSelect>
           </Grid.Col>
 
           <Grid.Col span={6}>

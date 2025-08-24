@@ -42,6 +42,7 @@ export default function Member() {
   const [rowHeaders, setRowHeaders] = useState([
     { field: 'id', header: 'Id' },
     { field: 'fullName', header: 'Ad Soyad' },
+    { field: 'typeName', header: 'Tipi' },
     { field: 'phoneWithCountryCode', header: 'Telefon' },
     { field: 'email', header: 'Mail' },
     { field: 'isSms', header: 'Sms' },
@@ -91,6 +92,7 @@ export default function Member() {
       phone: item.phone,
       dateOfBirth: item.dateOfBirth ? item.dateOfBirth.toString() : '',
       isActive: item.isActive,
+      typeId: item.typeId.toString(),
       isSms: item.isSms,
       isMail: item.isMail,
       referenceId: item.referenceId ? item.referenceId.toString() : '',

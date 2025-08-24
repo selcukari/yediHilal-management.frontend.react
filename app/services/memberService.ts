@@ -8,6 +8,7 @@ interface UserDataParams {
   countryId?: number;
   provinceId?: number;
   identificationNumber?: string;
+  typeId: number;
   telephone?: string;
   isSms: boolean;
   isMail: boolean;

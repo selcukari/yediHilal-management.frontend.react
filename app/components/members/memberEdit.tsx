@@ -10,6 +10,7 @@ import { CountrySelect } from '../addOrEdit/countrySelect';
 import { ProvinceSelect } from '../addOrEdit/provinceSelect';
 import { useMemberService } from '../../services/memberService';
 import { toast } from '../../utils/toastMessages';
+import { MemberTypeSelect } from '../addOrEdit/memberTypeSelect';
 
 export type MemberEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -29,6 +30,7 @@ type FormValues = {
   phone: string;
   dateOfBirth: string;
   referenceId: string;
+  typeId: string;
   isActive: boolean;
   isSms: boolean;
   isMail: boolean;
@@ -60,6 +62,7 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
       phone: '',
       dateOfBirth: '',
       referenceId: '',
+      typeId: '1',
       countryId: '1',
       provinceId: '',
       isActive: true,
@@ -108,6 +111,7 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
 
         return null;
       },
+      typeId: (value) => (value ? null : 'Üye tipi alanı zorunlu'),
     },
   });
 
@@ -141,11 +145,13 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
 
   const handleSubmit = async (values: FormValues) => {
     // Burada API çağrısı yapabilirsiniz
+    const typeIdVoluntarily = 1;
     setIsDisabledSelect(true);
 
     const newMemberValue = {
       ...omit(['createdDate', 'updateDate'], values),
       deleteMessageTitle: (values.isActive ? undefined : (values.deleteMessageTitle ? values.deleteMessageTitle.trim() : undefined )),
+      typeId: values.typeId ? parseInt(values.typeId) : typeIdVoluntarily,
       provinceId: values.provinceId ? parseInt(values.provinceId) : undefined,
       countryId: values.countryId ? parseInt(values.countryId) : undefined,
       referenceId: values.referenceId ? parseInt(values.referenceId) : undefined,
@@ -247,6 +253,13 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
               placeholder="Kimlik numarası giriniz"
               {...form.getInputProps('identificationNumber')}
             />
+          </Grid.Col>
+
+          <Grid.Col span={6}>
+            <MemberTypeSelect
+              form={form}
+              required={true}
+            ></MemberTypeSelect>
           </Grid.Col>
 
           <Grid.Col span={6}>

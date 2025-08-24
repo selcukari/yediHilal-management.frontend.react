@@ -55,13 +55,24 @@ export function MenuActionButton({
       textColor: '#2c3e50' // Koyu gri
     };
 
-    pdfHelperService.generatePdf(valueData, pdfColumns, config);
+    const newData = valueData?.map(item =>({
+      ...item,
+      isSms: item.isSms ? 'Evet' : 'Hayır',
+      isMail: item.isMail ? 'Evet' : 'Hayır',
+    }));
+
+    pdfHelperService.generatePdf(newData, pdfColumns, config);
     close();
   };
 
   const exportExcel = () => {
     open();
-    exportToExcel(valueData, excelColumns, `yediHilal-${reportTitle.toLocaleLowerCase().replace(/\//g,'-').replace(/ /g, '-')}`);
+    const newData = valueData?.map(item =>({
+      ...item,
+      isSms: item.isSms ? 'Evet' : 'Hayır',
+      isMail: item.isMail ? 'Evet' : 'Hayır',
+    }));
+    exportToExcel(newData, excelColumns, `yediHilal-${reportTitle.toLocaleLowerCase().replace(/\//g,'-').replace(/ /g, '-')}`);
     close();
   };
 

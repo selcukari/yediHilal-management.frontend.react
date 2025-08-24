@@ -2,14 +2,15 @@ export const calculateColumnWidthMember = (field: string): number | undefined =>
   const widthMap: {[key: string]: number} = {
     'id': 15,
     'fullName': 35,
+    'typeName': 18,
     'phoneWithCountryCode': 25,
     'email': 25,
     'isSms': 18,
     'isMail': 18,
     'identificationNumber': 20,
     'dateOfBirth': 20,
-    'countryName': 23,
-    'provinceName': 25,
+    'countryName': 18,
+    'provinceName': 18,
     'referenceFullName': 25,
     'referencePhone': 20,
     'createdDate': 25
