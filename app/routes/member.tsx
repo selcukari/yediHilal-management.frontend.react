@@ -31,6 +31,7 @@ interface Column {
 
 export default function Member() {
   const [resultData, setResultData] = useState<any[]>([]);
+  const [isDisabledDeleteAction, setDisabledDeleteAction]= useState(false);
   const [selectedCountry, setSelectedCountry] = useState<string | null | undefined>(null);
   const [filterModel, setFilterModel] = useState<filterModels>({ isActive: true, countryId: '1' });
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null); // Silinecek öğenin ID'sini tut
@@ -123,6 +124,7 @@ export default function Member() {
                 <ActionIcon 
                   variant="light" 
                   color="red"
+                  disabled={isDisabledDeleteAction}
                   onClick={() => handleDelete(item.id)}
                 >
                   <IconTrash size={16} />
@@ -200,6 +202,7 @@ export default function Member() {
         setResultData([]);
       }
         close();
+        setDisabledDeleteAction(!filterModel.isActive)
     } catch (error: any) {
       console.error('Error fetching getMembers:', error.message);
         toast.error(`Üye yüklenirken hata: ${error.message}`);

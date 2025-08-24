@@ -46,7 +46,7 @@ export function Sidebar({ active, setActive }: SidebarProps) {
       return;
     }
 
-    if (currentUser?.roleId == 3 && link != '/') {
+    if (currentUser?.roleId == 3 && !['/', '/mails', '/sms'].includes(link)) {
       toast.error('Bu işlem için yetkiniz bulunmamaktadır.');
       
       return;

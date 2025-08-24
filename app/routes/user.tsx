@@ -32,6 +32,7 @@ interface Column {
 
 export default function User() {
   const [resultData, setResultData] = useState<any[]>([]);
+  const [isDisabledDeleteAction, setDisabledDeleteAction]= useState(false);
   const [selectedCountry, setSelectedCountry] = useState<string | null | undefined>(null);
   const [filterModel, setFilterModel] = useState<filterModels>({ isActive: true, countryId: '1' });
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null); // Silinecek öğenin ID'sini tut
@@ -114,6 +115,7 @@ export default function User() {
                 <ActionIcon 
                   variant="light" 
                   color="red"
+                  disabled={isDisabledDeleteAction}
                   onClick={() => handleDelete(item.id)}
                 >
                   <IconTrash size={16} />
@@ -184,6 +186,7 @@ export default function User() {
         setResultData([]);
       }
         close();
+        setDisabledDeleteAction(!filterModel.isActive);
     } catch (error: any) {
       console.error('Error fetching getUsers:', error.message);
         toast.error(`Kullanıcılar yüklenirken hata: ${error.message}`);
