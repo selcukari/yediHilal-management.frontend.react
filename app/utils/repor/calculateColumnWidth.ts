@@ -6,7 +6,6 @@ export const calculateColumnWidthMember = (field: string): number | undefined =>
     'email': 25,
     'isSms': 18,
     'isMail': 18,
-    'areaName': 20,
     'identificationNumber': 20,
     'dateOfBirth': 20,
     'countryName': 23,
