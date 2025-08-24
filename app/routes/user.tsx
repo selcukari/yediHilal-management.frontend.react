@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { IconSearch, IconFilter, IconEdit, IconTrash } from '@tabler/icons-react';
 import {
-  Container, Grid, TextInput, Switch, Stack, Group, Title, Text, Button, Paper, Table, Badge,
+  Container, Grid, TextInput, Switch, Stack, Group, Title, Text, Button, Paper, Table,
   ActionIcon, LoadingOverlay, Flex,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -19,7 +19,7 @@ import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToEx
 
 type filterModels = {
   countryId?: string | null;
-  provinceId?: string | null;
+  provinceIds?: string[] | null;
   roleId?: string | null;
   searchText?: string;
   isActive: boolean;
@@ -37,7 +37,7 @@ export default function User() {
   const [filterModel, setFilterModel] = useState<filterModels>({ isActive: true, countryId: '1' });
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null); // Silinecek öğenin ID'sini tut
   const [selectedCountryName, setSelectedCountryName] = useState<string>('Türkiye'); // Yeni state
-  const [selectedProvinceName, setSelectedProvinceName] = useState<string>(''); // Yeni state
+  const [selectedProvinceNames, setSelectedProvinceNames] = useState<string[]>([]); // Yeni state
   const [selectedRoleName, setSelectedRoleName] = useState<string>(''); // Yeni state
   const [visible, { open, close }] = useDisclosure(false);
   
@@ -144,12 +144,12 @@ export default function User() {
     }));
   }
 
-  const onProvinceChange = (provinceValue: string | null, provinceName?: string): void => {
-    setSelectedProvinceName(provinceName || '');
+  const onProvinceChange = (provinceValues: string[] | null, provinceNames?: string[]): void => {
+    setSelectedProvinceNames(provinceNames || []);
 
     setFilterModel((prev) => ({
       ...prev,
-      provinceId: provinceValue,
+      provinceIds: provinceValues,
     }));
   };
 
@@ -165,8 +165,9 @@ export default function User() {
   const fetchUsers = async () => {
      open();
 
-    const params: filterModels = {
+    const params = {
       ...filterModel,
+      provinceIds: (filterModel.provinceIds && filterModel.provinceIds?.length > 0) ? filterModel.provinceIds?.join(",") : undefined,
       searchText: (filterModel.searchText && filterModel.searchText.length > 3 ? filterModel.searchText : undefined),
     }
      try {
@@ -254,19 +255,23 @@ export default function User() {
   const reportTitle = useMemo((): string => {
     const isActiveText = filterModel.isActive ? 'Aktif' : 'Pasif';
 
-    if (selectedProvinceName && selectedRoleName) {
-      return `${selectedCountryName}/${selectedProvinceName}/${selectedRoleName}/${isActiveText} Kullanıcı Raporu`;
+    if (selectedProvinceNames?.length > 0 && selectedRoleName) {
+      const provinceNames = selectedProvinceNames.join(",")
+
+      return `${selectedCountryName}/${provinceNames}/${selectedRoleName}/${isActiveText} Kullanıcı Raporu`;
     }
 
-    if (!selectedRoleName && selectedProvinceName) {
-      return `${selectedCountryName}/${selectedProvinceName}/Tüm Roller/${isActiveText} Kullanıcı Raporu`;
+    if (!selectedRoleName && selectedProvinceNames?.length > 0) {
+      const provinceNames = selectedProvinceNames.join(",")
+      
+      return `${selectedCountryName}/${provinceNames}/Tüm Roller/${isActiveText} Kullanıcı Raporu`;
     }
-    if (selectedRoleName && !selectedProvinceName) {
+    if (selectedRoleName && !(selectedProvinceNames?.length < 0)) {
       return `${selectedCountryName}/Tüm İller/${selectedRoleName}/${isActiveText} Kullanıcı Raporu`;
     }
 
     return `${selectedCountryName}/Tüm İller/Tüm Roller/${isActiveText} Kullanıcı Raporu`;
-  }, [selectedCountryName, filterModel.isActive, selectedProvinceName]);
+  }, [selectedCountryName, filterModel.isActive, selectedProvinceNames]);
 
   return (
       <Container size="xl">

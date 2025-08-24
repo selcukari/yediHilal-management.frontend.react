@@ -19,7 +19,7 @@ interface UserDataParams {
 type UserParams = {
   countryId?: string | null;
   isActive: boolean;
-  provinceId?: string | null;
+  provinceIds?: string | null;
   searchText?: string;
 };
 

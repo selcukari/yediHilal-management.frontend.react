@@ -19,7 +19,7 @@ import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToEx
 
 type filterModels = {
   countryId?: string | null;
-  provinceId?: string | null;
+  provinceIds?: string[] | null;
   searchText?: string;
   isActive: boolean;
 }
@@ -36,7 +36,7 @@ export default function Member() {
   const [filterModel, setFilterModel] = useState<filterModels>({ isActive: true, countryId: '1' });
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null); // Silinecek öğenin ID'sini tut
   const [selectedCountryName, setSelectedCountryName] = useState<string>('Türkiye'); // Yeni state
-  const [selectedProvinceName, setSelectedProvinceName] = useState<string>(''); // Yeni state
+  const [selectedProvinceNames, setSelectedProvinceNames] = useState<string[]>([]); // Yeni state
   const [visible, { open, close }] = useDisclosure(false);
   
   const [rowHeaders, setRowHeaders] = useState([
@@ -169,20 +169,21 @@ export default function Member() {
     }));
   }
 
-  const onProvinceChange = (provinceValue: string | null, provinceName?: string): void => {
-    setSelectedProvinceName(provinceName || '');
+  const onProvinceChange = (provinceValues: string[] | null, provinceNames?: string[]): void => {
+    setSelectedProvinceNames(provinceNames || []);
 
     setFilterModel((prev) => ({
       ...prev,
-      provinceId: provinceValue,
+      provinceIds: provinceValues,
     }));
   };
 
   const fetchMembers = async () => {
      open();
 
-    const params: filterModels = {
+    const params = {
       ...filterModel,
+      provinceIds: (filterModel.provinceIds && filterModel.provinceIds?.length > 0) ? filterModel.provinceIds?.join(",") : undefined,
       searchText: (filterModel.searchText && filterModel.searchText.length > 3 ? filterModel.searchText : undefined),
     }
      try {
@@ -270,12 +271,14 @@ export default function Member() {
   const reportTitle = useMemo((): string => {
     const isActiveText = filterModel.isActive ? 'Aktif' : 'Pasif';
 
-    if (selectedProvinceName) {
-      return `${selectedCountryName}/${selectedProvinceName}/${isActiveText} Üye Raporu`;
+    if (selectedProvinceNames?.length > 0) {
+      const provinceNames = selectedProvinceNames.join(",")
+
+      return `${selectedCountryName}/${provinceNames}/${isActiveText} Üye Raporu`;
     }
 
     return `${selectedCountryName}/Tüm İller/${isActiveText} Üye Raporu`;
-  }, [selectedCountryName, filterModel.isActive, selectedProvinceName]);
+  }, [selectedCountryName, filterModel.isActive, selectedProvinceNames]);
 
   return (
       <Container size="xl">

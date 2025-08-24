@@ -1,4 +1,4 @@
-import { Select } from '@mantine/core';
+import { MultiSelect } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { useProvinceService } from '../../services/provinceService'
 
@@ -6,21 +6,21 @@ interface ProvinceProps {
   isRequired?: boolean;
   isDisabled?: boolean;
   countryId?: string | null;
-  onProvinceChange: (val: string | null, name?: string) => void;
+  onProvinceChange: (vals: string[], names?: string[]) => void;
 }
 
 export function Province({ 
  isRequired = false, countryId, isDisabled = false, onProvinceChange,
 }: ProvinceProps) {
   const [provinces, setProvinces] = useState<{ value: string; label: string }[]>([]);
-  const [province, setProvince] = useState<string | null>("");
+  const [province, setProvince] = useState<string[] | undefined>(undefined);
   const [error, setError] = useState<string | null>(isRequired ? 'Ülke alanı gereklidir.' : null);
   
   const service = useProvinceService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
   
   useEffect(() => {
     fetchProvinceData(countryId);
-    setProvince("");
+    setProvince(undefined);
   }, [countryId]);
 
   const fetchProvinceData = async (countryId?: string | null) => {
@@ -43,13 +43,18 @@ export function Province({
     }
   }
 
-  const handleChange = (value: string | null) => {
-    onProvinceChange(value, value ? provinces.find(p => p.value == value)?.label : undefined);
-    setProvince(value);
+  const handleChange = (values: string[]) => {
+    const selectedProvinceNames = values.map(value => {
+    const province = provinces.find(p => p.value === value);
+    return province?.label || '';
+  }).filter(name => name !== '');
+  
+    onProvinceChange(values, selectedProvinceNames); // ikinci paremetre provinces in value degerine esiş olan values den gelen provinces label string oluştur
+    setProvince(values);
   };
   
   return (
-    <Select
+    <MultiSelect
       label="İl"
       placeholder="İl Seçiniz"
       data={provinces}
