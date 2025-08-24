@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, TextInput, Button, Stack, Grid, PasswordInput, Group, Switch, Textarea } from '@mantine/core';
+import { Modal, TextInput, Flex, Button, Stack, Grid, PasswordInput, Group, Switch, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
@@ -10,6 +10,7 @@ import { ProvinceSelect } from '../addOrEdit/provinceSelect';
 import { RoleSelect } from '../addOrEdit/roleSelect';
 import { useUserService } from '../../services/userService';
 import { toast } from '../../utils/toastMessages';
+import { ModuleSelect } from '../addOrEdit/moduleSelect';
 
 export type UserAddDialogControllerRef = {
   open: () => void;
@@ -31,6 +32,7 @@ type FormValues = {
   countryId: string;
   provinceId: string;
   password: string;
+  moduleRoles: string;
   roleId: string;
   deleteMessageTitle?: string;
 };
@@ -52,6 +54,7 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
       dateOfBirth: '',
       countryId: '1',
       roleId: '3',
+      moduleRoles: '',
       provinceId: '',
       password: '',
       isActive: true,
@@ -79,7 +82,7 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
 
         if (!form.values.isActive) {
 
-          return value ? null : 'Mesaj alanı gereklidir.';
+          return value && value.trim().length > 5 ? null : 'Mesaj en az 5 karakter olmalı.';
         }
 
         return null;
@@ -259,15 +262,27 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
               form={form} 
             />
           </Grid.Col>
-
+          
           <Grid.Col span={6}>
-           <Switch 
-              label="Kullanıcı Durumu" 
-              checked={form.values.isActive}
-              onChange={(event) => form.setFieldValue('isActive', event.currentTarget.checked)}
-            />
+            <ModuleSelect
+              form={form} 
+            ></ModuleSelect>
           </Grid.Col>
-
+          <Flex
+            mih={50}
+            gap="md"
+            justify="center"
+            align="flex-end"
+            direction="row"
+            wrap="wrap">
+            <Grid.Col span={6}>
+              <Switch
+                label="Kullanıcı Durumu" 
+                checked={form.values.isActive}
+                onChange={(event) => form.setFieldValue('isActive', event.currentTarget.checked)}
+              />
+            </Grid.Col>
+          </Flex>
           <Grid.Col span={6}>
             <Textarea
               mt="md"

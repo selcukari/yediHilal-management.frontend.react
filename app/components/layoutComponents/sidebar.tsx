@@ -40,6 +40,7 @@ export function Sidebar({ active, setActive }: SidebarProps) {
 
   const handleMenuItemClick = (key: string, link: string) => {
     setActive(key);
+    console.log("currentUser:", currentUser);
 
     if (currentUser?.roleId == 3 && link != '/') {
       toast.error('Bu işlem için yetkiniz bulunmamaktadır.');

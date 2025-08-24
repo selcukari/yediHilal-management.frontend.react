@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { omit } from 'ramda';
-import { Modal, TextInput, Button, Stack, Grid, PasswordInput, Group, Switch, Textarea } from '@mantine/core';
+import { Modal, TextInput, Flex, Button, Stack, Grid, PasswordInput, Group, Switch, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
@@ -11,6 +11,7 @@ import { ProvinceSelect } from '../addOrEdit/provinceSelect';
 import { useUserService } from '../../services/userService';
 import { RoleSelect } from '../addOrEdit/roleSelect';
 import { toast } from '../../utils/toastMessages';
+import { ModuleSelect } from '../addOrEdit/moduleSelect';
 
 export type UserEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -32,6 +33,7 @@ type FormValues = {
   isActive: boolean;
   countryId: string;
   roleId: string;
+  moduleRoles: string;
   provinceId: string;
   createdDate?: string;
   password: string;
@@ -62,6 +64,7 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
       createdDate: "",
       updateDate: "",
       password: '',
+      moduleRoles: '',
       deleteMessageTitle: '',
     },
     validate: {
@@ -87,7 +90,7 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
 
         if (!form.values.isActive) {
 
-          return value ? null : 'Mesaj alanı gereklidir.';
+          return value && value.trim().length > 5 ? null : 'Mesaj en az 5 karakter olmalı.';
         }
 
         return null;
@@ -191,7 +194,7 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
       onClose={() => {
         dialogClose();
       }}
-      title="Üye Düzenle"
+      title="Kullanıcı Düzenle"
       centered
       size="700"
       overlayProps={{
@@ -291,12 +294,25 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
           </Grid.Col>
 
           <Grid.Col span={6}>
-            <Switch 
-              label="Kullanıcı Durumu" 
-              checked={form.values.isActive}
-              onChange={(event) => form.setFieldValue('isActive', event.currentTarget.checked)}
-            />
+            <ModuleSelect
+              form={form} 
+            ></ModuleSelect>
           </Grid.Col>
+          <Flex
+            mih={50}
+            gap="md"
+            justify="center"
+            align="flex-end"
+            direction="row"
+            wrap="wrap">
+            <Grid.Col span={6}>
+              <Switch 
+                label="Kullanıcı Durumu" 
+                checked={form.values.isActive}
+                onChange={(event) => form.setFieldValue('isActive', event.currentTarget.checked)}
+              />
+            </Grid.Col>
+          </Flex>
 
           <Grid.Col span={6}>
             <Textarea

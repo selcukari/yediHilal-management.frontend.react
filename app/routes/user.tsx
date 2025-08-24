@@ -75,21 +75,22 @@ export default function User() {
   const handleEdit = (item: any) => {
     console.log('Edit:', item);
      userEditRef.current?.openDialog({
-       id: item.id,
-       fullName: item.fullName,
-       identificationNumber: item.identificationNumber,
-       email: item.email,
-       countryCode: item.countryCode,
-       phone: item.phone,
-       dateOfBirth: item.dateOfBirth ? item.dateOfBirth.toString() : '',
-       isActive: item.isActive,
-       password: item.password,
-       roleId: item.roleId.toString(),
-       countryId: item.countryId.toString(),
-       provinceId: item.provinceId?.toString(),
-       deleteMessageTitle: item.deleteMessageTitle?.toString(),
-       createdDate: item.createdDate,
-       updateDate: item.updateDate,
+      id: item.id,
+      fullName: item.fullName,
+      identificationNumber: item.identificationNumber,
+      email: item.email,
+      countryCode: item.countryCode,
+      phone: item.phone,
+      dateOfBirth: item.dateOfBirth ? item.dateOfBirth.toString() : '',
+      isActive: item.isActive,
+      password: item.password,
+      moduleRoles: item.moduleRoles,
+      roleId: item.roleId.toString(),
+      countryId: item.countryId.toString(),
+      provinceId: item.provinceId?.toString(),
+      deleteMessageTitle: item.deleteMessageTitle?.toString(),
+      createdDate: item.createdDate,
+      updateDate: item.updateDate,
      });
   };
 
