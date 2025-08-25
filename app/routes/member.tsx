@@ -175,9 +175,11 @@ export default function Member() {
   const onCountrySelected = (countryValue: string | null, countryName?: string): void => {
     setSelectedCountryName(countryName || '');
     setSelectedCountry(countryValue);
+    setSelectedProvinceNames([]);
 
     setFilterModel((prev) => ({
       ...prev,
+      provinceIds: [],
       countryId: countryValue,
     }));
   }

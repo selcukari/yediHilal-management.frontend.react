@@ -20,7 +20,7 @@ export function Province({
   
   useEffect(() => {
     fetchProvinceData(countryId);
-    setProvince(undefined);
+    setProvince([]);
   }, [countryId]);
 
   const fetchProvinceData = async (countryId?: string | null) => {
