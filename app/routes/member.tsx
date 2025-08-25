@@ -37,7 +37,7 @@ export default function Member() {
   const [filterModel, setFilterModel] = useState<filterModels>({ isActive: true, countryId: '1' });
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null); // Silinecek öğenin ID'sini tut
   const [selectedCountryName, setSelectedCountryName] = useState<string>('Türkiye'); // Yeni state
-  const [selectedMemberTypeName, setSelectedMemberTypeName] = useState<string>('');
+  const [selectedMemberTypeName, setSelectedMemberTypeName] = useState<string | null>('');
   const [selectedProvinceNames, setSelectedProvinceNames] = useState<string[]>([]); // Yeni state
   const [visible, { open, close }] = useDisclosure(false);
   
@@ -163,7 +163,7 @@ export default function Member() {
     </Table.Tr>
   ));
 
-  const onMemberTypeChange = (memberTypeValue: string | null, memberTypeName?: string): void => {
+  const onMemberTypeChange = (memberTypeValue: string | null, memberTypeName?: string | null): void => {
     setSelectedMemberTypeName(memberTypeName || '');
     console.log('selectedMemberTypeName:', memberTypeName)
 
@@ -282,7 +282,7 @@ export default function Member() {
     }));
   }, [rowHeaders]);
 
-  const reportTitle = useMemo((): string => {
+  const reportTitle = (): string => {
     const isActiveText = filterModel.isActive ? 'Aktif' : 'Pasif';
 
     if (selectedProvinceNames?.length > 0 && selectedMemberTypeName) {
@@ -303,7 +303,7 @@ export default function Member() {
     }
 
     return `${selectedCountryName}/Tüm Üye Tipler/Tüm İller/${isActiveText} Üye Raporu`;
-  }, [selectedCountryName, filterModel.isActive, selectedProvinceNames]);
+  };
 
   return (
       <Container size="xl">
@@ -406,7 +406,7 @@ export default function Member() {
                     wrap="wrap"
                   >
                     <MenuActionButton
-                    reportTitle={reportTitle}
+                    reportTitle={reportTitle()}
                     excelColumns={excelTableColumns}
                     valueData={resultData}
                     pdfColumns={pdfTableColumns}

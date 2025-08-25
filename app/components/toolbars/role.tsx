@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRoleService } from '../../services/roleService';
 
 interface RoleProps {
-  onRoleChange: (val: string | null, name?: string) => void;
+  onRoleChange: (val: string | null, name?: string | null) => void;
 }
 
 export function Role({ onRoleChange }: RoleProps) {
@@ -36,7 +36,7 @@ export function Role({ onRoleChange }: RoleProps) {
   };
 
   const handleChange = (value: string | null) => {
-    onRoleChange(value, value ? roles.find(c => c.value == value)?.label : undefined);
+    onRoleChange(value, value ? roles.find(c => c.value == value)?.label : null);
     setRole(value);
   };
 

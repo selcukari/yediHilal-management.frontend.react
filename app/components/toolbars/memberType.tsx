@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useMemberTypeService } from '../../services/memberTypeService';
 
 interface MemberTypeProps {
-  onMemberTypeChange: (val: string | null, name?: string) => void;
+  onMemberTypeChange: (val: string | null, name?: string | null) => void;
 }
 
 export function MemberType({ onMemberTypeChange }: MemberTypeProps) {
@@ -36,7 +36,7 @@ export function MemberType({ onMemberTypeChange }: MemberTypeProps) {
   };
 
   const handleChange = (value: string | null) => {
-    onMemberTypeChange(value, value ? memberTypes.find(c => c.value == value)?.label : undefined);
+    onMemberTypeChange(value, value ? memberTypes.find(c => c.value == value)?.label : null);
     setMemberType(value);
   };
 

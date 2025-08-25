@@ -38,7 +38,7 @@ export default function User() {
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null); // Silinecek öğenin ID'sini tut
   const [selectedCountryName, setSelectedCountryName] = useState<string>('Türkiye'); // Yeni state
   const [selectedProvinceNames, setSelectedProvinceNames] = useState<string[]>([]); // Yeni state
-  const [selectedRoleName, setSelectedRoleName] = useState<string>(''); // Yeni state
+  const [selectedRoleName, setSelectedRoleName] = useState<string | null>(''); // Yeni state
   const [visible, { open, close }] = useDisclosure(false);
   
   const [rowHeaders, setRowHeaders] = useState([
@@ -153,7 +153,7 @@ export default function User() {
     }));
   };
 
-  const onRoleChange = (roleValue: string | null, roleName?: string): void => {
+  const onRoleChange = (roleValue: string | null, roleName?: string | null): void => {
     setSelectedRoleName(roleName || '');
 
     setFilterModel((prev) => ({
@@ -252,7 +252,7 @@ export default function User() {
     }));
   }, [rowHeaders]);
 
-  const reportTitle = useMemo((): string => {
+  const reportTitle = (): string => {
     const isActiveText = filterModel.isActive ? 'Aktif' : 'Pasif';
 
     if (selectedProvinceNames?.length > 0 && selectedRoleName) {
@@ -271,7 +271,7 @@ export default function User() {
     }
 
     return `${selectedCountryName}/Tüm İller/Tüm Roller/${isActiveText} Kullanıcı Raporu`;
-  }, [selectedCountryName, filterModel.isActive, selectedProvinceNames]);
+  };
 
   return (
       <Container size="xl">
@@ -355,7 +355,7 @@ export default function User() {
                 <Grid.Col span={4}>
                   <Flex mih={50} gap="md" direction="row" wrap="wrap">
                     <MenuActionButton
-                    reportTitle={reportTitle}
+                    reportTitle={reportTitle()}
                     excelColumns={excelTableColumns}
                     valueData={resultData}
                     pdfColumns={pdfTableColumns}
