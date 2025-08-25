@@ -6,5 +6,6 @@ export { Country } from './toolbars/country';
 export { Province } from './toolbars/province';
 export { MainContent } from './layoutComponents/mainContent';
 export { Role } from './toolbars/role';
+export { MemberType } from './toolbars/memberType';
 export { MenuActionButton } from '../components/menuActionButton';
 export { RichTextEditorTiptap } from './richTextEditorTiptap';

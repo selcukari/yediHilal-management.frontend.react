@@ -315,23 +315,41 @@ export default function User() {
                   <Role onRoleChange={onRoleChange}></Role>
                 </Grid.Col>
 
-                <Grid.Col span={4}>
-                  <Switch 
-                    label="Kullanıcı Durumu" 
-                    checked={filterModel.isActive}
-                    onChange={(event) => {
-                      setFilterModel(prev => ({
-                      ...prev,
-                      isActive: event.currentTarget?.checked
-                    }))}}
-                  />
+                <Grid.Col span={2}>
+                  <Flex
+                    mih={50}
+                    gap="md"
+                    justify="flex-start"
+                    align="flex-end"
+                    direction="row"
+                    wrap="wrap"
+                  >
+                    <Switch 
+                      label="Kullanıcı Durumu" 
+                      checked={filterModel.isActive}
+                      onChange={(event) => {
+                        setFilterModel(prev => ({
+                        ...prev,
+                        isActive: event.currentTarget?.checked
+                      }))}}
+                    />
+                  </Flex>
                 </Grid.Col>
                 <Grid.Col span={4}>
-                  <Button
-                    leftSection={<IconFilter size={14} />}
-                    onClick={fetchUsers}>
-                    Filtrele
-                  </Button>
+                  <Flex
+                    mih={50}
+                    gap="md"
+                    justify="flex-start"
+                    align="flex-end"
+                    direction="row"
+                    wrap="wrap"
+                  >
+                    <Button
+                      leftSection={<IconFilter size={14} />}
+                      onClick={fetchUsers}>
+                      Filtrele
+                    </Button>
+                  </Flex>
                 </Grid.Col>
                 { false && 
                 <Grid.Col span={4}>

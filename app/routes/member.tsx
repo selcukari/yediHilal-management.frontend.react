@@ -5,7 +5,7 @@ import {
   ActionIcon, LoadingOverlay, Flex,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Country, Province, MenuActionButton } from '../components'
+import { Country, Province, MemberType, MenuActionButton } from '../components'
 import MemberAdd, { type MemberAddDialogControllerRef } from '../components/members/memberAdd';
 import MemberEdit, { type MemberEditDialogControllerRef } from '../components/members/memberEdit';
 import ConfirmModalMessage, { type ConfirmModalMessageRef } from '../components/confirmModalMessage';
@@ -20,6 +20,7 @@ import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToEx
 type filterModels = {
   countryId?: string | null;
   provinceIds?: string[] | null;
+  typeId?: string | null;
   searchText?: string;
   isActive: boolean;
 }
@@ -36,6 +37,7 @@ export default function Member() {
   const [filterModel, setFilterModel] = useState<filterModels>({ isActive: true, countryId: '1' });
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null); // Silinecek öğenin ID'sini tut
   const [selectedCountryName, setSelectedCountryName] = useState<string>('Türkiye'); // Yeni state
+  const [selectedMemberTypeName, setSelectedMemberTypeName] = useState<string>('');
   const [selectedProvinceNames, setSelectedProvinceNames] = useState<string[]>([]); // Yeni state
   const [visible, { open, close }] = useDisclosure(false);
   
@@ -161,6 +163,15 @@ export default function Member() {
     </Table.Tr>
   ));
 
+  const onMemberTypeChange = (memberTypeValue: string | null, memberTypeName?: string): void => {
+    setSelectedMemberTypeName(memberTypeName || '');
+
+    setFilterModel((prev) => ({
+      ...prev,
+      typeId: memberTypeValue,
+    }));
+  };
+
   const onCountrySelected = (countryValue: string | null, countryName?: string): void => {
     setSelectedCountryName(countryName || '');
     setSelectedCountry(countryValue);
@@ -273,13 +284,25 @@ export default function Member() {
   const reportTitle = useMemo((): string => {
     const isActiveText = filterModel.isActive ? 'Aktif' : 'Pasif';
 
-    if (selectedProvinceNames?.length > 0) {
+    if (selectedProvinceNames?.length > 0 && filterModel.typeId) {
       const provinceNames = selectedProvinceNames.join(",")
 
-      return `${selectedCountryName}/${provinceNames}/${isActiveText} Üye Raporu`;
+      return `${selectedCountryName}/${selectedMemberTypeName}/${provinceNames}/${isActiveText} Üye Raporu`;
     }
 
-    return `${selectedCountryName}/Tüm İller/${isActiveText} Üye Raporu`;
+    if (selectedProvinceNames?.length > 0 && !filterModel.typeId) {
+      const provinceNames = selectedProvinceNames.join(",")
+
+      return `${selectedCountryName}/Tüm Üye Tipler/${provinceNames}/${isActiveText} Üye Raporu`;
+    }
+
+    if (selectedProvinceNames?.length < 0 && filterModel.typeId) {
+      const provinceNames = selectedProvinceNames.join(",")
+
+      return `${selectedCountryName}/${selectedMemberTypeName}/Tüm İller/${isActiveText} Üye Raporu`;
+    }
+
+    return `${selectedCountryName}/Tüm Üye Tipler/Tüm İller/${isActiveText} Üye Raporu`;
   }, [selectedCountryName, filterModel.isActive, selectedProvinceNames]);
 
   return (
@@ -332,29 +355,53 @@ export default function Member() {
                 </Grid.Col>
 
                 <Grid.Col span={4}>
-                  <Switch 
-                    label="Üye Durumu" 
-                    checked={filterModel.isActive}
-                    onChange={(event) => {
-                      setFilterModel(prev => ({
-                      ...prev,
-                      isActive: event.currentTarget?.checked
-                    }))}}
-                  />
+                  <MemberType
+                    onMemberTypeChange={onMemberTypeChange}
+                  ></MemberType>
                 </Grid.Col>
-                <Grid.Col span={4}>
-                  <Button
-                    leftSection={<IconFilter size={14} />}
-                    onClick={fetchMembers}>
-                    Filtrele
-                  </Button>
+
+                <Grid.Col span={1.5}>
+                  <Flex
+                    mih={50}
+                    gap="md"
+                    justify="flex-start"
+                    align="flex-end"
+                    direction="row"
+                    wrap="wrap"
+                  >
+                    <Switch 
+                      label="Üye Durumu" 
+                      checked={filterModel.isActive}
+                      onChange={(event) => {
+                        setFilterModel(prev => ({
+                        ...prev,
+                        isActive: event.currentTarget?.checked
+                      }))}}
+                    />
+                  </Flex>
                 </Grid.Col>
                 <Grid.Col span={4}>
                   <Flex
                     mih={50}
                     gap="md"
-                    justify="flex-end"
-                    align="flex-start"
+                    justify="flex-start"
+                    align="flex-end"
+                    direction="row"
+                    wrap="wrap"
+                  >
+                    <Button
+                      leftSection={<IconFilter size={14} />}
+                      onClick={fetchMembers}>
+                      Filtrele
+                    </Button>
+                  </Flex>
+                </Grid.Col>
+                <Grid.Col span={2} offset={0.5}>
+                  <Flex
+                    mih={50}
+                    gap="md"
+                    justify="flex-start"
+                    align="flex-end"
                     direction="row"
                     wrap="wrap"
                   >
