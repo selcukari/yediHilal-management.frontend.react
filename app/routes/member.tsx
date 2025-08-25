@@ -165,6 +165,7 @@ export default function Member() {
 
   const onMemberTypeChange = (memberTypeValue: string | null, memberTypeName?: string): void => {
     setSelectedMemberTypeName(memberTypeName || '');
+    console.log('selectedMemberTypeName:', memberTypeName)
 
     setFilterModel((prev) => ({
       ...prev,
@@ -284,20 +285,19 @@ export default function Member() {
   const reportTitle = useMemo((): string => {
     const isActiveText = filterModel.isActive ? 'Aktif' : 'Pasif';
 
-    if (selectedProvinceNames?.length > 0 && filterModel.typeId) {
+    if (selectedProvinceNames?.length > 0 && selectedMemberTypeName) {
       const provinceNames = selectedProvinceNames.join(",")
 
       return `${selectedCountryName}/${selectedMemberTypeName}/${provinceNames}/${isActiveText} Üye Raporu`;
     }
 
-    if (selectedProvinceNames?.length > 0 && !filterModel.typeId) {
+    if (selectedProvinceNames?.length > 0 && !selectedMemberTypeName) {
       const provinceNames = selectedProvinceNames.join(",")
 
       return `${selectedCountryName}/Tüm Üye Tipler/${provinceNames}/${isActiveText} Üye Raporu`;
     }
 
-    if (selectedProvinceNames?.length < 0 && filterModel.typeId) {
-      const provinceNames = selectedProvinceNames.join(",")
+    if (selectedProvinceNames?.length < 1 && selectedMemberTypeName) {
 
       return `${selectedCountryName}/${selectedMemberTypeName}/Tüm İller/${isActiveText} Üye Raporu`;
     }

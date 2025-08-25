@@ -1,6 +1,6 @@
 import { Select } from '@mantine/core';
 import { useState, useEffect } from 'react';
-import { useRoleService } from '../../services/roleService';
+import { useMemberTypeService } from '../../services/memberTypeService';
 
 interface MemberTypeProps {
   onMemberTypeChange: (val: string | null, name?: string) => void;
@@ -10,7 +10,7 @@ export function MemberType({ onMemberTypeChange }: MemberTypeProps) {
   const [memberType, setMemberType] = useState<string | null>("");
   const [memberTypes, setMemberTypes] = useState<{ value: string; label: string }[]>([]);
   
-  const service = useRoleService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+  const service = useMemberTypeService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
   useEffect(() => {
     fetchRoleData();
@@ -18,7 +18,7 @@ export function MemberType({ onMemberTypeChange }: MemberTypeProps) {
 
   const fetchRoleData = async () => {
     try {
-      const response = await service.getRoles();
+      const response = await service.getMemberTypes();
 
       if (response) {
         setMemberTypes(

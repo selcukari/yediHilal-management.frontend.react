@@ -266,7 +266,7 @@ export default function User() {
       
       return `${selectedCountryName}/${provinceNames}/Tüm Roller/${isActiveText} Kullanıcı Raporu`;
     }
-    if (selectedRoleName && !(selectedProvinceNames?.length < 0)) {
+    if (selectedRoleName && !(selectedProvinceNames?.length < 1)) {
       return `${selectedCountryName}/Tüm İller/${selectedRoleName}/${isActiveText} Kullanıcı Raporu`;
     }
 
