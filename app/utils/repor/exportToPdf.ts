@@ -186,7 +186,7 @@ private addTable(
     margin: {
       top: 35,
       left: 0,
-      right: 10,
+      right: 0,
       bottom: 20
     },
     styles: {
