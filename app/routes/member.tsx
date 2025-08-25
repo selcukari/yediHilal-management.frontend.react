@@ -165,7 +165,6 @@ export default function Member() {
 
   const onMemberTypeChange = (memberTypeValue: string | null, memberTypeName?: string | null): void => {
     setSelectedMemberTypeName(memberTypeName || '');
-    console.log('selectedMemberTypeName:', memberTypeName)
 
     setFilterModel((prev) => ({
       ...prev,
