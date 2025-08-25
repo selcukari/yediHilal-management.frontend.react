@@ -375,7 +375,7 @@ export default function Member() {
           <Paper shadow="xs" p="lg" withBorder>
             <Stack gap="md">
               <Title order={4}>Son Üyeler({rowsTable?.length || 0})</Title>
-              <Table.ScrollContainer minWidth={500} maxHeight={300}>
+              <Table.ScrollContainer minWidth={200} maxHeight={700}>
                 <Table striped highlightOnHover withColumnBorders>
                   <Table.Thead>
                     <Table.Tr>
