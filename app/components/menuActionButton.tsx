@@ -1,10 +1,9 @@
 import { useRef } from 'react';
-import { Menu, Button, LoadingOverlay } from '@mantine/core';
+import { Menu, Button, LoadingOverlay, Divider } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconSearch, IconFileTypePdf, IconMessage, IconSend2, IconFileExcel } from '@tabler/icons-react';
+import { IconFileTypePdf, IconMessage, IconSend2, IconFileExcel } from '@tabler/icons-react';
 import { type PdfConfig, type PdfTableColumn, PdfHelperService } from '../utils/repor/exportToPdf';
 import { type ColumnDefinition, exportToExcel } from '../utils/repor/exportToExcel';
-import { useMailService } from '~/services/mailService';
 import MailSend, { type MailSendDialogControllerRef } from '../components/mail/mailSend';
 import SmsSend, { type SmsSendDialogControllerRef } from '../components/sms/smsSend';
 
@@ -109,7 +108,7 @@ export function MenuActionButton({
       <Menu.Dropdown>
         <Menu.Item leftSection={<IconFileTypePdf size={14} />} onClick={exportPdf} >Rapor-Pdf</Menu.Item>
         <Menu.Item leftSection={<IconFileExcel size={14} />} onClick={exportExcel} >Rapor-Excel</Menu.Item>
-        <Menu.Item leftSection={<IconSearch size={14} />} disabled>Search </Menu.Item>
+        <Divider my="md" />
         <Menu.Item leftSection={<IconSend2 size={14} />} onClick={sendMail}>Mail-Gönder</Menu.Item>
         <Menu.Item leftSection={<IconMessage size={14} />} onClick={sendSms} disabled>Sms-Gönder</Menu.Item> 
       </Menu.Dropdown>
