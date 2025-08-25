@@ -6,7 +6,7 @@ export function Footer() {
     <AppShell.Footer>
       <Group h="100%" px="md" justify="space-between" align="center">
         <Text size="sm" c="dimmed">
-          © 2025 Yedi Hilal Yönetim Sistemi. Tüm hakları saklıdır.
+          {`© 2025 YediHilal Yönetim Sistemi. Tüm hakları saklıdır. <selcuk.ari/>`}
         </Text>
         <Group gap="md">
           <Text

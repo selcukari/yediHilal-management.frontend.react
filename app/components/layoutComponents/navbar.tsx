@@ -35,7 +35,7 @@ export function Navbar({ opened, toggle }: NavbarProps) {
             size="sm"
           />
           <Title order={3} c="blue">
-            Yedi Hilal Yönetim
+            YediHilal Yönetim
           </Title>
         </Group>
         
