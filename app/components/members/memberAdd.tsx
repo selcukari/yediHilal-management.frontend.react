@@ -7,6 +7,7 @@ import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../../components/confirmModal';
 import { CountrySelect } from '../addOrEdit/countrySelect';
 import { ProvinceSelect } from '../addOrEdit/provinceSelect';
+import { ReferansMemberSelect } from '../addOrEdit/referansMemberSelect';
 import { useMemberService } from '../../services/memberService';
 import { toast } from '../../utils/toastMessages';
 import { MemberTypeSelect } from '../addOrEdit/memberTypeSelect';
@@ -269,16 +270,11 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
             />
           </Grid.Col>
 
-          <Grid.Col span={6}>
-            <Select
-              label="Referans"
-              placeholder="Referans Seçiniz"
-              data={[{value: "1", label: 'React' }, {value:"2", label:'Angular'}, {value: "3", label: 'Vue'}]}
-              searchable
-              maxDropdownHeight={200}
-              disabled={isDisabledReference}
-              nothingFoundMessage="Nothing found..."
-              {...form.getInputProps('referenceId')}
+          <Grid.Col span={6}> 
+            <ReferansMemberSelect
+              form={form}
+              countryId={form.values.countryId}
+              isDisabled={isDisabledReference}
             />
           </Grid.Col>
 

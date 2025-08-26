@@ -5,6 +5,7 @@ import { Modal, TextInput, Button, Stack, Grid, Select, Group, Switch, Textarea 
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
+import { ReferansMemberSelect } from '../addOrEdit/referansMemberSelect';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { CountrySelect } from '../addOrEdit/countrySelect';
 import { ProvinceSelect } from '../addOrEdit/provinceSelect';
@@ -298,16 +299,10 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
           </Grid.Col>
 
           <Grid.Col span={6}>
-            <Select
-              label="Referans"
-              placeholder="Referans Seçiniz"
-              value={form.values.referenceId}
-              data={[{value: "1", label: 'React' }, {value:"2", label:'Angular'}, {value: "3", label: 'Vue'}]}
-              searchable
-              maxDropdownHeight={200}
-              disabled={isDisabledReference}
-              nothingFoundMessage="Nothing found..."
-              {...form.getInputProps('referenceId')}
+            <ReferansMemberSelect
+              form={form}
+              countryId={form.values.countryId}
+              isDisabled={isDisabledReference}
             />
           </Grid.Col>
 

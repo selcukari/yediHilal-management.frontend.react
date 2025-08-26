@@ -78,5 +78,22 @@ export function useMemberService(controller: string) {
     }
   };
 
-  return { addMember, members, updateMember, deleteMember };
+  const membersInCache = async (countryId?: string) => {
+    const turkeyCountryId = 1;
+
+    try {
+
+      const res = await api.get(`/${controller}/getMembers`,{
+        params: {
+          ...(countryId ? { countryId: parseInt(countryId)} : { countryId: turkeyCountryId }),
+        }
+      });
+
+      return res.data.data;
+    } catch (error: any) {
+      return error.response.data;
+    }
+  };
+
+  return { addMember, members, updateMember, deleteMember, membersInCache };
 }
