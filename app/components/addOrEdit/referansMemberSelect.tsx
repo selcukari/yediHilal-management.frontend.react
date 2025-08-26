@@ -7,9 +7,10 @@ interface ReferansMemberSelectProps {
   form: UseFormReturnType<any>;
   countryId?: string;
   isDisabled: boolean;
+  memberId?: string;
 }
 
-export function ReferansMemberSelect({ form, countryId, isDisabled = false }: ReferansMemberSelectProps) {
+export function ReferansMemberSelect({ form, countryId, isDisabled = false, memberId }: ReferansMemberSelectProps) {
   const [referansMembers, setReferansMembers] = useState<{ value: string; label: string }[]>([]);
   
   const service = useMemberService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
@@ -24,10 +25,12 @@ export function ReferansMemberSelect({ form, countryId, isDisabled = false }: Re
 
       if (response) {
         setReferansMembers(
-          response.map((c: any) => ({
-            value: String(c.id),
-            label: c.fullName,
-          }))
+          response
+            .filter((c: any) => String(c.id) != memberId)
+            .map((c: any) => ({
+              value: String(c.id),
+              label: c.fullName,
+            }))
         );
       } else {
         console.error('No fetcReferansMembersData data found');

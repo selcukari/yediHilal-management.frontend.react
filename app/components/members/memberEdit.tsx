@@ -301,6 +301,7 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
           <Grid.Col span={6}>
             <ReferansMemberSelect
               form={form}
+              memberId={form.values.id?.toString()}
               countryId={form.values.countryId}
               isDisabled={isDisabledReference}
             />
