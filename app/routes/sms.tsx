@@ -19,7 +19,7 @@ export default function Mail() {
   const [visible, { open, close }] = useDisclosure(false);
   
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
-    { field: 'id', header: 'id' },
+    { field: 'id', header: 'Id' },
     { field: 'message', header: 'Mesaj' },
     { field: 'toUsers', header: 'Alıcı İsimleri' },
     { field: 'toPhoneNumbers', header: 'Alıcı Tel. Num.' },
@@ -119,7 +119,7 @@ export default function Mail() {
           {/* Sayfa Başlığı */}
           <Group justify="space-between" align="center">
             <div>
-              <Title order={2}>Mail Sayfası</Title>
+              <Title order={2}>Sms Sayfası</Title>
               <Text size="sm" c="dimmed">
                 Toolbar Filtreleme Alanı
               </Text>

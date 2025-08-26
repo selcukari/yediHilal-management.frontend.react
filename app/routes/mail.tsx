@@ -7,6 +7,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { useMailService } from '../services/mailService';
 import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
+import { stripHtml } from '../utils/stripHtml';
 import { useAuth } from '~/authContext';
 
 interface Column {
@@ -20,7 +21,7 @@ export default function Mail() {
   const [visible, { open, close }] = useDisclosure(false);
   
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
-    { field: 'id', header: 'id' },
+    { field: 'id', header: 'Id' },
     { field: 'subject', header: 'Konu' },
     { field: 'body', header: 'İçerik' },
     { field: 'count', header: 'Alıcı Sayısı' },
@@ -101,7 +102,7 @@ export default function Mail() {
           subject: mail.subject,
           toEmails: mail.toEmails,
           toUsers: mail.toUsers,
-          body: mail.body,
+          body: stripHtml(mail.body as string),
           count: mail.count,
           createdDate: formatDate(mail.createdDate),
         })));

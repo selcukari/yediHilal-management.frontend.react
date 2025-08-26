@@ -1,0 +1,1 @@
+export const stripHtml = (value?: string) => value ? value.replace(/<[^>]+>/g, '') : '';
