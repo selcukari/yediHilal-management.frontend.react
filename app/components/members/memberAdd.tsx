@@ -137,7 +137,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
 
     const result = await service.addMember(newMemberValue);
 
-    if (result) {
+    if (result == true) {
 
       toast.success('İşlem başarılı!');
       
@@ -152,7 +152,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
 
       return;
     }
-    if (result?.data === false && result?.errors) {
+    if (result?.data == false && result?.errors) {
 
       toast.warning(result.errors[0]);
 

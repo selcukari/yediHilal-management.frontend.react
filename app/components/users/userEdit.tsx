@@ -126,7 +126,7 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
 
     const result = await service.updateUser(newUserValue);
 
-    if (result === true) {
+    if (result == true) {
 
       toast.success('İşlem başarılı!');
       
@@ -141,7 +141,7 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
 
       return;
     }
-    if (result?.data === false && result?.errors) {
+    if (result?.data == false && result?.errors) {
 
       toast.warning(result.errors[0]);
 

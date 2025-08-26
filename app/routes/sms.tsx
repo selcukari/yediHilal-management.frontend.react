@@ -83,15 +83,15 @@ export default function Mail() {
     const params: number = 2; // 1: user, 2: member
      try {
 
-      const getMails = await service.getSms(params);
-      if (getMails) {
-        setResultData(getMails.map((mail: any) => ({
-          id: mail.id,
-          message: mail.message,
-          toUsers: mail.toUsers,
-          toPhoneNumbers: mail.toPhoneNumbers,
-          count: mail.count,
-          createdDate: formatDate(mail.createdDate),
+      const getSmss = await service.getSms(params);
+      if (getSmss) {
+        setResultData(getSmss.map((sms: any) => ({
+          id: sms.id,
+          message: sms.message,
+          toUsers: sms.toUsers,
+          toPhoneNumbers: sms.toPhoneNumbers,
+          count: sms.count,
+          createdDate: formatDate(sms.createdDate),
         })));
        
       } else {
@@ -101,8 +101,7 @@ export default function Mail() {
       }
         close();
     } catch (error: any) {
-      console.error('Error fetching getMails:', error.message);
-        toast.error(`Mail yüklenirken hata: ${error.message}`);
+        toast.error(`Sms yüklenirken hata: ${error.message}`);
       close();
     }
   };

@@ -159,8 +159,7 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
     }
 
     const result = await service.updateMember(newMemberValue);
-
-    if (result === true) {
+    if (result == true) {
 
       toast.success('İşlem başarılı!');
       
@@ -175,7 +174,7 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
 
       return;
     }
-    if (result?.data === false && result?.errors) {
+    if (result?.data == false && result?.errors) {
 
       toast.warning(result.errors[0]);
 

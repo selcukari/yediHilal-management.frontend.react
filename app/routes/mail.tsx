@@ -114,8 +114,7 @@ export default function Mail() {
       }
         close();
     } catch (error: any) {
-      console.error('Error fetching getMails:', error.message);
-        toast.error(`Mail yüklenirken hata: ${error.message}`);
+      toast.error(`Mail yüklenirken hata: ${error.message}`);
       close();
     }
   };

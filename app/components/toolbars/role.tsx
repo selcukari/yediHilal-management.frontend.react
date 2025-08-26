@@ -1,5 +1,6 @@
 import { Select } from '@mantine/core';
 import { useState, useEffect } from 'react';
+import { toast } from '../../utils/toastMessages';
 import { useRoleService } from '../../services/roleService';
 
 interface RoleProps {
@@ -28,10 +29,11 @@ export function Role({ onRoleChange }: RoleProps) {
           }))
         );
       } else {
-        console.error('No getRoles data found');
+        toast.info('Hiçbir veri yok!');
       }
     } catch (error: any) {
-      console.error('Error fetching getRoles:', error.message);
+      toast.error(`countries yüklenirken hata: ${error.message}`);
+      
     }
   };
 

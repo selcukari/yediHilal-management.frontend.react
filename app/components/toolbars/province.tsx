@@ -1,5 +1,6 @@
 import { MultiSelect } from '@mantine/core';
 import { useEffect, useState } from 'react';
+import { toast } from '../../utils/toastMessages';
 import { useProvinceService } from '../../services/provinceService'
 
 interface ProvinceProps {
@@ -36,10 +37,10 @@ export function Province({
         );
 
       } else {
-        console.error('No getProvinces data found');
+        toast.info('Hiçbir veri yok!');
       }
     } catch (error: any) {
-      console.error('Error fetching getProvinces:', error.message);
+      toast.error(`countries yüklenirken hata: ${error.message}`);
     }
   }
 

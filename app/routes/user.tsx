@@ -191,8 +191,8 @@ export default function User() {
         close();
         setDisabledDeleteAction(!filterModel.isActive);
     } catch (error: any) {
-      console.error('Error fetching getUsers:', error.message);
-        toast.error(`Kullanıcılar yüklenirken hata: ${error.message}`);
+
+      toast.error(`Kullanıcılar yüklenirken hata: ${error.message}`);
       close();
     }
   };

@@ -1,5 +1,6 @@
 import { Select } from '@mantine/core';
 import { useState, useEffect } from 'react';
+import { toast } from '../../utils/toastMessages';
 import { useCountryService } from '../../services/countryService'
 
 interface CountryProps {
@@ -33,10 +34,10 @@ export function Country({ isRequired = false, isDisabled = false,
           }))
         );
       } else {
-        console.error('No countries data found');
+        toast.info('Hiçbir veri yok!');
       }
     } catch (error: any) {
-      console.error('Error fetching countries:', error.message);
+      toast.error(`countries yüklenirken hata: ${error.message}`);
     }
   };
 

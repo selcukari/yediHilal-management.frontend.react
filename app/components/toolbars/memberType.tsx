@@ -1,5 +1,6 @@
 import { Select } from '@mantine/core';
 import { useState, useEffect } from 'react';
+import { toast } from '../../utils/toastMessages';
 import { useMemberTypeService } from '../../services/memberTypeService';
 
 interface MemberTypeProps {
@@ -28,10 +29,10 @@ export function MemberType({ onMemberTypeChange }: MemberTypeProps) {
           }))
         );
       } else {
-        console.error('No getRoles data found');
+        toast.info('Hiçbir veri yok!');
       }
     } catch (error: any) {
-      console.error('Error fetching getRoles:', error.message);
+      toast.error(`MemberTypes yüklenirken hata: ${error.message}`);
     }
   };
 

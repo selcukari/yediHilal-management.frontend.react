@@ -36,7 +36,7 @@ export function useUserService(controller: string) {
 
       return res.data.data;
     } catch (error: any) {
-      return error.response.data;
+      return error;
     }
   };
 
@@ -47,7 +47,7 @@ export function useUserService(controller: string) {
 
       return res.data.data;
     } catch (error: any) {
-      return error.response.data;
+      return error;
     }
   };
 
@@ -58,7 +58,7 @@ export function useUserService(controller: string) {
 
       return res.data.data;
     } catch (error: any) {
-      return error.response.data;
+      return error;
     }
   };
 
@@ -72,7 +72,7 @@ export function useUserService(controller: string) {
 
       return res.data.data;
     } catch (error: any) {
-      return error.response.data;
+      return error;
     }
   };
 

@@ -38,7 +38,7 @@ export function useMemberService(controller: string) {
 
       return res.data.data;
     } catch (error: any) {
-      return error.response.data;
+      return error;
     }
   };
 
@@ -49,7 +49,8 @@ export function useMemberService(controller: string) {
 
       return res.data.data;
     } catch (error: any) {
-      return error.response.data;
+
+      return error;
     }
   };
 
@@ -60,7 +61,8 @@ export function useMemberService(controller: string) {
 
       return res.data.data;
     } catch (error: any) {
-      return error.response.data;
+
+      return error;
     }
   };
 
@@ -74,7 +76,7 @@ export function useMemberService(controller: string) {
 
       return res.data.data;
     } catch (error: any) {
-      return error.response.data;
+      return error;
     }
   };
 
@@ -91,7 +93,7 @@ export function useMemberService(controller: string) {
 
       return res.data.data;
     } catch (error: any) {
-      return error.response.data;
+      return error;
     }
   };
 

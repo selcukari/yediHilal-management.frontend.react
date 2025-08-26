@@ -220,8 +220,7 @@ export default function Member() {
         close();
         setDisabledDeleteAction(!filterModel.isActive)
     } catch (error: any) {
-      console.error('Error fetching getMembers:', error.message);
-        toast.error(`Üye yüklenirken hata: ${error.message}`);
+      toast.error(`Üye yüklenirken hata: ${error.message}`);
       close();
     }
   };

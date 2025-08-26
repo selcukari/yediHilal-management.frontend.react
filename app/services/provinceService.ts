@@ -18,7 +18,7 @@ export function useProvinceService(controller: string) {
 
       return res.data.data;
     } catch (error: any) {
-      return error.error;
+      return error;
     }
   };
 

@@ -12,7 +12,7 @@ export function useCountryService(controller: string) {
 
       return res.data.data;
     } catch (error: any) {
-      return error.error;
+      return error;
     }
   };
 
