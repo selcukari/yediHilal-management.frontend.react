@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       setCurrentUser(getUser.data);
-      setWithExpiry('currentUser', JSON.stringify(getUser.data), 86400000 * 7);
+      setWithExpiry('currentUser', JSON.stringify(getUser.data), 86400000 * 7); // a week
 
       return true;
     } catch (error: any) {
