@@ -86,7 +86,7 @@ export function Sidebar({ active, setActive }: SidebarProps) {
       { isLoggedIn && <AppShell.Section>
         <Divider my="sm" />
         <Group justify="center">
-          <Text size="xs" c="dimmed">v1.0.0</Text>
+          <Text size="xs" c="dimmed">{`v${import.meta.env.VITE_APP_VERSION}`}</Text>
         </Group>
       </AppShell.Section> }
     </AppShell.Navbar>
