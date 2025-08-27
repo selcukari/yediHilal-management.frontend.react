@@ -33,7 +33,7 @@ export default function Mail() {
   const filteredUsers = useMemo(() => {
     if (!searchText) return resultData;
     
-    return resultData.filter(sms => sms.message.toLowerCase().includes(searchText.toLowerCase()));
+    return resultData.filter(sms => sms.message.toLowerCase().includes(searchText.trim().toLowerCase()));
   }, [resultData, searchText]);
 
   useEffect(() => {

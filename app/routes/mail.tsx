@@ -39,8 +39,8 @@ export default function Mail() {
     if (!searchText) return resultData;
     
     return resultData.filter(mail =>
-      mail.subject.toLowerCase().includes(searchText.toLowerCase()) ||
-      mail.body.toLowerCase().includes(searchText.toLowerCase())
+      mail.subject.toLowerCase().includes(searchText.trim().toLowerCase()) ||
+      mail.body.toLowerCase().includes(searchText.trim().toLowerCase())
     );
   }, [resultData, searchText]);
 
