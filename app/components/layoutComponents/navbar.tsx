@@ -1,19 +1,6 @@
 import React from 'react';
-import {
-  Group,
-  Title,
-  Button,
-  Avatar,
-  Menu,
-  Burger,
-  AppShell,
-} from '@mantine/core';
-import {
-  IconBell,
-  IconLogout,
-  IconUser,
-  IconSettings,
-} from '@tabler/icons-react';
+import { Group, Image,  Title,  Button,  Avatar,  Menu, Box,  Burger, AppShell} from '@mantine/core';
+import { IconBell, IconLogout, IconUser, IconSettings} from '@tabler/icons-react';
 import { useAuth } from '../../authContext';
 
 interface NavbarProps {
@@ -34,9 +21,19 @@ export function Navbar({ opened, toggle }: NavbarProps) {
             hiddenFrom="sm"
             size="sm"
           />
+          <Image
+            h={50}
+            w="auto"
+            fit="contain"
+            radius="md"
+            src="https://yedihilal.org/wp-content/uploads/2023/12/yedihilal-yatayLogo.png"
+          />
+          
+           <Box style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
           <Title order={3} c="blue">
             YediHilal Yönetim
           </Title>
+        </Box>
         </Group>
         
         <Group>
