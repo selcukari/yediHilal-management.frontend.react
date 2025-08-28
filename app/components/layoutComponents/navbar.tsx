@@ -1,16 +1,63 @@
-import React from 'react';
+import { useRef } from 'react';
 import { Group, Image,  Title,  Button,  Avatar,  Menu, Box,  Burger, AppShell} from '@mantine/core';
 import { IconBell, IconLogout, IconUser, IconSettings} from '@tabler/icons-react';
 import { useAuth } from '../../authContext';
-
+import { useNavigate } from "react-router";
+import { toast } from '../../utils/toastMessages';
+import UserEdit, { type UserEditDialogControllerRef } from '../../components/users/userEdit';
+import { useUserService } from '~/services/userService';
 interface NavbarProps {
   opened: boolean;
   toggle: () => void;
 }
 
 export function Navbar({ opened, toggle }: NavbarProps) {
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, logout, currentUser } = useAuth();
+  const navigate = useNavigate();
+  
+  const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
+  const userEditRef = useRef<UserEditDialogControllerRef>(null);
+
+   const handleSaveSuccess = () => {
+
+    setTimeout(() => {
+      navigate("/")
+    }, 500);
+  };
+
+    const handleEdit = async() => {
+      if (currentUser?.id) {
+        const getUser = await service.user(currentUser.id as number);
+
+        if (getUser) {
+
+          userEditRef.current?.openDialog({
+          id: getUser.id,
+          fullName: getUser.fullName,
+          identificationNumber: getUser.identificationNumber,
+          email: getUser.email,
+          countryCode: getUser.countryCode,
+          phone: getUser.phone,
+          dateOfBirth: getUser.dateOfBirth ? getUser.dateOfBirth.toString() : '',
+          isActive: getUser.isActive,
+          password: getUser.password,
+          moduleRoles: getUser.moduleRoles,
+          roleId: getUser.roleId.toString(),
+          countryId: getUser.countryId.toString(),
+          provinceId: getUser.provinceId?.toString(),
+          deleteMessageTitle: getUser.deleteMessageTitle?.toString(),
+          createdDate: getUser.createdDate,
+          updateDate: getUser.updateDate,
+        });
+
+        }
+        else {
+          toast.info('Hiçbir veri yok!');
+        }
+      };
+  };
+  
   return (
     <AppShell.Header>
       <Group h="100%" px="md" justify="space-between">
@@ -52,7 +99,7 @@ export function Navbar({ opened, toggle }: NavbarProps) {
 
             <Menu.Dropdown>
               <Menu.Label>Hesap</Menu.Label>
-              <Menu.Item leftSection={<IconUser size={14} />}>
+              <Menu.Item leftSection={<IconUser size={14} />} onClick={handleEdit}>
                 Profili Düzenle
               </Menu.Item>
               <Menu.Item leftSection={<IconSettings size={14} />}>
@@ -74,6 +121,7 @@ export function Navbar({ opened, toggle }: NavbarProps) {
           <Button>Giriş Yap</Button>)}
         </Group>
       </Group>
+      <UserEdit ref={userEditRef} onSaveSuccess={handleSaveSuccess} />
     </AppShell.Header>
   );
 }

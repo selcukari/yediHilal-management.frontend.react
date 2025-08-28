@@ -76,5 +76,18 @@ export function useUserService(controller: string) {
     }
   };
 
-  return { addUser, users, deleteUser, updateUser };
+  const user = async (userId: number) => {
+    try {
+
+      const res = await api.get(`/${controller}/getUser`,{
+        params: { userId }
+      });
+
+      return res.data.data;
+    } catch (error: any) {
+      return error;
+    }
+  }
+
+  return { addUser, users, deleteUser, updateUser, user };
 }
