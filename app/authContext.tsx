@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string): Promise<boolean> => {
     setLoading(true);
     try {
-      const response = await api.get(`/managementUser/login?email=${email}&password=${password}`);
+      const response = await api.get(`/${import.meta.env.VITE_APP_API_USER_CONTROLLER}/login?email=${email}&password=${password}`);
       const getUser = response.data;
 
       if (getUser?.errors) {
