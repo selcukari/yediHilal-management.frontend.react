@@ -16,7 +16,7 @@ interface SidebarProps {
 // IconDashboard
 const menuItems = [
   { icon: IconUsers, label: 'Üye Yönetimi', key: 'member', link: '/' },
-  { icon: IconUser, label: 'Kullanıcı Tönetimi', key: 'user', link: '/users' },
+  { icon: IconUser, label: 'Kullanıcı Yönetimi', key: 'user', link: '/users' },
   { icon: IconMail, label: 'Gön. Mail Lis.', key: 'mail', link: '/mails' },
   { icon: IconMessage, label: 'Gön. Sms Lis.', key: 'sms', link: '/sms' },
   { icon: IconChartBar, label: 'Raporlar', key: 'report', link: '/reports' },
@@ -47,7 +47,7 @@ export function Sidebar({ active, setActive }: SidebarProps) {
       return;
     }
 
-    if (currentUser?.roleId == 3 && !['/', '/mails', '/sms'].includes(link)) {
+    if ([2,3].includes(currentUser?.roleId) && !['/', '/mails', '/sms'].includes(link)) {
       toast.error('Bu işlem için yetkiniz bulunmamaktadır.');
       
       return;

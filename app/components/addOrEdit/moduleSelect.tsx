@@ -49,7 +49,6 @@ export function ModuleSelect({ form, required = false, }: ModuleSelectProps) {
       maxDropdownHeight={200}
       nothingFoundMessage="Modül bulunamadı..."
       onChange={handleChange}
-      // {...form.getInputProps('moduleRoles')}
     />
   );
 }

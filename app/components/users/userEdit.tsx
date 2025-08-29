@@ -12,6 +12,8 @@ import { useUserService } from '../../services/userService';
 import { RoleSelect } from '../addOrEdit/roleSelect';
 import { toast } from '../../utils/toastMessages';
 import { ModuleSelect } from '../addOrEdit/moduleSelect';
+import { ResponsibleSelect } from '../addOrEdit/responsibleSelect';
+import { useAuth } from '~/authContext';
 
 export type UserEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -38,6 +40,7 @@ type FormValues = {
   createdDate?: string;
   password: string;
   updateDate?: string;
+  responsibilities?: string;
   deleteMessageTitle?: string;
 };
 
@@ -47,6 +50,7 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
   const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
+  const { currentUser } = useAuth();
 
   const form = useForm<FormValues>({
     initialValues: {
@@ -65,6 +69,7 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
       updateDate: "",
       password: '',
       moduleRoles: '',
+      responsibilities: '',
       deleteMessageTitle: '',
     },
     validate: {
@@ -290,12 +295,22 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
               form={form} 
             />
           </Grid.Col>
-
-          <Grid.Col span={6}>
-            <ModuleSelect
-              form={form} 
-            ></ModuleSelect>
-          </Grid.Col>
+          { currentUser?.roleId == 1 && (
+            <>
+              <Grid.Col span={6}>
+                <ModuleSelect
+                  form={form} 
+                  {...form.getInputProps('moduleRoles')}
+                />
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <ResponsibleSelect
+                  form={form}
+                  {...form.getInputProps('responsibilities')}
+                />
+              </Grid.Col>
+            </>
+          )}
           <Flex
             mih={50}
             gap="md"

@@ -5,6 +5,7 @@ export const modulesMockData = [
    // { key: 'mail', url: '/mails', label: 'Mail Modül' },
    // { key: 'sms', url: '/sms', label: 'Sms Modül' },
    { key: 'report', url: '/reports', label: 'Rapor Modül' },
+   { key: 'stock', url: '/stocks', label: 'Stock Modül' },
    { key: 'setting', url: '/settings', label: 'Ayarlar Modül' },
    { key: 'dashboard', url: '/dashboard', label: "Dashboard Modül" },
 ];

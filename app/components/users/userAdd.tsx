@@ -11,6 +11,7 @@ import { RoleSelect } from '../addOrEdit/roleSelect';
 import { useUserService } from '../../services/userService';
 import { toast } from '../../utils/toastMessages';
 import { ModuleSelect } from '../addOrEdit/moduleSelect';
+import { useAuth } from '~/authContext';
 
 export type UserAddDialogControllerRef = {
   open: () => void;
@@ -41,6 +42,8 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
   const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+
+  const { currentUser } = useAuth();
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
@@ -260,12 +263,12 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
               form={form} 
             />
           </Grid.Col>
-          
-          <Grid.Col span={6}>
+          { currentUser?.roleId == 1 &&
+          <Grid.Col span={6}> 
             <ModuleSelect
               form={form} 
             ></ModuleSelect>
-          </Grid.Col>
+          </Grid.Col> }
           <Flex
             mih={50}
             gap="md"

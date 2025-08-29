@@ -84,6 +84,7 @@ export default function User() {
       isActive: item.isActive,
       password: item.password,
       moduleRoles: item.moduleRoles,
+      responsibilities: item.responsibilities,
       roleId: item.roleId.toString(),
       countryId: item.countryId.toString(),
       provinceId: item.provinceId?.toString(),
