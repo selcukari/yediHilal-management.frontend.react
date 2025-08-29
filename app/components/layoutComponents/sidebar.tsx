@@ -16,11 +16,11 @@ interface SidebarProps {
 // IconDashboard
 const menuItems = [
   { icon: IconUsers, label: 'Üye Yönetimi', key: 'member', link: '/' },
-  { icon: IconUser, label: 'Kullanıcılar', key: 'user', link: '/users' },
+  { icon: IconUser, label: 'Kullanıcı Tönetimi', key: 'user', link: '/users' },
   { icon: IconMail, label: 'Gön. Mail Lis.', key: 'mail', link: '/mails' },
   { icon: IconMessage, label: 'Gön. Sms Lis.', key: 'sms', link: '/sms' },
   { icon: IconChartBar, label: 'Raporlar', key: 'report', link: '/reports' },
-  { icon: IconClipboardList, label: 'Stock', key: 'stock', link: '/stocks' },
+  { icon: IconClipboardList, label: 'Stock Yönetimi', key: 'stock', link: '/stocks' },
   { icon: IconSettings, label: 'Ayarlar', key: 'setting', link: '/settings' },
 ];
 
