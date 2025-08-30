@@ -41,5 +41,21 @@ export function useStockService(controller: string) {
     }
   };
 
-  return { getStock, updateStock };
+    const getStockUsed = async (type: string, buyerId?: number) => {
+
+    try {
+      const res = await api.get(`/${controller}/getStockUseds`, {
+        params: {
+          type,
+          ...(buyerId ? { buyerId } : { }),
+        }
+      });
+
+      return res.data.data;
+    } catch (error: any) {
+      return error;
+    }
+  };
+
+  return { getStock, updateStock, getStockUsed };
 }

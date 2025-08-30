@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  NavLink, Flex,  Text,  Stack,  Divider,  Group,  ScrollArea,  AppShell,
+  NavLink, Flex, Text, Stack, Divider, Group, ScrollArea, AppShell,
 } from '@mantine/core';
 import {
-  IconUser,  IconMail,  IconUsers,  IconSettings,  IconMessage,  IconChartBar,  IconChevronRight, IconClipboardList,
+  IconUser, IconMail, IconUsers, IconSettings, IconMessage, IconChartBar, 
+  IconChevronRight, IconClipboardList, IconChevronDown,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
 import { useAuth } from '~/authContext';
@@ -13,19 +14,30 @@ interface SidebarProps {
   active: string;
   setActive: (key: string) => void;
 }
-// IconDashboard
+
 const menuItems = [
   { icon: IconUsers, label: 'Üye Yönetimi', key: 'member', link: '/' },
   { icon: IconUser, label: 'Kullanıcı Yönetimi', key: 'user', link: '/users' },
   { icon: IconMail, label: 'Gön. Mail Lis.', key: 'mail', link: '/mails' },
   { icon: IconMessage, label: 'Gön. Sms Lis.', key: 'sms', link: '/sms' },
   { icon: IconChartBar, label: 'Raporlar', key: 'report', link: '/reports' },
-  { icon: IconClipboardList, label: 'Stock Yönetimi', key: 'stock', link: '/stocks' },
+  { 
+    icon: IconClipboardList, 
+    label: 'Stock Yönetimi', 
+    key: 'stock',
+    link: '/stocks',
+    children: [
+      { label: 'Emanetler', key: 'deposit', link: '/deposits' },
+      { label: 'Giderler', key: 'stockExpense', link: '/stockExpenses' },
+      { label: 'Depo', key: 'stock-depo', link: '/stocks' },
+    ],
+  },
   { icon: IconSettings, label: 'Ayarlar', key: 'setting', link: '/settings' },
 ];
 
 export function Sidebar({ active, setActive }: SidebarProps) {
   const { isLoggedIn, currentUser } = useAuth();
+  const [openedItems, setOpenedItems] = useState<string[]>([]);
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -33,13 +45,34 @@ export function Sidebar({ active, setActive }: SidebarProps) {
   // URL'e göre aktif menüyü belirle
   useEffect(() => {
     const currentPath = location.pathname;
-    const activeItem = menuItems.find(item => item.link === currentPath);
+    const activeItem = menuItems.find(item => item.link === currentPath) || 
+                      menuItems.flatMap(item => item.children || []).find(child => child.link === currentPath);
+    
     if (activeItem) {
       setActive(activeItem.key);
+      
+      // Eğer aktif öğe bir alt menü öğesiyse, ana menüyü de açık hale getir
+      const parentItem = menuItems.find(item => 
+        item.children && item.children.some(child => child.key === activeItem.key)
+      );
+      
+      if (parentItem && !openedItems.includes(parentItem.key)) {
+        setOpenedItems([...openedItems, parentItem.key]);
+      }
     }
   }, [location.pathname, setActive]);
 
-  const handleMenuItemClick = (key: string, link: string) => {
+  const handleMenuItemClick = (key: string, link: string, hasChildren: boolean = false) => {
+    if (hasChildren) {
+      // Alt menüyü aç/kapat
+      setOpenedItems(prev => 
+        prev.includes(key) 
+          ? prev.filter(item => item !== key) 
+          : [...prev, key]
+      );
+      return;
+    }
+
     setActive(key);
 
     if(currentUser.moduleRoles?.includes(key)) {
@@ -49,7 +82,6 @@ export function Sidebar({ active, setActive }: SidebarProps) {
 
     if ([2,3].includes(currentUser?.roleId) && !['/', '/mails', '/sms'].includes(link)) {
       toast.error('Bu işlem için yetkiniz bulunmamaktadır.');
-      
       return;
     }
     navigate(link);
@@ -72,15 +104,37 @@ export function Sidebar({ active, setActive }: SidebarProps) {
           </Flex>
           
           {menuItems.map((item) => (
-            <NavLink
-              key={item.key}
-              active={item.key === active}
-              label={item.label}
-              leftSection={<item.icon size="1rem" stroke={1.5} />}
-              rightSection={<IconChevronRight size="0.8rem" stroke={1.5} />}
-              onClick={() => handleMenuItemClick(item.key, item.link)}
-              variant="filled"
-            />
+            <div key={item.key}>
+              <NavLink
+                active={item.key === active || (item.children || []).some(child => child.key === active)}
+                label={item.label}
+                leftSection={<item.icon size="1rem" stroke={1.5} />}
+                rightSection={
+                  item.children ? (
+                    openedItems.includes(item.key) ? 
+                      <IconChevronDown size="0.8rem" stroke={1.5} /> : 
+                      <IconChevronRight size="0.8rem" stroke={1.5} />
+                  ) : (
+                    <IconChevronRight size="0.8rem" stroke={1.5} />
+                  )
+                }
+                onClick={() => handleMenuItemClick(item.key, item.link, !!item.children)}
+                opened={openedItems.includes(item.key)}
+                variant="filled"
+                childrenOffset={28}
+              >
+                {item.children && openedItems.includes(item.key) && (
+                  item.children.map((child) => (
+                    <NavLink
+                      key={child.key}
+                      label={child.label}
+                      active={child.key === active}
+                      onClick={() => handleMenuItemClick(child.key, child.link)}
+                    />
+                  ))
+                )}
+              </NavLink>
+            </div>
           ))}
         </Stack>
       </AppShell.Section> }
