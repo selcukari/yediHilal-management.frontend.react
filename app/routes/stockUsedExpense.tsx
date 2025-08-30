@@ -9,6 +9,7 @@ import { useStockService } from '../services/stockService';
 import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
 import { useAuth } from '~/authContext';
+import StockUsedExpenseEdit, { type StockUsedExpenseEditDialogControllerRef } from '../components/stock/stockUsedExpenseEdit';
 
 interface Column {
   field: string;
@@ -20,6 +21,7 @@ export default function StockUsedExpense() {
   const [searchText, setSearchText] = useState('');
   const [visible, { open, close }] = useDisclosure(false);
   const [isDisabledDeleteAction, setDisabledDeleteAction]= useState(false);
+  const stockUsedExpenseEditRef = useRef<StockUsedExpenseEditDialogControllerRef>(null);
   
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
     { field: 'id', header: 'Id' },
@@ -36,8 +38,9 @@ export default function StockUsedExpense() {
   // Filtrelenmiş veriler
   const filteredUsers = useMemo(() => {
     if (!searchText) return resultData;
+
     
-    return resultData.filter(sms => sms.message.toLowerCase().includes(searchText.trim().toLowerCase()));
+    return resultData.filter(stock => stock.buyerInformations?.fullName?.toLowerCase().includes(searchText.trim().toLowerCase()));
   }, [resultData, searchText]);
 
   useEffect(() => {
@@ -54,11 +57,28 @@ export default function StockUsedExpense() {
       );
     };
 
-    const handleDelete = (id: number) => {
-      console.log("handleDelete:id:", id);
+    const handleDelete = async (id: number) => {
+
+      const result = await service.deleteStockUsed(id);
+      if (result === true) {
+
+        toast.success('İşlem başarılı!');
+
+        fetchStockUsedExpense();
+      
+      return;
+    }
+    if (result?.data === false && result?.errors) {
+
+      toast.warning(result.errors[0]);
+
+    } else {
+      toast.error('Bir hata oluştu!');
+    }
+
     }
     const handleEdit = (item: any) => {
-      console.log("handleEdit:item:", item);
+      stockUsedExpenseEditRef.current?.openDialog(item);
     }
 
   const rowsTable = filteredUsers.map((item) => (
@@ -215,6 +235,9 @@ export default function StockUsedExpense() {
             </Stack>
           </Paper>
         </Stack>
+        <StockUsedExpenseEdit
+          ref={stockUsedExpenseEditRef}
+          ></StockUsedExpenseEdit>
       </Container>
   );
 }
