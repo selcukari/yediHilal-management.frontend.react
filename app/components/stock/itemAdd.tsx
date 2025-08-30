@@ -93,7 +93,7 @@ const ItemAdd = forwardRef<ItemAddDialogControllerRef, UserAddProps>(({onSaveSuc
       id: stockData.id,
       updateUserId: currentUser?.id as number,
       items: JSON.stringify([
-        ...stockData.items,
+        // ...stockData.items,
         {
           key: stripSpecialCharacters(values.name.trim()),
           name: values.name.trim(),

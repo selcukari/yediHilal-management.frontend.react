@@ -23,6 +23,14 @@ interface StockUsedExpenseParams {
   type: string;
 }
 
+interface UpdateStockUsedExpenseParams {
+  id: number;
+  buyerId: number;
+  items?: string;
+  isDelivery: boolean;
+  type: string;
+}
+
 export function useStockService(controller: string) {
   const { getCurrentToken, logout } = useAuth();
   const api = createApi(getCurrentToken() ?? undefined, logout);
@@ -65,7 +73,19 @@ export function useStockService(controller: string) {
       return error;
     }
   };
-    const updateStockUsedExpense = async (params: StockUsedExpenseParams) => {
+
+  const addStockUsed = async (params: StockUsedExpenseParams) => {
+
+    try {
+      const res = await api.put(`/${controller}/addStockUsed`, params);
+
+      return res.data.data;
+    } catch (error: any) {
+
+      return error;
+    }
+  };
+  const updateStockUsedExpense = async (params: UpdateStockUsedExpenseParams) => {
 
     try {
       const res = await api.put(`/${controller}/updateStockUsed`, params);
@@ -88,5 +108,5 @@ export function useStockService(controller: string) {
     }
   };
 
-  return { getStock, updateStock, getStockUsed, updateStockUsedExpense, deleteStockUsed };
+  return { getStock, updateStock, addStockUsed, getStockUsed, updateStockUsedExpense, deleteStockUsed };
 }

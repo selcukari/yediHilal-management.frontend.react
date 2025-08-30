@@ -20,7 +20,6 @@ export default function StockUsedExpense() {
   const [resultData, setResultData] = useState<any[]>([]);
   const [searchText, setSearchText] = useState('');
   const [visible, { open, close }] = useDisclosure(false);
-  const [isDisabledDeleteAction, setDisabledDeleteAction]= useState(false);
   const stockUsedExpenseEditRef = useRef<StockUsedExpenseEditDialogControllerRef>(null);
   
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
@@ -29,7 +28,7 @@ export default function StockUsedExpense() {
     { field: 'buyerInformations', header: 'Alıcı Bilgileri' },
     { field: 'isDelivery', header: 'Bitiş Durum' },
     { field: 'createDate', header: 'Kayıt Tarih' },
-    { field: 'updatedDate', header: 'Güncelleme Tarih' },
+    { field: 'updateDate', header: 'Güncelleme Tarih' },
     { field: 'actions', header: 'İşlemler' },
   ]);
 
@@ -48,6 +47,13 @@ export default function StockUsedExpense() {
       fetchStockUsedExpense();
     }, 1000);
   }, []);
+
+  const handleSaveSuccess = () => {
+
+    setTimeout(() => {
+      fetchStockUsedExpense();
+    }, 1000);
+  };
 
     const renderBoolean = (value: boolean) => {
       return (
@@ -91,6 +97,7 @@ export default function StockUsedExpense() {
                 <ActionIcon 
                   variant="light" 
                   color="blue"
+                  disabled={item.isDelivery as boolean}
                   onClick={() => handleEdit(item)}
                 >
                   <IconEdit size={16} />
@@ -236,7 +243,7 @@ export default function StockUsedExpense() {
           </Paper>
         </Stack>
         <StockUsedExpenseEdit
-          ref={stockUsedExpenseEditRef}
+          ref={stockUsedExpenseEditRef} onSaveSuccess={handleSaveSuccess}
           ></StockUsedExpenseEdit>
       </Container>
   );

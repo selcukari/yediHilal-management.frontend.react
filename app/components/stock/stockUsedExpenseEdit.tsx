@@ -24,22 +24,16 @@ interface StockDataParams {
   updateUserId?: number;
   buyerId: number;
   items?: string;
-  isActive: boolean;
   type: string;
   isDelivery: boolean;
 }
 
 type FormValues = {
-  isActive: boolean;
   isDelivery: boolean;
 };
 
 const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
-  type StockData = {
-    id: number;
-    items: { key: string }[];
-  };
   
   const [stockData, setStockData] = useState<any>({ items: [], id: 0 });
   const [opened, { open, close }] = useDisclosure(false);
@@ -50,7 +44,6 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
 
   const form = useForm<FormValues>({
     initialValues: {
-      isActive: true,
       isDelivery: false,
     },
     validate: {
@@ -74,11 +67,9 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
       id: stockData.id,
       buyerId: currentUser?.id as number,
       items: JSON.stringify(stockData.items.map((item: any) => ({key: item.key, count: item.count, name: item.name})) || ""),
-      isActive: values.isActive,
       isDelivery: values.isDelivery,
       type: stockData.type
     }
-    console.log("handleSubmit.newStockValue:", newStockValue)
 
     const result = await service.updateStockUsedExpense(newStockValue);
 
@@ -211,18 +202,11 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
           <Grid.Col span={6}>
             <fieldset style={{ border: '1px solid #e9ecef', borderRadius: '8px', padding: '16px' }}>
               <legend style={{ padding: '0 8px', fontWeight: 600 }}>Durum Ayarları</legend>
-              <Group gap="lg">
                 <Switch 
                   label="Tamamlandı Durumu" 
                   checked={form.values.isDelivery}
-                  onChange={(event) => form.setFieldValue('isActive', event.currentTarget.checked)}
+                  onChange={(event) => form.setFieldValue('isDelivery', event.currentTarget.checked)}
                 />
-                <Switch 
-                  label="Aktive Durumu" 
-                  checked={form.values.isActive}
-                  onChange={(event) => form.setFieldValue('isSms', event.currentTarget.checked)}
-                />
-              </Group>
             </fieldset>
           </Grid.Col>
            <Grid.Col span={6} offset={4}>
