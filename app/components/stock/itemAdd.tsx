@@ -53,7 +53,7 @@ const ItemAdd = forwardRef<ItemAddDialogControllerRef, UserAddProps>(({onSaveSuc
     validate: {
       name: (value) => {
         if(value.trim().length < 5 ) {
-            return "İsim en az 5 karakter olmalı";
+          return "İsim en az 5 karakter olmalı";
         }
 
         const keys = stockData?.items.map((item: any) => item.key);
@@ -70,7 +70,7 @@ const ItemAdd = forwardRef<ItemAddDialogControllerRef, UserAddProps>(({onSaveSuc
     },
   });
 
- useEffect(() => {
+  useEffect(() => {
     if (form.isValid()) {
         setIsDisabledSubmit(false);
 
@@ -95,8 +95,8 @@ const ItemAdd = forwardRef<ItemAddDialogControllerRef, UserAddProps>(({onSaveSuc
       items: JSON.stringify([
         ...stockData.items,
         {
-          key: stripSpecialCharacters(values.name),
-          ...values,
+          key: stripSpecialCharacters(values.name.trim()),
+          name: values.name.trim(),
           count: parseInt(values.count),
           color: randaomColor()
         }
