@@ -2,6 +2,7 @@ import { forwardRef, useEffect, useImperativeHandle, useState, Fragment, useRef 
 import { useDisclosure } from '@mantine/hooks';
 import { Modal, TextInput, Flex, Button, Stack, Grid, Title, Group, Switch } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { clone } from 'ramda';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
@@ -43,6 +44,7 @@ const StockUsedAdd = forwardRef<StockUsedAddDialogControllerRef, StockUsedAddPro
   const [type, setType] = useState("expense");
   
   const [stockItem, setStockItem] = useState<StockItem[]>([]);
+  const [stockItemInitial, setStockItemInitial] = useState<StockItem[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
   const service = useStockService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
   const { currentUser } = useAuth();
@@ -109,7 +111,7 @@ const StockUsedAdd = forwardRef<StockUsedAddDialogControllerRef, StockUsedAddPro
   };
 
   const dialogClose = () => {
-     if (!isEquals(form.getInitialValues(), form.getValues())) {
+     if (!isEquals(stockItem, stockItemInitial)) {
 
       confirmModalRef.current?.open();
     } else {
@@ -124,6 +126,7 @@ const StockUsedAdd = forwardRef<StockUsedAddDialogControllerRef, StockUsedAddPro
     if (stockItem.length > 0) {
       form.reset();
       setStockItem(stockItem.map((item: any) => ({...item, count: 0})));
+      setStockItemInitial(clone(stockItem.map((item: any) => ({...item, count: 0}))));
       setType(type);
       open();
 
