@@ -191,7 +191,7 @@ export default function StockUsedExpense() {
           {/* Sayfa Başlığı */}
           <Group justify="space-between" align="center">
             <div>
-              <Title order={2}>Sms Sayfası</Title>
+              <Title order={2}>Stock Gider Sayfası</Title>
               <Text size="sm" c="dimmed">
                 Toolbar Filtreleme Alanı
               </Text>
