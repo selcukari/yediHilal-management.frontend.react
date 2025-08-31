@@ -39,7 +39,7 @@ type FormValues = {
 };
 
 const StockUsedAdd = forwardRef<StockUsedAddDialogControllerRef, StockUsedAddProps>(({onSaveSuccess}, ref) => {
-  const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
+  const [isDisabledSubmit, setIsDisabledSubmit] = useState(true);
   const [type, setType] = useState("expense");
   
   const [stockItem, setStockItem] = useState<StockItem[]>([]);
@@ -59,14 +59,8 @@ const StockUsedAdd = forwardRef<StockUsedAddDialogControllerRef, StockUsedAddPro
   });
 
   useEffect(() => {
-    if (form.isValid()) {
-        setIsDisabledSubmit(false);
-
-        return;
-    }
-
-    setIsDisabledSubmit(true);
-  }, [form.values]);
+    setIsDisabledSubmit(!(stockItem.filter((item: any) => item.count > 0).length > 0));
+  }, [stockItem]);
 
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
@@ -126,8 +120,6 @@ const StockUsedAdd = forwardRef<StockUsedAddDialogControllerRef, StockUsedAddPro
   }
 
   const openDialog = (type: string, stockItem: StockItem[]) => {
-      console.log("openDialog:item:", stockItem);
-      console.log("openDialog:type:", type);
 
     if (stockItem.length > 0) {
       form.reset();
@@ -203,14 +195,11 @@ const StockUsedAdd = forwardRef<StockUsedAddDialogControllerRef, StockUsedAddPro
             {rowItems()}
          
           <Grid.Col span={6}>
-            <fieldset style={{ border: '1px solid #e9ecef', borderRadius: '8px', padding: '16px' }}>
-              <legend style={{ padding: '0 8px', fontWeight: 600 }}>Durum Ayarları</legend>
-                <Switch 
-                  label="Tamamlandı Durumu" 
-                  checked={form.values.isDelivery}
-                  onChange={(event) => form.setFieldValue('isDelivery', event.currentTarget.checked)}
-                />
-            </fieldset>
+            <Switch 
+              label="Tamamlandı Durumu" 
+              checked={form.values.isDelivery}
+              onChange={(event) => form.setFieldValue('isDelivery', event.currentTarget.checked)}
+            />
           </Grid.Col>
            <Grid.Col span={6} offset={4}>
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">

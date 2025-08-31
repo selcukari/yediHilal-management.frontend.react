@@ -230,7 +230,7 @@ export default function StockUsedExpense() {
 
                 <Grid.Col span={4}>
                   <TextInput
-                    label="Mesaj Ara"
+                    label="Alıcı İsim Ara"
                     placeholder="text giriniz"
                     leftSection={<IconSearch size={18} />}
                     value={searchText}

@@ -230,7 +230,7 @@ export default function StockUsedDeposit() {
 
                 <Grid.Col span={4}>
                   <TextInput
-                    label="Mesaj Ara"
+                    label="Emanetci İsim Ara"
                     placeholder="text giriniz"
                     leftSection={<IconSearch size={18} />}
                     value={searchText}
