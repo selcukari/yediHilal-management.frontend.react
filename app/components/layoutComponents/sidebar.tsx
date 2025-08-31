@@ -3,8 +3,8 @@ import {
   NavLink, Flex, Text, Stack, Divider, Group, ScrollArea, AppShell,
 } from '@mantine/core';
 import {
-  IconUser, IconMail, IconUsers, IconSettings, IconMessage, IconChartBar, IconFileCheck,
-  IconChevronRight, IconClipboardList, IconChevronDown,
+  IconUser, IconMail, IconUsers, IconSettings, IconMessage, IconChartBar, IconFileCheck, IconCar,
+  IconChevronRight, IconClipboardList, IconChevronDown, IconReportMoney,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
 import { useAuth } from '~/authContext';
@@ -42,6 +42,39 @@ const menuItems = [
       { label: 'A Projeler', key: 'a-project', link: '/a-projects' },
       { label: 'B Projeler', key: 'b-project', link: '/b-projects' },
       { label: 'Projeler', key: 'project-all', link: '/projects' },
+    ],
+  },
+   {
+    icon: IconReportMoney,
+    label: 'Maliye Yönetimi',
+    key: 'finance',
+    link: '/finances',
+    children: [
+      { label: 'A Maliye', key: 'a-finance', link: '/a-finances' },
+      { label: 'B Maliye', key: 'b-finance', link: '/b-finances' },
+      { label: 'Maliyeler', key: 'finance-all', link: '/finances' },
+    ],
+  },
+  {
+    icon: IconReportMoney,
+    label: 'Toplantı Yönetimi',
+    key: 'meeting',
+    link: '/meetings',
+    children: [
+      { label: 'A Toplantı', key: 'a-meeting', link: '/a-meeting' },
+      { label: 'B Toplantı', key: 'b-meeting', link: '/b-meeting' },
+      { label: 'Toplantılar', key: 'meeting-all', link: '/meetings' },
+    ],
+  },
+  {
+    icon: IconCar,
+    label: 'Araç Yönetimi',
+    key: 'vehicle',
+    link: '/vehicles',
+    children: [
+      { label: 'A Araç', key: 'a-vehicle', link: '/a-vehicle' },
+      { label: 'B Araç', key: 'b-vehicle', link: '/b-vehicle' },
+      { label: 'Araçlar', key: 'vehicle-all', link: '/vehicles' },
     ],
   },
 ];
