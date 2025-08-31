@@ -3,7 +3,7 @@ import {
   NavLink, Flex, Text, Stack, Divider, Group, ScrollArea, AppShell,
 } from '@mantine/core';
 import {
-  IconUser, IconMail, IconUsers, IconSettings, IconMessage, IconChartBar, 
+  IconUser, IconMail, IconUsers, IconSettings, IconMessage, IconChartBar, IconFileCheck,
   IconChevronRight, IconClipboardList, IconChevronDown,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
@@ -33,6 +33,17 @@ const menuItems = [
     ],
   },
   { icon: IconSettings, label: 'Ayarlar', key: 'setting', link: '/settings' },
+  {
+    icon: IconFileCheck,
+    label: 'Proje Yönetimi',
+    key: 'project',
+    link: '/projects',
+    children: [
+      { label: 'A Projeler', key: 'a-project', link: '/a-projects' },
+      { label: 'B Projeler', key: 'b-project', link: '/b-projects' },
+      { label: 'Projeler', key: 'project-all', link: '/projects' },
+    ],
+  },
 ];
 
 export function Sidebar({ active, setActive }: SidebarProps) {
@@ -46,7 +57,7 @@ export function Sidebar({ active, setActive }: SidebarProps) {
   useEffect(() => {
     const currentPath = location.pathname;
     const activeItem = menuItems.find(item => item.link === currentPath) || 
-                      menuItems.flatMap(item => item.children || []).find(child => child.link === currentPath);
+      menuItems.flatMap(item => item.children || []).find(child => child.link === currentPath);
     
     if (activeItem) {
       setActive(activeItem.key);
