@@ -27,7 +27,7 @@ const menuItems = [
     key: 'stock',
     link: '/stocks',
     children: [
-      { label: 'Emanetler', key: 'deposit', link: '/deposits' },
+      { label: 'Emanetler', key: 'stockDeposit', link: '/stockDeposits' },
       { label: 'Giderler', key: 'stockExpense', link: '/stockExpenses' },
       { label: 'Depo', key: 'stock-depo', link: '/stocks' },
     ],

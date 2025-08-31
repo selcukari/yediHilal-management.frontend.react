@@ -178,7 +178,6 @@ export default function Stock() {
             <RingProgress
               size={170}
               thickness={16}
-              roundCaps
               label={
                 <Text size="xs" ta="center" px="xs" style={{ pointerEvents: 'none' }}>
                   Genel Toplam: {calculateTotal()}
