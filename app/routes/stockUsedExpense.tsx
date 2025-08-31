@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { IconSearch, IconEdit, IconTrash } from '@tabler/icons-react';
+import { IconSearch, IconEdit, IconTrash, IconPlus } from '@tabler/icons-react';
 import {
   Container, Grid, TextInput, Badge, Stack, Group, Title, Text, Paper,
-  ActionIcon, Table, LoadingOverlay,
+  ActionIcon, Table, LoadingOverlay, Flex, Button,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useStockService } from '../services/stockService';
@@ -10,17 +10,27 @@ import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
 import { useAuth } from '~/authContext';
 import StockUsedExpenseEdit, { type StockUsedExpenseEditDialogControllerRef } from '../components/stock/stockUsedExpenseEdit';
-
+import StockUsedAdd, { type StockUsedAddDialogControllerRef } from '../components/stock/stockUsedAdd';
 interface Column {
   field: string;
   header: string;
 }
+interface StockItem {
+  name: string;
+  key: string;
+  count: number;
+  color: string;
+  value?: number;
+  tooltip?: string;
+}
 
 export default function StockUsedExpense() {
   const [resultData, setResultData] = useState<any[]>([]);
+  const [stockDataItems, setStockDataItems] = useState<StockItem[] | null>([]);
   const [searchText, setSearchText] = useState('');
   const [visible, { open, close }] = useDisclosure(false);
   const stockUsedExpenseEditRef = useRef<StockUsedExpenseEditDialogControllerRef>(null);
+  const stockUsedAddRef = useRef<StockUsedAddDialogControllerRef>(null);
   
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
     { field: 'id', header: 'Id' },
@@ -85,6 +95,9 @@ export default function StockUsedExpense() {
     }
     const handleEdit = (item: any) => {
       stockUsedExpenseEditRef.current?.openDialog(item);
+    }
+    const handleAddItem = () => {
+      stockUsedAddRef.current?.openDialog("expense", stockDataItems || [])
     }
 
   const rowsTable = filteredUsers.map((item) => (
@@ -153,9 +166,10 @@ export default function StockUsedExpense() {
         ((currentUser?.responsibilities as string)?.includes("stock") || currentUser.roleId == 1) ? undefined : currentUser?.id as number
       )
      try {
+      const getStock = await service.getStock();
 
       const getStockUsedExpenses = await service.getStockUsed(type, buyerId);
-      if (getStockUsedExpenses) {
+      if (getStockUsedExpenses && getStock) {
         setResultData(getStockUsedExpenses.map((stockUsed: any) => ({
           id: stockUsed.id,
           buyerInformations: stockUsed.buyerInformations ? JSON.parse(stockUsed.buyerInformations) : null,
@@ -166,6 +180,11 @@ export default function StockUsedExpense() {
           createDate: formatDate(stockUsed.createDate),
           updateDate: formatDate(stockUsed.updateDate),
         })));
+        const parsedItems: StockItem[] = JSON.parse(getStock.items) || [];
+        setStockDataItems(parsedItems.map(item => ({
+            ...item,
+            value: item.count,
+          })))
        
       } else {
         toast.info('Hiçbir veri yok!');
@@ -219,6 +238,11 @@ export default function StockUsedExpense() {
                   />
                 </Grid.Col>
 
+                <Grid.Col span={4}>
+                <Flex mih={50} gap="md" justify="flex-end" align="flex-end" direction="row" wrap="wrap">
+                  <Button variant="filled" leftSection={<IconPlus size={14} />}  onClick={handleAddItem}>Yeni Gider Ekle</Button>
+                </Flex>
+                </Grid.Col>
               </Grid>
             </Paper>
           </div>
@@ -244,7 +268,10 @@ export default function StockUsedExpense() {
         </Stack>
         <StockUsedExpenseEdit
           ref={stockUsedExpenseEditRef} onSaveSuccess={handleSaveSuccess}
-          ></StockUsedExpenseEdit>
+        ></StockUsedExpenseEdit>
+        <StockUsedAdd
+          ref={stockUsedAddRef} onSaveSuccess={handleSaveSuccess}
+        ></StockUsedAdd>
       </Container>
   );
 }

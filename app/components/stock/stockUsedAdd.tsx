@@ -9,18 +9,25 @@ import { useStockService } from '../../services/stockService';
 import { toast } from '../../utils/toastMessages';
 import { useAuth } from '~/authContext';
 
-export type StockUsedExpenseEditDialogControllerRef = {
-  openDialog: (value: any) => void;
+interface StockItem {
+  name: string;
+  key: string;
+  count: number;
+  color: string;
+  value?: number;
+  tooltip?: string;
+}
+
+export type StockUsedAddDialogControllerRef = {
+  openDialog: (type: string, stockItems: StockItem[]) => void;
   close: () => void;
 };
 
-interface UserAddProps {
+interface StockUsedAddProps {
   onSaveSuccess?: () => void; // Yeni prop
 }
 
 interface StockDataParams {
-  id: number;
-  updateUserId?: number;
   buyerId: number;
   items?: string;
   type: string;
@@ -31,10 +38,11 @@ type FormValues = {
   isDelivery: boolean;
 };
 
-const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
+const StockUsedAdd = forwardRef<StockUsedAddDialogControllerRef, StockUsedAddProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
+  const [type, setType] = useState("expense");
   
-  const [stockData, setStockData] = useState<any>({ items: [], id: 0 });
+  const [stockItem, setStockItem] = useState<StockItem[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
   const service = useStockService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
   const { currentUser } = useAuth();
@@ -63,14 +71,13 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
     const newStockValue: StockDataParams = {
-      id: stockData.id,
       buyerId: currentUser?.id as number,
-      items: JSON.stringify(stockData.items.map((item: any) => ({key: item.key, count: item.count, name: item.name})) || ""),
+      items: JSON.stringify(stockItem.filter((item: any) => item.count > 0).map((item: any) => ({key: item.key, count: item.count, name: item.name})) || ""),
       isDelivery: values.isDelivery,
-      type: stockData.type
+      type: type
     }
 
-    const result = await service.updateStockUsedExpense(newStockValue);
+    const result = await service.addStockUsed(newStockValue);
 
     if (result) {
 
@@ -118,12 +125,14 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
     }
   }
 
-  const openDialog = (value: any) => {
-      console.log("openDialog:item:", value);
+  const openDialog = (type: string, stockItem: StockItem[]) => {
+      console.log("openDialog:item:", stockItem);
+      console.log("openDialog:type:", type);
 
-    if (value) {
+    if (stockItem.length > 0) {
       form.reset();
-      setStockData(value);
+      setStockItem(stockItem.map((item: any) => ({...item, count: 0})));
+      setType(type);
       open();
 
     }
@@ -135,28 +144,23 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
   }));
 
     const handleItemChange = (key: string, newCount: number) => {
-    if (!stockData) return;
+    if (stockItem.length < 0) return;
 
-    setStockData((prevData:any) => {
-      if (!prevData) return null;
-      
-      return {
-        ...prevData,
-        items: prevData.items.map((item: any) => 
-          item.key === key 
-            ? { ...item, count: newCount, value: newCount }
-            : item
-        )
-      };
-    });
+    setStockItem((prevData: StockItem[]) =>
+      prevData.map((item: any) =>
+        item.key === key
+          ? { ...item, count: newCount, value: newCount }
+          : item
+      )
+    );
 
     setIsDisabledSubmit(false);
   };
 
    const rowItems = () => {
-      if (!stockData?.items) return null;
+      if (stockItem.length < 0) return null;
   
-      return stockData.items.map((item: any, index: number) => (
+      return stockItem.map((item: any, index: number) => (
         <Fragment key={`item-${index}`}>
           <Grid.Col span={2}>
             <Flex mih={50} gap="md" justify="center" align="center" direction="row" wrap="wrap">
@@ -229,4 +233,4 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
   </>);
 });
 
-export default StockUsedExpenseEdit;
+export default StockUsedAdd;

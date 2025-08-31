@@ -15,10 +15,8 @@ interface StockDataParams {
 }
 
 interface StockUsedExpenseParams {
-  id: number;
   buyerId: number;
   items?: string;
-  isActive: boolean;
   isDelivery: boolean;
   type: string;
 }
@@ -77,7 +75,7 @@ export function useStockService(controller: string) {
   const addStockUsed = async (params: StockUsedExpenseParams) => {
 
     try {
-      const res = await api.put(`/${controller}/addStockUsed`, params);
+      const res = await api.post(`/${controller}/addStockUsed`, params);
 
       return res.data.data;
     } catch (error: any) {
