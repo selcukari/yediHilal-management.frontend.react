@@ -21,9 +21,9 @@ const menuItems = [
   { icon: IconMail, label: 'Gön. Mail Lis.', key: 'mail', link: '/mails' },
   { icon: IconMessage, label: 'Gön. Sms Lis.', key: 'sms', link: '/sms' },
   { icon: IconChartBar, label: 'Raporlar', key: 'report', link: '/reports' },
-  { 
-    icon: IconClipboardList, 
-    label: 'Stock Yönetimi', 
+  {
+    icon: IconClipboardList,
+    label: 'Stock Yönetimi',
     key: 'stock',
     link: '/stocks',
     children: [
