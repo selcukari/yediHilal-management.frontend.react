@@ -119,6 +119,7 @@ export function Sidebar({ active, setActive }: SidebarProps) {
 
     setActive(key);
 
+    console.log("currentUSer:", currentUser)
     if(currentUser.moduleRoles?.includes(key)) {
       navigate(link);
       return;
@@ -173,7 +174,7 @@ export function Sidebar({ active, setActive }: SidebarProps) {
                       key={child.key}
                       label={child.label}
                       active={child.key === active}
-                      onClick={() => handleMenuItemClick(child.key, child.link)}
+                      onClick={() => handleMenuItemClick(item.key, child.link)}
                     />
                   ))
                 )}
