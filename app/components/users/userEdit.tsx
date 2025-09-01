@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState, useRef, useMemo } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { omit } from 'ramda';
 import { Modal, TextInput, Flex, Button, Stack, Grid, PasswordInput, Group, Switch, Textarea } from '@mantine/core';
@@ -117,6 +117,10 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
 
     }
   }
+
+  const isDisabledRoleComponent = useMemo(() => {
+    return currentUser.roleId != 1; // admin roleId
+  }, [currentUser.roleId]);
 
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
@@ -292,25 +296,24 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
 
           <Grid.Col span={6}>
             <RoleSelect 
-              form={form} 
+              form={form}
+              isDisabled={isDisabledRoleComponent}
             />
           </Grid.Col>
-          { currentUser?.roleId == 1 && (
-            <>
               <Grid.Col span={6}>
                 <ModuleSelect
-                  form={form} 
+                  form={form}
+                  isDisabled={isDisabledRoleComponent}
                   {...form.getInputProps('moduleRoles')}
                 />
               </Grid.Col>
               <Grid.Col span={6}>
                 <ResponsibleSelect
                   form={form}
+                  isDisabled={isDisabledRoleComponent}
                   {...form.getInputProps('responsibilities')}
                 />
               </Grid.Col>
-            </>
-          )}
           <Flex
             mih={50}
             gap="md"

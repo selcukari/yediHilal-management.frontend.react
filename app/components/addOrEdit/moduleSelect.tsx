@@ -7,9 +7,10 @@ interface ModuleSelectProps {
   form: UseFormReturnType<any>;
   required?: boolean;
   value?: string[];
+  isDisabled?: boolean;
 }
 
-export function ModuleSelect({ form, required = false, }: ModuleSelectProps) {
+export function ModuleSelect({ form, required = false, isDisabled = false }: ModuleSelectProps) {
   const [modules, setModules] = useState<{ value: string; label: string }[]>([]);
   
   useEffect(() => {
@@ -44,6 +45,7 @@ export function ModuleSelect({ form, required = false, }: ModuleSelectProps) {
       data={modules}
       searchable
       clearable
+      disabled={isDisabled}
       value={selectedValues}
       required={required}
       maxDropdownHeight={200}

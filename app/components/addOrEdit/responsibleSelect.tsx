@@ -7,9 +7,10 @@ interface ResponsibleSelectProps {
   form: UseFormReturnType<any>;
   required?: boolean;
   value?: string[];
+  isDisabled?: boolean;
 }
 
-export function ResponsibleSelect({ form, required = false, }: ResponsibleSelectProps) {
+export function ResponsibleSelect({ form, required = false, isDisabled = false }: ResponsibleSelectProps) {
   const [responsibles, setResponsibles] = useState<{ value: string; label: string }[]>([]);
   
   useEffect(() => {
@@ -44,6 +45,7 @@ export function ResponsibleSelect({ form, required = false, }: ResponsibleSelect
       data={responsibles}
       searchable
       clearable
+      disabled={isDisabled}
       value={selectedValues}
       required={required}
       maxDropdownHeight={200}

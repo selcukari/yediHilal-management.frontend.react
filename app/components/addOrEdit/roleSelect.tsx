@@ -6,9 +6,10 @@ import { useRoleService } from '../../services/roleService';
 interface RoleSelectProps {
   form: UseFormReturnType<any>;
   required?: boolean;
+  isDisabled?: boolean;
 }
 
-export function RoleSelect({ form, required = false, }: RoleSelectProps) {
+export function RoleSelect({ form, required = false, isDisabled = false }: RoleSelectProps) {
   const [roles, setRoles] = useState<{ value: string; label: string }[]>([]);
   
   const service = useRoleService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
@@ -42,6 +43,7 @@ export function RoleSelect({ form, required = false, }: RoleSelectProps) {
       placeholder="Role Seçiniz"
       data={roles}
       required={required}
+      disabled={isDisabled}
       maxDropdownHeight={200}
       nothingFoundMessage="Role bulunamadı..."
       {...form.getInputProps('roleId')}
