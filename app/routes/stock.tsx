@@ -82,6 +82,10 @@ export default function Stock() {
         toast.error('Stok ID bulunamadı!');
         return;
       }
+      if (stockData.items.some((item: StockItem) => item.count < 1)) {
+        toast.error('item en az 1 olmalı!');
+        return;
+      }
       const newValue = {
         id: stockData.id,
         updateUserId: currentUser?.id as number,
