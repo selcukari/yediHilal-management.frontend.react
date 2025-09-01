@@ -119,7 +119,6 @@ export function Sidebar({ active, setActive }: SidebarProps) {
 
     setActive(key);
 
-    console.log("currentUSer:", currentUser)
     if(currentUser.moduleRoles?.includes(key)) {
       navigate(link);
       return;

@@ -1,6 +1,6 @@
-import { useState, useEffect, Fragment, useRef } from 'react';
+import { useState, useEffect, Fragment, useRef, useMemo } from 'react';
 import {
-  Container, Grid, TextInput, Text, Stack, Group, Title, RingProgress,
+  Container, Grid, TextInput, Text, Stack, Title, RingProgress,
   Paper, Button, LoadingOverlay, Flex,
 } from '@mantine/core';
 import { IconCheck, IconPlus } from '@tabler/icons-react';
@@ -31,7 +31,6 @@ interface StockData {
 export default function Stock() {
   const [stockData, setStockData] = useState<StockData | null>(null);
   const [visible, { open, close }] = useDisclosure(false);
-  const [isDisabledSubmit, setIsDisabledSubmit] = useState(true);
   const { currentUser } = useAuth();
 
   const service = useStockService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
@@ -105,6 +104,10 @@ export default function Stock() {
     }
   };
 
+  let isDisabledSaveButton = useMemo(() => {
+    return !(currentUser?.roleId == 1 || currentUser?.responsibilities?.includes("stock")); // admin roleId
+  }, [currentUser?.roleId]);
+
   const handleSaveSuccess = () => {
     setTimeout(() => {
       fetchStock();
@@ -126,8 +129,7 @@ export default function Stock() {
         )
       };
     });
-
-    setIsDisabledSubmit(false);
+    isDisabledSaveButton = false;
   };
 
   const rowItems = () => {
@@ -163,8 +165,8 @@ export default function Stock() {
 
   const handleAddItem = (data: any) => {
     itemAddRef.current?.openDialog({
-        id: data.id,
-        items: data.items
+      id: data.id,
+      items: data.items
     })
   }
 
@@ -195,7 +197,7 @@ export default function Stock() {
             />
           </Flex>
             <Flex mih={50} gap="md" justify="flex-end" align="center" direction="row" wrap="wrap">
-            <Button variant="filled" leftSection={<IconPlus size={14} />}  onClick={() => handleAddItem(stockData)}>Yeni Ekle</Button>
+            <Button variant="filled" disabled={isDisabledSaveButton} leftSection={<IconPlus size={14} />}  onClick={() => handleAddItem(stockData)}>Yeni Ekle</Button>
           </Flex>
         {/* Stok Formu */}
         <Paper shadow="xs" p="lg" withBorder>
@@ -209,7 +211,7 @@ export default function Stock() {
                     type="submit" 
                     variant="filled" 
                     size="xs" 
-                    disabled={isDisabledSubmit}  
+                    disabled={isDisabledSaveButton}  
                     leftSection={<IconCheck size={14} />} 
                     radius="xs"
                   >
