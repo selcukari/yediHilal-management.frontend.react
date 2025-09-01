@@ -119,8 +119,8 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
   }
 
   const isDisabledRoleComponent = useMemo(() => {
-    return currentUser.roleId != 1; // admin roleId
-  }, [currentUser.roleId]);
+    return currentUser?.roleId != 1; // admin roleId
+  }, [currentUser?.roleId]);
 
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
