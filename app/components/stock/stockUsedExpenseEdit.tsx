@@ -2,6 +2,7 @@ import { forwardRef, useEffect, useImperativeHandle, useState, Fragment, useRef 
 import { useDisclosure } from '@mantine/hooks';
 import { Modal, TextInput, Flex, Button, Stack, Grid, Title, Group, Switch } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { clone } from 'ramda';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
@@ -10,7 +11,7 @@ import { toast } from '../../utils/toastMessages';
 import { useAuth } from '~/authContext';
 
 export type StockUsedExpenseEditDialogControllerRef = {
-  openDialog: (dialogTitle: string, value: any) => void;
+  openDialog: (dialogTitle: string, value: any, stockDataItems: StockItem[]) => void;
   close: () => void;
 };
 
@@ -31,8 +32,18 @@ type FormValues = {
   isDelivery: boolean;
 };
 
+interface StockItem {
+  name: string;
+  key: string;
+  count: number;
+  color: string;
+  value?: number;
+  tooltip?: string;
+}
+
 const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
+  const [stockDataFirtsItems, setStockDataFirstItems] = useState<StockItem[]>([]);
   const [dialogTitle, setDialogTitle] = useState("");
   
   const [stockData, setStockData] = useState<any>({ items: [], id: 0 });
@@ -63,10 +74,32 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
 
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
+    const newItems = stockData.items.map((item: any) => ({key: item.key, count: item.count, name: item.name})) || "";
+
+    // Stok kontrolü yap
+    let hasStockExceeded = false;
+    for (const item of stockDataFirtsItems) {
+      const findItem = newItems.find((i: StockItem) => i.key == item.key);
+      
+
+    // Eğer bu key ikinci dizide varsa ve count değeri daha büyükse
+      if (findItem && findItem.count as number > item.count) {
+        toast.info(`${item.name} adeti stock tan fazla olmaz!`);
+        hasStockExceeded = true;
+        break;
+      }
+    };
+
+     // Eğer stok aşımı varsa işlemi durdur
+    if (hasStockExceeded) {
+      setIsDisabledSubmit(false);
+      return;
+    }
+
     const newStockValue: StockDataParams = {
       id: stockData.id,
       buyerId: currentUser?.id as number,
-      items: JSON.stringify(stockData.items.map((item: any) => ({key: item.key, count: item.count, name: item.name})) || ""),
+      items: JSON.stringify(newItems),
       isDelivery: values.isDelivery,
       type: stockData.type
     }
@@ -119,12 +152,13 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
     }
   }
 
-  const openDialog = (dialogTitle: string, value: any) => {
+  const openDialog = (dialogTitle: string, value: any, stockDataItems: StockItem[]) => {
 
     if (value) {
       form.reset();
       setStockData(value);
       setDialogTitle(dialogTitle);
+      setStockDataFirstItems(clone(stockDataItems))
       open();
 
     }

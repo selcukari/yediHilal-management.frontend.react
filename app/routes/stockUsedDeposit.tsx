@@ -95,7 +95,7 @@ export default function StockUsedDeposit() {
 
     }
     const handleEdit = (item: any) => {
-      stockUsedExpenseEditRef.current?.openDialog("Gider Düzenle", item);
+      stockUsedExpenseEditRef.current?.openDialog("Gider Düzenle", item, stockDataItems || []);
     }
     const handleAddItem = () => {
       stockUsedAddRef.current?.openDialog("Emanet Ekle","deposit", stockDataItems || [])

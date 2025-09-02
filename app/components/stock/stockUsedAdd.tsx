@@ -46,6 +46,7 @@ const StockUsedAdd = forwardRef<StockUsedAddDialogControllerRef, StockUsedAddPro
   
   const [stockItem, setStockItem] = useState<StockItem[]>([]);
   const [stockItemInitial, setStockItemInitial] = useState<StockItem[]>([]);
+  const [stockItemFirstInitial, setStockItemFirstInitial] = useState<StockItem[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
   const service = useStockService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
   const { currentUser } = useAuth();
@@ -67,9 +68,31 @@ const StockUsedAdd = forwardRef<StockUsedAddDialogControllerRef, StockUsedAddPro
 
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
+    const newItems = stockItem.filter((item: any) => item.count > 0).map((item: any) => ({key: item.key, count: item.count, name: item.name})) || "";
+
+    // Stok kontrolü yap
+    let hasStockExceeded = false;
+
+    for (const item of stockItemFirstInitial) {
+      const findItem = newItems.find(i => i.key == item.key);
+      
+      // Eğer bu key ikinci dizide varsa ve count değeri daha büyükse
+      if (findItem && findItem.count as number > item.count) {
+        toast.info(`${item.name} adeti stock tan fazla olmaz!`);
+        hasStockExceeded = true;
+        break;
+      }
+    };
+
+     // Eğer stok aşımı varsa işlemi durdur
+    if (hasStockExceeded) {
+      setIsDisabledSubmit(false);
+      return;
+    }
+
     const newStockValue: StockDataParams = {
       buyerId: currentUser?.id as number,
-      items: JSON.stringify(stockItem.filter((item: any) => item.count > 0).map((item: any) => ({key: item.key, count: item.count, name: item.name})) || ""),
+      items: JSON.stringify(newItems),
       isDelivery: values.isDelivery,
       type: type
     }
@@ -128,6 +151,7 @@ const StockUsedAdd = forwardRef<StockUsedAddDialogControllerRef, StockUsedAddPro
       form.reset();
       setStockItem(stockItem.map((item: any) => ({...item, count: 0})));
       setStockItemInitial(clone(stockItem.map((item: any) => ({...item, count: 0}))));
+      setStockItemFirstInitial(clone(stockItem));
       setType(type);
       setDialogTitle(dialogTitle);
       open();
