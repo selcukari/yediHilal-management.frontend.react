@@ -12,6 +12,7 @@ import ConfirmModalMessage, { type ConfirmModalMessageRef } from '../components/
 import { useUserService } from '../services/userService';
 import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
+import { dateFormatStrings } from '../utils/dateFormatStrings';
 import { useAuth } from '~/authContext';
 import { type PdfTableColumn } from '../utils/repor/exportToPdf';
 import { calculateColumnWidthUser } from '../utils/repor/calculateColumnWidth';
@@ -179,8 +180,8 @@ export default function User() {
       if (getUsers) {
         setResultData(getUsers.map((item: any) => ({
           ...item,
-          createdDate: formatDate(item.createdDate),
-          updateDate: formatDate(item.updateDate),
+          createdDate: formatDate(item.createdDate, dateFormatStrings.dateTimeFormatWithoutSecond),
+          updateDate: formatDate(item.updateDate, dateFormatStrings.dateTimeFormatWithoutSecond),
           phoneWithCountryCode: (item.countryCode && item.phone) ? `${item.countryCode}${item.phone}` : undefined
         })));
        

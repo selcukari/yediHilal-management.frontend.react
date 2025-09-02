@@ -7,6 +7,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { useMailService } from '../services/mailService';
 import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
+import { dateFormatStrings } from '../utils/dateFormatStrings';
 import { stripHtml } from '../utils/stripHtml';
 import { useAuth } from '~/authContext';
 
@@ -104,7 +105,7 @@ export default function Mail() {
           toUsers: mail.toUsers,
           body: stripHtml(mail.body as string),
           count: mail.count,
-          createdDate: formatDate(mail.createdDate),
+          createdDate: formatDate(mail.createdDate, dateFormatStrings.dateTimeFormatWithoutSecond),
         })));
        
       } else {

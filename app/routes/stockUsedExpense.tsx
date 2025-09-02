@@ -8,6 +8,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { useStockService } from '../services/stockService';
 import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
+import { dateFormatStrings } from '../utils/dateFormatStrings';
 import { useAuth } from '~/authContext';
 import StockUsedExpenseEdit, { type StockUsedExpenseEditDialogControllerRef } from '../components/stock/stockUsedExpenseEdit';
 import StockUsedAdd, { type StockUsedAddDialogControllerRef } from '../components/stock/stockUsedAdd';
@@ -177,8 +178,8 @@ export default function StockUsedExpense() {
           type: stockUsed.type,
           isDelivery: stockUsed.isDelivery, // true ise edit yapma
           isActive: stockUsed.isActive,
-          createDate: formatDate(stockUsed.createDate),
-          updateDate: formatDate(stockUsed.updateDate),
+          createDate: formatDate(stockUsed.createDate, dateFormatStrings.dateTimeFormatWithoutSecond),
+          updateDate: formatDate(stockUsed.updateDate, dateFormatStrings.dateTimeFormatWithoutSecond),
         })));
         const parsedItems: StockItem[] = JSON.parse(getStock.items) || [];
         setStockDataItems(parsedItems.map(item => ({

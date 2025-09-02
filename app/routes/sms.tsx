@@ -7,6 +7,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { useSmsService } from '../services/smsService';
 import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
+import { dateFormatStrings } from '../utils/dateFormatStrings';
 
 interface Column {
   field: string;
@@ -91,7 +92,7 @@ export default function Mail() {
           toUsers: sms.toUsers,
           toPhoneNumbers: sms.toPhoneNumbers,
           count: sms.count,
-          createdDate: formatDate(sms.createdDate),
+          createdDate: formatDate(sms.createdDate, dateFormatStrings.dateTimeFormatWithoutSecond),
         })));
        
       } else {

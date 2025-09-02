@@ -10,6 +10,7 @@ import { toast } from '../utils/toastMessages';
 import ItemAdd, { type ItemAddDialogControllerRef } from '../components/stock/itemAdd';
 import { formatDate } from '../utils/formatDate';
 import { useAuth } from '~/authContext';
+import { dateFormatStrings } from '../utils/dateFormatStrings';
 
 interface StockItem {
   name: string;
@@ -53,7 +54,7 @@ export default function Stock() {
           id: getStock.id,
           updateUserId: getStock.updateUserId,
           updateUserFullName: getStock.updateUserFullName,
-          createDate: formatDate(getStock.createDate),
+          createDate: formatDate(getStock.createDate, dateFormatStrings.dateTimeFormatWithoutSecond),
           items: parsedItems.map(item => ({
             ...item,
             value: item.count,

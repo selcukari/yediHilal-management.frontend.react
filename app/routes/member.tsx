@@ -13,6 +13,7 @@ import { useMemberService } from '../services/memberService';
 import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
 import { useAuth } from '~/authContext';
+import { dateFormatStrings } from '../utils/dateFormatStrings';
 import { type PdfTableColumn } from '../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../utils/repor/calculateColumnWidth';
 import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToExcel';
@@ -207,8 +208,8 @@ export default function Member() {
       if (getMembers) {
         setResultData(getMembers.map((item: any) => ({
           ...item,
-          createdDate: formatDate(item.createdDate),
-          updateDate: formatDate(item.updateDate),
+          createdDate: formatDate(item.createdDate, dateFormatStrings.dateTimeFormatWithoutSecond),
+          updateDate: formatDate(item.updateDate, dateFormatStrings.dateTimeFormatWithoutSecond),
           phoneWithCountryCode: (item.countryCode && item.phone) ? `${item.countryCode}${item.phone}` : undefined
         })));
        

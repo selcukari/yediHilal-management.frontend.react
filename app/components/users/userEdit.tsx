@@ -77,7 +77,30 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
       password: (value) => (value.trim().length < 5 ? 'Şifre en az 5 karakter olmalı' : null),
       identificationNumber: (value) => {
         if (!value?.trim()) return null;
-        return /^[0-9]+$/.test(value) ? null : 'Sadece rakam girebilirsiniz';
+        // Sadece rakam kontrolü
+        if (!/^[0-9]+$/.test(value)) return 'Sadece rakam girebilirsiniz';
+
+         // Algoritmik kontrol
+        let sum1 = 0;
+        let sum2 = 0;
+        
+        for (let i = 0; i < 9; i++) {
+          const digit = parseInt(value[i]);
+          sum1 += digit;
+          sum2 += sum1;
+        }
+        
+        sum1 %= 10;
+        sum2 %= 10;
+        
+        const tenthDigit = parseInt(value[9]);
+        const eleventhDigit = parseInt(value[10]);
+        
+        if (sum1 !== tenthDigit || sum2 !== eleventhDigit) {
+          return 'Geçersiz TC Kimlik No';
+        }
+        
+        return null; // Geçerli
       },
       countryCode: (value) => {
 

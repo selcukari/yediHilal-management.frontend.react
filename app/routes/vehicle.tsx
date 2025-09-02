@@ -8,6 +8,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { toast } from '../utils/toastMessages';
 import ItemAdd, { type ItemAddDialogControllerRef } from '../components/stock/itemAdd';
 import { formatDate } from '../utils/formatDate';
+import { dateFormatStrings } from '../utils/dateFormatStrings';
 
 interface ProjectItem {
   name: string;
@@ -76,8 +77,8 @@ export default function Vehicle() {
       <Table.Td>{element.name}</Table.Td>
       <Table.Td>{element.count}</Table.Td>
       <Table.Td>{element.responsible}</Table.Td>
-      <Table.Td>{formatDate(element.createDate)}</Table.Td>
-      <Table.Td>{formatDate(element.finisDate)}</Table.Td>
+      <Table.Td>{formatDate(element.createDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
+      <Table.Td>{formatDate(element.finisDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
     </Table.Tr>
   ));
 
