@@ -20,7 +20,7 @@ interface StockItem {
 }
 
 export type StockUsedAddDialogControllerRef = {
-  openDialog: (type: string, stockItems: StockItem[]) => void;
+  openDialog: (dialogTitle: string, type: string, stockItems: StockItem[]) => void;
   close: () => void;
 };
 
@@ -42,6 +42,7 @@ type FormValues = {
 const StockUsedAdd = forwardRef<StockUsedAddDialogControllerRef, StockUsedAddProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(true);
   const [type, setType] = useState("expense");
+  const [dialogTitle, setDialogTitle] = useState("");
   
   const [stockItem, setStockItem] = useState<StockItem[]>([]);
   const [stockItemInitial, setStockItemInitial] = useState<StockItem[]>([]);
@@ -121,13 +122,14 @@ const StockUsedAdd = forwardRef<StockUsedAddDialogControllerRef, StockUsedAddPro
     }
   }
 
-  const openDialog = (type: string, stockItem: StockItem[]) => {
+  const openDialog = (dialogTitle:string, type: string, stockItem: StockItem[]) => {
 
     if (stockItem.length > 0) {
       form.reset();
       setStockItem(stockItem.map((item: any) => ({...item, count: 0})));
       setStockItemInitial(clone(stockItem.map((item: any) => ({...item, count: 0}))));
       setType(type);
+      setDialogTitle(dialogTitle);
       open();
 
     }
@@ -184,7 +186,7 @@ const StockUsedAdd = forwardRef<StockUsedAddDialogControllerRef, StockUsedAddPro
       onClose={() => {
         dialogClose();
       }}
-      title="İtem Düzenle"
+      title={dialogTitle}
       centered
       size="700"
       overlayProps={{

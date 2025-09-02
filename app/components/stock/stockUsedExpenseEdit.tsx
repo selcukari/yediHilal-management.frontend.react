@@ -10,7 +10,7 @@ import { toast } from '../../utils/toastMessages';
 import { useAuth } from '~/authContext';
 
 export type StockUsedExpenseEditDialogControllerRef = {
-  openDialog: (value: any) => void;
+  openDialog: (dialogTitle: string, value: any) => void;
   close: () => void;
 };
 
@@ -33,6 +33,7 @@ type FormValues = {
 
 const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
+  const [dialogTitle, setDialogTitle] = useState("");
   
   const [stockData, setStockData] = useState<any>({ items: [], id: 0 });
   const [opened, { open, close }] = useDisclosure(false);
@@ -118,12 +119,12 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
     }
   }
 
-  const openDialog = (value: any) => {
-      console.log("openDialog:item:", value);
+  const openDialog = (dialogTitle: string, value: any) => {
 
     if (value) {
       form.reset();
       setStockData(value);
+      setDialogTitle(dialogTitle);
       open();
 
     }
@@ -185,7 +186,7 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
       onClose={() => {
         dialogClose();
       }}
-      title="İtem Düzenle"
+      title={dialogTitle}
       centered
       size="700"
       overlayProps={{

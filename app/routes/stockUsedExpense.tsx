@@ -95,10 +95,10 @@ export default function StockUsedExpense() {
 
     }
     const handleEdit = (item: any) => {
-      stockUsedExpenseEditRef.current?.openDialog(item);
+      stockUsedExpenseEditRef.current?.openDialog("Gider Düzenle", item);
     }
     const handleAddItem = () => {
-      stockUsedAddRef.current?.openDialog("expense", stockDataItems || [])
+      stockUsedAddRef.current?.openDialog("Gider Ekle", "expense", stockDataItems || [])
     }
 
   const rowsTable = filteredUsers.map((item) => (

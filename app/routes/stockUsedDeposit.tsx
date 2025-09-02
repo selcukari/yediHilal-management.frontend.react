@@ -95,10 +95,10 @@ export default function StockUsedDeposit() {
 
     }
     const handleEdit = (item: any) => {
-      stockUsedExpenseEditRef.current?.openDialog(item);
+      stockUsedExpenseEditRef.current?.openDialog("Gider Düzenle", item);
     }
     const handleAddItem = () => {
-      stockUsedAddRef.current?.openDialog("deposit", stockDataItems || [])
+      stockUsedAddRef.current?.openDialog("Emanet Ekle","deposit", stockDataItems || [])
     }
 
   const rowsTable = filteredUsers.map((item) => (
