@@ -21,7 +21,7 @@ import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToEx
 type filterModels = {
   countryId?: string | null;
   provinceIds?: string[] | null;
-  typeId?: string | null;
+  typeIds?: string[] | null;
   searchText?: string;
   isActive: boolean;
 }
@@ -38,7 +38,7 @@ export default function Member() {
   const [filterModel, setFilterModel] = useState<filterModels>({ isActive: true, countryId: '1' });
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null); // Silinecek öğenin ID'sini tut
   const [selectedCountryName, setSelectedCountryName] = useState<string>('Türkiye'); // Yeni state
-  const [selectedMemberTypeName, setSelectedMemberTypeName] = useState<string | null>('');
+  const [selectedMemberTypeName, setSelectedMemberTypeName] = useState<string[]>([]);
   const [selectedProvinceNames, setSelectedProvinceNames] = useState<string[]>([]); // Yeni state
   const [visible, { open, close }] = useDisclosure(false);
   
@@ -164,12 +164,12 @@ export default function Member() {
     </Table.Tr>
   ));
 
-  const onMemberTypeChange = (memberTypeValue: string | null, memberTypeName?: string | null): void => {
-    setSelectedMemberTypeName(memberTypeName || '');
+  const onMemberTypeChange = (memberTypeValues: string[] | null, memberTypeNames?: string[] | null): void => {
+    setSelectedMemberTypeName(memberTypeNames || []);
 
     setFilterModel((prev) => ({
       ...prev,
-      typeId: memberTypeValue,
+      typeIds: memberTypeValues,
     }));
   };
 
@@ -200,6 +200,7 @@ export default function Member() {
     const params = {
       ...filterModel,
       provinceIds: (filterModel.provinceIds && filterModel.provinceIds?.length > 0) ? filterModel.provinceIds?.join(",") : undefined,
+      typeIds: (filterModel.typeIds && filterModel.typeIds?.length > 0) ? filterModel.typeIds?.join(",") : undefined,
       searchText: (filterModel.searchText && filterModel.searchText.length > 3 ? filterModel.searchText.trim() : undefined),
     }
      try {

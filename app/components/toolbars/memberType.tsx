@@ -1,14 +1,14 @@
-import { Select } from '@mantine/core';
+import { MultiSelect } from '@mantine/core';
 import { useState, useEffect } from 'react';
 import { toast } from '../../utils/toastMessages';
 import { useMemberTypeService } from '../../services/memberTypeService';
 
 interface MemberTypeProps {
-  onMemberTypeChange: (val: string | null, name?: string | null) => void;
+  onMemberTypeChange: (vals: string[] | null, names?: string[] | null) => void;
 }
 
 export function MemberType({ onMemberTypeChange }: MemberTypeProps) {
-  const [memberType, setMemberType] = useState<string | null>("");
+  const [memberType, setMemberType] = useState<string[] | undefined>(undefined);
   const [memberTypes, setMemberTypes] = useState<{ value: string; label: string }[]>([]);
   
   const service = useMemberTypeService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
@@ -36,13 +36,18 @@ export function MemberType({ onMemberTypeChange }: MemberTypeProps) {
     }
   };
 
-  const handleChange = (value: string | null) => {
-    onMemberTypeChange(value, value ? memberTypes.find(c => c.value == value)?.label : null);
-    setMemberType(value);
+  const handleChange = (values: string[]) => {
+    const selectedMemberTypeNames = values.map(value => {
+    const memberType = memberTypes.find(p => p.value === value);
+    return memberType?.label || '';
+  }).filter(name => name !== '');
+  
+    onMemberTypeChange(values, selectedMemberTypeNames); // ikinci paremetre provinces in value degerine esiş olan values den gelen provinces label string oluştur
+    setMemberType(values);
   };
 
   return (
-    <Select
+    <MultiSelect
       label="Üye Tipi"
       placeholder="Üye Tipi Seçiniz"
       data={memberTypes}
