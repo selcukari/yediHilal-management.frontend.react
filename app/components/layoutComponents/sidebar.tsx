@@ -4,7 +4,7 @@ import {
 } from '@mantine/core';
 import {
   IconUser, IconMail, IconUsers, IconSettings, IconMessage, IconChartBar, IconFileCheck, IconCar,
-  IconChevronRight, IconClipboardList, IconChevronDown, IconReportMoney,
+  IconChevronRight, IconClipboardList, IconSettingsAutomation, IconChevronDown, IconReportMoney,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
 import { useAuth } from '~/authContext';
@@ -75,6 +75,16 @@ const menuItems = [
       { label: 'A Araç', key: 'a-vehicle', link: '/a-vehicle' },
       { label: 'B Araç', key: 'b-vehicle', link: '/b-vehicle' },
       { label: 'Araçlar', key: 'vehicle-all', link: '/vehicles' },
+    ],
+  },
+   {
+    icon: IconSettingsAutomation,
+    label: 'Otomatik Mesaj Yönetimi',
+    key: 'automaticMessageManagenet',
+    link: '/vehicles',
+    children: [
+      { label: 'Otomatik Sms Yön.', key: 'automaticSmsManagement', link: '/automaticSmsManagement' },
+      { label: 'Otomatik Mail Yön.', key: 'automaticMailManagement', link: '/automaticMailManagement' },
     ],
   },
 ];

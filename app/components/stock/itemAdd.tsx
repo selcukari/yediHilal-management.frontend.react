@@ -72,9 +72,9 @@ const ItemAdd = forwardRef<ItemAddDialogControllerRef, UserAddProps>(({onSaveSuc
 
   useEffect(() => {
     if (form.isValid()) {
-        setIsDisabledSubmit(false);
+      setIsDisabledSubmit(false);
 
-        return;
+      return;
     }
 
     setIsDisabledSubmit(true);

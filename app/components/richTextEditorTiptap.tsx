@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Text } from '@mantine/core';
 import Highlight from '@tiptap/extension-highlight';
 import Underline from '@tiptap/extension-underline';
@@ -12,9 +12,10 @@ import { RichTextEditor } from '@mantine/tiptap';
 interface RichTextEditorTiptapProps {
   form: UseFormReturnType<any>;
   required?: boolean;
+  value?: string;
 }
 
-function RichTextEditorTiptap({form, required=false}: RichTextEditorTiptapProps) {
+function RichTextEditorTiptap({form, required=false, value=""}: RichTextEditorTiptapProps) {
   const [error, setError] = useState("İçerik en az 10 karakter olmalıdır.");
   const editor = useEditor({
     extensions: [StarterKit, Underline, Highlight, Placeholder.configure({ placeholder: 'içerik mesajı...' })],
@@ -34,6 +35,12 @@ function RichTextEditorTiptap({form, required=false}: RichTextEditorTiptapProps)
       }
      },
   });
+
+  useEffect(() => {
+    if (value) {
+      editor.commands.setContent(value);
+    }
+  }, [value]);
 
   return (<>
     <RichTextEditor editor={editor} variant="subtle" style={{ height: '500px' }}
