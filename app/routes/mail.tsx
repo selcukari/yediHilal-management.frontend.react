@@ -76,7 +76,7 @@ export default function Mail() {
         if (header.field === 'toEmails' || header.field === 'toUsers') {
           return (
             <Table.Td key={header.field}>
-              {item[header.field].length > 50 ? `${item[header.field].substring(0,50)}...`: item[header.field]}
+              {item[header.field].length > 30 ? `${item[header.field].substring(0,30)}...`: item[header.field]}
             </Table.Td>
           );
         }
