@@ -61,7 +61,7 @@ export default function Mail() {
             </Table.Td>
           );
         }
-        if (header.field === 'toEmails' || header.field === 'toUsers') {
+        if (header.field === 'toPhoneNumbers' || header.field === 'toUsers') {
           return (
             <Table.Td key={header.field}>
               {item[header.field].length > 30 ? `${item[header.field].substring(0,30)}...`: item[header.field]}
