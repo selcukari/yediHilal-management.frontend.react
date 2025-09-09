@@ -3,8 +3,8 @@ import {
   NavLink, Flex, Text, Stack, Divider, Group, ScrollArea, AppShell,
 } from '@mantine/core';
 import {
-  IconUser, IconMail, IconUsers, IconSettings, IconMessage, IconChartBar, IconFileCheck, IconCar,
-  IconChevronRight, IconClipboardList, IconSettingsAutomation, IconChevronDown, IconReportMoney,
+  IconUser, IconMail, IconUsers, IconSettings, IconMessage, IconChartBar, IconFileCheck, IconCar, IconCoin,
+  IconChevronRight, IconClipboardList, IconCalendarTime, IconSettingsAutomation, IconChevronDown, IconReportMoney,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
 import { useAuth } from '~/authContext';
@@ -21,6 +21,7 @@ const menuItems = [
   { icon: IconMail, label: 'Gön. Mail Lis.', key: 'mail', link: '/mails' },
   { icon: IconMessage, label: 'Gön. Sms Lis.', key: 'sms', link: '/sms' },
   { icon: IconChartBar, label: 'Raporlar', key: 'report', link: '/reports' },
+  { icon: IconCoin, label: 'Kasa Yönetimi', key: 'safe', link: '/safe' },
   {
     icon: IconClipboardList,
     label: 'Stock Yönetimi',
@@ -56,7 +57,7 @@ const menuItems = [
     ],
   },
   {
-    icon: IconReportMoney,
+    icon: IconCalendarTime,
     label: 'Toplantı Yönetimi',
     key: 'meeting',
     link: '/meetings',

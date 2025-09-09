@@ -11,6 +11,7 @@ export default defineConfig({
     "import.meta.env.VITE_APP_API_BASE_CONTROLLER": JSON.stringify(process.env.VITE_APP_API_BASE_CONTROLLER),
     "import.meta.env.VITE_APP_API_USER_CONTROLLER": JSON.stringify(process.env.VITE_APP_API_USER_CONTROLLER),
     "import.meta.env.VITE_APP_API_STOCK_CONTROLLER": JSON.stringify(process.env.VITE_APP_API_STOCK_CONTROLLER),
+    "import.meta.env.VITE_APP_API_SAFE_CONTROLLER": JSON.stringify(process.env.VITE_APP_API_SAFE_CONTROLLER),
     "import.meta.env.VITE_APP_VERSION": JSON.stringify(process.env.VITE_APP_VERSION)
     }
   },

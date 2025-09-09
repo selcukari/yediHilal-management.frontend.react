@@ -12,5 +12,6 @@ export const modulesMockData = [
    { key: 'vehicle', url: '/vehicles', label: 'Araç Modül' },
    { key: 'setting', url: '/settings', label: 'Ayarlar Modül' },
    { key: 'dashboard', url: '/dashboard', label: "Dashboard Modül" },
+   { key: 'safe', url: '/safe', label: "Kasa Modül" },
    { key: 'automaticMessageManagenet', url: '/automaticMessageManagenet', label: "Otomatik Mesaj Modül" },
 ];
