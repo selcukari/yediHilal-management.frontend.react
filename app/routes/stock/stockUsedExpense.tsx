@@ -5,13 +5,13 @@ import {
   ActionIcon, Table, LoadingOverlay, Flex, Button,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useStockService } from '../services/stockService';
-import { toast } from '../utils/toastMessages';
-import { formatDate } from '../utils/formatDate';
-import { dateFormatStrings } from '../utils/dateFormatStrings';
+import { useStockService } from '../../services/stockService';
+import { toast } from '../../utils/toastMessages';
+import { formatDate } from '../../utils/formatDate';
+import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import { useAuth } from '~/authContext';
-import StockUsedExpenseEdit, { type StockUsedExpenseEditDialogControllerRef } from '../components/stock/stockUsedExpenseEdit';
-import StockUsedAdd, { type StockUsedAddDialogControllerRef } from '../components/stock/stockUsedAdd';
+import StockUsedExpenseEdit, { type StockUsedExpenseEditDialogControllerRef } from '../../components/stock/stockUsedExpenseEdit';
+import StockUsedAdd, { type StockUsedAddDialogControllerRef } from '../../components/stock/stockUsedAdd';
 interface Column {
   field: string;
   header: string;

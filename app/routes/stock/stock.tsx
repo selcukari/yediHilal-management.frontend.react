@@ -5,12 +5,12 @@ import {
 } from '@mantine/core';
 import { IconCheck, IconPlus } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
-import { useStockService } from '../services/stockService';
-import { toast } from '../utils/toastMessages';
-import ItemAdd, { type ItemAddDialogControllerRef } from '../components/stock/itemAdd';
-import { formatDate } from '../utils/formatDate';
+import { useStockService } from '../../services/stockService';
+import { toast } from '../../utils/toastMessages';
+import ItemAdd, { type ItemAddDialogControllerRef } from '../../components/stock/itemAdd';
+import { formatDate } from '../../utils/formatDate';
 import { useAuth } from '~/authContext';
-import { dateFormatStrings } from '../utils/dateFormatStrings';
+import { dateFormatStrings } from '../../utils/dateFormatStrings';
 
 interface StockItem {
   name: string;
