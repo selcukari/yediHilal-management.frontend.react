@@ -9,7 +9,7 @@ interface ResponsibleSelectProps {
   value?: string[];
   isDisabled?: boolean;
 }
-
+// sorumluluk modulu
 export function ResponsibleSelect({ form, required = false, isDisabled = false }: ResponsibleSelectProps) {
   const [responsibles, setResponsibles] = useState<{ value: string; label: string }[]>([]);
   
