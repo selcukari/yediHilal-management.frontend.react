@@ -234,14 +234,11 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
             {rowItems()}
          
           <Grid.Col span={6}>
-            <fieldset style={{ border: '1px solid #e9ecef', borderRadius: '8px', padding: '16px' }}>
-              <legend style={{ padding: '0 8px', fontWeight: 600 }}>Durum Ayarları</legend>
-                <Switch 
-                  label="Tamamlandı Durumu" 
-                  checked={form.values.isDelivery}
-                  onChange={(event) => form.setFieldValue('isDelivery', event.currentTarget.checked)}
-                />
-            </fieldset>
+            <Switch 
+              label="Tamamlandı Durumu" 
+              checked={form.values.isDelivery}
+              onChange={(event) => form.setFieldValue('isDelivery', event.currentTarget.checked)}
+            />
           </Grid.Col>
            <Grid.Col span={6} offset={4}>
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
