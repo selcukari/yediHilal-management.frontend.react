@@ -38,14 +38,16 @@ export function DutySelect({ form, required = false, isDisabled = false }: DutyS
   };
 
   // Form değerini string'ten array'e çevir
-  const selectedValues = form.values.responsibilities 
-    ? form.values.responsibilities.split(',').filter(Boolean)
+  const selectedValues = form.values.dutiesIds 
+    ? form.values.dutiesIds.split(',').filter(Boolean)
     : [];
 
   // Değer değiştiğinde array'i string'e çevirip form'a set et
   const handleChange = (values: string[]) => {
-    form.setFieldValue('duties', values.join(','));
+    form.setFieldValue('dutiesIds', values.join(','));
   };
+  // Form'dan error mesajını al
+  const error = form.errors.dutiesIds;
 
   return (
     <MultiSelect
@@ -57,6 +59,7 @@ export function DutySelect({ form, required = false, isDisabled = false }: DutyS
       disabled={isDisabled}
       value={selectedValues}
       required={required}
+      error={error}
       maxDropdownHeight={200}
       nothingFoundMessage="Görevi bulunamadı..."
       onChange={handleChange}
