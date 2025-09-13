@@ -31,6 +31,14 @@ interface Column {
   header: string;
 }
 
+interface DutiesType {
+  ids: string;
+  names: string;
+  createDate: string;
+  authorizedPersonId: number; // yetkili kişi tarafından atandı id
+  authorizedPersonName: string; // yetkili kişi tarafından atandı name
+}
+
 export default function User() {
   const [resultData, setResultData] = useState<any[]>([]);
   const [isDisabledDeleteAction, setDisabledDeleteAction]= useState(false);
@@ -46,6 +54,7 @@ export default function User() {
     { field: 'id', header: 'Id' },
     { field: 'fullName', header: 'Ad Soyad' },
     { field: 'roleName', header: 'Role' },
+    { field: 'duties', header: 'Görevi' },
     { field: 'phoneWithCountryCode', header: 'Telefon' },
     { field: 'email', header: 'Mail' },
     { field: 'identificationNumber', header: 'Kimlik' },
@@ -91,6 +100,8 @@ export default function User() {
       provinceId: item.provinceId?.toString(),
       deleteMessageTitle: item.deleteMessageTitle?.toString(),
       createdDate: item.createdDate,
+      duties: (item.duties && item.duties) as DutiesType[],
+      dutiesIds: item.duties && item.duties[item.duties.length -1].ids as string,
       updateDate: item.updateDate,
      });
   };
@@ -103,7 +114,15 @@ export default function User() {
   const rowsTable = resultData.map((item) => (
     <Table.Tr key={item.id}>
       {rowHeaders.map((header) => {
-        if (header.field === 'actions') {
+        if (header.field === 'duties') {
+          return (
+            <Table.Td key={header.field}>
+              {item["duties"] && item["duties"][item["duties"].length-1]?.names}
+            </Table.Td>
+          );
+        }
+
+        else if (header.field === 'actions') {
           return (
             <Table.Td key={header.field}>
               <Group gap="xs">
@@ -182,7 +201,8 @@ export default function User() {
           ...item,
           createdDate: formatDate(item.createdDate, dateFormatStrings.dateTimeFormatWithoutSecond),
           updateDate: formatDate(item.updateDate, dateFormatStrings.dateTimeFormatWithoutSecond),
-          phoneWithCountryCode: (item.countryCode && item.phone) ? `${item.countryCode}${item.phone}` : undefined
+          phoneWithCountryCode: (item.countryCode && item.phone) ? `${item.countryCode}${item.phone}` : undefined,
+          duties: (item.duties && JSON.parse(item.duties)) as DutiesType[],
         })));
        
       } else {

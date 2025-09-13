@@ -10,7 +10,10 @@ import { ProvinceSelect } from '../addOrEdit/provinceSelect';
 import { RoleSelect } from '../addOrEdit/roleSelect';
 import { useUserService } from '../../services/userService';
 import { toast } from '../../utils/toastMessages';
+import { DutySelect } from '../addOrEdit/dutySelect';
 import { ModuleSelect } from '../addOrEdit/moduleSelect';
+import { formatDate } from '../../utils/formatDate';
+import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import { useAuth } from '~/authContext';
 
 export type UserAddDialogControllerRef = {
@@ -20,6 +23,14 @@ export type UserAddDialogControllerRef = {
 
 interface UserAddProps {
   onSaveSuccess?: () => void; // Yeni prop
+}
+
+interface DutiesType {
+  ids: string;
+  names?: string;
+  createDate: string;
+  authorizedPersonId: number; // yetkili kişi tarafından atandı id
+  authorizedPersonName: string; // yetkili kişi tarafından atandı name
 }
 
 type FormValues = {
@@ -35,6 +46,7 @@ type FormValues = {
   password: string;
   moduleRoles: string;
   roleId: string;
+  dutiesIds?: string;
   deleteMessageTitle?: string;
 };
 
@@ -60,12 +72,15 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
       moduleRoles: '',
       provinceId: '',
       password: '',
+      dutiesIds: '',
       isActive: true,
       deleteMessageTitle: '',
     },
     validate: {
       fullName: (value) => (value.trim().length < 5 ? 'İsim en az 5 karakter olmalı' : null),
       password: (value) => (value.trim().length < 5 ? 'Şifre en az 5 karakter olmalı' : null),
+      dutiesIds: (value) => ((value && value?.length >= 1) ? null : 'Görev en az 1 tane olmalı'),
+      provinceId: (value) => (value ? null : 'İl alanı zorunlu'),
       identificationNumber: (value) => {
         if (!value?.trim()) return null;
         // Sadece rakam kontrolü
@@ -118,12 +133,21 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
 
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
+    // Yeni görev verisi
+    const newDuty = {
+      ids: values.dutiesIds?.toString() ?? "",
+      authorizedPersonId: currentUser?.id,
+      authorizedPersonName: currentUser?.fullName,
+      createDate: formatDate(new Date().toISOString(), dateFormatStrings.dateTimeFormatWithoutSecond)
+    };
+
     const newMemberValue = {
       ...values,
       deleteMessageTitle: (values.isActive ? undefined : (values.deleteMessageTitle ? values.deleteMessageTitle.trim() : undefined )),
       provinceId: values.provinceId ? parseInt(values.provinceId) : undefined,
       countryId: values.countryId ? parseInt(values.countryId) : undefined,
       roleId: values.roleId ? parseInt(values.roleId) : undefined,
+      duties: JSON.stringify([newDuty])
     }
 
     const result = await service.addUser(newMemberValue);
@@ -229,7 +253,8 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
 
           <Grid.Col span={6}>
             <ProvinceSelect 
-              form={form} 
+              form={form}
+              required={true}
               label="İl" 
               placeholder="İl Seçiniz" 
               countryId={form.values.countryId}
@@ -284,6 +309,13 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
           <Grid.Col span={6}>
             <RoleSelect 
               form={form} 
+            />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <DutySelect
+              form={form}
+              required={true}
+              {...form.getInputProps('dutiesIds')}
             />
           </Grid.Col>
           { currentUser?.roleId == 1 &&

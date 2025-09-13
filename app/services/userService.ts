@@ -13,6 +13,7 @@ interface UserDataParams {
   dateOfBirth?: string;
   createdDate?: string;
   updateDate?: string;
+  duties?: string;
   deleteMessageTitle?: string;
 }
 

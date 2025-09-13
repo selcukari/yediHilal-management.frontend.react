@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, useRef, useMemo } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { omit } from 'ramda';
-import { Modal, TextInput, Flex, Button, Stack, Grid, PasswordInput, Group, Switch, Textarea } from '@mantine/core';
+import { Modal, TextInput, Paper, Title, Table, Flex, Button, Stack, Grid, PasswordInput, Group, Switch, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
@@ -13,7 +13,25 @@ import { RoleSelect } from '../addOrEdit/roleSelect';
 import { toast } from '../../utils/toastMessages';
 import { ModuleSelect } from '../addOrEdit/moduleSelect';
 import { ResponsibleSelect } from '../addOrEdit/responsibleSelect';
+import { areNumberSequencesEqual } from '../../utils/areNumberSequencesEqual';
+import { DutySelect } from '../addOrEdit/dutySelect';
+import { formatDate } from '../../utils/formatDate';
+import { dateFormatStrings } from '../../utils/dateFormatStrings';
+
 import { useAuth } from '~/authContext';
+
+interface DutiesType {
+  ids: string;
+  names?: string;
+  createDate: string;
+  authorizedPersonId: number; // yetkili kişi tarafından atandı id
+  authorizedPersonName: string; // yetkili kişi tarafından atandı name
+}
+
+interface TableHeader {
+  field: keyof DutiesType;
+  header: string;
+}
 
 export type UserEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -41,11 +59,14 @@ type FormValues = {
   password: string;
   updateDate?: string;
   responsibilities?: string;
+  duties?: DutiesType[];
+  dutiesIds?: string;
   deleteMessageTitle?: string;
 };
 
 const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSaveSuccess}, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
+  const [resultDutyData, setresultDutyData] = useState<DutiesType[]>([]);
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   
@@ -70,10 +91,14 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
       password: '',
       moduleRoles: '',
       responsibilities: '',
+      duties: [],
+      dutiesIds: '',
       deleteMessageTitle: '',
     },
     validate: {
       fullName: (value) => (value.trim().length < 5 ? 'İsim en az 5 karakter olmalı' : null),
+      dutiesIds: (value) => ((value && value?.length >= 1) ? null : 'Görev en az 1 tane olmalı'),
+      provinceId: (value) => (value ? null : 'İl alanı zorunlu'),
       password: (value) => (value.trim().length < 5 ? 'Şifre en az 5 karakter olmalı' : null),
       identificationNumber: (value) => {
         if (!value?.trim()) return null;
@@ -126,9 +151,36 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
     },
   });
 
-   const openDialog = (value: FormValues) => {
+    const [rowDutyHeaders, setRowDutyHeaders] = useState<TableHeader[]>([
+    { field: 'names', header: 'Görevi' },
+    { field: 'createDate', header: 'Görev Atama Kayıt' },
+    { field: 'authorizedPersonName', header: 'Atayan Kişi' },
+  ]);
+
+    const rowsDutyTable = resultDutyData?.map((item) => (
+    <Table.Tr key={item.ids}>
+      {rowDutyHeaders.map((header) => {
+        if (header.field === 'authorizedPersonName') {
+          return (
+            <Table.Td key={header.field}>
+              {item["authorizedPersonName"] && item["authorizedPersonName"]}
+            </Table.Td>
+          );
+        }
+
+        return (
+          <Table.Td key={header.field}>
+            {item[header.field] || '-'}
+          </Table.Td>
+        );
+      })}
+    </Table.Tr>
+  ));
+
+  const openDialog = (value: FormValues) => {
 
     if (value) {
+      setresultDutyData(value.duties as DutiesType[] || []);
       form.reset();
       // Önce initial values'ı set et
       form.setValues((value));
@@ -148,12 +200,29 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
 
+    const isChangeDuty = areNumberSequencesEqual(values.dutiesIds,
+      resultDutyData[resultDutyData?.length -1]?.ids)
+
+    // Yeni görev verisi
+    const newDuty = {
+      ids: values.dutiesIds?.toString() ?? "",
+      authorizedPersonId: currentUser?.id,
+      authorizedPersonName: currentUser?.fullName,
+      createDate: formatDate(new Date().toISOString(), dateFormatStrings.dateTimeFormatWithoutSecond)
+    };
+
+    // Eğer görev değişmişse, yeni görevi ekle
+    if (!isChangeDuty) {
+      resultDutyData.push(newDuty);
+    }
+
     const newUserValue = {
-      ...omit(['createdDate', 'updateDate'], values),
+      ...omit(['createdDate', 'updateDate', 'dutiesIds'], values),
       deleteMessageTitle: (values.isActive ? undefined : (values.deleteMessageTitle ? values.deleteMessageTitle.trim() : undefined )),
       provinceId: values.provinceId ? parseInt(values.provinceId) : undefined,
       countryId: values.countryId ? parseInt(values.countryId) : undefined,
       roleId: values.roleId ? parseInt(values.roleId) : undefined,
+      duties: !isChangeDuty ? JSON.stringify(resultDutyData) : undefined
     }
 
     const result = await service.updateUser(newUserValue);
@@ -262,7 +331,8 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
 
           <Grid.Col span={6}>
             <ProvinceSelect 
-              form={form} 
+              form={form}
+              required={true}
               label="İl" 
               placeholder="İl Seçiniz"
               countryId={form.values.countryId}
@@ -323,20 +393,27 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
               isDisabled={isDisabledRoleComponent}
             />
           </Grid.Col>
-              <Grid.Col span={6}>
-                <ModuleSelect
-                  form={form}
-                  isDisabled={isDisabledRoleComponent}
-                  {...form.getInputProps('moduleRoles')}
-                />
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <ResponsibleSelect
-                  form={form}
-                  isDisabled={isDisabledRoleComponent}
-                  {...form.getInputProps('responsibilities')}
-                />
-              </Grid.Col>
+          <Grid.Col span={6}>
+            <DutySelect
+              form={form}
+              required={true}
+              {...form.getInputProps('dutiesIds')}
+            />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <ModuleSelect
+              form={form}
+              isDisabled={isDisabledRoleComponent}
+              {...form.getInputProps('moduleRoles')}
+            />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <ResponsibleSelect
+              form={form}
+              isDisabled={isDisabledRoleComponent}
+              {...form.getInputProps('responsibilities')}
+            />
+          </Grid.Col>
           <Flex
             mih={50}
             gap="md"
@@ -363,6 +440,36 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
               {...form.getInputProps('deleteMessageTitle')}
             />
           </Grid.Col>
+          {/* dagişen duty(görev) listesi */}
+          {rowsDutyTable?.length > 0 &&
+          <Flex
+            mih={50}
+            gap="md"
+            justify="center"
+            align="center"
+            direction="row"
+            wrap="wrap">
+            <Grid.Col span={12}>
+            <Paper shadow="xs" p="lg" withBorder>
+              <Stack gap="md">
+                <Title order={2}>Son Görevler</Title>
+                <Table.ScrollContainer minWidth={500} maxHeight={700}>
+                  <Table striped highlightOnHover withColumnBorders>
+                    <Table.Thead>
+                      <Table.Tr>
+                        {rowDutyHeaders.map((header) => (
+                          <Table.Th key={header.field}>{header.header}</Table.Th>
+                        ))}
+                      </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody>{rowsDutyTable}</Table.Tbody>
+                  </Table>
+                </Table.ScrollContainer>
+              </Stack>
+            </Paper>
+          </Grid.Col>
+          </Flex>
+          }
 
           <Grid.Col span={6} offset={4}>
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
