@@ -33,7 +33,11 @@ const menuItems = [
       { label: 'Depo', key: 'stock-depo', link: '/stocks' },
     ],
   },
-  { icon: IconSettings, label: 'Ayarlar', key: 'setting', link: '/settings' },
+  { icon: IconSettings, label: 'Ayarlar', key: 'setting', link: '/settings',
+    children: [
+      { label: 'Görevler', key: 'duty', link: '/settings-duty' },
+    ],
+   },
   {
     icon: IconFileCheck,
     label: 'Proje Yönetimi',

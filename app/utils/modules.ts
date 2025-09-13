@@ -13,5 +13,6 @@ export const modulesMockData = [
    { key: 'setting', url: '/settings', label: 'Ayarlar Modül' },
    { key: 'dashboard', url: '/dashboard', label: "Dashboard Modül" },
    { key: 'safe', url: '/safe', label: "Kasa Modül" },
+   { key: 'settings', url: '/settings', label: "Ayarlar Modül" },
    { key: 'automaticMessageManagenet', url: '/automaticMessageManagenet', label: "Otomatik Mesaj Modül" },
 ];

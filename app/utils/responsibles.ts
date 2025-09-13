@@ -7,5 +7,6 @@ export const responsiblesMockData = [
    { key: 'meeting', label: 'Toplantı Modül' },
    { key: 'vehicle', label: 'Araç Modül' },
    { key: 'safe', label: 'Kasa Modül' },
+   { key: 'settings', label: 'Ayarlar Modül' },
    { key: 'automaticMessageManagenet', label: 'Otomatik Mesaj Modül' },
 ];
