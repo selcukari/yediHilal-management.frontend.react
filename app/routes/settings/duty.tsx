@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { IconSearch, IconEdit, IconTrash } from '@tabler/icons-react';
 import {
-  Container, Grid, TextInput, ActionIcon, Stack, Group, Title, Text, Paper, Table, LoadingOverlay,
+  Container, Grid, TextInput, ActionIcon, Stack, Group, Title, Text, Paper, Table, LoadingOverlay, Button,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import DutyAdd, { type DutyAddDialogControllerRef } from '../../components/duty/dutyAdd';
+import DutyEdit, { type DutyEditDialogControllerRef } from '../../components/duty/dutyEdit';
 import { useDutyService } from '../../services/dutyService';
 import { toast } from '../../utils/toastMessages';
 
@@ -29,6 +31,8 @@ export default function Duty() {
     { field: 'name', header: 'Mesaj' },
     { field: 'actions', header: 'İşlemler' },
   ]);
+  const dutyAddRef = useRef<DutyAddDialogControllerRef>(null);
+  const dutyEditRef = useRef<DutyEditDialogControllerRef>(null);
 
   const service = useDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
@@ -46,11 +50,37 @@ export default function Duty() {
   }, []);
 
   const handleEdit = (item: DutyType) => {
-    console.log("handleEdit:item:", item)
+    dutyEditRef.current?.openDialog(item);
   };
 
-  const handleDelete = (id: number) => {
-    console.log("handleEdit:id:", id)
+  const handleDelete = async (id: number) => {
+    open();
+
+     try {
+
+      const result = await service.deleteDuty(id);
+      if (result == true) {
+
+      toast.success('İşlem başarılı!');
+      
+      fetchDuty();
+      
+      close();
+
+      return;
+    }
+    else if (result?.data == false && result?.errors?.length > 0) {
+
+      toast.warning(result.errors[0]);
+
+    } else {
+      toast.error('Bir hata oluştu!');
+    }
+      close();
+    } catch (error: any) {
+      toast.error(`silme işleminde bir hata: ${error.message}`);
+      close();
+    }
   };
 
   const rowsTable = filteredUsers.map((item) => (
@@ -94,9 +124,10 @@ export default function Duty() {
 
       const getDuties = await service.getDuties();
       if (getDuties) {
-        setResultData(getDuties.map((duty: any) => ({
+        setResultData(getDuties.map((duty: DutyType) => ({
           id: duty.id,
           name: duty.name,
+          isActive: duty.isActive
         })));
        
       } else {
@@ -110,6 +141,13 @@ export default function Duty() {
         toast.error(`getDuties yüklenirken hata: ${error.message}`);
       close();
     }
+  };
+
+  const handleSaveSuccess = () => {
+
+    setTimeout(() => {
+      fetchDuty();
+    }, 1500);
   };
 
   return (
@@ -129,6 +167,7 @@ export default function Duty() {
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
+            <Button variant="filled" onClick={() => dutyAddRef.current?.open()}>Yeni Ekle</Button>
           </Group>
 
           {/* İçerik Kartları */}
@@ -175,6 +214,8 @@ export default function Duty() {
             </Stack>
           </Paper>
         </Stack>
+        <DutyAdd ref={dutyAddRef} onSaveSuccess={handleSaveSuccess} />
+        <DutyEdit ref={dutyEditRef} onSaveSuccess={handleSaveSuccess} />
       </Container>
   );
 }

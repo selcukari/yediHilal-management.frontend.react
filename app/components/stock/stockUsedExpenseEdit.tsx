@@ -106,7 +106,7 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
 
     const result = await service.updateStockUsedExpense(newStockValue);
 
-    if (result) {
+    if (result === true) {
 
       toast.success('İşlem başarılı!');
       
@@ -121,7 +121,7 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
 
       return;
     }
-    if (result?.data === false && result?.errors) {
+    if (result?.data === false && result?.errors?.length > 0) {
 
       toast.warning(result.errors[0]);
 

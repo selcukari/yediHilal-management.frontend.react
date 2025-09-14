@@ -152,7 +152,7 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
 
     const result = await service.addUser(newMemberValue);
 
-    if (result) {
+    if (result === true) {
 
       toast.success('İşlem başarılı!');
       
@@ -167,7 +167,7 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
 
       return;
     }
-    if (result?.data === false && result?.errors) {
+    if (result?.data === false && result?.errors?.length > 0) {
 
       toast.warning(result.errors[0]);
 

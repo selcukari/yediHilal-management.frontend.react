@@ -1,17 +1,15 @@
-import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
+import { forwardRef, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, TextInput, Flex, Button, Stack, Grid, PasswordInput, Group, Switch, Textarea } from '@mantine/core';
+import { Modal, TextInput, Flex, Button, Stack, Grid, Switch } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
-import { useStockService } from '../../services/stockService';
+import { useDutyService } from '../../services/dutyService';
 import { toast } from '../../utils/toastMessages';
-import { useAuth } from '~/authContext';
-import stripSpecialCharacters from '../../utils/stripSpecialCharacters';
 
-export type ItemAddDialogControllerRef = {
-  openDialog: (value: any) => void;
+export type DutyAddDialogControllerRef = {
+  open: () => void;
   close: () => void;
 };
 
@@ -19,91 +17,36 @@ interface UserAddProps {
   onSaveSuccess?: () => void; // Yeni prop
 }
 
-interface StockDataParams {
-  id: number;
-  updateUserId: number;
-  items?: string;
-}
-
 type FormValues = {
   name: string;
-  count: string;
+  isActive: boolean;
 };
 
-const ItemAdd = forwardRef<ItemAddDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
+const DutyAdd = forwardRef<DutyAddDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
-  type StockData = {
-    id: number;
-    items: { key: string }[];
-  };
-  
-  const [stockData, setStockData] = useState<StockData>({ items: [], id: 0 });
   const [opened, { open, close }] = useDisclosure(false);
-  const service = useStockService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
-  const { currentUser } = useAuth();
-  
+  const service = useDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
   const form = useForm<FormValues>({
     initialValues: {
       name: '',
-      count: '',
-   
+      isActive: true,
     },
     validate: {
-      name: (value) => {
-        if(value.trim().length < 5 ) {
-          return "İsim en az 5 karakter olmalı";
-        }
-
-        const keys = stockData?.items.map((item: any) => item.key);
-
-        if(keys.includes(stripSpecialCharacters(value))) {
-
-          return "Aynı item tekrar eklenemez";
-        }
-      },
-      count: (value) => {
-
-        return parseInt(value) <= 0 ? "En az 1 olmalıdır": null
-      },
+      name: (value) => (value.trim().length < 5 ? 'Görev Adı en az 5 karakter olmalı' : null),
     },
   });
 
-  useEffect(() => {
-    if (form.isValid()) {
-      setIsDisabledSubmit(false);
-
-      return;
-    }
-
-    setIsDisabledSubmit(true);
-  }, [form.values]);
-
-  const randaomColor = () => {
-    const colors = ["dark", "gray", "red", "pink", "grape", "violet", "indigo", "blue", "cyan", "teal", "green", "lime", "yellow", "orange"];
-    const index = Math.floor(Math.random() * colors.length);
-
-    return colors[index];
-  }
-
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
-    const newStockValue: StockDataParams = {
-      id: stockData.id,
-      updateUserId: currentUser?.id as number,
-      items: JSON.stringify([
-        // ...stockData.items,
-        {
-          key: stripSpecialCharacters(values.name.trim()),
-          name: values.name.trim(),
-          count: parseInt(values.count),
-          color: randaomColor()
-        }
-      ])
-    }
 
-    const result = await service.updateStock(newStockValue);
+    const result = await service.addDuty({
+      ...values,
+      name: values.name.trim()
+    });
+    console.log("dutyadd:result", result);
 
     if (result === true) {
 
@@ -120,7 +63,7 @@ const ItemAdd = forwardRef<ItemAddDialogControllerRef, UserAddProps>(({onSaveSuc
 
       return;
     }
-    if (result?.data === false && result?.errors?.length > 0) {
+    else if (result?.data === false && result?.errors?.length > 0) {
 
       toast.warning(result.errors[0]);
 
@@ -151,18 +94,8 @@ const ItemAdd = forwardRef<ItemAddDialogControllerRef, UserAddProps>(({onSaveSuc
     }
   }
 
-  const openDialog = (value: any) => {
-
-    if (value) {
-      form.reset();
-      setStockData(value);
-      open();
-
-    }
-  }
-
   useImperativeHandle(ref, () => ({
-    openDialog,
+    open,
     close,
   }));
 
@@ -172,7 +105,7 @@ const ItemAdd = forwardRef<ItemAddDialogControllerRef, UserAddProps>(({onSaveSuc
       onClose={() => {
         dialogClose();
       }}
-      title="Yeni İtem Ekle"
+      title="Yeni Görev Ekle"
       centered
       size="700"
       overlayProps={{
@@ -185,22 +118,28 @@ const ItemAdd = forwardRef<ItemAddDialogControllerRef, UserAddProps>(({onSaveSuc
           <Grid>
             <Grid.Col span={6}>
               <TextInput
-                label="İtem Adı"
-                placeholder="İtem adı giriniz"
+                label="Görev Adı"
+                placeholder="görev giriniz"
                 required
                 {...form.getInputProps('name')}
               />
             </Grid.Col>
 
-          <Grid.Col span={6}>
-            <TextInput
-              label="İtem sayısı"
-              placeholder="item sayısı giriniz"
-              type='number'
-              required
-              {...form.getInputProps('count')}
-            />
-          </Grid.Col>
+          <Flex
+            mih={50}
+            gap="md"
+            justify="center"
+            align="flex-end"
+            direction="row"
+            wrap="wrap">
+            <Grid.Col span={6}>
+              <Switch
+                label="Görev Durumu" 
+                checked={form.values.isActive}
+                onChange={(event) => form.setFieldValue('isActive', event.currentTarget.checked)}
+              />
+            </Grid.Col>
+          </Flex>
           <Grid.Col span={6} offset={4}>
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
               İptal
@@ -222,4 +161,4 @@ const ItemAdd = forwardRef<ItemAddDialogControllerRef, UserAddProps>(({onSaveSuc
   </>);
 });
 
-export default ItemAdd;
+export default DutyAdd;

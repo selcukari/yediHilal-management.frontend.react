@@ -99,7 +99,7 @@ const StockUsedAdd = forwardRef<StockUsedAddDialogControllerRef, StockUsedAddPro
 
     const result = await service.addStockUsed(newStockValue);
 
-    if (result) {
+    if (result === true) {
 
       toast.success('İşlem başarılı!');
       
@@ -114,7 +114,7 @@ const StockUsedAdd = forwardRef<StockUsedAddDialogControllerRef, StockUsedAddPro
 
       return;
     }
-    if (result?.data === false && result?.errors) {
+    if (result?.data === false && result?.errors?.length > 0) {
 
       toast.warning(result.errors[0]);
 

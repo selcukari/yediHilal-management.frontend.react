@@ -197,7 +197,7 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
 
       return;
     }
-    if (result?.data == false && result?.errors) {
+    if (result?.data == false && result?.errors?.length > 0) {
 
       toast.warning(result.errors[0]);
 

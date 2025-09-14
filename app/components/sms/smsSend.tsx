@@ -88,7 +88,7 @@ const SmsSend = forwardRef<SmsSendDialogControllerRef, unknown>((_props, ref) =>
 
       return;
     }
-    if (result?.data === false && result?.errors) {
+    if (result?.data === false && result?.errors?.length > 0) {
 
       toast.warning(result.errors[0]);
 
