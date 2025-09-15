@@ -186,6 +186,15 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
               onChange={(value) => form.setFieldValue('finisDate', value)}
             />
           </Grid.Col>
+          <Grid.Col span={6}>
+            <Textarea
+              mt="md"
+              label="Note giriniz"
+              placeholder="messaj..."
+              withAsterisk
+              {...form.getInputProps('note')}
+            />
+          </Grid.Col>
           <Flex
             mih={50}
             gap="md"
@@ -201,16 +210,6 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
               />
             </Grid.Col>
           </Flex>
-          <Grid.Col span={6}>
-            <Textarea
-              mt="md"
-              label="Note giriniz"
-              placeholder="messaj..."
-              withAsterisk
-              {...form.getInputProps('note')}
-            />
-          </Grid.Col>
-
           <Grid.Col span={6} offset={4}>
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
               İptal
