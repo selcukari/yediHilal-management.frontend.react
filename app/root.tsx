@@ -2,6 +2,7 @@
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 import '@mantine/tiptap/styles.css';
+import '@mantine/dates/styles.css';
 import { ColorSchemeScript, MantineProvider, mantineHtmlProps, createTheme } from '@mantine/core';
 import {
   isRouteErrorResponse,

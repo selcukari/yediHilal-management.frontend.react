@@ -1,7 +1,7 @@
 import { MultiSelect } from '@mantine/core';
 import { useState, useEffect } from 'react';
 import type { UseFormReturnType } from '@mantine/form';
-import { responsiblesMockData } from '~/utils/responsibles';
+import { responsiblesMockData } from '~/utils/responsiblesMockData';
 
 interface ResponsibleSelectProps {
   form: UseFormReturnType<any>;

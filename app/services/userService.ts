@@ -89,6 +89,21 @@ export function useUserService(controller: string) {
       return error;
     }
   }
+  const usersInCache = async (countryId?: string) => {
 
-  return { addUser, users, deleteUser, updateUser, user };
+    try {
+
+      const res = await api.get(`/${controller}/getUsers`,{
+        params: {
+          ...(countryId ? { countryId: parseInt(countryId)} : { countryId: turkeyCountryId }),
+        }
+      });
+
+      return res.data.data;
+    } catch (error: any) {
+      return error;
+    }
+  };
+
+  return { addUser, users, deleteUser, updateUser, user, usersInCache };
 }

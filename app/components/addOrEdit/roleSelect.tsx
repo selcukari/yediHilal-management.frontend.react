@@ -37,11 +37,15 @@ export function RoleSelect({ form, required = false, isDisabled = false }: RoleS
     }
   };
 
+  // Form'dan error mesajını al
+  const error = form.errors.roleId;
+
   return (
     <Select
       label="Role"
       placeholder="Role Seçiniz"
       data={roles}
+      error={error}
       required={required}
       disabled={isDisabled}
       maxDropdownHeight={200}

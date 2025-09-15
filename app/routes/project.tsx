@@ -1,14 +1,16 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import {
-  Container, Grid, TextInput, Text, Stack, Title, RingProgress,
-  Paper, Button, LoadingOverlay, Flex, Table, Group,
+  Container, Grid, TextInput, Text, Stack, Title, RingProgress,Badge,
+  Paper, Button, LoadingOverlay, Flex, Table, Group, ActionIcon,
 } from '@mantine/core';
-import { IconSearch, IconPlus } from '@tabler/icons-react';
+import { IconSearch, IconPlus, IconTrash, IconEdit } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { toast } from '../utils/toastMessages';
-import ItemAdd, { type ItemAddDialogControllerRef } from '../components/stock/itemAdd';
+import { useProjectService } from '../services/projectService';
 import { formatDate } from '../utils/formatDate';
 import { dateFormatStrings } from '../utils/dateFormatStrings';
+import { priorityMockData } from '../utils/priorityMockData';
+import ProjectAdd, { type ProjectAddDialogControllerRef } from '../components/project/projectAdd';
 
 interface ProjectItem {
   name: string;
@@ -21,34 +23,44 @@ interface ProjectItem {
 
 interface ProjectData {
   id: number;
-  updateUserId: number;
-  updateUserFullName: string;
+  numberOfParticipant: number;
+  note: string;
+  name: string;
+  priority: string;
+  isActive: boolean;
+  responsibleId: string;
+  responsibleFullName: string;
+  finisDate: string;
   createDate: string;
-  items: ProjectItem[];
 }
 
 export default function Project() {
-  const [projectData, setProjectData] = useState<ProjectData | null>(null);
+  const [projectData, setProjectData] = useState<ProjectData[]>([]);
   const [visible, { open, close }] = useDisclosure(false);
   const [searchText, setSearchText] = useState('');
 
-  const itemAddRef = useRef<ItemAddDialogControllerRef>(null);
+  const projectAddRef = useRef<ProjectAddDialogControllerRef>(null);
+
+  const service = useProjectService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
   useEffect(() => {
     setTimeout(() => {
-        // fetchProject();
+        fetchProject();
       }, 1000);
   }, []);
 
   const fetchProject = async () => {
     open();
     try {
+
+      const getProjects = await service.getProjects();
       
-      if (true) {
+      if (getProjects) {
+        setProjectData(getProjects)
       
       } else {
         toast.info('Hiçbir veri yok!');
-        setProjectData(null);
+        setProjectData([]);
       }
     } catch (error: any) {
       toast.error(`Stok yüklenirken hata: ${error.message}`);
@@ -57,39 +69,87 @@ export default function Project() {
     }
   };
 
+  const handleEdit = (value: ProjectData) => {
+    console.log("handleEdit: value:", value);
+  };
+  const handleDelete = (id: number) => {
+    console.log("handleDelete: id:", id);
+  };
+
   const handleSaveSuccess = () => {
     setTimeout(() => {
       fetchProject();
     }, 1500);
   };
 
-  const elements = [
-  { id: 6, count: 23, responsible: 'Ali',name: "Proje name test 1", createDate: "2025-08-31T13:52:20.289Z", finisDate: "2025-11-25T13:52:20.289Z"  },
-  { id: 7, count: 17, responsible: 'Ahmet',name: "Proje name test 12", createDate: "2025-08-31T13:52:20.289Z", finisDate: "2025-11-25T13:52:20.289Z"  },
-  { id: 39, count: 27, responsible: 'Fatma',name: "Proje name test 13", createDate: "2025-08-31T13:52:20.289Z", finisDate: "2025-11-25T13:52:20.289Z"  },
-  { id: 56, count: 47, responsible: 'Fırat',name: "Proje name test 14", createDate: "2025-08-31T13:52:20.289Z", finisDate: "2025-11-25T13:52:20.289Z"  },
-  { id: 58, count: 48, responsible: 'Ayşe', name: "Proje name test 15", createDate: "2025-08-31T13:52:20.289Z", finisDate: "2025-11-25T13:52:20.289Z" },
-];
-
-  const rowItems = elements.map((element) => (
-    <Table.Tr key={element.id}>
-      <Table.Td>{element.id}</Table.Td>
-      <Table.Td>{element.name}</Table.Td>
-      <Table.Td>{element.count}</Table.Td>
-      <Table.Td>{element.responsible}</Table.Td>
-      <Table.Td>{formatDate(element.createDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
-      <Table.Td>{formatDate(element.finisDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
-    </Table.Tr>
-  ));
-
-  const calculateTotal = () => {
-    if (!elements) return 0;
-    return elements.reduce((total, item) => total + item.count, 0);
+   // Öncelik değerlerine göre renk döndüren fonksiyon
+  const getPriorityColor = (priorityValue: string) => {
+    switch(priorityValue) {
+      case 'urgent': return 'red';
+      case 'high': return 'orange';
+      case 'medium': return 'blue';
+      case 'low': return 'green';
+      default: return 'gray';
+    }
   };
 
-  const handleAddItem = () => {
-   console.log("proje ekle");
-  }
+  // Filtrelenmiş proje verileri
+  const filteredProjects = useMemo(() => {
+    if (!searchText) return projectData;
+    
+    return projectData.filter(project => 
+      project.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      project.responsibleFullName.toLowerCase().includes(searchText.toLowerCase()) ||
+      project.note.toLowerCase().includes(searchText.toLowerCase())
+    );
+  }, [projectData, searchText]);
+
+  const rowItems = filteredProjects.map((element) => {
+    const priorityInfo = priorityMockData.find(x => x.value === element.priority);
+
+    return (<Table.Tr key={element.id}>
+      <Table.Td>{element.id}</Table.Td>
+      <Table.Td>{element.name}</Table.Td>
+      <Table.Td>{element.numberOfParticipant}</Table.Td>
+      <Table.Td>{
+        <Badge 
+            color={getPriorityColor(element.priority)} 
+            variant="filled"
+          >
+          {priorityInfo?.label || element.priority}
+          </Badge>
+      }</Table.Td>
+      <Table.Td>{element.responsibleFullName}</Table.Td>
+      <Table.Td>{element.note}</Table.Td>
+      <Table.Td>{formatDate(element.createDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
+      <Table.Td>{formatDate(element.finisDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
+      <Table.Td>
+        <Group gap="xs">
+          <ActionIcon 
+            variant="light" 
+            color="blue"
+            disabled={element.finisDate ? true : false}
+            onClick={() => handleEdit(element)}
+          >
+            <IconEdit size={16} />
+          </ActionIcon>
+          <ActionIcon 
+            variant="light" 
+            color="red"
+            disabled={element.finisDate ? true : false}
+            onClick={() => handleDelete(element.id)}
+          >
+            <IconTrash size={16} />
+          </ActionIcon>
+        </Group>
+      </Table.Td>
+    </Table.Tr>)
+  });
+
+  const calculateTotal = () => {
+    if (projectData.length < 0) return 0;
+    return projectData.reduce((total, item) => total + item.numberOfParticipant, 0);
+  };
 
   const randaomColor = () => {
     const colors = ["dark", "gray", "red", "pink", "grape", "violet", "indigo", "blue", "cyan", "teal", "green", "lime", "yellow", "orange"];
@@ -117,10 +177,10 @@ export default function Project() {
                   Genel Toplam: {calculateTotal()}
                 </Text>
               }
-              sections={(elements || []).map(item => ({
-                value: (item.count / Math.max(calculateTotal(), 1)) * 100,
+              sections={(projectData || []).map(item => ({
+                value: (item.numberOfParticipant / Math.max(calculateTotal(), 1)) * 100,
                 color: randaomColor(),
-                tooltip: `${item.name}: ${item.count}`
+                tooltip: `${item.name}: ${item.numberOfParticipant}`
               }))}
             />
           </Flex>
@@ -153,7 +213,7 @@ export default function Project() {
                 </Grid.Col>
                 <Grid.Col span={4} offset={3}>
                 <Flex mih={50} gap="md" justify="flex-end" align="flex-end" direction="row" wrap="wrap">
-                <Button variant="filled" leftSection={<IconPlus size={14} />}  onClick={handleAddItem}>Yeni Ekle</Button>
+                <Button variant="filled" leftSection={<IconPlus size={14} />}  onClick={() => projectAddRef.current?.open()}>Yeni Ekle</Button>
                 </Flex>
               </Grid.Col>
               </Grid>
@@ -171,9 +231,12 @@ export default function Project() {
                     <Table.Th>Id</Table.Th>
                     <Table.Th>Proje Adı</Table.Th>
                     <Table.Th>Katılımcı Sayısı</Table.Th>
+                    <Table.Th>Öncelik</Table.Th>
                     <Table.Th>Sorumlu</Table.Th>
+                    <Table.Th>Note</Table.Th>
                     <Table.Th>Başlangıç</Table.Th>
                     <Table.Th>Bitiş</Table.Th>
+                    <Table.Th>İşlemler</Table.Th>
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>{rowItems}</Table.Tbody>
@@ -182,7 +245,7 @@ export default function Project() {
           </Stack>
         </Paper>
       </Stack>
-        <ItemAdd ref={itemAddRef} onSaveSuccess={handleSaveSuccess} />
+      <ProjectAdd ref={projectAddRef} onSaveSuccess={handleSaveSuccess} />
     </Container>
   );
 }
