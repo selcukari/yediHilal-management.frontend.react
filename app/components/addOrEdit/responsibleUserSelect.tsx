@@ -7,12 +7,11 @@ interface ResponsibleUserSelectProps {
   form: UseFormReturnType<any>;
   countryId?: string;
   isDisabled?: boolean;
-  required: boolean;
-  responsibleId?: string;
-  onResponsibleChange: (val: string | null, name?: string | null) => void;
+  required?: boolean;
+  onResponsibleChange?: (val: string | null, name?: string | null) => void;
 }
 
-export function ResponsibleUserSelect({ form, countryId, onResponsibleChange, isDisabled = false, required = false, responsibleId }: ResponsibleUserSelectProps) {
+export function ResponsibleUserSelect({ form, countryId, onResponsibleChange, isDisabled = false, required = false }: ResponsibleUserSelectProps) {
   const [responsiblesUsers, setResponsiblesUsers] = useState<{ value: string; label: string }[]>([]);
   
   const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
@@ -28,7 +27,6 @@ export function ResponsibleUserSelect({ form, countryId, onResponsibleChange, is
       if (response) {
         setResponsiblesUsers(
           response
-            .filter((c: any) => String(c.id) != responsibleId)
             .map((c: any) => ({
               value: String(c.id),
               label: c.fullName,
@@ -44,7 +42,10 @@ export function ResponsibleUserSelect({ form, countryId, onResponsibleChange, is
 
   const handleChange = (value: string | null) => {
     if (!value) return;
-    onResponsibleChange(value, responsiblesUsers.find(i => i.value == value)?.label);
+
+    else if (onResponsibleChange) {
+      onResponsibleChange(value, responsiblesUsers.find(i => i.value == value)?.label);
+    }
   };
    // Form'dan error mesajını al
   const error = form.errors.responsibleId;
@@ -57,6 +58,7 @@ export function ResponsibleUserSelect({ form, countryId, onResponsibleChange, is
       error={error}
       searchable
       clearable
+      value={form.values.responsibleId}
       required={required}
       disabled={isDisabled}
       maxDropdownHeight={200}

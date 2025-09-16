@@ -11,15 +11,7 @@ import { formatDate } from '../utils/formatDate';
 import { dateFormatStrings } from '../utils/dateFormatStrings';
 import { priorityMockData } from '../utils/priorityMockData';
 import ProjectAdd, { type ProjectAddDialogControllerRef } from '../components/project/projectAdd';
-
-interface ProjectItem {
-  name: string;
-  key: string;
-  count: number;
-  color: string;
-  value?: number;
-  tooltip?: string;
-}
+import ProjectEdit, { type ProjectEditDialogControllerRef } from '../components/project/projectEdit';
 
 interface ProjectData {
   id: number;
@@ -40,6 +32,7 @@ export default function Project() {
   const [searchText, setSearchText] = useState('');
 
   const projectAddRef = useRef<ProjectAddDialogControllerRef>(null);
+  const projectEditRef = useRef<ProjectEditDialogControllerRef>(null);
 
   const service = useProjectService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
@@ -71,6 +64,10 @@ export default function Project() {
 
   const handleEdit = (value: ProjectData) => {
     console.log("handleEdit: value:", value);
+    projectEditRef.current?.openDialog({
+      ...value,
+      responsibleId: value.responsibleId.toString()
+    });
   };
   const handleDelete = (id: number) => {
     console.log("handleDelete: id:", id);
@@ -246,6 +243,7 @@ export default function Project() {
         </Paper>
       </Stack>
       <ProjectAdd ref={projectAddRef} onSaveSuccess={handleSaveSuccess} />
+      <ProjectEdit ref={projectEditRef} onSaveSuccess={handleSaveSuccess} />
     </Container>
   );
 }

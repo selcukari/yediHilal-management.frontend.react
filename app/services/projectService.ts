@@ -54,7 +54,7 @@ export function useProjectService(controller: string) {
     }
   };
 
-  const updateProject = async (params: DutyDataParams) => {
+  const updateProject = async (params: ProjectType) => {
 
     try {
       const res = await api.put(`/${controller}/updateProject`, params);
