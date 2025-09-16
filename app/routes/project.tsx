@@ -69,8 +69,35 @@ export default function Project() {
       responsibleId: value.responsibleId.toString()
     });
   };
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number) => {
     console.log("handleDelete: id:", id);
+    open();
+
+    try {
+
+      const result = await service.deleteProject(id);
+      if (result == true) {
+
+      toast.success('İşlem başarılı!');
+      
+      fetchProject();
+      
+      close();
+
+      return;
+    }
+    else if (result?.data == false && result?.errors?.length > 0) {
+
+      toast.warning(result.errors[0]);
+
+    } else {
+      toast.error('Bir hata oluştu!');
+    }
+      close();
+    } catch (error: any) {
+      toast.error(`silme işleminde bir hata: ${error.message}`);
+      close();
+    }
   };
 
   const handleSaveSuccess = () => {

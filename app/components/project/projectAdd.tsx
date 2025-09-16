@@ -9,7 +9,7 @@ import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { PrioritySelect } from '../addOrEdit/prioritySelect';
 import { ResponsibleUserSelect } from '../addOrEdit/responsibleUserSelect';
 import { useProjectService } from '../../services/projectService';
-import { toast } from '../../utils/toastMessages';
+import { toast } from '../../utils/toastMessages'; 
 
 export type ProjectAddDialogControllerRef = {
   open: () => void;
