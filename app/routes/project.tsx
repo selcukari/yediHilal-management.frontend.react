@@ -63,7 +63,6 @@ export default function Project() {
   };
 
   const handleEdit = (value: ProjectData) => {
-    console.log("handleEdit: value:", value);
     projectEditRef.current?.openDialog({
       ...value,
       responsibleId: value.responsibleId.toString()

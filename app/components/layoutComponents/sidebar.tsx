@@ -43,11 +43,6 @@ const menuItems = [
     label: 'Proje Yönetimi',
     key: 'project',
     link: '/projects',
-    children: [
-      { label: 'A Projeler', key: 'a-project', link: '/a-projects' },
-      { label: 'B Projeler', key: 'b-project', link: '/b-projects' },
-      { label: 'Projeler', key: 'project-all', link: '/projects' },
-    ],
   },
    {
     icon: IconReportMoney,
