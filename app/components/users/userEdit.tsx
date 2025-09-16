@@ -97,7 +97,7 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
     },
     validate: {
       fullName: (value) => (value.trim().length < 5 ? 'İsim en az 5 karakter olmalı' : null),
-      dutiesIds: (value) => ((value && value?.length >= 1) ? null : 'Görev en az 1 tane olmalı'),
+      dutiesIds: (value) => ((value && value?.length >= 1) || isDisabledRoleComponent ? null : 'Görev en az 1 tane olmalı'),
       provinceId: (value) => (value ? null : 'İl alanı zorunlu'),
       password: (value) => (value.trim().length < 5 ? 'Şifre en az 5 karakter olmalı' : null),
       identificationNumber: (value) => {
@@ -105,26 +105,6 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
         // Sadece rakam kontrolü
         if (!/^[0-9]+$/.test(value)) return 'Sadece rakam girebilirsiniz';
 
-         // Algoritmik kontrol
-        let sum1 = 0;
-        let sum2 = 0;
-        
-        for (let i = 0; i < 9; i++) {
-          const digit = parseInt(value[i]);
-          sum1 += digit;
-          sum2 += sum1;
-        }
-        
-        sum1 %= 10;
-        sum2 %= 10;
-        
-        const tenthDigit = parseInt(value[9]);
-        const eleventhDigit = parseInt(value[10]);
-        
-        if (sum1 !== tenthDigit || sum2 !== eleventhDigit) {
-          return 'Geçersiz TC Kimlik No';
-        }
-        
         return null; // Geçerli
       },
       countryCode: (value) => {
@@ -396,7 +376,8 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
           <Grid.Col span={6}>
             <DutySelect
               form={form}
-              required={true}
+              required={isDisabledRoleComponent}
+              isDisabled={isDisabledRoleComponent}
               {...form.getInputProps('dutiesIds')}
             />
           </Grid.Col>
