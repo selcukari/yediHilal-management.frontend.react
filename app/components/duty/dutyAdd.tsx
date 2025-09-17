@@ -46,7 +46,6 @@ const DutyAdd = forwardRef<DutyAddDialogControllerRef, UserAddProps>(({onSaveSuc
       ...values,
       name: values.name.trim()
     });
-    console.log("dutyadd:result", result);
 
     if (result === true) {
 

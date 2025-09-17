@@ -175,8 +175,8 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
           <Grid.Col span={6}>
             <DateTimePicker
               dropdownType="modal"
-              label="Pick date and time"
-              placeholder="Pick date and time"
+              label="Bitiş Tarihi"
+              placeholder="bitiş tarihi"
               required
               clearable
               minDate={new Date()}

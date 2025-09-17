@@ -10,15 +10,11 @@ import { useStockService } from '../../services/stockService';
 import { toast } from '../../utils/toastMessages';
 import { useAuth } from '~/authContext';
 
-export type StockUsedExpenseEditDialogControllerRef = {
-  openDialog: (dialogTitle: string, value: any, stockDataItems: StockItem[]) => void;
-  close: () => void;
-};
 
-interface UserAddProps {
-  onSaveSuccess?: () => void; // Yeni prop
+interface StockUsedData {
+  id: number;
+  items: StockItem[];
 }
-
 interface StockDataParams {
   id: number;
   updateUserId?: number;
@@ -33,12 +29,17 @@ type FormValues = {
 };
 
 interface StockItem {
-  name: string;
-  key: string;
-  count: number;
-  color: string;
-  value?: number;
-  tooltip?: string;
+  name?: string;
+  key?: string;
+  count?: number;
+}
+
+export type StockUsedExpenseEditDialogControllerRef = {
+  openDialog: (dialogTitle: string, value: StockUsedData, stockDataItems: StockItem[]) => void;
+  close: () => void;
+};
+interface UserAddProps {
+  onSaveSuccess?: () => void; // Yeni prop
 }
 
 const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
@@ -64,9 +65,9 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
 
   useEffect(() => {
     if (form.isValid()) {
-        setIsDisabledSubmit(false);
+      setIsDisabledSubmit(false);
 
-        return;
+      return;
     }
 
     setIsDisabledSubmit(true);
@@ -80,10 +81,9 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
     let hasStockExceeded = false;
     for (const item of stockDataFirtsItems) {
       const findItem = newItems.find((i: StockItem) => i.key == item.key);
-      
 
     // Eğer bu key ikinci dizide varsa ve count değeri daha büyükse
-      if (findItem && findItem.count as number > item.count) {
+      if (findItem && findItem.count as number > (item.count ?? 0)) {
         toast.info(`${item.name} adeti stock tan fazla olmaz!`);
         hasStockExceeded = true;
         break;
@@ -152,13 +152,34 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
     }
   }
 
-  const openDialog = (dialogTitle: string, value: any, stockDataItems: StockItem[]) => {
+  const openDialog = (dialogTitle: string, value: StockUsedData, stockDataItems: StockItem[]) => {
 
     if (value) {
       form.reset();
+        let newStockDataItems = stockDataItems;
+
+      const matchingItems = value.items.filter((valueItem: StockItem) => 
+        stockDataItems.some((stockItem: StockItem) => stockItem.key === valueItem.key)
+      );
+
+      if (matchingItems.length > 0) {
+          
+        newStockDataItems = stockDataItems.map((stockItem: StockItem) => {
+          const valueItem = value.items.find((vi: StockItem) => vi.key === stockItem.key);
+          
+          if (valueItem) {
+              return {
+                  ...stockItem,
+                  count: ((stockItem.count ?? 0) + (valueItem.count ?? 0)) || 1,
+              };
+          }
+          return stockItem;
+        });
+      }
+
       setStockData(value);
       setDialogTitle(dialogTitle);
-      setStockDataFirstItems(clone(stockDataItems))
+      setStockDataFirstItems((newStockDataItems))
       open();
 
     }

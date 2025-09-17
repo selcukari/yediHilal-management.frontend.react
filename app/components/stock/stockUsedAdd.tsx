@@ -11,12 +11,9 @@ import { toast } from '../../utils/toastMessages';
 import { useAuth } from '~/authContext';
 
 interface StockItem {
-  name: string;
-  key: string;
-  count: number;
-  color: string;
-  value?: number;
-  tooltip?: string;
+  name?: string;
+  key?: string;
+  count?: number;
 }
 
 export type StockUsedAddDialogControllerRef = {
@@ -77,7 +74,7 @@ const StockUsedAdd = forwardRef<StockUsedAddDialogControllerRef, StockUsedAddPro
       const findItem = newItems.find(i => i.key == item.key);
       
       // Eğer bu key ikinci dizide varsa ve count değeri daha büyükse
-      if (findItem && findItem.count as number > item.count) {
+      if (findItem && findItem.count as number > (item.count ?? 0)) {
         toast.info(`${item.name} adeti stock tan fazla olmaz!`);
         hasStockExceeded = true;
         break;

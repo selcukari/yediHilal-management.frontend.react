@@ -9,7 +9,6 @@ import { useStockService } from '../../services/stockService';
 import { toast } from '../../utils/toastMessages';
 import { formatDate } from '../../utils/formatDate';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
-import { useAuth } from '~/authContext';
 import StockUsedExpenseEdit, { type StockUsedExpenseEditDialogControllerRef } from '../../components/stock/stockUsedExpenseEdit';
 import StockUsedAdd, { type StockUsedAddDialogControllerRef } from '../../components/stock/stockUsedAdd';
 interface Column {
@@ -17,12 +16,32 @@ interface Column {
   header: string;
 }
 interface StockItem {
+  name?: string;
+  key?: string;
+  count?: number;
+}
+
+interface StockUsedData {
+  id: number;
+  items: StockItem[];
+}
+
+interface StockData {
+  id: number;
+  updateUserId: number;
+  updateUserFullName: string;
+  createDate: string;
   name: string;
-  key: string;
-  count: number;
-  color: string;
-  value?: number;
-  tooltip?: string;
+  updateDate: string;
+  expirationDate?: string;
+  nameKey: string;
+  isActive: boolean;
+  unitPrice: number;
+  totalPrice?: number;
+  count?: number;
+  description?: string;
+  fromWhere?: string;
+  actions?: string;
 }
 
 export default function StockUsedDeposit() {
@@ -44,7 +63,6 @@ export default function StockUsedDeposit() {
   ]);
 
   const service = useStockService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
-  const { currentUser } = useAuth();
   // Filtrelenmiş veriler
   const filteredUsers = useMemo(() => {
     if (!searchText) return resultData;
@@ -94,8 +112,8 @@ export default function StockUsedDeposit() {
     }
 
     }
-    const handleEdit = (item: any) => {
-      stockUsedExpenseEditRef.current?.openDialog("Gider Düzenle", item, stockDataItems || []);
+    const handleEdit = (item: StockUsedData) => {
+      stockUsedExpenseEditRef.current?.openDialog("Emanet Düzenle", item, stockDataItems || []);
     }
     const handleAddItem = () => {
       stockUsedAddRef.current?.openDialog("Emanet Ekle","deposit", stockDataItems || [])
@@ -163,14 +181,12 @@ export default function StockUsedDeposit() {
      open();
 
     const type = "deposit";
-    const buyerId = (
-        ((currentUser?.responsibilities as string)?.includes("stock") || currentUser.roleId == 1) ? undefined : currentUser?.id as number
-      )
+  
      try {
-      const getStock = await service.getStock();
+      const getStock: StockData[] = await service.getStock();
 
-      const getStockUsedExpenses = await service.getStockUsed(type, buyerId);
-      if (getStockUsedExpenses && getStock) {
+      const getStockUsedExpenses = await service.getStockUsed(type);
+      if (getStockUsedExpenses && getStock.length > 0) {
         setResultData(getStockUsedExpenses.map((stockUsed: any) => ({
           id: stockUsed.id,
           buyerInformations: stockUsed.buyerInformations ? JSON.parse(stockUsed.buyerInformations) : null,
@@ -181,10 +197,10 @@ export default function StockUsedDeposit() {
           createDate: formatDate(stockUsed.createDate, dateFormatStrings.dateTimeFormatWithoutSecond),
           updateDate: formatDate(stockUsed.updateDate, dateFormatStrings.dateTimeFormatWithoutSecond),
         })));
-        const parsedItems: StockItem[] = JSON.parse(getStock.items) || [];
-        setStockDataItems(parsedItems.map(item => ({
-          ...item,
-          value: item.count,
+        setStockDataItems(getStock.map(item => ({
+          name: item.name,
+          key: item.nameKey,
+          count: item.count,
         })))
        
       } else {

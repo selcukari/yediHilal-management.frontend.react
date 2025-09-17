@@ -6,7 +6,7 @@ import {
 import { IconSearch, IconPlus } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { toast } from '../utils/toastMessages';
-import ItemAdd, { type ItemAddDialogControllerRef } from '../components/stock/itemAdd';
+import ItemAdd, { type ItemAddDialogControllerRef } from '../components/stock/stockAdd';
 import { formatDate } from '../utils/formatDate';
 
 interface ProjectItem {

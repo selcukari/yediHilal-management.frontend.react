@@ -1,7 +1,8 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, TextInput, Flex, Button, Stack, Grid, PasswordInput, Group, Switch, Textarea } from '@mantine/core';
+import { Modal, TextInput, Button, Stack, Grid, PasswordInput, Group, Switch, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { DateTimePicker } from '@mantine/dates';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
@@ -9,9 +10,10 @@ import { useStockService } from '../../services/stockService';
 import { toast } from '../../utils/toastMessages';
 import { useAuth } from '~/authContext';
 import stripSpecialCharacters from '../../utils/stripSpecialCharacters';
+import { omit } from 'ramda';
 
-export type ItemAddDialogControllerRef = {
-  openDialog: (value: any) => void;
+export type StockAddDialogControllerRef = {
+  openDialog: (values: GetDtockData[]) => void;
   close: () => void;
 };
 
@@ -19,25 +21,29 @@ interface UserAddProps {
   onSaveSuccess?: () => void; // Yeni prop
 }
 
-interface StockDataParams {
+type GetDtockData = {
   id: number;
-  updateUserId: number;
-  items?: string;
+  name: string;
+  nameKey: string;
 }
 
 type FormValues = {
+  updateUserId: number;
+  updateUserFullName: string;
+  expirationDate?: string | null;
   name: string;
-  count: string;
+  nameKey: string;
+  isActive: boolean;
+  unitPrice?: string;
+  totalPrice?: number;
+  count?: string;
+  description?: string;
+  fromWhere?: string;
 };
 
-const ItemAdd = forwardRef<ItemAddDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
+const StockAdd = forwardRef<StockAddDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
-  type StockData = {
-    id: number;
-    items: { key: string }[];
-  };
-  
-  const [stockData, setStockData] = useState<StockData>({ items: [], id: 0 });
+  const [stockData, setStockData] = useState<GetDtockData[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
   const service = useStockService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
   const { currentUser } = useAuth();
@@ -46,32 +52,44 @@ const ItemAdd = forwardRef<ItemAddDialogControllerRef, UserAddProps>(({onSaveSuc
 
   const form = useForm<FormValues>({
     initialValues: {
+      updateUserId: 0,
+      updateUserFullName: '',
+      expirationDate: '',
       name: '',
-      count: '',
+      nameKey: '',
+      isActive: true,
+      unitPrice: "1",
+      totalPrice: 1,
+      count: "1",
+      description: '',
+      fromWhere: 'Bim Market',
    
     },
     validate: {
       name: (value) => {
         if(value.trim().length < 5 ) {
-          return "İsim en az 5 karakter olmalı";
+          return "Ürün Adı en az 5 karakter olmalı";
         }
 
-        const keys = stockData?.items.map((item: any) => item.key);
+        const keys = stockData?.map((item: GetDtockData) => item.nameKey);
 
         if(keys.includes(stripSpecialCharacters(value))) {
 
           return "Aynı item tekrar eklenemez";
         }
       },
+      unitPrice: (value) => {
+        return (value && parseInt(value) > 0) ? null: "Birim fiyatı en az 1 olmalıdır"
+      },
       count: (value) => {
 
-        return parseInt(value) <= 0 ? "En az 1 olmalıdır": null
+        return (value && parseInt(value) > 0) ? null : "Toplam sayı en az 1 olmalıdır"
       },
     },
   });
 
   useEffect(() => {
-    if (form.isValid()) {
+    if (form.isDirty()) {
       setIsDisabledSubmit(false);
 
       return;
@@ -80,30 +98,18 @@ const ItemAdd = forwardRef<ItemAddDialogControllerRef, UserAddProps>(({onSaveSuc
     setIsDisabledSubmit(true);
   }, [form.values]);
 
-  const randaomColor = () => {
-    const colors = ["dark", "gray", "red", "pink", "grape", "violet", "indigo", "blue", "cyan", "teal", "green", "lime", "yellow", "orange"];
-    const index = Math.floor(Math.random() * colors.length);
-
-    return colors[index];
-  }
-
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
-    const newStockValue: StockDataParams = {
-      id: stockData.id,
+    const newStockValue = {
+      ...(omit(['updateUserFullName'], values)),
+      totalPrice: (parseInt(values.unitPrice || "1")) * (parseInt(values.count || "1")),
+      unitPrice: parseInt(values.unitPrice || "1"),
+      count: parseInt(values.count || "1"),
       updateUserId: currentUser?.id as number,
-      items: JSON.stringify([
-        // ...stockData.items,
-        {
-          key: stripSpecialCharacters(values.name.trim()),
-          name: values.name.trim(),
-          count: parseInt(values.count),
-          color: randaomColor()
-        }
-      ])
+      nameKey: stripSpecialCharacters(values.name)
     }
 
-    const result = await service.updateStock(newStockValue);
+    const result = await service.addStock(newStockValue);
 
     if (result === true) {
 
@@ -150,17 +156,15 @@ const ItemAdd = forwardRef<ItemAddDialogControllerRef, UserAddProps>(({onSaveSuc
       form.reset();
     }
   }
+ const openDialog = (values: GetDtockData[]) => {
 
-  const openDialog = (value: any) => {
-
-    if (value) {
+    if (values?.length > 0) {
       form.reset();
-      setStockData(value);
+      setStockData(values);
       open();
 
     }
   }
-
   useImperativeHandle(ref, () => ({
     openDialog,
     close,
@@ -172,7 +176,7 @@ const ItemAdd = forwardRef<ItemAddDialogControllerRef, UserAddProps>(({onSaveSuc
       onClose={() => {
         dialogClose();
       }}
-      title="Yeni İtem Ekle"
+      title="Yeni Ürün Ekle"
       centered
       size="700"
       overlayProps={{
@@ -185,12 +189,22 @@ const ItemAdd = forwardRef<ItemAddDialogControllerRef, UserAddProps>(({onSaveSuc
           <Grid>
             <Grid.Col span={6}>
               <TextInput
-                label="İtem Adı"
-                placeholder="İtem adı giriniz"
+                label="Ürün Adı"
+                placeholder="Ürün adı giriniz"
                 required
                 {...form.getInputProps('name')}
               />
             </Grid.Col>
+            <Grid.Col span={6}>
+            <TextInput
+              label="Birim fiyatı"
+              placeholder="fiyat giriniz"
+              type='number'
+              required
+              min={1}
+              {...form.getInputProps('unitPrice')}
+            />
+          </Grid.Col>
 
           <Grid.Col span={6}>
             <TextInput
@@ -198,7 +212,44 @@ const ItemAdd = forwardRef<ItemAddDialogControllerRef, UserAddProps>(({onSaveSuc
               placeholder="item sayısı giriniz"
               type='number'
               required
+              min={1}
               {...form.getInputProps('count')}
+            />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <TextInput
+              label="Toplam Fiyat"
+              type='number'
+              disabled
+              min={1}
+              value={(parseInt(form.values.unitPrice ?? "1")) * (parseInt(form.values.count ?? "1"))}
+            />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <TextInput
+              label="Nereden alındı"
+              placeholder="yer giriniz"
+              {...form.getInputProps('fromWhere')}
+            />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <DateTimePicker
+              dropdownType="modal"
+              label="Son Kullanma Tarihi"
+              placeholder="son tarihi"
+              required
+              clearable
+              minDate={new Date()}
+              onChange={(value) => form.setFieldValue('expirationDate', value)}
+            />
+           </Grid.Col>
+          <Grid.Col span={6}>
+            <Textarea
+              mt="md"
+              label="Açıklama"
+              placeholder="messaj..."
+              withAsterisk
+              {...form.getInputProps('description')}
             />
           </Grid.Col>
           <Grid.Col span={6} offset={4}>
@@ -222,4 +273,4 @@ const ItemAdd = forwardRef<ItemAddDialogControllerRef, UserAddProps>(({onSaveSuc
   </>);
 });
 
-export default ItemAdd;
+export default StockAdd;

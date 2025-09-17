@@ -192,8 +192,8 @@ const ProjectEdit = forwardRef<ProjectEditDialogControllerRef, UserEditProps>(({
           <Grid.Col span={6}>
             <DateTimePicker
               dropdownType="modal"
-              label="Pick date and time"
-              placeholder="Pick date and time"
+              label="Bitiş Tarihi"
+              placeholder="bitiş tarihi"
               required
               clearable
               minDate={new Date()}

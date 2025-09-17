@@ -1,17 +1,31 @@
 import { createApi } from './api';
 import { useAuth } from '~/authContext';
 
-interface StockItem {
+interface StockData {
+  updateUserId: number;
+  updateUserFullName: string;
+  expirationDate?: string | null;
   name: string;
-  key: string;
-  count: number;
-  color: string;
+  nameKey: string;
+  isActive: boolean;
+  unitPrice: number;
+  totalPrice?: number;
+  count?: number;
+  description?: string;
+  fromWhere?: string;
 }
 
 interface StockDataParams {
-  id: number;
   updateUserId: number;
-  items?: string;
+  expirationDate?: string | null;
+  name: string;
+  nameKey: string;
+  isActive: boolean;
+  unitPrice: number;
+  totalPrice?: number;
+  count?: number;
+  description?: string;
+  fromWhere?: string;
 }
 
 interface StockUsedExpenseParams {
@@ -43,7 +57,28 @@ export function useStockService(controller: string) {
       return error;
     }
   };
+  const addStock = async (params: StockDataParams) => {
 
+    try {
+      const res = await api.post(`/${controller}/addStock`, params);
+
+      return res.data.data;
+    } catch (error: any) {
+
+      return error;
+    }
+  };
+  const deleteStock = async (stockId: number) => {
+
+    try {
+      const res = await api.put(`/${controller}/deleteStock?id=${stockId}`, null);
+
+      return res.data.data;
+    } catch (error: any) {
+      console.log("hata:", error)
+      return error;
+    }
+  };
    const updateStock = async (params: StockDataParams) => {
 
     try {
@@ -56,13 +91,12 @@ export function useStockService(controller: string) {
     }
   };
 
-    const getStockUsed = async (type: string, buyerId?: number) => {
+    const getStockUsed = async (type: string) => {
 
     try {
       const res = await api.get(`/${controller}/getStockUseds`, {
         params: {
           type,
-          ...(buyerId ? { buyerId } : { }),
         }
       });
 
@@ -106,5 +140,5 @@ export function useStockService(controller: string) {
     }
   };
 
-  return { getStock, updateStock, addStockUsed, getStockUsed, updateStockUsedExpense, deleteStockUsed };
+  return { getStock, addStock, deleteStock, updateStock, addStockUsed, getStockUsed, updateStockUsedExpense, deleteStockUsed };
 }

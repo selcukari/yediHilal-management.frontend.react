@@ -6,7 +6,7 @@ import {
 import { IconSearch, IconPlus } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { toast } from '../utils/toastMessages';
-import ItemAdd, { type ItemAddDialogControllerRef } from '../components/stock/itemAdd';
+// import ItemAdd, { type ItemAddDialogControllerRef } from '../components/stock/stockAdd';
 import { formatDate } from '../utils/formatDate';
 
 interface ProjectItem {
@@ -31,7 +31,7 @@ export default function Finance() {
   const [visible, { open, close }] = useDisclosure(false);
   const [searchText, setSearchText] = useState('');
 
-  const itemAddRef = useRef<ItemAddDialogControllerRef>(null);
+  // const itemAddRef = useRef<ItemAddDialogControllerRef>(null);
 
   useEffect(() => {
     setTimeout(() => {
@@ -181,7 +181,7 @@ export default function Finance() {
           </Stack>
         </Paper>
       </Stack>
-        <ItemAdd ref={itemAddRef} onSaveSuccess={handleSaveSuccess} />
+        {/* <ItemAdd ref={itemAddRef} onSaveSuccess={handleSaveSuccess} /> */}
     </Container>
   );
 }

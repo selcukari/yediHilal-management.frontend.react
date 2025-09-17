@@ -1,4 +1,4 @@
-const stripSpecialCharacters = (text: string) => text.toLocaleLowerCase()
+const stripSpecialCharacters = (text: string) => text.trim().toLocaleLowerCase()
   .replace(/ş/g, 's')
   .replace(/ı/g, 'i')
   .replace(/ç/g, 'c')
