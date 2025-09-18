@@ -33,6 +33,9 @@ interface StockUsedExpenseParams {
   items?: string;
   isDelivery: boolean;
   type: string;
+  title: string;
+  address: string;
+  note: string;
 }
 
 interface UpdateStockUsedExpenseParams {
@@ -41,6 +44,9 @@ interface UpdateStockUsedExpenseParams {
   items?: string;
   isDelivery: boolean;
   type: string;
+  title: string;
+  address: string;
+  note: string;
 }
 
 export function useStockService(controller: string) {

@@ -49,6 +49,9 @@ export default function StockUsedExpense() {
   
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
     { field: 'id', header: 'Id' },
+    { field: 'title', header: 'Başlık' },
+    { field: 'address', header: 'Adres' },
+    { field: 'note', header: 'Note' },
     { field: 'items', header: 'Giderler' },
     { field: 'buyerInformations', header: 'Alıcı Bilgileri' },
     { field: 'isDelivery', header: 'Bitiş Durum' },
@@ -62,8 +65,11 @@ export default function StockUsedExpense() {
   const filteredUsers = useMemo(() => {
     if (!searchText) return resultData;
 
-    
-    return resultData.filter(stock => stock.buyerInformations?.fullName?.toLowerCase().includes(searchText.trim().toLowerCase()));
+    return resultData.filter(stockUsed =>
+      stockUsed.title.toLowerCase().includes(searchText.trim().toLowerCase()) ||
+      stockUsed.buyerInformations?.fullName?.toLowerCase().includes(searchText.trim().toLowerCase()) ||
+      stockUsed.note?.toLowerCase().includes(searchText.trim().toLowerCase())
+    );
   }, [resultData, searchText]);
 
   useEffect(() => {
@@ -82,7 +88,7 @@ export default function StockUsedExpense() {
     const renderBoolean = (value: boolean) => {
       return (
         <Badge color={!value ? 'green' : 'red'}>
-          {!value ? 'Aktive' : 'Bitti'}
+          {!value ? 'Aktive' : 'Tamamlandı'}
         </Badge>
       );
     };
@@ -149,12 +155,26 @@ export default function StockUsedExpense() {
           );
         }
         if (header.field === 'isDelivery') {
-            return (
-              <Table.Td key={header.field}>
-                {renderBoolean(item[header.field])}
-              </Table.Td>
-            );
-          }
+          return (
+            <Table.Td key={header.field}>
+              {renderBoolean(item[header.field])}
+            </Table.Td>
+          );
+        }
+        if (header.field === 'note') {
+          return (
+            <Table.Td key={header.field}>
+              {item[header.field] ? `${item[header.field].substring(0,30)}...` : '-'}
+            </Table.Td>
+          );
+        }
+        if (header.field === 'address') {
+          return (
+            <Table.Td key={header.field}>
+              {item[header.field] ? `${item[header.field].substring(0,25)}...` : '-'}
+            </Table.Td>
+          );
+        }
         if (header.field === 'items') {
           return (
             <Table.Td key={header.field}>
@@ -188,6 +208,9 @@ export default function StockUsedExpense() {
           type: stockUsed.type,
           isDelivery: stockUsed.isDelivery, // true ise edit yapma
           isActive: stockUsed.isActive,
+          title: stockUsed.title,
+          address: stockUsed.address,
+          note: stockUsed.note,
           createDate: formatDate(stockUsed.createDate, dateFormatStrings.dateTimeFormatWithoutSecond),
           updateDate: formatDate(stockUsed.updateDate, dateFormatStrings.dateTimeFormatWithoutSecond),
         })));
@@ -241,7 +264,7 @@ export default function StockUsedExpense() {
 
                 <Grid.Col span={4}>
                   <TextInput
-                    label="Alıcı İsim Ara"
+                    label="Başlık/Note/Alıcı İsim Ara"
                     placeholder="text giriniz"
                     leftSection={<IconSearch size={18} />}
                     value={searchText}

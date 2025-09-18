@@ -1,8 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, Fragment, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, TextInput, Flex, Button, Stack, Grid, Title, Group, Switch } from '@mantine/core';
+import { Modal, TextInput, Flex, Button, Stack, Grid, Title, Textarea, Switch } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { clone } from 'ramda';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
@@ -22,10 +21,16 @@ interface StockDataParams {
   items?: string;
   type: string;
   isDelivery: boolean;
+  title: string;
+  address: string;
+  note: string;
 }
 
 type FormValues = {
   isDelivery: boolean;
+  title: string;
+  address: string;
+  note: string;
 };
 
 interface StockItem {
@@ -57,9 +62,12 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
   const form = useForm<FormValues>({
     initialValues: {
       isDelivery: false,
+      title: '',
+      address: '',
+      note: '',
     },
     validate: {
-    
+      title: (value) => (value.trim().length < 5 ? 'Başlık en az 5 karakter olmalı' : null),
     },
   });
 
@@ -101,7 +109,10 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
       buyerId: currentUser?.id as number,
       items: JSON.stringify(newItems),
       isDelivery: values.isDelivery,
-      type: stockData.type
+      type: stockData.type,
+      title: values.title,
+      address: values.address,
+      note: values.note
     }
 
     const result = await service.updateStockUsedExpense(newStockValue);
@@ -252,8 +263,32 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap="md">
           <Grid>
+            <Grid.Col span={6}>
+              <TextInput
+                label="Etkinlik/Program Adı"
+                placeholder="Başlık giriniz"
+                required
+                {...form.getInputProps('title')}
+              />
+             </Grid.Col>
+             <Grid.Col span={6}>
+              <TextInput
+                label="Adres"
+                placeholder="Adres giriniz"
+                required
+                {...form.getInputProps('address')}
+              />
+             </Grid.Col>
+             <Grid.Col span={10} offset={1}>
+              <Textarea
+                mt="md"
+                label="Note"
+                placeholder="messaj..."
+                withAsterisk
+                {...form.getInputProps('note')}
+              />
+            </Grid.Col>
             {rowItems()}
-         
           <Grid.Col span={6}>
             <Switch 
               label="Tamamlandı Durumu" 
