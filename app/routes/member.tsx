@@ -413,6 +413,7 @@ export default function Member() {
                     valueData={resultData}
                     pdfColumns={pdfTableColumns}
                     type={2}
+                    isSmsDisabled={true}
                     />
                   </Flex>
                 </Grid.Col>

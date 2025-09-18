@@ -4,6 +4,10 @@ import {
   Container, Grid, TextInput, Badge, Stack, Group, Title, Text, Paper,
   ActionIcon, Table, LoadingOverlay, Flex, Button,
 } from '@mantine/core';
+import { MenuActionButton } from '../../components'
+import { type ColumnDefinition, type ValueData } from '../../utils/repor/exportToExcel';
+import { type PdfTableColumn } from '../../utils/repor/exportToPdf';
+import { calculateColumnWidthMember } from '../../utils/repor/calculateColumnWidth';
 import { useDisclosure } from '@mantine/hooks';
 import { useStockService } from '../../services/stockService';
 import { toast } from '../../utils/toastMessages';
@@ -19,6 +23,17 @@ interface StockItem {
   name?: string;
   key?: string;
   count?: number;
+}
+
+interface StockUsedData {
+  id: number;
+  items: StockItem[];
+  createDate: string;
+  address?: string;
+  title: string;
+  note?: string;
+  buyerInformations?: any;
+  isDelivery?: boolean;
 }
 
 interface StockData {
@@ -62,7 +77,7 @@ export default function StockUsedExpense() {
 
   const service = useStockService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
   // Filtrelenmiş veriler
-  const filteredUsers = useMemo(() => {
+  const filteredStockUseds = useMemo(() => {
     if (!searchText) return resultData;
 
     return resultData.filter(stockUsed =>
@@ -88,7 +103,7 @@ export default function StockUsedExpense() {
     const renderBoolean = (value: boolean) => {
       return (
         <Badge color={!value ? 'green' : 'red'}>
-          {!value ? 'Aktive' : 'Tamamlandı'}
+          {!value ? 'Aktif' : 'Tamamlandı'}
         </Badge>
       );
     };
@@ -113,14 +128,14 @@ export default function StockUsedExpense() {
     }
 
     }
-    const handleEdit = (item: any) => {
+    const handleEdit = (item: StockUsedData) => {
       stockUsedExpenseEditRef.current?.openDialog("Gider Düzenle", item, stockDataItems || []);
     }
     const handleAddItem = () => {
       stockUsedAddRef.current?.openDialog("Gider Ekle", "expense", stockDataItems || [])
     }
 
-  const rowsTable = filteredUsers.map((item) => (
+  const rowsTable = filteredStockUseds.map((item) => (
     <Table.Tr key={item.id}>
       {rowHeaders.map((header) => {
         if (header.field === 'actions') {
@@ -231,7 +246,48 @@ export default function StockUsedExpense() {
       close();
     }
   };
+  // raportdata
+  const raportStocUsedkData = useMemo(() => {
+    return filteredStockUseds.map((stock: StockUsedData) => {
+      const itemsData = stock.items ? `${stock.items?.map(item => `${item.name}(${item.count})`).join(',').substring(0,20)}...` : "-";
+      return {
+        ...stock,
+      address: stock.address ? stock.address.substring(0,20) : "-",
+      note: stock.note ? stock.note.substring(0,20) : "-",
+      items: itemsData,
+      isDelivery: stock.isDelivery ? "Tamamlandı": "Aktif",
+      buyerInformations: stock.buyerInformations ? `${stock.buyerInformations["fullName"]}(${stock.buyerInformations["phone"]})` : "-",
+      createDate: formatDate(stock.createDate, dateFormatStrings.dateTimeFormatWithoutSecond),
+      }
+    })
+  }, [filteredStockUseds])
+  const pdfTableColumns = useMemo((): PdfTableColumn[] => {
+  
+    const newCols: Column[] = rowHeaders.filter(col =>
+      col.field != 'updateDate' && col.field != 'description' && col.field != 'actions');
 
+    return newCols.map(col => ({
+      key: col.field,
+      title: col.header,
+      // İsteğe bağlı olarak genişlik ayarları ekleyebilirsiniz
+      width: calculateColumnWidthMember(col.field) // Özel genişlik hesaplama fonksiyonu
+    }));
+  }, [rowHeaders]);
+  // useMemo hook'u ile sütunları önbelleğe alıyoruz
+  const excelTableColumns = useMemo((): ColumnDefinition[] => {
+
+    const newCols: Column[] = rowHeaders.filter(col =>
+      col.field != 'updateDate' && col.field != 'actions');
+
+    return newCols.map(col => ({
+      key: col.field as keyof ValueData,
+      header: col.header,
+      // İsteğe bağlı olarak genişlik ayarları ekleyebilirsiniz
+    }));
+  }, [rowHeaders]);
+  const reportTitle = (): string => {
+    return "Gider Ürünler Raporu";
+  }
   return (
       <Container size="xl">
         <LoadingOverlay
@@ -276,6 +332,26 @@ export default function StockUsedExpense() {
                 <Flex mih={50} gap="md" justify="flex-end" align="flex-end" direction="row" wrap="wrap">
                   <Button variant="filled" leftSection={<IconPlus size={14} />}  onClick={handleAddItem}>Yeni Gider Ekle</Button>
                 </Flex>
+                </Grid.Col>
+                <Grid.Col span={2} offset={2}>
+                  <Flex
+                  mih={50}
+                  gap="md"
+                  justify="flex-end"
+                  align="flex-end"
+                  direction="row"
+                  wrap="wrap"
+                >
+                  <MenuActionButton
+                  reportTitle={reportTitle()}
+                  excelColumns={excelTableColumns}
+                  valueData={raportStocUsedkData}
+                  pdfColumns={pdfTableColumns}
+                  type={2}
+                  isMailDisabled={true}
+                  isSmsDisabled={true}
+                  />
+                  </Flex>
                 </Grid.Col>
               </Grid>
             </Paper>

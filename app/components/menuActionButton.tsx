@@ -19,6 +19,8 @@ export interface MenuActionButtonProps {
   excelColumns?: ColumnDefinition[];
   valueData?: ValueData[];
   type?: number;
+  isSmsDisabled?: boolean;
+  isMailDisabled?: boolean;
 }
 
 export interface ValueData {
@@ -27,7 +29,9 @@ export interface ValueData {
 
 export function MenuActionButton({
   menuTitle = "Aksiyonlar", 
-  reportTitle = "", 
+  reportTitle = "",
+  isSmsDisabled = false,
+  isMailDisabled = false,
   pdfColumns = [],
   excelColumns = [],
   valueData = [],
@@ -109,8 +113,8 @@ export function MenuActionButton({
         <Menu.Item leftSection={<IconFileTypePdf size={14} />} onClick={exportPdf} >Rapor-Pdf</Menu.Item>
         <Menu.Item leftSection={<IconFileExcel size={14} />} onClick={exportExcel} >Rapor-Excel</Menu.Item>
         <Divider my="md" />
-        <Menu.Item leftSection={<IconSend2 size={14} />} onClick={sendMail}>Mail-Gönder</Menu.Item>
-        <Menu.Item leftSection={<IconMessage size={14} />} onClick={sendSms} disabled>Sms-Gönder</Menu.Item> 
+        <Menu.Item leftSection={<IconSend2 size={14} />} onClick={sendMail}disabled={isMailDisabled}>Mail-Gönder</Menu.Item>
+        <Menu.Item leftSection={<IconMessage size={14} />} onClick={sendSms} disabled={isSmsDisabled}>Sms-Gönder</Menu.Item> 
       </Menu.Dropdown>
     </Menu>
     <MailSend ref={mailSendRef} />

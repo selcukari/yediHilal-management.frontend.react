@@ -5,7 +5,8 @@ import {
   Paper, TextInput, LoadingOverlay, Flex, Group, ActionIcon,
 } from '@mantine/core';
 import { differenceInDays } from 'date-fns';
-import { IconSearch, IconPlus, IconTrash, IconEdit } from '@tabler/icons-react';
+import { MenuActionButton } from '../../components'
+import { IconSearch, IconTrash, IconEdit } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { useStockService } from '../../services/stockService';
 import { toast } from '../../utils/toastMessages';
@@ -14,6 +15,9 @@ import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import { randaomColor } from '../../utils/randaomColor';
 import StockAdd, { type StockAddDialogControllerRef } from '../../components/stock/stockAdd';
 import StockEdit, { type StockEditDialogControllerRef } from '../../components/stock/stockEdit';
+import { type ColumnDefinition, type ValueData } from '../../utils/repor/exportToExcel';
+import { type PdfTableColumn } from '../../utils/repor/exportToPdf';
+import { calculateColumnWidthMember } from '../../utils/repor/calculateColumnWidth';
 
 interface StockData {
   id: number;
@@ -141,7 +145,7 @@ export default function Stock() {
   }
 
     // Filtrelenmiş veriler
-  const filteredUsers = useMemo(() => {
+  const filteredStocks = useMemo(() => {
     if (!searchText) return stockData;
     
     return stockData.filter(stock =>
@@ -150,7 +154,46 @@ export default function Stock() {
     );
   }, [stockData, searchText]);
 
-  const rowsTable = filteredUsers.map((item) => (
+  // raportdata
+  const raportStockData = useMemo(() => {
+    return filteredStocks.map((stock: StockData) => ({
+      ...stock,
+      createDate: formatDate(stock.createDate, dateFormatStrings.dateTimeFormatWithoutSecond),
+      expirationDate: formatDate(stock.expirationDate, dateFormatStrings.dateTimeFormatWithoutSecond),
+    }))
+  }, [filteredStocks])
+
+  // useMemo hook'u ile sütunları önbelleğe alıyoruz
+  const pdfTableColumns = useMemo((): PdfTableColumn[] => {
+
+    const newCols: Column[] = rowHeaders.filter(col =>
+      col.field != 'updateDate' && col.field != 'description' && col.field != 'actions');
+
+    return newCols.map(col => ({
+      key: col.field,
+      title: col.header,
+      // İsteğe bağlı olarak genişlik ayarları ekleyebilirsiniz
+      width: calculateColumnWidthMember(col.field) // Özel genişlik hesaplama fonksiyonu
+    }));
+  }, [rowHeaders]);
+  // useMemo hook'u ile sütunları önbelleğe alıyoruz
+  const excelTableColumns = useMemo((): ColumnDefinition[] => {
+
+    const newCols: Column[] = rowHeaders.filter(col =>
+      col.field != 'updateDate' && col.field != 'description' && col.field != 'actions');
+
+    return newCols.map(col => ({
+      key: col.field as keyof ValueData,
+      header: col.header,
+      // İsteğe bağlı olarak genişlik ayarları ekleyebilirsiniz
+    }));
+  }, [rowHeaders]);
+
+  const reportTitle = (): string => {
+    return "Stok Ürünler Raporu";
+  }
+
+  const rowsTable = filteredStocks.map((item) => (
     <Table.Tr key={item.id}>
       {rowHeaders.map((header) => {
      
@@ -263,6 +306,7 @@ export default function Stock() {
               <Button variant="filled" onClick={() => stockAddRef.current?.openDialog(
                 stockData.map(x => pick(['id', 'name', 'nameKey'], x))
               )}>Yeni Ekle</Button>
+              
             </Group>
             {/* İçerik Kartları */}
           <div
@@ -274,7 +318,6 @@ export default function Stock() {
           >
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
-
                 <Grid.Col span={4}>
                   <TextInput
                     label="Ürün adı veya Kullanıcı Ara"
@@ -284,7 +327,26 @@ export default function Stock() {
                     onChange={(event) => setSearchText(event.currentTarget.value)}
                   />
                 </Grid.Col>
-
+                <Grid.Col span={4}>
+                  <Flex
+                  mih={50}
+                  gap="md"
+                  justify="flex-end"
+                  align="flex-end"
+                  direction="row"
+                  wrap="wrap"
+                >
+                  <MenuActionButton
+                  reportTitle={reportTitle()}
+                  excelColumns={excelTableColumns}
+                  valueData={raportStockData}
+                  pdfColumns={pdfTableColumns}
+                  type={2}
+                  isMailDisabled={true}
+                  isSmsDisabled={true}
+                  />
+                </Flex>
+                </Grid.Col>
               </Grid>
             </Paper>
           </div>
