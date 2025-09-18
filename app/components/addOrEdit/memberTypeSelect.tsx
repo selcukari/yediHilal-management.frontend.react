@@ -1,4 +1,4 @@
-import { Select } from '@mantine/core';
+import { MultiSelect } from '@mantine/core';
 import { useState, useEffect } from 'react';
 import type { UseFormReturnType } from '@mantine/form';
 import { useMemberTypeService } from '../../services/memberTypeService';
@@ -36,15 +36,29 @@ export function MemberTypeSelect({ form, required = false, }: MemberTypeSelectPr
     }
   };
 
+    // Form değerini string'ten array'e çevir
+  const selectedValues = form.values.typeIds 
+    ? form.values.typeIds.split(',').filter(Boolean)
+    : [];
+
+  const handleChange = (values: string[]) => {
+    form.setFieldValue('typeIds', values.join(','));
+  };
+  // Form'dan error mesajını al
+  const error = form.errors.typeIds;
+
   return (
-    <Select
-      label="Tipi"
+    <MultiSelect
+      label="Üye Tipi"
       placeholder="Tipi Seçiniz"
       data={memberTypes}
-      required={required}
+      searchable
+      clearable
+      value={selectedValues}
+      error={error}
       maxDropdownHeight={200}
       nothingFoundMessage="Tipi bulunamadı..."
-      {...form.getInputProps('typeId')}
+      onChange={handleChange}
     />
   );
 }

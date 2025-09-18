@@ -46,9 +46,9 @@ export function Province({
 
   const handleChange = (values: string[]) => {
     const selectedProvinceNames = values.map(value => {
-    const province = provinces.find(p => p.value === value);
+    const province = provinces.find(p => p.value == value);
     return province?.label || '';
-  }).filter(name => name !== '');
+  }).filter(name => name != '');
   
     onProvinceChange(values, selectedProvinceNames); // ikinci paremetre provinces in value degerine esiş olan values den gelen provinces label string oluştur
     setProvince(values);

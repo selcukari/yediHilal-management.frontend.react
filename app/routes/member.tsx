@@ -45,7 +45,7 @@ export default function Member() {
   const [rowHeaders, setRowHeaders] = useState([
     { field: 'id', header: 'Id' },
     { field: 'fullName', header: 'Ad Soyad' },
-    { field: 'typeName', header: 'Tipi' },
+    { field: 'typeNames', header: 'Üye Tipi' },
     { field: 'phoneWithCountryCode', header: 'Telefon' },
     { field: 'email', header: 'Mail' },
     { field: 'isSms', header: 'Sms' },
@@ -95,7 +95,7 @@ export default function Member() {
       phone: item.phone,
       dateOfBirth: item.dateOfBirth ? item.dateOfBirth.toString() : '',
       isActive: item.isActive,
-      typeId: item.typeId.toString(),
+      typeIds: item.typeIds.toString(),
       isSms: item.isSms,
       isMail: item.isMail,
       referenceId: item.referenceId ? item.referenceId.toString() : '',
@@ -287,8 +287,8 @@ export default function Member() {
   const reportTitle = (): string => {
     const isActiveText = filterModel.isActive ? 'Aktif' : 'Pasif';
 
-    if (selectedProvinceNames?.length > 0 && selectedMemberTypeName) {
-      const provinceNames = selectedProvinceNames.join(",")
+    if (selectedProvinceNames?.length > 0 && selectedMemberTypeName?.length > 0) {
+      const provinceNames = selectedProvinceNames.join(",") 
 
       return `${selectedCountryName}/${selectedMemberTypeName}/${provinceNames}/${isActiveText} Üye Raporu`;
     }

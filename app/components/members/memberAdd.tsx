@@ -32,7 +32,7 @@ type FormValues = {
   isActive: boolean;
   isSms: boolean;
   isMail: boolean;
-  typeId: string;
+  typeIds: string;
   countryId: string;
   provinceId: string;
   deleteMessageTitle?: string;
@@ -58,7 +58,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
       phone: '',
       dateOfBirth: '',
       referenceId: '',
-      typeId: '1',
+      typeIds: '1',
       countryId: '1',
       provinceId: '',
       isActive: true,
@@ -108,7 +108,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
 
         return null;
       },
-      typeId: (value) => (value ? null : 'Üye tipi alanı zorunlu'),
+      typeIds: (value) => (value ? null : 'Üye tipi alanı zorunlu'),
     },
   });
 
@@ -126,13 +126,13 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
   }, [form.values.referenceId]);
 
   const handleSubmit = async (values: FormValues) => {
-    const typeIdVoluntarily = 1;
+    const typeIdVoluntarily = "1";
 
     setIsDisabledSelect(true);
     const newMemberValue = {
       ...values,
       deleteMessageTitle: (values.isActive ? undefined : (values.deleteMessageTitle ? values.deleteMessageTitle.trim() : undefined )),
-      typeId: values.typeId ? parseInt(values.typeId) : typeIdVoluntarily,
+      typeIds: values.typeIds ? values.typeIds : typeIdVoluntarily,
       provinceId: values.provinceId ? parseInt(values.provinceId) : undefined,
       countryId: values.countryId ? parseInt(values.countryId) : undefined,
       referenceId: values.referenceId ? parseInt(values.referenceId) : undefined,
@@ -237,6 +237,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
             <MemberTypeSelect
               form={form}
               required={true}
+              {...form.getInputProps('typeIds')}
             ></MemberTypeSelect>
           </Grid.Col>
 

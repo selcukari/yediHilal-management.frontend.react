@@ -38,9 +38,9 @@ export function MemberType({ onMemberTypeChange }: MemberTypeProps) {
 
   const handleChange = (values: string[]) => {
     const selectedMemberTypeNames = values.map(value => {
-    const memberType = memberTypes.find(p => p.value === value);
+    const memberType = memberTypes.find(p => p.value == value);
     return memberType?.label || '';
-  }).filter(name => name !== '');
+  }).filter(name => name != '');
   
     onMemberTypeChange(values, selectedMemberTypeNames); // ikinci paremetre provinces in value degerine esiş olan values den gelen provinces label string oluştur
     setMemberType(values);
