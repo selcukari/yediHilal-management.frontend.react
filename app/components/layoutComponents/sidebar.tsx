@@ -83,7 +83,7 @@ const menuItems = [
     key: 'automaticMessageManagenet',
     link: '/vehicles',
     children: [
-      { label: 'Otomatik Sms Yön.', key: 'automaticSmsManagement', link: '/automaticSmsManagement' },
+      { label: 'Otomatik Sms/WhatsApp Yön.', key: 'automaticSmsManagement', link: '/automaticSmsManagement' },
       { label: 'Otomatik Mail Yön.', key: 'automaticMailManagement', link: '/automaticMailManagement' },
     ],
   },

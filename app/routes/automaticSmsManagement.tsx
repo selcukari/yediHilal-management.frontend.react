@@ -45,7 +45,6 @@ export default function AutomaticSmsManagement() {
       const response = await service.getAutomaticSmsFields();
 
       if (response) {
-        console.log("response:", response)
         form.setValues((pick(['id', 'message', 'isActive', 'updateDate'], response) as FormValues));
 
         form.setInitialValues(pick(['id', 'message', 'isActive', 'updateDate'],response));
@@ -91,7 +90,7 @@ export default function AutomaticSmsManagement() {
         overlayProps={{ radius: 'sm', blur: 2 }}
         loaderProps={{ color: 'pink', type: 'bars' }}
       />
-      <Title ta="center" mb="md">Otomatik Sms Alanı</Title>
+      <Title ta="center" mb="md">Otomatik Sms/WhatsApp Alanı</Title>
 
       <Paper withBorder shadow="md" p={30} radius="md">
         <Text c="dimmed">Son Güncelle: {formatDate(form.values.updateDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Text>
