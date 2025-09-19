@@ -22,18 +22,19 @@ type ValueParams = {
   toUsers: Array<string>;
   toPhoneNumbers: Array<string>;
   toCountryCodes: Array<string>;
-  type: number;
+  personType: number;
   count: number;
 }
 
 type FormValues = {
   message: string;
+  smsType: string;
 };
 
 const SmsSend = forwardRef<SmsSendDialogControllerRef, unknown>((_props, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
   const [visibleLoading, openLoading] = useDisclosure(false);
-  const [valueParams, setValueParams] = useState<ValueParams>({ toUsers: [], toPhoneNumbers: [], toCountryCodes: [], type: 2, count: 0 });
+  const [valueParams, setValueParams] = useState<ValueParams>({ toUsers: [], toPhoneNumbers: [], toCountryCodes: [], personType: 2, count: 0 });
 
   const service = useSmsService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   
@@ -42,6 +43,7 @@ const SmsSend = forwardRef<SmsSendDialogControllerRef, unknown>((_props, ref) =>
   const form = useForm<FormValues>({
     initialValues: {
       message: "",
+      smsType: "sms",
     },
     validate: {
       message: (value) => (value.trim().length < 10 ? 'Mesaj en az 10 karakter olmalı' : null),

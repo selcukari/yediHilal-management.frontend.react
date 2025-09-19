@@ -10,18 +10,19 @@ interface SmsParams {
   toUsers: Array<string>;
   toPhoneNumbersWithCountryCode: Array<PhoneNumbersWithCountryCode>;
   count: number;
-  type: number;
+  personType: number;
+  smsType: string;
 }
 
 export function useSmsService(controller: string) {
   const { getCurrentToken, logout } = useAuth();
   const api = createApi(getCurrentToken() ?? undefined, logout);
 
-  const getSms = async (type: number) => {
+  const getSms = async (personType: number) => {
 
     try {
       const res = await api.get(`/${controller}/getSms`, {
-        params: {type},
+        params: {personType},
       });
 
       return res.data.data;
