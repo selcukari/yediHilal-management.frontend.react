@@ -6,9 +6,10 @@ import {
 import { IconSearch, IconPlus } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { toast } from '../utils/toastMessages';
-import ItemAdd, { type ItemAddDialogControllerRef } from '../components/stock/stockAdd';
+// import ItemAdd, { type ItemAddDialogControllerRef } from '../components/stock/stockAdd';
 import { formatDate } from '../utils/formatDate';
 import { dateFormatStrings } from '../utils/dateFormatStrings';
+import { useVehicleService } from '../services/vehicleService';
 
 interface ProjectItem {
   name: string;
@@ -19,39 +20,58 @@ interface ProjectItem {
   tooltip?: string;
 }
 
-interface ProjectData {
+interface VehicleData {
   id: number;
-  updateUserId: number;
-  updateUserFullName: string;
+  userId: number;
+  userFullName: string;
+  userPhone: string;
   createDate: string;
-  items: ProjectItem[];
+  updateDate?: string;
+  status: boolean;
+  plate: string;
+  brand: string;
+  model: string;
+  engineNumber?: string;
+  color?: string;
+  mileage: number;
+  note?: string;
+  fuelType?: string; // yakıt tipi(Gasoline/Diesel/Electric/Hybrid)
+  transmission?: string; //Manual/Automatic
+  insuranceDate?: string; // sigortaTarih
+  inspectionDate?: string; // muane tarihi
+  year: number;
+  actions?: string;
 }
 
 export default function Vehicle() {
-  const [projectData, setProjectData] = useState<ProjectData | null>(null);
+  const [vehicleData, setVehicleData] = useState<VehicleData[]>([]);
   const [visible, { open, close }] = useDisclosure(false);
   const [searchText, setSearchText] = useState('');
 
-  const itemAddRef = useRef<ItemAddDialogControllerRef>(null);
+  const service = useVehicleService(import.meta.env.VITE_APP_API_VEHICLE_CONTROLLER);
+
+  // const itemAddRef = useRef<ItemAddDialogControllerRef>(null);
 
   useEffect(() => {
     setTimeout(() => {
-        // fetchProject();
+        fetchProject();
       }, 1000);
   }, []);
 
   const fetchProject = async () => {
     open();
     try {
+      const getVehicles = await service.getVehicles();
       
-      if (true) {
+      if (getVehicles) {
+        setVehicleData(getVehicles);
       
       } else {
         toast.info('Hiçbir veri yok!');
-        setProjectData(null);
+        setVehicleData([]);
       }
     } catch (error: any) {
-      toast.error(`Stok yüklenirken hata: ${error.message}`);
+      toast.error(`Vehicles yüklenirken hata: ${error.message}`);
     } finally {
       close();
     }
@@ -71,14 +91,24 @@ export default function Vehicle() {
   { id: 58, count: 48, responsible: 'Ayşe', name: "Toplantı name test 15", createDate: "2025-08-31T13:52:20.289Z", finisDate: "2025-11-25T13:52:20.289Z" },
 ];
 
-  const rowItems = elements.map((element) => (
-    <Table.Tr key={element.id}>
-      <Table.Td>{element.id}</Table.Td>
-      <Table.Td>{element.name}</Table.Td>
-      <Table.Td>{element.count}</Table.Td>
-      <Table.Td>{element.responsible}</Table.Td>
-      <Table.Td>{formatDate(element.createDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
-      <Table.Td>{formatDate(element.finisDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
+  const rowItems = vehicleData.map((vehicle: VehicleData) => (
+    <Table.Tr key={vehicle.id}>
+      <Table.Td>{vehicle.id}</Table.Td>
+      <Table.Td>{vehicle.plate}</Table.Td>
+      <Table.Td>{vehicle.brand}</Table.Td>
+      <Table.Td>{vehicle.model}</Table.Td>
+      <Table.Td>{vehicle.year}</Table.Td>
+      <Table.Td>{vehicle.mileage}</Table.Td>
+      <Table.Td>{vehicle.fuelType}</Table.Td>
+      <Table.Td>{vehicle.transmission}</Table.Td>
+      <Table.Td>{vehicle.color}</Table.Td>
+      <Table.Td>{vehicle.engineNumber}</Table.Td>
+      <Table.Td>{vehicle.note}</Table.Td>
+      <Table.Td>{`${vehicle.userFullName}(${vehicle.userPhone})`}</Table.Td>
+      <Table.Td>{formatDate(vehicle.createDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
+      <Table.Td>{formatDate(vehicle.updateDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
+      <Table.Td>{formatDate(vehicle.inspectionDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
+      <Table.Td>{formatDate(vehicle.insuranceDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
     </Table.Tr>
   ));
 
@@ -169,11 +199,22 @@ export default function Vehicle() {
                 <Table.Thead>
                   <Table.Tr>
                     <Table.Th>Id</Table.Th>
-                    <Table.Th>Araç Adı</Table.Th>
-                    <Table.Th>Katılımcı Sayısı</Table.Th>
-                    <Table.Th>Sorumlu</Table.Th>
-                    <Table.Th>Başlangıç</Table.Th>
-                    <Table.Th>Bitiş</Table.Th>
+                    <Table.Th>Plaka</Table.Th>
+                    <Table.Th>Marka</Table.Th>
+                    <Table.Th>Model</Table.Th>
+                    <Table.Th>Yıl</Table.Th>
+                    <Table.Th>Klometre</Table.Th>
+                    <Table.Th>Yakıt</Table.Th>
+                    <Table.Th>Vites Türü</Table.Th>
+                    <Table.Th>Renk</Table.Th>
+                    <Table.Th>Motor Numarası</Table.Th>
+                    <Table.Th>Note</Table.Th>
+                    <Table.Th>Son Güncelleyen Kişi</Table.Th>
+                    <Table.Th>İlk Kayıt</Table.Th>
+                    <Table.Th>Son Güncelleme</Table.Th>
+                    <Table.Th>Muane Tarihi</Table.Th>
+                    <Table.Th>Sigorta Tarih</Table.Th>
+                    <Table.Th>İşlemler</Table.Th>
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>{rowItems}</Table.Tbody>
@@ -182,7 +223,7 @@ export default function Vehicle() {
           </Stack>
         </Paper>
       </Stack>
-        <ItemAdd ref={itemAddRef} onSaveSuccess={handleSaveSuccess} />
+        {/* <ItemAdd ref={itemAddRef} onSaveSuccess={handleSaveSuccess} /> */}
     </Container>
   );
 }
