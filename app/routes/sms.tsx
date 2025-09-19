@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { IconSearch } from '@tabler/icons-react';
 import {
-  Container, Grid, TextInput, Stack, Group, Title, Text, Paper, Table, LoadingOverlay,
+  Container, Grid, TextInput, Stack, Group, Select, Title, Text, Paper, Table, LoadingOverlay,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useSmsService } from '../services/smsService';
@@ -17,11 +17,19 @@ interface Column {
 export default function Mail() {
   const [resultData, setResultData] = useState<any[]>([]);
   const [searchText, setSearchText] = useState('');
+  const [smsTypes, setSmsTypes] = useState<{ value: string; label: string }[]>([]);
+  const [smsType, setSmsType] = useState<string | null>('');
   const [visible, { open, close }] = useDisclosure(false);
+
+   const mockDataSmsTypes =[
+    {id: "sms", name: "Sms"},
+    {id: "whatsApp", name: "WhatsApp"}
+  ];
   
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
     { field: 'id', header: 'Id' },
     { field: 'message', header: 'Mesaj' },
+    { field: 'smsType', header: 'Sms Tipi' },
     { field: 'toUsers', header: 'Alıcı İsimleri' },
     { field: 'toPhoneNumbers', header: 'Alıcı Tel. Num.' },
     { field: 'count', header: 'Alıcı Sayısı' },
@@ -32,15 +40,31 @@ export default function Mail() {
 
   // Filtrelenmiş veriler
   const filteredUsers = useMemo(() => {
-    if (!searchText) return resultData;
+    if (!searchText && !smsType) return resultData;
     
-    return resultData.filter(sms => sms.message.toLowerCase().includes(searchText.trim().toLowerCase()));
-  }, [resultData, searchText]);
+    return resultData.filter(sms => {
+      const matchesSearch = searchText 
+        ? sms.message.toLowerCase().includes(searchText.trim().toLowerCase())
+        : true;
+      
+      const matchesType = smsType 
+        ? sms.smsType === smsType
+        : true;
+      
+      return matchesSearch && matchesType;
+    });
+  }, [resultData, searchText, smsType]);
 
   useEffect(() => {
     setTimeout(() => {
       fetchSms();
     }, 1000);
+    setSmsTypes(
+      mockDataSmsTypes.map((c: any) => ({
+        value: c.id,
+        label: c.name,
+      }))
+    );
   }, []);
 
   const rowsTable = filteredUsers.map((item) => (
@@ -54,10 +78,10 @@ export default function Mail() {
             </Table.Td>
           );
         }
-        if (header.field === 'body') {
+        if (header.field === 'smsType') {
           return (
             <Table.Td key={header.field}>
-              {item["body"].length > 25 ? `${item["body"].substring(0,25)}...`: item["body"]}
+              {smsTypes.find((i:any)=> i.value == item["smsType"])?.label}
             </Table.Td>
           );
         }
@@ -92,6 +116,7 @@ export default function Mail() {
           toUsers: sms.toUsers,
           toPhoneNumbers: sms.toPhoneNumbers,
           count: sms.count,
+          smsType: sms.smsType,
           createdDate: formatDate(sms.createdDate, dateFormatStrings.dateTimeFormatWithoutSecond),
         })));
        
@@ -136,7 +161,6 @@ export default function Mail() {
           >
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
-
                 <Grid.Col span={4}>
                   <TextInput
                     label="Mesaj Ara"
@@ -146,7 +170,18 @@ export default function Mail() {
                     onChange={(event) => setSearchText(event.currentTarget.value)}
                   />
                 </Grid.Col>
-
+                <Grid.Col span={4}>
+                  <Select
+                    label="Sms Tipi"
+                    placeholder="tipi Seçiniz"
+                    data={smsTypes}
+                    searchable
+                    clearable
+                    maxDropdownHeight={200}
+                    nothingFoundMessage="tipi bulunamadı..."
+                    onChange={(value) => setSmsType(value)}
+                  />
+                </Grid.Col>
               </Grid>
             </Paper>
           </div>
