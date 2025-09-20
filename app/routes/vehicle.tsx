@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Container, Grid, TextInput, Text, Stack, Title, RingProgress,
-  Paper, Button, LoadingOverlay, Flex, Table, Group,
+  Paper, Button, LoadingOverlay, Flex, Table, Group, Select,
 } from '@mantine/core';
 import { IconSearch, IconPlus } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
@@ -46,16 +46,65 @@ interface VehicleData {
 export default function Vehicle() {
   const [vehicleData, setVehicleData] = useState<VehicleData[]>([]);
   const [visible, { open, close }] = useDisclosure(false);
+  const [fuelTypes, setFuelTypes] = useState<{ value: string; label: string }[]>([]);
+  const [transmissionTypes, setTransmissionTypes] = useState<{ value: string; label: string }[]>([]);
+  const [transmissionType, setTransmissionType] = useState<string | null>('');
+  const [fuelType, setfuelType] = useState<string | null>('');
   const [searchText, setSearchText] = useState('');
 
   const service = useVehicleService(import.meta.env.VITE_APP_API_VEHICLE_CONTROLLER);
 
   // const itemAddRef = useRef<ItemAddDialogControllerRef>(null);
 
+  const mockDataFuelTypes =[
+    {id: "gasoline", name: "Benzin"},
+    {id: "diesel", name: "Eizel"},
+    {id: "electric", name: "Elektrik"},
+    {id: "hybrid", name: "Melez"},
+  ];
+  const mockDataTransmissionTypes =[
+    {id: "manual", name: "Manual"},
+    {id: "automatic", name: "Otomatik"},];
+
+  // Filtrelenmiş veriler
+  const filteredVehicles = useMemo(() => {
+    if (!searchText && !fuelType && !transmissionType) return vehicleData;
+    
+    return vehicleData.filter(vehicle => {
+      const matchesSearch = searchText 
+        ? (vehicle.plate.toLowerCase().includes(searchText.trim().toLowerCase()) ||
+          vehicle.model.toLowerCase().includes(searchText.trim().toLowerCase()) ||
+          vehicle.brand.toLowerCase().includes(searchText.trim().toLowerCase()))
+        : true;
+      
+      const matchesFuelType = fuelType 
+        ? vehicle.fuelType === fuelType
+        : true;
+
+      const matchesTransmissionType = transmissionType 
+        ? vehicle.transmission === transmissionType
+        : true;
+      
+      return matchesSearch && matchesFuelType && matchesTransmissionType;
+    });
+  }, [vehicleData, searchText, fuelType, transmissionType]);
+
   useEffect(() => {
     setTimeout(() => {
         fetchProject();
       }, 1000);
+    setFuelTypes(
+      mockDataFuelTypes.map((c: any) => ({
+        value: c.id,
+        label: c.name,
+      }))
+    );
+    setTransmissionTypes(
+      mockDataTransmissionTypes.map((c: any) => ({
+        value: c.id,
+        label: c.name,
+      }))
+    );
   }, []);
 
   const fetchProject = async () => {
@@ -91,7 +140,7 @@ export default function Vehicle() {
   { id: 58, count: 48, responsible: 'Ayşe', name: "Toplantı name test 15", createDate: "2025-08-31T13:52:20.289Z", finisDate: "2025-11-25T13:52:20.289Z" },
 ];
 
-  const rowItems = vehicleData.map((vehicle: VehicleData) => (
+  const rowItems = filteredVehicles.map((vehicle: VehicleData) => (
     <Table.Tr key={vehicle.id}>
       <Table.Td>{vehicle.id}</Table.Td>
       <Table.Td>{vehicle.plate}</Table.Td>
@@ -99,8 +148,8 @@ export default function Vehicle() {
       <Table.Td>{vehicle.model}</Table.Td>
       <Table.Td>{vehicle.year}</Table.Td>
       <Table.Td>{vehicle.mileage}</Table.Td>
-      <Table.Td>{vehicle.fuelType}</Table.Td>
-      <Table.Td>{vehicle.transmission}</Table.Td>
+      <Table.Td>{fuelTypes.find((i)=> i.value == vehicle.fuelType)?.label}</Table.Td>
+      <Table.Td>{transmissionTypes.find((i)=> i.value == vehicle.transmission)?.label}</Table.Td>
       <Table.Td>{vehicle.color}</Table.Td>
       <Table.Td>{vehicle.engineNumber}</Table.Td>
       <Table.Td>{vehicle.note}</Table.Td>
@@ -113,8 +162,8 @@ export default function Vehicle() {
   ));
 
   const calculateTotal = () => {
-    if (!elements) return 0;
-    return elements.reduce((total, item) => total + item.count, 0);
+    if (!vehicleData) return 0;
+    return vehicleData.reduce((total, item) => total + item.mileage, 0);
   };
 
   const handleAddItem = () => {
@@ -147,10 +196,10 @@ export default function Vehicle() {
                   Genel Toplam: {calculateTotal()}
                 </Text>
               }
-              sections={(elements || []).map(item => ({
-                value: (item.count / Math.max(calculateTotal(), 1)) * 100,
+              sections={(vehicleData || []).map(vehicle => ({
+                value: (vehicle.mileage / Math.max(calculateTotal(), 1)) * 100,
                 color: randaomColor(),
-                tooltip: `${item.name}: ${item.count}`
+                tooltip: `${vehicle.plate}: ${vehicle.mileage} km`,
               }))}
             />
           </Flex>
@@ -174,14 +223,38 @@ export default function Vehicle() {
               <Grid>
                 <Grid.Col span={4}>
                   <TextInput
-                    label="Araç Ara"
+                    label="Plaka/Marka/Model Ara"
                     placeholder="text giriniz"
                     leftSection={<IconSearch size={18} />}
                     value={searchText}
                     onChange={(event) => setSearchText(event.currentTarget.value)}
                   />
                 </Grid.Col>
-                <Grid.Col span={4} offset={3}>
+                <Grid.Col span={2}>
+                  <Select
+                    label="Yakıt Tipi"
+                    placeholder="yakıt Seçiniz"
+                    data={fuelTypes}
+                    searchable
+                    clearable
+                    maxDropdownHeight={200}
+                    nothingFoundMessage="yakıt bulunamadı..."
+                    onChange={(value) => setfuelType(value)}
+                  />
+                </Grid.Col>
+                <Grid.Col span={2}>
+                  <Select
+                    label="Vites Tipi"
+                    placeholder="vites Seçiniz"
+                    data={transmissionTypes}
+                    searchable
+                    clearable
+                    maxDropdownHeight={200}
+                    nothingFoundMessage="vites bulunamadı..."
+                    onChange={(value) => setTransmissionType(value)}
+                  />
+                </Grid.Col>
+                <Grid.Col span={4}>
                 <Flex mih={50} gap="md" justify="flex-end" align="flex-end" direction="row" wrap="wrap">
                 <Button variant="filled" leftSection={<IconPlus size={14} />}  onClick={handleAddItem}>Yeni Ekle</Button>
                 </Flex>
@@ -203,9 +276,9 @@ export default function Vehicle() {
                     <Table.Th>Marka</Table.Th>
                     <Table.Th>Model</Table.Th>
                     <Table.Th>Yıl</Table.Th>
-                    <Table.Th>Klometre</Table.Th>
+                    <Table.Th>Kilometre</Table.Th>
                     <Table.Th>Yakıt</Table.Th>
-                    <Table.Th>Vites Türü</Table.Th>
+                    <Table.Th>Vites Tipi</Table.Th>
                     <Table.Th>Renk</Table.Th>
                     <Table.Th>Motor Numarası</Table.Th>
                     <Table.Th>Note</Table.Th>

@@ -21,7 +21,7 @@ export default function Mail() {
   const [smsType, setSmsType] = useState<string | null>('');
   const [visible, { open, close }] = useDisclosure(false);
 
-   const mockDataSmsTypes =[
+  const mockDataSmsTypes =[
     {id: "sms", name: "Sms"},
     {id: "whatsApp", name: "WhatsApp"}
   ];
