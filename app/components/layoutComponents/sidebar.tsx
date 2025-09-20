@@ -72,9 +72,8 @@ const menuItems = [
     key: 'vehicle',
     link: '/vehicles',
     children: [
-      { label: 'A Araç', key: 'a-vehicle', link: '/a-vehicle' },
-      { label: 'B Araç', key: 'b-vehicle', link: '/b-vehicle' },
-      { label: 'Araçlar', key: 'vehicle-all', link: '/vehicles' },
+      { label: 'Emanet Araçlar', key: 'vehicleDeposits', link: '/vehicleDeposits' },
+      { label: 'Araçlar', key: 'vehicles', link: '/vehicles' },
     ],
   },
    {
