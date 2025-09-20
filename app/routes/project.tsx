@@ -12,7 +12,7 @@ import { dateFormatStrings } from '../utils/dateFormatStrings';
 import { priorityMockData } from '../utils/priorityMockData';
 import ProjectAdd, { type ProjectAddDialogControllerRef } from '../components/project/projectAdd';
 import ProjectEdit, { type ProjectEditDialogControllerRef } from '../components/project/projectEdit';
-
+import { randaomColor } from '../utils/randaomColor';
 interface ProjectData {
   id: number;
   numberOfParticipant: number;
@@ -173,13 +173,6 @@ export default function Project() {
     if (projectData.length < 0) return 0;
     return projectData.reduce((total, item) => total + item.numberOfParticipant, 0);
   };
-
-  const randaomColor = () => {
-    const colors = ["dark", "gray", "red", "pink", "grape", "violet", "indigo", "blue", "cyan", "teal", "green", "lime", "yellow", "orange"];
-    const index = Math.floor(Math.random() * colors.length);
-
-    return colors[index];
-  }
 
   return (
     <Container size="xl">

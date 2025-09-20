@@ -10,7 +10,7 @@ import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
 import { dateFormatStrings } from '../utils/dateFormatStrings';
 import { useVehicleService } from '../services/vehicleService';
-
+import { randaomColor } from '../utils/randaomColor';
 interface ProjectItem {
   name: string;
   key: string;
@@ -168,13 +168,6 @@ export default function Vehicle() {
 
   const handleAddItem = () => {
    console.log("proje ekle");
-  }
-
-  const randaomColor = () => {
-    const colors = ["dark", "gray", "red", "pink", "grape", "violet", "indigo", "blue", "cyan", "teal", "green", "lime", "yellow", "orange"];
-    const index = Math.floor(Math.random() * colors.length);
-
-    return colors[index];
   }
 
   return (
