@@ -1,9 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
+import { differenceInDays } from 'date-fns';
 import {
-  Container, Grid, TextInput, Text, Stack, Title, RingProgress,
+  Container, Grid, TextInput, Text, Stack, Title, RingProgress, ActionIcon,
   Paper, Button, LoadingOverlay, Flex, Table, Group, Select,
 } from '@mantine/core';
-import { IconSearch, IconPlus } from '@tabler/icons-react';
+import { IconSearch, IconPlus, IconEdit, IconTrash } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { toast } from '../utils/toastMessages';
 // import ItemAdd, { type ItemAddDialogControllerRef } from '../components/stock/stockAdd';
@@ -125,6 +126,16 @@ export default function Vehicle() {
       close();
     }
   };
+  const diffDateTimeForColor = (date?: string) => {
+    if (!date) return "green";
+    const daysDiff = differenceInDays(date, new Date());
+
+    if (daysDiff > 7) return "green";
+
+    if (new Date() >= new Date(date)) return "red";
+
+    return "yellow";
+  };
 
   const handleSaveSuccess = () => {
     setTimeout(() => {
@@ -132,13 +143,12 @@ export default function Vehicle() {
     }, 1500);
   };
 
-  const elements = [
-  { id: 6, count: 23, responsible: 'Ali',name: "Toplantı name test 1", createDate: "2025-08-31T13:52:20.289Z", finisDate: "2025-11-25T13:52:20.289Z"  },
-  { id: 7, count: 17, responsible: 'Ahmet',name: "Toplantı name test 12", createDate: "2025-08-31T13:52:20.289Z", finisDate: "2025-11-25T13:52:20.289Z"  },
-  { id: 39, count: 27, responsible: 'Fatma',name: "Toplantı name test 13", createDate: "2025-08-31T13:52:20.289Z", finisDate: "2025-11-25T13:52:20.289Z"  },
-  { id: 56, count: 47, responsible: 'Fırat',name: "Toplantı name test 14", createDate: "2025-08-31T13:52:20.289Z", finisDate: "2025-11-25T13:52:20.289Z"  },
-  { id: 58, count: 48, responsible: 'Ayşe', name: "Toplantı name test 15", createDate: "2025-08-31T13:52:20.289Z", finisDate: "2025-11-25T13:52:20.289Z" },
-];
+  const handleEdit = (item: VehicleData) => {
+   console.log("handleEdit: item:", item);
+  }
+  const handleDelete = async (id: number) => {
+    console.log("handleDelete: id:", id);
+  }
 
   const rowItems = filteredVehicles.map((vehicle: VehicleData) => (
     <Table.Tr key={vehicle.id}>
@@ -154,10 +164,36 @@ export default function Vehicle() {
       <Table.Td>{vehicle.engineNumber}</Table.Td>
       <Table.Td>{vehicle.note}</Table.Td>
       <Table.Td>{`${vehicle.userFullName}(${vehicle.userPhone})`}</Table.Td>
-      <Table.Td>{formatDate(vehicle.createDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
-      <Table.Td>{formatDate(vehicle.updateDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
-      <Table.Td>{formatDate(vehicle.inspectionDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
-      <Table.Td>{formatDate(vehicle.insuranceDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
+      <Table.Td style={{ color: diffDateTimeForColor(vehicle.createDate) }}>
+          {formatDate(vehicle.createDate, dateFormatStrings.dateTimeFormatWithoutSecond)}
+      </Table.Td>
+      <Table.Td style={{ color: diffDateTimeForColor(vehicle.updateDate) }}>
+        {formatDate(vehicle.updateDate, dateFormatStrings.dateTimeFormatWithoutSecond)}
+      </Table.Td>
+      <Table.Td style={{ color: diffDateTimeForColor(vehicle.inspectionDate) }}>
+        {formatDate(vehicle.inspectionDate, dateFormatStrings.dateTimeFormatWithoutSecond)}
+      </Table.Td>
+      <Table.Td style={{ color: diffDateTimeForColor(vehicle.insuranceDate) }}>
+        {formatDate(vehicle.insuranceDate, dateFormatStrings.dateTimeFormatWithoutSecond)}
+      </Table.Td>
+      <Table.Td>
+        <Group gap="xs">
+          <ActionIcon 
+            variant="light" 
+            color="blue"
+            onClick={() => handleEdit(vehicle)}
+          >
+            <IconEdit size={16} />
+          </ActionIcon>
+          <ActionIcon 
+            variant="light" 
+            color="red"
+            onClick={() => handleDelete(vehicle.id)}
+          >
+            <IconTrash size={16} />
+          </ActionIcon>
+        </Group>
+      </Table.Td>
     </Table.Tr>
   ));
 
