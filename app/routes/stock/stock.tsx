@@ -6,7 +6,7 @@ import {
 } from '@mantine/core';
 import { differenceInDays } from 'date-fns';
 import { MenuActionButton } from '../../components'
-import { IconSearch, IconTrash, IconEdit } from '@tabler/icons-react';
+import { IconSearch, IconTrash, IconEdit, IconPlus } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { useStockService } from '../../services/stockService';
 import { toast } from '../../utils/toastMessages';
@@ -303,7 +303,7 @@ export default function Stock() {
                   Toolbar Filtreleme Alanı
                 </Text>
               </div>
-              <Button variant="filled" onClick={() => stockAddRef.current?.openDialog(
+              <Button variant="filled" leftSection={<IconPlus size={14} />} onClick={() => stockAddRef.current?.openDialog(
                 stockData.map(x => pick(['id', 'name', 'nameKey'], x))
               )}>Yeni Ekle</Button>
               

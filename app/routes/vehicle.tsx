@@ -12,6 +12,10 @@ import { formatDate } from '../utils/formatDate';
 import { dateFormatStrings } from '../utils/dateFormatStrings';
 import { useVehicleService } from '../services/vehicleService';
 import { randaomColor } from '../utils/randaomColor';
+import { MenuActionButton } from '../components'
+import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToExcel';
+import { type PdfTableColumn } from '../utils/repor/exportToPdf';
+import { calculateColumnWidthMember } from '../utils/repor/calculateColumnWidth';
 interface ProjectItem {
   name: string;
   key: string;
@@ -20,7 +24,10 @@ interface ProjectItem {
   value?: number;
   tooltip?: string;
 }
-
+interface Column {
+  field: keyof VehicleData;
+  header: string;
+}
 interface VehicleData {
   id: number;
   userId: number;
@@ -56,6 +63,21 @@ export default function Vehicle() {
   const service = useVehicleService(import.meta.env.VITE_APP_API_VEHICLE_CONTROLLER);
 
   // const itemAddRef = useRef<ItemAddDialogControllerRef>(null);
+
+    const [rowHeaders, setRowHeaders] = useState<Column[]>([
+      { field: 'id', header: 'Id' },
+      { field: 'plate', header: 'Plaka' },
+      { field: 'brand', header: 'Marka' },
+      { field: 'model', header: 'Model' },
+      { field: 'year', header: 'Yıl' },
+      { field: 'mileage', header: 'Kilometre' },
+      { field: 'fuelType', header: 'Yakıt' },
+      { field: 'transmission', header: 'Vites' },
+      { field: 'color', header: 'Renk' },
+      { field: 'engineNumber', header: 'Motor Numarası' },
+      { field: 'inspectionDate', header: 'Muane Tarih' },
+      { field: 'insuranceDate', header: 'Sigorta Tarih' },
+    ]);
 
   const mockDataFuelTypes =[
     {id: "gasoline", name: "Benzin"},
@@ -149,6 +171,42 @@ export default function Vehicle() {
   const handleDelete = async (id: number) => {
     console.log("handleDelete: id:", id);
   }
+   // useMemo hook'u ile sütunları önbelleğe alıyoruz
+  const pdfTableColumns = useMemo((): PdfTableColumn[] => {
+
+    const newCols: Column[] = rowHeaders;
+
+    return newCols.map(col => ({
+      key: col.field,
+      title: col.header,
+      // İsteğe bağlı olarak genişlik ayarları ekleyebilirsiniz
+      width: calculateColumnWidthMember(col.field) // Özel genişlik hesaplama fonksiyonu
+    }));
+  }, [rowHeaders]);
+  const excelTableColumns = useMemo((): ColumnDefinition[] => {
+
+    const newCols: Column[] = rowHeaders;
+
+    return newCols.map(col => ({
+      key: col.field as keyof ValueData,
+      header: col.header,
+      // İsteğe bağlı olarak genişlik ayarları ekleyebilirsiniz
+    }));
+  }, [rowHeaders]);
+  const reportTitle = (): string => {
+    return "Araç Ürünler Raporu";
+  }
+
+  // raportdata
+  const raportVehicleData = useMemo(() => {
+    return filteredVehicles.map((vehicle: VehicleData) => ({
+      ...vehicle,
+      fuelType: fuelTypes.find((i)=> i.value == vehicle.fuelType)?.label,
+      transmission: transmissionTypes.find((i)=> i.value == vehicle.transmission)?.label,
+      inspectionDate: formatDate(vehicle.inspectionDate, dateFormatStrings.dateTimeFormatWithoutSecond),
+      insuranceDate: formatDate(vehicle.insuranceDate, dateFormatStrings.dateTimeFormatWithoutSecond),
+    }))
+  }, [filteredVehicles])
 
   const rowItems = filteredVehicles.map((vehicle: VehicleData) => (
     <Table.Tr key={vehicle.id}>
@@ -239,6 +297,7 @@ export default function Vehicle() {
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
+              <Button variant="filled" leftSection={<IconPlus size={14} />}  onClick={handleAddItem}>Yeni Ekle</Button>
           </Group>
           {/* İçerik Kartları */}
           <div
@@ -283,9 +342,24 @@ export default function Vehicle() {
                     onChange={(value) => setTransmissionType(value)}
                   />
                 </Grid.Col>
-                <Grid.Col span={4}>
-                <Flex mih={50} gap="md" justify="flex-end" align="flex-end" direction="row" wrap="wrap">
-                <Button variant="filled" leftSection={<IconPlus size={14} />}  onClick={handleAddItem}>Yeni Ekle</Button>
+                 <Grid.Col span={4}>
+                  <Flex
+                  mih={50}
+                  gap="md"
+                  justify="flex-end"
+                  align="flex-end"
+                  direction="row"
+                  wrap="wrap"
+                >
+                  <MenuActionButton
+                  reportTitle={reportTitle()}
+                  excelColumns={excelTableColumns}
+                  valueData={raportVehicleData}
+                  pdfColumns={pdfTableColumns}
+                  type={2}
+                  isMailDisabled={true}
+                  isSmsDisabled={true}
+                  />
                 </Flex>
               </Grid.Col>
               </Grid>
@@ -307,7 +381,7 @@ export default function Vehicle() {
                     <Table.Th>Yıl</Table.Th>
                     <Table.Th>Kilometre</Table.Th>
                     <Table.Th>Yakıt</Table.Th>
-                    <Table.Th>Vites Tipi</Table.Th>
+                    <Table.Th>Vites</Table.Th>
                     <Table.Th>Renk</Table.Th>
                     <Table.Th>Motor Numarası</Table.Th>
                     <Table.Th>Note</Table.Th>
