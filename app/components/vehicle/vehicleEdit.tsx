@@ -111,7 +111,7 @@ const VehicleEdit = forwardRef<VehicleEditDialogControllerRef, VehicleEditProps>
 
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
-    const newStockValue = {
+    const newVehicleValue = {
       ...values,
       plate: values.plate.toUpperCase(),
       userId: currentUser?.id as number,
@@ -119,7 +119,7 @@ const VehicleEdit = forwardRef<VehicleEditDialogControllerRef, VehicleEditProps>
       year: values.year ? parseInt(values.year) : null
     }
 
-    const result = await service.editVehicle(newStockValue);
+    const result = await service.editVehicle(newVehicleValue);
 
     if (result === true) {
 
