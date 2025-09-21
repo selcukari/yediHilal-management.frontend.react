@@ -1,20 +1,5 @@
 import { createApi } from './api';
 import { useAuth } from '~/authContext';
-
-interface StockData {
-  updateUserId: number;
-  updateUserFullName: string;
-  expirationDate?: string | null;
-  name: string;
-  nameKey: string;
-  isActive: boolean;
-  unitPrice: number;
-  totalPrice?: number;
-  count?: number;
-  description?: string;
-  fromWhere?: string;
-}
-
 interface StockDataParams {
   updateUserId: number;
   expirationDate?: string | null;
@@ -53,10 +38,10 @@ export function useStockService(controller: string) {
   const { getCurrentToken, logout } = useAuth();
   const api = createApi(getCurrentToken() ?? undefined, logout);
 
-  const getStock = async () => {
+  const getStocks = async () => {
 
     try {
-      const res = await api.get(`/${controller}/getStock`);
+      const res = await api.get(`/${controller}/getStocks`);
 
       return res.data.data;
     } catch (error: any) {
@@ -85,7 +70,7 @@ export function useStockService(controller: string) {
       return error;
     }
   };
-   const updateStock = async (params: StockDataParams) => {
+  const updateStock = async (params: StockDataParams) => {
 
     try {
       const res = await api.put(`/${controller}/updateStock`, params);
@@ -97,7 +82,7 @@ export function useStockService(controller: string) {
     }
   };
 
-    const getStockUsed = async (type: string) => {
+  const getStockUsed = async (type: string) => {
 
     try {
       const res = await api.get(`/${controller}/getStockUseds`, {
@@ -146,5 +131,5 @@ export function useStockService(controller: string) {
     }
   };
 
-  return { getStock, addStock, deleteStock, updateStock, addStockUsed, getStockUsed, updateStockUsedExpense, deleteStockUsed };
+  return { getStocks, addStock, deleteStock, updateStock, addStockUsed, getStockUsed, updateStockUsedExpense, deleteStockUsed };
 }

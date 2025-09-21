@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { differenceInDays } from 'date-fns';
+import { omit } from 'ramda';
 import {
   Container, Grid, TextInput, Text, Stack, Title, RingProgress, ActionIcon,
   Paper, Button, LoadingOverlay, Flex, Table, Group, Select,
@@ -7,7 +8,8 @@ import {
 import { IconSearch, IconPlus, IconEdit, IconTrash } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { toast } from '../../utils/toastMessages';
-// import ItemAdd, { type ItemAddDialogControllerRef } from '../components/stock/stockAdd';
+import VehicleAdd, { type VehicleAddDialogControllerRef } from '../../components/vehicle/vehicleAdd';
+import VehicleEdit, { type VehicleEditDialogControllerRef } from '../../components/vehicle/vehicleEdit';
 import { formatDate } from '../../utils/formatDate';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import { useVehicleService } from '../../services/vehicleService';
@@ -16,14 +18,8 @@ import { MenuActionButton } from '../../components'
 import { type ColumnDefinition, type ValueData } from '../../utils/repor/exportToExcel';
 import { type PdfTableColumn } from '../../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../../utils/repor/calculateColumnWidth';
-interface ProjectItem {
-  name: string;
-  key: string;
-  count: number;
-  color: string;
-  value?: number;
-  tooltip?: string;
-}
+import { mockDataFuelTypes, mockDataTransmissionTypes, mockDataFuelLevel } from '../../utils/vehicleMockData';
+
 interface Column {
   field: keyof VehicleData;
   header: string;
@@ -41,57 +37,50 @@ interface VehicleData {
   model: string;
   engineNumber?: string;
   color?: string;
-  mileage: number;
+  mileage?: number | null;
   note?: string;
-  fuelType?: string; // yakıt tipi(Gasoline/Diesel/Electric/Hybrid)
-  transmission?: string; //Manual/Automatic
+  fuelType: string; // yakıt tipi(Gasoline/Diesel/Electric/Hybrid)
+  transmission: string; //Manual/Automatic
   insuranceDate?: string; // sigortaTarih
   inspectionDate?: string; // muane tarihi
   year: number;
+  isDeposit: boolean;
+  fuelLevel: string;
   actions?: string;
 }
 
 export default function Vehicle() {
   const [vehicleData, setVehicleData] = useState<VehicleData[]>([]);
   const [visible, { open, close }] = useDisclosure(false);
-  const [fuelTypes, setFuelTypes] = useState<{ value: string; label: string }[]>([]);
-  const [transmissionTypes, setTransmissionTypes] = useState<{ value: string; label: string }[]>([]);
   const [transmissionType, setTransmissionType] = useState<string | null>('');
+  const [fuelLevel, setFuelLevel] = useState<string | null>('');
   const [fuelType, setfuelType] = useState<string | null>('');
   const [searchText, setSearchText] = useState('');
 
   const service = useVehicleService(import.meta.env.VITE_APP_API_VEHICLE_CONTROLLER);
 
-  // const itemAddRef = useRef<ItemAddDialogControllerRef>(null);
+  const vehicleAdd = useRef<VehicleAddDialogControllerRef>(null);
+  const vehicleEdit = useRef<VehicleEditDialogControllerRef>(null);
 
-    const [rowHeaders, setRowHeaders] = useState<Column[]>([
-      { field: 'id', header: 'Id' },
-      { field: 'plate', header: 'Plaka' },
-      { field: 'brand', header: 'Marka' },
-      { field: 'model', header: 'Model' },
-      { field: 'year', header: 'Yıl' },
-      { field: 'mileage', header: 'Kilometre' },
-      { field: 'fuelType', header: 'Yakıt' },
-      { field: 'transmission', header: 'Vites' },
-      { field: 'color', header: 'Renk' },
-      { field: 'engineNumber', header: 'Motor Numarası' },
-      { field: 'inspectionDate', header: 'Muane Tarih' },
-      { field: 'insuranceDate', header: 'Sigorta Tarih' },
-    ]);
-
-  const mockDataFuelTypes =[
-    {id: "gasoline", name: "Benzin"},
-    {id: "diesel", name: "Eizel"},
-    {id: "electric", name: "Elektrik"},
-    {id: "hybrid", name: "Melez"},
-  ];
-  const mockDataTransmissionTypes =[
-    {id: "manual", name: "Manual"},
-    {id: "automatic", name: "Otomatik"},];
+  const [rowHeaders, setRowHeaders] = useState<Column[]>([
+    { field: 'id', header: 'Id' },
+    { field: 'plate', header: 'Plaka' },
+    { field: 'brand', header: 'Marka' },
+    { field: 'model', header: 'Model' },
+    { field: 'year', header: 'Yıl' },
+    { field: 'mileage', header: 'Kilometre' },
+    { field: 'fuelLevel', header: 'Yakıt Durumu' },
+    { field: 'fuelType', header: 'Yakıt Tipi' },
+    { field: 'transmission', header: 'Vites' },
+    { field: 'color', header: 'Renk' },
+    { field: 'engineNumber', header: 'Motor Numarası' },
+    { field: 'inspectionDate', header: 'Muane Tarih' },
+    { field: 'insuranceDate', header: 'Sigorta Tarih' },
+  ]);
 
   // Filtrelenmiş veriler
   const filteredVehicles = useMemo(() => {
-    if (!searchText && !fuelType && !transmissionType) return vehicleData;
+    if (!searchText && !fuelType && !transmissionType && !fuelLevel) return vehicleData;
     
     return vehicleData.filter(vehicle => {
       const matchesSearch = searchText 
@@ -101,36 +90,80 @@ export default function Vehicle() {
         : true;
       
       const matchesFuelType = fuelType 
-        ? vehicle.fuelType === fuelType
+        ? vehicle.fuelType == fuelType
         : true;
 
       const matchesTransmissionType = transmissionType 
-        ? vehicle.transmission === transmissionType
+        ? vehicle.transmission == transmissionType
+        : true;
+
+      const matchesFuelLevel = fuelLevel 
+        ? vehicle.fuelLevel == fuelLevel
         : true;
       
-      return matchesSearch && matchesFuelType && matchesTransmissionType;
+      return matchesSearch && matchesFuelType && matchesTransmissionType && matchesFuelLevel;
     });
-  }, [vehicleData, searchText, fuelType, transmissionType]);
+  }, [vehicleData, searchText, fuelType, transmissionType, fuelLevel]);
 
   useEffect(() => {
     setTimeout(() => {
-        fetchProject();
-      }, 1000);
-    setFuelTypes(
-      mockDataFuelTypes.map((c: any) => ({
-        value: c.id,
-        label: c.name,
-      }))
-    );
-    setTransmissionTypes(
-      mockDataTransmissionTypes.map((c: any) => ({
-        value: c.id,
-        label: c.name,
-      }))
-    );
+      fetchVehicle();
+    }, 1000);
   }, []);
+  const diffDateTimeForColor = (date?: string) => {
+    if (!date) return "green";
+    const daysDiff = differenceInDays(date, new Date());
 
-  const fetchProject = async () => {
+    if (daysDiff > 7) return "green";
+
+    if (new Date() >= new Date(date)) return "red";
+
+    return "yellow";
+  };
+
+  const handleSaveSuccess = () => {
+    setTimeout(() => {
+      fetchVehicle();
+    }, 1500);
+  };
+
+  const handleEdit = (item: VehicleData) => {
+    vehicleEdit.current?.openDialog({
+      ...omit(['userFullName', 'userPhone', 'createDate', 'updateDate', 'actions'], item),
+      mileage: item.mileage?.toString() || '',
+      year: item.year?.toString() || '',
+    }, vehicleData.map(i => ({ id: i.id, plate: i.plate })));
+  }
+  const handleDelete = async (id: number) => {
+    open();
+
+    try {
+
+      const result = await service.deleteVehicle(id);
+      if (result == true) {
+
+      toast.success('İşlem başarılı!');
+      
+      fetchVehicle();
+      
+      close();
+
+      return;
+    }
+    else if (result?.data == false && result?.errors?.length > 0) {
+
+      toast.warning(result.errors[0]);
+
+    } else {
+      toast.error('Bir hata oluştu!');
+    }
+      close();
+    } catch (error: any) {
+      toast.error(`silme işleminde bir hata: ${error.message}`);
+      close();
+    }
+  }
+  const fetchVehicle = async () => {
     open();
     try {
       const getVehicles = await service.getVehicles();
@@ -148,29 +181,6 @@ export default function Vehicle() {
       close();
     }
   };
-  const diffDateTimeForColor = (date?: string) => {
-    if (!date) return "green";
-    const daysDiff = differenceInDays(date, new Date());
-
-    if (daysDiff > 7) return "green";
-
-    if (new Date() >= new Date(date)) return "red";
-
-    return "yellow";
-  };
-
-  const handleSaveSuccess = () => {
-    setTimeout(() => {
-      fetchProject();
-    }, 1500);
-  };
-
-  const handleEdit = (item: VehicleData) => {
-   console.log("handleEdit: item:", item);
-  }
-  const handleDelete = async (id: number) => {
-    console.log("handleDelete: id:", id);
-  }
    // useMemo hook'u ile sütunları önbelleğe alıyoruz
   const pdfTableColumns = useMemo((): PdfTableColumn[] => {
 
@@ -201,8 +211,9 @@ export default function Vehicle() {
   const raportVehicleData = useMemo(() => {
     return filteredVehicles.map((vehicle: VehicleData) => ({
       ...vehicle,
-      fuelType: fuelTypes.find((i)=> i.value == vehicle.fuelType)?.label,
-      transmission: transmissionTypes.find((i)=> i.value == vehicle.transmission)?.label,
+      fuelLevel: mockDataFuelLevel.find((i)=> i.id == vehicle.fuelLevel)?.name,
+      fuelType: mockDataFuelTypes.find((i)=> i.id == vehicle.fuelType)?.name,
+      transmission: mockDataTransmissionTypes.find((i)=> i.id == vehicle.transmission)?.name,
       inspectionDate: formatDate(vehicle.inspectionDate, dateFormatStrings.dateTimeFormatWithoutSecond),
       insuranceDate: formatDate(vehicle.insuranceDate, dateFormatStrings.dateTimeFormatWithoutSecond),
     }))
@@ -216,16 +227,17 @@ export default function Vehicle() {
       <Table.Td>{vehicle.model}</Table.Td>
       <Table.Td>{vehicle.year}</Table.Td>
       <Table.Td>{vehicle.mileage}</Table.Td>
-      <Table.Td>{fuelTypes.find((i)=> i.value == vehicle.fuelType)?.label}</Table.Td>
-      <Table.Td>{transmissionTypes.find((i)=> i.value == vehicle.transmission)?.label}</Table.Td>
+      <Table.Td>{mockDataFuelLevel.find((i)=> i.id == vehicle.fuelLevel)?.name}</Table.Td>
+      <Table.Td>{mockDataFuelTypes.find((i)=> i.id == vehicle.fuelType)?.name}</Table.Td>
+      <Table.Td>{mockDataTransmissionTypes.find((i)=> i.id == vehicle.transmission)?.name}</Table.Td>
       <Table.Td>{vehicle.color}</Table.Td>
       <Table.Td>{vehicle.engineNumber}</Table.Td>
       <Table.Td>{vehicle.note}</Table.Td>
       <Table.Td>{`${vehicle.userFullName}(${vehicle.userPhone})`}</Table.Td>
-      <Table.Td style={{ color: diffDateTimeForColor(vehicle.createDate) }}>
+      <Table.Td>
           {formatDate(vehicle.createDate, dateFormatStrings.dateTimeFormatWithoutSecond)}
       </Table.Td>
-      <Table.Td style={{ color: diffDateTimeForColor(vehicle.updateDate) }}>
+      <Table.Td>
         {formatDate(vehicle.updateDate, dateFormatStrings.dateTimeFormatWithoutSecond)}
       </Table.Td>
       <Table.Td style={{ color: diffDateTimeForColor(vehicle.inspectionDate) }}>
@@ -239,6 +251,7 @@ export default function Vehicle() {
           <ActionIcon 
             variant="light" 
             color="blue"
+            disabled={vehicle.isDeposit}
             onClick={() => handleEdit(vehicle)}
           >
             <IconEdit size={16} />
@@ -246,6 +259,7 @@ export default function Vehicle() {
           <ActionIcon 
             variant="light" 
             color="red"
+            disabled={vehicle.isDeposit}
             onClick={() => handleDelete(vehicle.id)}
           >
             <IconTrash size={16} />
@@ -257,11 +271,11 @@ export default function Vehicle() {
 
   const calculateTotal = () => {
     if (!vehicleData) return 0;
-    return vehicleData.reduce((total, item) => total + item.mileage, 0);
+    return vehicleData.reduce((total, item) => total + (item.mileage || 1), 0);
   };
 
   const handleAddItem = () => {
-   console.log("proje ekle");
+   vehicleAdd.current?.openDialog(vehicleData.map(i => ({ id: i.id, plate: i.plate })));
   }
 
   return (
@@ -284,7 +298,7 @@ export default function Vehicle() {
                 </Text>
               }
               sections={(vehicleData || []).map(vehicle => ({
-                value: (vehicle.mileage / Math.max(calculateTotal(), 1)) * 100,
+                value: ((vehicle.mileage || 1) / Math.max(calculateTotal(), 1)) * 100,
                 color: randaomColor(),
                 tooltip: `${vehicle.plate}: ${vehicle.mileage} km`,
               }))}
@@ -322,7 +336,7 @@ export default function Vehicle() {
                   <Select
                     label="Yakıt Tipi"
                     placeholder="yakıt Seçiniz"
-                    data={fuelTypes}
+                    data={mockDataFuelTypes.map(item => ({ value: item.id, label: item.name }))}
                     searchable
                     clearable
                     maxDropdownHeight={200}
@@ -334,7 +348,7 @@ export default function Vehicle() {
                   <Select
                     label="Vites Tipi"
                     placeholder="vites Seçiniz"
-                    data={transmissionTypes}
+                    data={mockDataTransmissionTypes.map(item => ({ value: item.id, label: item.name }))}
                     searchable
                     clearable
                     maxDropdownHeight={200}
@@ -342,7 +356,19 @@ export default function Vehicle() {
                     onChange={(value) => setTransmissionType(value)}
                   />
                 </Grid.Col>
-                 <Grid.Col span={4}>
+                <Grid.Col span={2}>
+                  <Select
+                    label="Yakıt Durumu"
+                    placeholder="yakıt durumu Seçiniz"
+                    data={mockDataFuelLevel.map(item => ({ value: item.id, label: item.name }))}
+                    searchable
+                    clearable
+                    maxDropdownHeight={200}
+                    nothingFoundMessage="yakıt durumu bulunamadı..."
+                    onChange={(value) => setFuelLevel(value)}
+                  />
+                </Grid.Col>
+                 <Grid.Col span={2}>
                   <Flex
                   mih={50}
                   gap="md"
@@ -369,7 +395,7 @@ export default function Vehicle() {
         {/* Stok Formu */}
         <Paper shadow="xs" p="lg" withBorder>
           <Stack gap="md">
-            <Title order={4}>Son Araçlar({rowItems?.length || 0})</Title>
+            <Title order={4}>Araçlar({rowItems?.length || 0})</Title>
             <Table.ScrollContainer minWidth={400} maxHeight={700}>
               <Table striped highlightOnHover withColumnBorders>
                 <Table.Thead>
@@ -380,7 +406,8 @@ export default function Vehicle() {
                     <Table.Th>Model</Table.Th>
                     <Table.Th>Yıl</Table.Th>
                     <Table.Th>Kilometre</Table.Th>
-                    <Table.Th>Yakıt</Table.Th>
+                    <Table.Th>Yakıt Durumu</Table.Th>
+                    <Table.Th>Yakıt Tipi</Table.Th>
                     <Table.Th>Vites</Table.Th>
                     <Table.Th>Renk</Table.Th>
                     <Table.Th>Motor Numarası</Table.Th>
@@ -399,7 +426,8 @@ export default function Vehicle() {
           </Stack>
         </Paper>
       </Stack>
-        {/* <ItemAdd ref={itemAddRef} onSaveSuccess={handleSaveSuccess} /> */}
+      <VehicleAdd ref={vehicleAdd} onSaveSuccess={handleSaveSuccess} />
+      <VehicleEdit ref={vehicleEdit} onSaveSuccess={handleSaveSuccess} />
     </Container>
   );
 }

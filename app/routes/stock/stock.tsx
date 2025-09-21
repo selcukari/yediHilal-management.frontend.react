@@ -74,11 +74,11 @@ export default function Stock() {
   const fetchStock = async () => {
     open();
     try {
-      const getStock = await service.getStock();
+      const getStocks = await service.getStocks();
       
-      if (getStock) {
+      if (getStocks) {
         
-        setStockData(getStock);
+        setStockData(getStocks);
       } else {
         toast.info('Hiçbir veri yok!');
         setStockData([]);
@@ -135,7 +135,6 @@ export default function Stock() {
       toast.error(`silme işleminde bir hata: ${error.message}`);
       close();
     }
-    
   }
   const handleEdit = (value: StockData) => {
 
