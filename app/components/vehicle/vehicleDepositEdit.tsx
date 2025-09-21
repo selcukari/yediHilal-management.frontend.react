@@ -99,7 +99,6 @@ const VehicleDepositEdit = forwardRef<VehicleDepositEditDialogControllerRef, Veh
       mileageStart: (values.mileageStart ? parseInt(values.mileageStart): 0),
       mileageEnd: (values.mileageEnd ? parseInt(values.mileageEnd): 0),
     }
-    console.log("handleSubmit: newVehicleDepositValue:", newVehicleDepositValue);
 
     const result = await serviceVehicle.editVehicleDeposit(newVehicleDepositValue);
 
