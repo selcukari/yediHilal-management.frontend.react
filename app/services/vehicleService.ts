@@ -23,6 +23,19 @@ type VehicleParams = {
   fuelLevel: string | null;
   note?: string | null;
 };
+type VehicleDepositParams = {
+  vehicleId: number;
+  givenToId: number;
+  givenById: number;
+  // kilometresi
+  mileageStart?: number;
+  mileageEnd?: number;
+  fuelLevelStart: string;
+  fuelLevelEnd: string | null;
+  // teslim tarihi
+  returnDate?: string | null;
+  note?: string | null;
+};
 
 export function useVehicleService(controller: string) {
   const { getCurrentToken, logout } = useAuth();
@@ -80,6 +93,40 @@ export function useVehicleService(controller: string) {
       return error;
     }
   };
+  const addVehicleDeposit = async (params: VehicleDepositParams) => {
 
-  return { getVehicles, editVehicle, deleteVehicle, getVehicleDeposits, addVehicle };
+    try {
+      const res = await api.post(`/${controller}/addVehicleDeposit`, params);
+
+      return res.data.data;
+    } catch (error: any) {
+
+      return error;
+    }
+  };
+  const editVehicleDeposit = async (params: VehicleDepositParams) => {
+
+    try {
+      const res = await api.put(`/${controller}/updateVehicleDeposit`, params);
+
+      return res.data.data;
+    } catch (error: any) {
+
+      return error;
+    }
+  };
+  const deleteVehicleDeposit = async (vehicleDepositId: number) => {
+
+    try {
+      const res = await api.put(`/${controller}/deleteVehicleDeposit?id=${vehicleDepositId}`, null);
+
+      return res.data.data;
+    } catch (error: any) {
+      return error;
+    }
+  };
+
+  return { getVehicles, editVehicle, deleteVehicle, getVehicleDeposits, addVehicle, addVehicleDeposit,
+    deleteVehicleDeposit, editVehicleDeposit
+   };
 }

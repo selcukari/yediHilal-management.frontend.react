@@ -24,7 +24,7 @@ interface Column {
   field: keyof VehicleData;
   header: string;
 }
-interface VehicleData {
+export interface VehicleData {
   id: number;
   userId: number;
   userFullName: string;
@@ -65,6 +65,7 @@ export default function Vehicle() {
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
     { field: 'id', header: 'Id' },
     { field: 'plate', header: 'Plaka' },
+    { field: 'isDeposit', header: 'Emanet Durumu' },
     { field: 'brand', header: 'Marka' },
     { field: 'model', header: 'Model' },
     { field: 'year', header: 'Yıl' },
@@ -211,6 +212,7 @@ export default function Vehicle() {
   const raportVehicleData = useMemo(() => {
     return filteredVehicles.map((vehicle: VehicleData) => ({
       ...vehicle,
+      isDeposit: vehicle.isDeposit ? "Evet" : "Hayır",
       fuelLevel: mockDataFuelLevel.find((i)=> i.id == vehicle.fuelLevel)?.name,
       fuelType: mockDataFuelTypes.find((i)=> i.id == vehicle.fuelType)?.name,
       transmission: mockDataTransmissionTypes.find((i)=> i.id == vehicle.transmission)?.name,
@@ -223,6 +225,7 @@ export default function Vehicle() {
     <Table.Tr key={vehicle.id}>
       <Table.Td>{vehicle.id}</Table.Td>
       <Table.Td>{vehicle.plate}</Table.Td>
+      <Table.Td style={{ color: vehicle.isDeposit ? "green" : "red"}}>{vehicle.isDeposit ? "Evet" : "Hayır"}</Table.Td>
       <Table.Td>{vehicle.brand}</Table.Td>
       <Table.Td>{vehicle.model}</Table.Td>
       <Table.Td>{vehicle.year}</Table.Td>
@@ -402,6 +405,7 @@ export default function Vehicle() {
                   <Table.Tr>
                     <Table.Th>Id</Table.Th>
                     <Table.Th>Plaka</Table.Th>
+                    <Table.Th>Emanet Durumu</Table.Th>
                     <Table.Th>Marka</Table.Th>
                     <Table.Th>Model</Table.Th>
                     <Table.Th>Yıl</Table.Th>

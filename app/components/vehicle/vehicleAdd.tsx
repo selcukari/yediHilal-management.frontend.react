@@ -108,7 +108,7 @@ const VehicleAdd = forwardRef<VehicleAddDialogControllerRef, VehicleAddProps>(({
 
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
-    const newStockValue = {
+    const newVehicleValue = {
       ...values,
       plate: values.plate.toUpperCase(),
       userId: currentUser?.id as number,
@@ -116,7 +116,7 @@ const VehicleAdd = forwardRef<VehicleAddDialogControllerRef, VehicleAddProps>(({
       year: values.year ? parseInt(values.year) : null
     }
 
-    const result = await service.addVehicle(newStockValue);
+    const result = await service.addVehicle(newVehicleValue);
 
     if (result === true) {
 
@@ -163,7 +163,7 @@ const VehicleAdd = forwardRef<VehicleAddDialogControllerRef, VehicleAddProps>(({
       form.reset();
     }
   }
- const openDialog = (values: GetVehicleData[]) => {
+  const openDialog = (values: GetVehicleData[]) => {
 
     if (values?.length > 0) {
       form.reset();

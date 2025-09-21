@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { differenceInDays } from 'date-fns';
+import { omit } from 'ramda';
 import {
   Container, Grid, TextInput, Text, Stack, Title, ActionIcon, Flex, Table, Group,
   Paper, Button, LoadingOverlay,
@@ -7,7 +8,8 @@ import {
 import { IconSearch, IconPlus, IconEdit, IconTrash } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { toast } from '../../utils/toastMessages';
-// import ItemAdd, { type ItemAddDialogControllerRef } from '../components/stock/stockAdd';
+import VehicleDepositAdd, { type VehicleDepositAddDialogControllerRef } from '../../components/vehicle/vehicleDepositAdd';
+import VehicleDepositEdit, { type VehicleDepositEditDialogControllerRef } from '../../components/vehicle/vehicleDepositEdit';
 import { formatDate } from '../../utils/formatDate';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import { useVehicleService } from '../../services/vehicleService';
@@ -48,7 +50,8 @@ export default function VehicleDeposit() {
 
   const service = useVehicleService(import.meta.env.VITE_APP_API_VEHICLE_CONTROLLER);
 
-  // const itemAddRef = useRef<ItemAddDialogControllerRef>(null);
+  const vehicleDepositAdd = useRef<VehicleDepositAddDialogControllerRef>(null);
+  const vehicleDepositEdit = useRef<VehicleDepositEditDialogControllerRef>(null);
 
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
     { field: 'id', header: 'Id' },
@@ -101,13 +104,23 @@ export default function VehicleDeposit() {
 
   const handleEdit = (item: VehicleData) => {
    console.log("handleEdit: item:", item);
+    vehicleDepositEdit.current?.openDialog({
+      ...omit(['createDate', 'isActive', 'givenByFullName', 'givenToFullName', 'givenToPhone', 'givenByPhone'], item),
+      note: item.note ? item.note : "",
+      givenById: item.givenById ? item.givenById.toString() : "",
+      vehicleId: item.vehicleId ? item.vehicleId.toString() : null,
+      mileageStart: item.mileageStart ? item.mileageStart?.toString() : null,
+      mileageEnd: item.mileageEnd ? item.mileageEnd?.toString() : null,
+      fuelLevelStart: item.fuelLevelStart ? item.fuelLevelStart?.toString() : "1/2",
+      fuelLevelEnd: item.fuelLevelEnd ? item.fuelLevelEnd?.toString() : null,
+    });
   }
   const handleDelete = async (id: number) => {
     open();
 
     try {
 
-      const result = await service.deleteVehicle(id);
+      const result = await service.deleteVehicleDeposit(id);
       if (result == true) {
 
       toast.success('İşlem başarılı!');
@@ -205,15 +218,15 @@ export default function VehicleDeposit() {
       <Table.Td>
         <Group gap="xs">
           <ActionIcon 
-            variant="light" 
-            color="blue"
+            variant="light" color="blue"
+            disabled={vehicleDeposit.returnDate ? true : false}
             onClick={() => handleEdit(vehicleDeposit)}
           >
             <IconEdit size={16} />
           </ActionIcon>
           <ActionIcon 
-            variant="light" 
-            color="red"
+            variant="light" color="red"
+            disabled={vehicleDeposit.returnDate ? true : false}
             onClick={() => handleDelete(vehicleDeposit.id)}
           >
             <IconTrash size={16} />
@@ -226,6 +239,7 @@ export default function VehicleDeposit() {
 
   const handleAddItem = () => {
    console.log("proje ekle");
+    vehicleDepositAdd.current?.openDialog();
   }
 
   return (
@@ -312,7 +326,8 @@ export default function VehicleDeposit() {
           </Stack>
         </Paper>
       </Stack>
-        {/* <ItemAdd ref={itemAddRef} onSaveSuccess={handleSaveSuccess} /> */}
+        <VehicleDepositAdd ref={vehicleDepositAdd} onSaveSuccess={handleSaveSuccess} />
+        <VehicleDepositEdit ref={vehicleDepositEdit} onSaveSuccess={handleSaveSuccess} />
     </Container>
   );
 }

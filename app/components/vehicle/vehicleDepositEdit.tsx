@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
+import { clone } from 'ramda';
 import { Modal, TextInput, Button, Stack, Grid, Textarea, Select } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DateTimePicker } from '@mantine/dates';
@@ -13,7 +14,7 @@ import { useAuth } from '~/authContext';
 import type { VehicleData } from '../../routes/vehicle/vehicle';
 import { mockDataFuelLevel } from '../../utils/vehicleMockData';
 
-interface VehicleDepositAddProps {
+interface VehicleDepositEditProps {
   onSaveSuccess?: () => void; // Yeni prop
 }
 
@@ -29,6 +30,7 @@ type GetUserData = {
 }
 
 type FormValues = {
+  id: number;
   // kilometresi
   mileageStart: string | null;
   mileageEnd: string | null;
@@ -41,12 +43,12 @@ type FormValues = {
   givenById: string | null;
   note: string | null;
 };
-export type VehicleDepositAddDialogControllerRef = {
-  openDialog: () => void;
+export type VehicleDepositEditDialogControllerRef = {
+  openDialog: (value: FormValues) => void;
   close: () => void;
 };
 
-const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, VehicleDepositAddProps>(({onSaveSuccess}, ref) => {
+const VehicleDepositEdit = forwardRef<VehicleDepositEditDialogControllerRef, VehicleDepositEditProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
   const [vehicleData, setVehicleData] = useState<GetVehicleData[]>([]);
@@ -60,6 +62,7 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
 
   const form = useForm<FormValues>({
     initialValues: {
+      id: 0,
       mileageStart: '100',
       mileageEnd: '',
       fuelLevelStart: '',
@@ -86,13 +89,6 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
     setIsDisabledSubmit(true);
   }, [form.values]);
 
-  useEffect(() => {
-    if (form.values.vehicleId) {
-      form.setFieldValue('mileageStart', vehicleData.find(v => v.id === form.values.vehicleId)?.mileage.toString() || '100');
-      form.setFieldValue('fuelLevelStart', vehicleData.find(v => v.id === form.values.vehicleId)?.fuelLevel || '1/2');
-    }
-  }, [form.values.vehicleId]);
-
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
     const newVehicleDepositValue = {
@@ -100,11 +96,12 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
       givenToId: currentUser?.id as number,
       vehicleId: values.vehicleId ? parseInt(values.vehicleId) : 0,
       givenById: values.givenById ? parseInt(values.givenById) : 0,
-      mileageStart: (values.mileageStart ? parseInt(values.mileageStart): undefined),
-      mileageEnd: (values.mileageEnd ? parseInt(values.mileageEnd): undefined),
+      mileageStart: (values.mileageStart ? parseInt(values.mileageStart): 0),
+      mileageEnd: (values.mileageEnd ? parseInt(values.mileageEnd): 0),
     }
+    console.log("handleSubmit: newVehicleDepositValue:", newVehicleDepositValue);
 
-    const result = await serviceVehicle.addVehicleDeposit(newVehicleDepositValue);
+    const result = await serviceVehicle.editVehicleDeposit(newVehicleDepositValue);
 
     if (result === true) {
 
@@ -152,13 +149,24 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
     }
   }
 
-  const openDialog = () => {
+  const openDialog = (value: FormValues) => {
+    if (value) {
 
-    setTimeout(() => {
-      fetchVehicle();
-    }, 500);
-    open();
+      form.reset();
 
+      setTimeout(() => {
+        fetchVehicle();
+      }, 500);
+
+      console.log("openDialog value:", value);
+
+      // Önce initial values'ı set et
+      form.setValues(value);
+      form.setInitialValues(clone(value));
+      // Sonra form values'larını set et
+
+      open();
+    }
   };
 
   useImperativeHandle(ref, () => ({
@@ -166,7 +174,6 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
     close,
   }));
   const fetchVehicle = async () => {
-    // open();
     try {
       const params = {
         countryId: "1",
@@ -177,7 +184,7 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
       const getUsers = await serviceUser.users(params);
       
       if (getVehicles && getUsers) {
-        setVehicleData(getVehicles.filter(v => !v.isDeposit)?.map(i => ({ id: i.id.toString(), plate: i.plate, mileage: i.mileage || 0, fuelLevel: i.fuelLevel || '1/2' })));
+        setVehicleData(getVehicles.map(i => ({ id: i.id.toString(), plate: i.plate, mileage: i.mileage || 0, fuelLevel: i.fuelLevel || '1/2' })));
         setUserData(getUsers.map((i: any) => ({ id: i.id.toString(), fullName: i.fullName })));
       } else {
         toast.info('Hiçbir veri yok!');
@@ -187,7 +194,6 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
     } catch (error: any) {
       toast.error(`Vehicles yüklenirken hata: ${error.message}`);
     } finally {
-      // close();
     }
   };
 
@@ -213,9 +219,8 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
                 label="Araç"
                 placeholder="araç Seçiniz"
                 data={vehicleData.map(item => ({ value: item.id, label: item.plate }))}
-                searchable clearable required maxDropdownHeight={200}
-                nothingFoundMessage="araç bulunamadı..."
-                onChange={(value) => form.setFieldValue('vehicleId', value)}
+                searchable clearable required maxDropdownHeight={200} disabled nothingFoundMessage="araç bulunamadı..."
+                value={form.values.vehicleId}
               />
             </Grid.Col>
             <Grid.Col span={4}>
@@ -223,8 +228,8 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
                 label="Teslim Alan Kişi"
                 placeholder="teslim alan Seçiniz"
                 data={userData.map(item => ({ value: item.id, label: item.fullName }))}
-                searchable clearable required maxDropdownHeight={200}
-                nothingFoundMessage="teslim alan bulunamadı..."
+                searchable clearable required maxDropdownHeight={200} nothingFoundMessage="teslim alan bulunamadı..."
+                value={form.values.givenById}
                 onChange={(value) => form.setFieldValue('givenById', value)}
               />
             </Grid.Col>
@@ -232,7 +237,7 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
             <TextInput
               label="Başlangıç kilometresi" placeholder="başlangıç kilometre giriniz"
               type='number' min={100} required disabled
-              {...form.getInputProps('mileageStart')}
+              value={form.values.mileageStart || undefined}
             />
           </Grid.Col>
           <Grid.Col span={2}>
@@ -240,6 +245,7 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
               label="Bitiş kilometresi" placeholder="bitiş kilometre giriniz"
               required={form.values.returnDate ? true : false}
               type='number' min={120} disabled={form.values.returnDate ? false : true}
+              value={form.values.mileageEnd || undefined}
               {...form.getInputProps('mileageEnd')}
             />
           </Grid.Col>
@@ -262,25 +268,21 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
               searchable clearable maxDropdownHeight={200}
               required={form.values.returnDate ? true : false}
               nothingFoundMessage="b. yakıt durumu bulunamadı..."
+              value={form.values.fuelLevelEnd}
               onChange={(value) => form.setFieldValue('fuelLevelEnd', value || '1/3')}
             />
           </Grid.Col>
           <Grid.Col span={4}>
             <DateTimePicker
-              dropdownType="modal"
-              label="Teslim Tarihi"
-              placeholder="teslim tarihi"
-              clearable
-              minDate={new Date()}
+              dropdownType="modal" label="Teslim Tarihi" placeholder="teslim tarihi" clearable
+              minDate={new Date()} value={form.values.returnDate}
               onChange={(value) => form.setFieldValue('returnDate', value)}
             />
            </Grid.Col>
           <Grid.Col span={6}>
             <Textarea
-              mt="md"
-              label="Note"
-              placeholder="messaj..."
-              withAsterisk
+              mt="md" label="Note" placeholder="messaj..." withAsterisk
+              value={form.values.note}
               {...form.getInputProps('note')}
             />
           </Grid.Col>
@@ -305,4 +307,4 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
   </>);
 });
 
-export default VehicleDepositAdd;
+export default VehicleDepositEdit;
