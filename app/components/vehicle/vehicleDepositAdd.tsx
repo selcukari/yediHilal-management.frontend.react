@@ -166,7 +166,6 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
     close,
   }));
   const fetchVehicle = async () => {
-    // open();
     try {
       const params = {
         countryId: "1",
