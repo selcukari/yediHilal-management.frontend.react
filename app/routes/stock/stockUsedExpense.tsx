@@ -212,7 +212,7 @@ export default function StockUsedExpense() {
 
     const type = "expense";
      try {
-      const getStock: StockData[] = await service.getStock();
+      const getStock: StockData[] = await service.getStocks();
 
       const getStockUsedExpenses = await service.getStockUsed(type);
       if (getStockUsedExpenses && getStock.length > 0) {

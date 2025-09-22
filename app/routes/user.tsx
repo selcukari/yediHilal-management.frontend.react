@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { IconSearch, IconFilter, IconEdit, IconTrash } from '@tabler/icons-react';
+import { IconSearch, IconFilter, IconEdit, IconTrash, IconPlus } from '@tabler/icons-react';
 import {
   Container, Grid, TextInput, Switch, Stack, Group, Title, Text, Button, Paper, Table,
   ActionIcon, LoadingOverlay, Flex,
@@ -310,7 +310,7 @@ export default function User() {
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
-            <Button variant="filled" onClick={() => userAddRef.current?.openDialog()}>Yeni Ekle</Button>
+            <Button variant="filled" leftSection={<IconPlus size={14} />} onClick={() => userAddRef.current?.openDialog()}>Yeni Ekle</Button>
           </Group>
 
           {/* İçerik Kartları */}

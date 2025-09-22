@@ -179,10 +179,10 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
           const valueItem = value.items.find((vi: StockItem) => vi.key === stockItem.key);
           
           if (valueItem) {
-              return {
-                  ...stockItem,
-                  count: ((stockItem.count ?? 0) + (valueItem.count ?? 0)) || 1,
-              };
+            return {
+              ...stockItem,
+              count: ((stockItem.count ?? 0) + (valueItem.count ?? 0)) || 1,
+            };
           }
           return stockItem;
         });

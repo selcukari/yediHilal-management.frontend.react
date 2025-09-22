@@ -9,6 +9,7 @@ interface ProvinceSelectProps {
   placeholder?: string;
   required?: boolean;
   countryId?: string;
+  disabled?: boolean;
 }
 
 export function ProvinceSelect({ 
@@ -17,6 +18,7 @@ export function ProvinceSelect({
   placeholder = "İl Seçiniz", 
   required = false,
   countryId,
+  disabled = false
 }: ProvinceSelectProps) {
 
   const [provinces, setProvinces] = useState<{ value: string; label: string }[]>([]);
@@ -56,6 +58,7 @@ export function ProvinceSelect({
       maxDropdownHeight={200}
       nothingFoundMessage="İl bulunamadı"
       required={required}
+      disabled={disabled}
       {...form.getInputProps('provinceId')}
     />
   );

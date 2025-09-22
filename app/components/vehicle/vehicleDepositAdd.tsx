@@ -60,15 +60,15 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
 
   const form = useForm<FormValues>({
     initialValues: {
-      mileageStart: '100',
-      mileageEnd: '',
-      fuelLevelStart: '',
-      fuelLevelEnd: '',
-      returnDate: '',
-      vehicleId: "",
-      givenToId: 0,
-      givenById: "",
-      note: '',
+    mileageStart: '100',
+    mileageEnd: '',
+    fuelLevelStart: '',
+    fuelLevelEnd: '',
+    returnDate: '',
+    vehicleId: "",
+    givenToId: 0,
+    givenById: "",
+    note: '',
     },
     validate: {
       vehicleId: (value) => value ? null: "Araç alanı zorunlu",

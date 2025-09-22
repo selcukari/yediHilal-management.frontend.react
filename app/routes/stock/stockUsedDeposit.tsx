@@ -100,13 +100,13 @@ export default function StockUsedDeposit() {
     }, 1000);
   };
 
-    const renderBoolean = (value: boolean) => {
-      return (
-        <Badge color={!value ? 'green' : 'red'}>
-          {!value ? 'Aktif' : 'Tamamlandı'}
-        </Badge>
-      );
-    };
+  const renderBoolean = (value: boolean) => {
+    return (
+      <Badge color={!value ? 'green' : 'red'}>
+        {!value ? 'Aktif' : 'Tamamlandı'}
+      </Badge>
+    );
+  };
 
     const handleDelete = async (id: number) => {
 
@@ -213,7 +213,7 @@ export default function StockUsedDeposit() {
     const type = "deposit";
   
      try {
-      const getStock: StockData[] = await service.getStock();
+      const getStock: StockData[] = await service.getStocks();
 
       const getStockUsedExpenses = await service.getStockUsed(type);
       if (getStockUsedExpenses && getStock.length > 0) {

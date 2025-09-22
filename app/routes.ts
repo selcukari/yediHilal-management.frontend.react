@@ -5,6 +5,6 @@ export default [
   route("sms", "routes/sms.tsx"), route("stocks", "routes/stock/stock.tsx"), route("stockExpenses", "routes/stock/stockUsedExpense.tsx"),
   route("stockDeposits", "routes/stock/stockUsedDeposit.tsx"), route("projects", "routes/project.tsx"), route("finances", "routes/finance.tsx"),
   route("meetings", "routes/meeting.tsx"), route("vehicles", "routes/vehicle/vehicle.tsx"), route("vehicleDeposits", "routes/vehicle/vehicleDeposits.tsx"), route("automaticSmsManagement", "routes/automaticSmsManagement.tsx"), route("automaticMailManagement", "routes/automaticMailManagement.tsx"),
-  route("safe", "routes/safe.tsx"), route("settings-duty", "routes/settings/duty.tsx")
+  route("safe", "routes/safe.tsx"), route("branches", "routes/branch.tsx"), route("settings-duty", "routes/settings/duty.tsx")
 ] satisfies RouteConfig;
 

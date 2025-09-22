@@ -1,56 +1,84 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { IconSearch, IconEdit, IconTrash } from '@tabler/icons-react';
+import { IconSearch, IconEdit, IconTrash, IconPlus } from '@tabler/icons-react';
 import {
-  Container, Grid, TextInput, ActionIcon, Stack, Group, Title, Text, Paper, Table, LoadingOverlay, Button,
+  Container, Grid, TextInput, Badge, ActionIcon, Stack, Group, Title, Text, Paper, Table, LoadingOverlay, Button,
 } from '@mantine/core';
+import { omit } from 'ramda';
 import { useDisclosure } from '@mantine/hooks';
-import DutyAdd, { type DutyAddDialogControllerRef } from '../../components/duty/dutyAdd';
-import DutyEdit, { type DutyEditDialogControllerRef } from '../../components/duty/dutyEdit';
-import { useDutyService } from '../../services/dutyService';
-import { toast } from '../../utils/toastMessages';
+import BranchAdd, { type BranchAddDialogControllerRef } from '../components/branch/branchAdd';
+import BranchEdit, { type BranchEditDialogControllerRef } from '../components/branch/branchEdit';
+import { useBranchService } from '../services/branchService';
+import { toast } from '../utils/toastMessages';
+import { formatDate } from '../utils/formatDate';
+import { dateFormatStrings } from '../utils/dateFormatStrings';
 
 interface Column {
-  field: keyof DutyType;
+  field: keyof BranchType;
   header: string;
 }
 
-interface DutyType {
+interface BranchType {
   id: number;
-  name: string;
+  branchName: string;
+  provinceId: number;
+  provinceName: string;
+  branchHeadId: number;
+  branchHeadFullName?: string | null;
+  branchHeadPhone?: string | null;
+  address?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  socialMedias?: string | null;
+  openingDate?: string | null;
+  updateDate?: string | null;
+  createDate?: string | null;
+  rentalPrice?: number;
+  isRent: boolean;
   isActive: boolean;
   actions?: any
 }
 
 export default function Duty() {
-  const [resultData, setResultData] = useState<DutyType[]>([]);
+  const [resultData, setResultData] = useState<BranchType[]>([]);
   const [searchText, setSearchText] = useState('');
   const [visible, { open, close }] = useDisclosure(false);
   
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
     { field: 'id', header: 'Id' },
-    { field: 'name', header: 'Mesaj' },
+    { field: 'branchName', header: 'Şube Adı' },
+    { field: 'branchHeadFullName', header: 'Başkan Adı/Telefon' },
+    { field: 'provinceName', header: 'İl' },
+    { field: 'phone', header: 'Telefon' },
+    { field: 'email', header: 'Mail' },
+    { field: 'openingDate', header: 'Acılış Tarih' },
+    { field: 'isRent', header: 'Kiralık Mı' },
+    { field: 'rentalPrice', header: 'Kira Miktarı' },
     { field: 'actions', header: 'İşlemler' },
   ]);
-  const dutyAddRef = useRef<DutyAddDialogControllerRef>(null);
-  const dutyEditRef = useRef<DutyEditDialogControllerRef>(null);
+  const branchAddRef = useRef<BranchAddDialogControllerRef>(null);
+  const branchEditRef = useRef<BranchEditDialogControllerRef>(null);
 
-  const service = useDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+  const service = useBranchService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
   // Filtrelenmiş veriler
   const filteredUsers = useMemo(() => {
     if (!searchText) return resultData;
     
-    return resultData.filter(duty => duty.name.toLowerCase().includes(searchText.trim().toLowerCase()));
+    return resultData.filter(branch => branch.branchName.toLowerCase().includes(searchText.trim().toLowerCase()));
   }, [resultData, searchText]);
 
   useEffect(() => {
     setTimeout(() => {
-      fetchDuty();
+      fetchBranch();
     }, 1000);
   }, []);
 
-  const handleEdit = (item: DutyType) => {
-    dutyEditRef.current?.openDialog(item);
+  const handleEdit = (item: BranchType) => {
+    branchEditRef.current?.openDialog({
+      ...omit(['actions', 'createDate', 'branchHeadPhone', 'updateDate', 'provinceName', 'branchHeadFullName'], item),
+      branchHeadId: item.branchHeadId ? item.branchHeadId.toString() : null,
+      provinceId: item.provinceId?.toString(),
+    });
   };
 
   const handleDelete = async (id: number) => {
@@ -58,12 +86,12 @@ export default function Duty() {
 
      try {
 
-      const result = await service.deleteDuty(id);
+      const result = await service.deleteBranch(id);
       if (result == true) {
 
       toast.success('İşlem başarılı!');
       
-      fetchDuty();
+      fetchBranch();
       
       close();
 
@@ -82,10 +110,38 @@ export default function Duty() {
       close();
     }
   };
+  const renderBoolean = (value: boolean) => {
+    return (
+      <Badge color={value ? 'green' : 'red'}>
+        {value ? 'Evet' : 'Hayır'}
+      </Badge>
+    );
+  };
 
   const rowsTable = filteredUsers.map((item) => (
     <Table.Tr key={item.id}>
       {rowHeaders.map((header) => {
+        if (header.field === 'isRent') {
+          return (
+            <Table.Td key={header.field}>
+              {renderBoolean(item[header.field])}
+            </Table.Td>
+          );
+        }
+        if (header.field === 'branchHeadFullName') {
+          return (
+            <Table.Td key={header.field}>
+              {`${item[header.field]}(${item.branchHeadPhone || '-'})`}
+            </Table.Td>
+          );
+        }
+        if (header.field === 'rentalPrice') {
+          return (
+            <Table.Td key={header.field}>
+              {`${item[header.field] ?? "-"} ₺`}
+            </Table.Td>
+          );
+        }
         if (header.field === 'actions') {
           return (
             <Table.Td key={header.field}>
@@ -117,17 +173,17 @@ export default function Duty() {
     </Table.Tr>
   ));
 
-  const fetchDuty = async () => {
+  const fetchBranch = async () => {
      open();
 
      try {
 
-      const getDuties = await service.getDuties();
-      if (getDuties) {
-        setResultData(getDuties.map((duty: DutyType) => ({
-          id: duty.id,
-          name: duty.name,
-          isActive: duty.isActive
+      const getBranches = await service.getBranches();
+      if (getBranches) {
+        setResultData(getBranches.map((branch: BranchType) => ({
+          ...branch,
+          openingDate: branch.openingDate ? formatDate(branch.openingDate, dateFormatStrings.defaultDateFormat) : null,
+          createDate: branch.createDate ? formatDate(branch.createDate, dateFormatStrings.dateTimeFormatWithoutSecond) : null,
         })));
        
       } else {
@@ -146,8 +202,8 @@ export default function Duty() {
   const handleSaveSuccess = () => {
 
     setTimeout(() => {
-      fetchDuty();
-    }, 1500);
+      fetchBranch();
+    }, 1000);
   };
 
   return (
@@ -162,12 +218,12 @@ export default function Duty() {
           {/* Sayfa Başlığı */}
           <Group justify="space-between" align="center">
             <div>
-              <Title order={2}>Görev Sayfası</Title>
+              <Title order={2}>Şubeler Sayfası</Title>
               <Text size="sm" c="dimmed">
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
-            <Button variant="filled" onClick={() => dutyAddRef.current?.open()}>Yeni Ekle</Button>
+            <Button variant="filled" leftSection={<IconPlus size={14} />} onClick={() => branchAddRef.current?.openDialog()}>Yeni Ekle</Button>
           </Group>
 
           {/* İçerik Kartları */}
@@ -183,7 +239,7 @@ export default function Duty() {
 
                 <Grid.Col span={4}>
                   <TextInput
-                    label="Görev Ara"
+                    label="Şube Ara"
                     placeholder="text giriniz"
                     leftSection={<IconSearch size={18} />}
                     value={searchText}
@@ -198,7 +254,7 @@ export default function Duty() {
           {/* Örnek Tablo */}
           <Paper shadow="xs" p="lg" withBorder>
             <Stack gap="md">
-              <Title order={4}>Son Görevler({rowsTable?.length || 0})</Title>
+              <Title order={4}>Son Şubeler({rowsTable?.length || 0})</Title>
               <Table.ScrollContainer minWidth={400} maxHeight={700}>
                 <Table striped highlightOnHover withColumnBorders>
                   <Table.Thead>
@@ -214,8 +270,8 @@ export default function Duty() {
             </Stack>
           </Paper>
         </Stack>
-        <DutyAdd ref={dutyAddRef} onSaveSuccess={handleSaveSuccess} />
-        <DutyEdit ref={dutyEditRef} onSaveSuccess={handleSaveSuccess} />
+        <BranchAdd ref={branchAddRef} onSaveSuccess={handleSaveSuccess} />
+        <BranchEdit ref={branchEditRef} onSaveSuccess={handleSaveSuccess} />
       </Container>
   );
 }

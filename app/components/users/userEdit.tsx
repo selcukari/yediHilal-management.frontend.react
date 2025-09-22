@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, useRef, useMemo } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { omit, last } from 'ramda';
+import { omit, last, clone } from 'ramda';
 import { Modal, TextInput, Paper, Title, Table, Flex, Button, Select, Stack, Grid, PasswordInput, Group, Switch, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
@@ -140,13 +140,13 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
     },
   });
 
-    const [rowDutyHeaders, setRowDutyHeaders] = useState<TableHeader[]>([
+  const [rowDutyHeaders, setRowDutyHeaders] = useState<TableHeader[]>([
     { field: 'names', header: 'Görevi' },
     { field: 'createDate', header: 'Görev Atama Kayıt' },
     { field: 'authorizedPersonName', header: 'Atayan Kişi' },
   ]);
 
-    const rowsDutyTable = resultDutyData?.map((item) => (
+  const rowsDutyTable = resultDutyData?.map((item) => (
     <Table.Tr key={item.ids}>
       {rowDutyHeaders.map((header) => {
         if (header.field === 'authorizedPersonName') {
@@ -175,7 +175,7 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
       // Önce initial values'ı set et
       form.setValues((value));
 
-      form.setInitialValues((value));
+      form.setInitialValues(clone(value));
       // Sonra form values'larını set et
 
       open();

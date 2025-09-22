@@ -44,6 +44,12 @@ const menuItems = [
     key: 'project',
     link: '/projects',
   },
+  {
+    icon: IconFileCheck,
+    label: 'Şubeler Yönetimi',
+    key: 'branch',
+    link: '/branches',
+  },
    {
     icon: IconReportMoney,
     label: 'Maliye Yönetimi',
