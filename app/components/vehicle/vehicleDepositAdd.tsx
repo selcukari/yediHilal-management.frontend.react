@@ -156,7 +156,7 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
 
     setTimeout(() => {
       fetchVehicle();
-    }, 500);
+    }, 200);
     open();
 
   };
@@ -186,8 +186,6 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
       }
     } catch (error: any) {
       toast.error(`Vehicles yüklenirken hata: ${error.message}`);
-    } finally {
-      // close();
     }
   };
 

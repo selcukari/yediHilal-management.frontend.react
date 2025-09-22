@@ -8,13 +8,15 @@ interface CountrySelectProps {
   label?: string;
   placeholder?: string;
   required?: boolean;
+  disabled?: boolean;
 }
 
 export function CountrySelect({ 
   form, 
   label = "Ülke", 
   placeholder = "Ülke Seçiniz", 
-  required = false 
+  required = false,
+  disabled = false
 }: CountrySelectProps) {
 
   const [countries, setCountries] = useState<{ value: string; label: string }[]>([]);
@@ -54,6 +56,7 @@ export function CountrySelect({
       maxDropdownHeight={200}
       nothingFoundMessage="Ülke bulunamadı..."
       required={required}
+      disabled={disabled}
       {...form.getInputProps('countryId')}
     />
   );

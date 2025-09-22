@@ -94,6 +94,7 @@ export default function User() {
       isActive: item.isActive,
       password: item.password,
       moduleRoles: item.moduleRoles,
+      hierarchy: item.hierarchy ? item.hierarchy.toString() : undefined,
       responsibilities: item.responsibilities,
       roleId: item.roleId.toString(),
       countryId: item.countryId.toString(),
@@ -309,7 +310,7 @@ export default function User() {
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
-            <Button variant="filled" onClick={() => userAddRef.current?.open()}>Yeni Ekle</Button>
+            <Button variant="filled" onClick={() => userAddRef.current?.openDialog()}>Yeni Ekle</Button>
           </Group>
 
           {/* İçerik Kartları */}

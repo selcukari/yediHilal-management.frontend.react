@@ -1,7 +1,8 @@
-import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
+import { forwardRef, useMemo, useEffect, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, TextInput, Flex, Button, Stack, Grid, PasswordInput, Group, Switch, Textarea } from '@mantine/core';
+import { Modal, TextInput, Flex, Button, Stack, Grid, PasswordInput, Select, Switch, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { last } from 'ramda';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
@@ -17,7 +18,7 @@ import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import { useAuth } from '~/authContext';
 
 export type UserAddDialogControllerRef = {
-  open: () => void;
+  openDialog: () => void;
   close: () => void;
 };
 
@@ -41,6 +42,7 @@ type FormValues = {
   phone: string;
   dateOfBirth: string;
   isActive: boolean;
+  hierarchy?: string | null;
   countryId: string;
   provinceId: string;
   password: string;
@@ -49,10 +51,19 @@ type FormValues = {
   dutiesIds?: string;
   deleteMessageTitle?: string;
 };
+type GetUserData = {
+  id: string;
+  fullName: string;
+}
 
 const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
+  const [userData, setUserData] = useState<GetUserData[]>([]);
+  // Sadece sancaktar id tutmak için ve sube baskanının uyelerini eklemek icin
+  const [sancaktarDutyId, setSancaktarDutyId] = useState<string>("10");
+  const [branchHeadDutyId, setBranchHeadDutyIdDutyId] = useState<string>("9");
+
   const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
   const { currentUser } = useAuth();
@@ -69,6 +80,7 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
       dateOfBirth: '',
       countryId: '1',
       roleId: '3',
+      hierarchy: '',
       moduleRoles: '',
       provinceId: '',
       password: '',
@@ -186,10 +198,53 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
     }
   }
 
+  const openDialog = () => {
+
+    setTimeout(() => {
+      fetchUsers();
+    }, 500);
+    form.reset();
+  
+    open();
+  }
+
   useImperativeHandle(ref, () => ({
-    open,
+    openDialog,
     close,
   }));
+  const fetchUsers = async () => {
+    try {
+      const params = {
+        countryId: "1",
+        isActive: true,
+      }
+      const getUsers: any[] | null = await service.users(params);
+      
+      if (getUsers) {
+        const newUsers = getUsers.map(u => ({
+          ...u,
+          duties: u.duties ? last(JSON.parse(u.duties as string)) : { ids: "", names: "" }
+        }));
+
+        setUserData(newUsers.filter(u => u.duties?.ids?.includes(branchHeadDutyId))?.map((i: any) => ({ id: i.id.toString(), fullName: i.fullName })));
+      } else {
+        toast.info('Hiçbir veri yok!');
+        setUserData([]);
+      }
+    } catch (error: any) {
+      toast.error(`User yüklenirken hata: ${error.message}`);
+    }
+  };
+  const isDisabledRoleComponent = useMemo(() => {
+    return currentUser?.roleId != 1; // admin roleId
+  }, [currentUser?.roleId]);
+
+  const isDisabledBranchHead = useMemo(() => {
+    if (form.values.dutiesIds?.includes(sancaktarDutyId)) {
+      return !isDisabledRoleComponent;
+    }
+    return false;
+  },[form.values.dutiesIds]);
 
   return (<>
     <Modal
