@@ -4,25 +4,25 @@ import {
   Container, Grid, TextInput, ActionIcon, Stack, Group, Title, Text, Paper, Table, LoadingOverlay, Button,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import DutyAdd, { type DutyAddDialogControllerRef } from '../../components/duty/dutyAdd';
-import DutyEdit, { type DutyEditDialogControllerRef } from '../../components/duty/dutyEdit';
-import { useDutyService } from '../../services/dutyService';
+import MeetingTypeAdd, { type MeetingTypeAddDialogControllerRef } from '../../components/meetingType/meetingTypAdd';
+import MeetingTypeEdit, { type MeetingTypeEditDialogControllerRef } from '../../components/meetingType/meetingTypEdit';
+import { useMeetingTypeService } from '../../services/meetingTypeService';
 import { toast } from '../../utils/toastMessages';
 
 interface Column {
-  field: keyof DutyType;
+  field: keyof MeetingType;
   header: string;
 }
 
-interface DutyType {
+interface MeetingType {
   id: number;
   name: string;
   isActive: boolean;
   actions?: any
 }
 
-export default function Duty() {
-  const [resultData, setResultData] = useState<DutyType[]>([]);
+export default function MeetingType() {
+  const [resultData, setResultData] = useState<MeetingType[]>([]);
   const [searchText, setSearchText] = useState('');
   const [visible, { open, close }] = useDisclosure(false);
   
@@ -31,10 +31,10 @@ export default function Duty() {
     { field: 'name', header: 'Mesaj' },
     { field: 'actions', header: 'İşlemler' },
   ]);
-  const dutyAddRef = useRef<DutyAddDialogControllerRef>(null);
-  const dutyEditRef = useRef<DutyEditDialogControllerRef>(null);
+  const meetingTypeAdd = useRef<MeetingTypeAddDialogControllerRef>(null);
+  const meetingTypeEdit = useRef<MeetingTypeEditDialogControllerRef>(null);
 
-  const service = useDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+  const service = useMeetingTypeService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
   // Filtrelenmiş veriler
   const filteredUsers = useMemo(() => {
@@ -43,25 +43,25 @@ export default function Duty() {
     return resultData.filter(duty => duty.name.toLowerCase().includes(searchText.trim().toLowerCase()));
   }, [resultData, searchText]);
 
-  const fetchDuty = async () => {
+  const fetchMeetingType = async () => {
     open();
 
     try {
 
-      const getDuties = await service.getDuties();
-      if (getDuties) {
-        setResultData(getDuties.map((duty: DutyType) => ({
-          id: duty.id,
-          name: duty.name,
-          isActive: duty.isActive
-        })));
+     const getDuties = await service.getMeetingTypes();
+     if (getDuties) {
+       setResultData(getDuties.map((duty: MeetingType) => ({
+         id: duty.id,
+         name: duty.name,
+         isActive: duty.isActive
+       })));
       
-      } else {
-        toast.info('Hiçbir veri yok!');
+     } else {
+       toast.info('Hiçbir veri yok!');
 
-        setResultData([]);
-      }
-        close();
+       setResultData([]);
+     }
+       close();
 
     } catch (error: any) {
         toast.error(`getDuties yüklenirken hata: ${error.message}`);
@@ -71,12 +71,12 @@ export default function Duty() {
 
   useEffect(() => {
     setTimeout(() => {
-      fetchDuty();
+      fetchMeetingType();
     }, 1000);
   }, []);
 
-  const handleEdit = (item: DutyType) => {
-    dutyEditRef.current?.openDialog(item);
+  const handleEdit = (item: MeetingType) => {
+    meetingTypeEdit.current?.openDialog(item);
   };
 
   const handleDelete = async (id: number) => {
@@ -84,12 +84,12 @@ export default function Duty() {
 
      try {
 
-      const result = await service.deleteDuty(id);
+      const result = await service.deleteMeetingType(id);
       if (result == true) {
 
       toast.success('İşlem başarılı!');
       
-      fetchDuty();
+      fetchMeetingType();
       
       close();
 
@@ -146,7 +146,7 @@ export default function Duty() {
   const handleSaveSuccess = () => {
 
     setTimeout(() => {
-      fetchDuty();
+      fetchMeetingType();
     }, 1500);
   };
 
@@ -162,12 +162,12 @@ export default function Duty() {
           {/* Sayfa Başlığı */}
           <Group justify="space-between" align="center">
             <div>
-              <Title order={2}>Görev Türleri</Title>
+              <Title order={2}>Toplantı Türleri</Title>
               <Text size="sm" c="dimmed">
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
-            <Button variant="filled" onClick={() => dutyAddRef.current?.open()}>Yeni Ekle</Button>
+            <Button variant="filled" onClick={() => meetingTypeAdd.current?.open()}>Yeni Ekle</Button>
           </Group>
 
           {/* İçerik Kartları */}
@@ -198,7 +198,7 @@ export default function Duty() {
           {/* Örnek Tablo */}
           <Paper shadow="xs" p="lg" withBorder>
             <Stack gap="md">
-              <Title order={4}>Görevler({rowsTable?.length || 0})</Title>
+              <Title order={4}>Toplantı Türleri({rowsTable?.length || 0})</Title>
               <Table.ScrollContainer minWidth={400} maxHeight={700}>
                 <Table striped highlightOnHover withColumnBorders>
                   <Table.Thead>
@@ -214,8 +214,8 @@ export default function Duty() {
             </Stack>
           </Paper>
         </Stack>
-        <DutyAdd ref={dutyAddRef} onSaveSuccess={handleSaveSuccess} />
-        <DutyEdit ref={dutyEditRef} onSaveSuccess={handleSaveSuccess} />
+        <MeetingTypeEdit ref={meetingTypeEdit} onSaveSuccess={handleSaveSuccess} />
+        <MeetingTypeEdit ref={meetingTypeEdit} onSaveSuccess={handleSaveSuccess} />
       </Container>
   );
 }

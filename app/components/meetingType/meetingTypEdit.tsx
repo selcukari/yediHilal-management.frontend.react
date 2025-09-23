@@ -9,12 +9,12 @@ import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useDutyService } from '../../services/dutyService';
 import { toast } from '../../utils/toastMessages';
 
-export type DutyEditDialogControllerRef = {
+export type MeetingTypeEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
   close: () => void;
 };
 
-interface DutyEditProps {
+interface MeetingTypeEditProps {
   onSaveSuccess?: () => void; // Yeni prop
 }
 
@@ -24,7 +24,7 @@ type FormValues = {
   isActive: boolean;
 };
 
-const UserEdit = forwardRef<DutyEditDialogControllerRef, DutyEditProps>(({onSaveSuccess}, ref) => {
+const MeetingTypeEdit = forwardRef<MeetingTypeEditDialogControllerRef, MeetingTypeEditProps>(({onSaveSuccess}, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const service = useDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
@@ -38,7 +38,7 @@ const UserEdit = forwardRef<DutyEditDialogControllerRef, DutyEditProps>(({onSave
       isActive: true,
     },
     validate: {
-      name: (value) => (value.trim().length < 5 ? 'Görev Adı en az 5 karakter olmalı' : null),
+      name: (value) => (value.trim().length < 5 ? 'Toplantı Türü Adı en az 5 karakter olmalı' : null),
     },
   });
 
@@ -132,7 +132,7 @@ const UserEdit = forwardRef<DutyEditDialogControllerRef, DutyEditProps>(({onSave
       onClose={() => {
         dialogClose();
       }}
-      title="Görev Düzenle"
+      title="Toplantı Türü Düzenle"
       centered
       size="700"
       overlayProps={{
@@ -145,8 +145,8 @@ const UserEdit = forwardRef<DutyEditDialogControllerRef, DutyEditProps>(({onSave
           <Grid>
             <Grid.Col span={6}>
               <TextInput
-                label="Görev Adı"
-                placeholder="görev giriniz"
+                label="Toplantı Türü Adı"
+                placeholder="toplantı türü giriniz"
                 value={form.values.name}
                 required
                 {...form.getInputProps('name')}
@@ -162,7 +162,7 @@ const UserEdit = forwardRef<DutyEditDialogControllerRef, DutyEditProps>(({onSave
             wrap="wrap">
             <Grid.Col span={6}>
               <Switch 
-                label="Görev Durumu" 
+                label="Toplantı Türü Durumu" 
                 checked={form.values.isActive}
                 onChange={(event) => form.setFieldValue('isActive', event.currentTarget.checked)}
               />
@@ -189,4 +189,4 @@ const UserEdit = forwardRef<DutyEditDialogControllerRef, DutyEditProps>(({onSave
   </>);
 });
 
-export default UserEdit;
+export default MeetingTypeEdit;

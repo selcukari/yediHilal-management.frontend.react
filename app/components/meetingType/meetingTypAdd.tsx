@@ -1,72 +1,54 @@
-import { forwardRef, useImperativeHandle, useState, useRef, useEffect } from 'react';
+import { forwardRef, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { Modal, TextInput, Flex, Button, Stack, Grid, Switch } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { clone } from 'ramda';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
-import { useDutyService } from '../../services/dutyService';
+import { useMeetingTypeService } from '../../services/meetingTypeService';
 import { toast } from '../../utils/toastMessages';
 
-export type DutyEditDialogControllerRef = {
-  openDialog: (value: FormValues) => void;
+export type MeetingTypeAddDialogControllerRef = {
+  open: () => void;
   close: () => void;
 };
 
-interface DutyEditProps {
+interface MeetingTypeAddProps {
   onSaveSuccess?: () => void; // Yeni prop
 }
 
 type FormValues = {
-  id: number;
   name: string;
   isActive: boolean;
 };
 
-const UserEdit = forwardRef<DutyEditDialogControllerRef, DutyEditProps>(({onSaveSuccess}, ref) => {
-  const [opened, { open, close }] = useDisclosure(false);
+const MeetingTypeAdd = forwardRef<MeetingTypeAddDialogControllerRef, MeetingTypeAddProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
-  const service = useDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
-  
+  const [opened, { open, close }] = useDisclosure(false);
+
+  const service = useMeetingTypeService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
   const form = useForm<FormValues>({
     initialValues: {
-      id: 0,
       name: '',
       isActive: true,
     },
     validate: {
-      name: (value) => (value.trim().length < 5 ? 'Görev Adı en az 5 karakter olmalı' : null),
+      name: (value) => (value.trim().length < 5 ? 'Toplantı Türü Adı en az 5 karakter olmalı' : null),
     },
   });
 
-
-  const openDialog = (value: FormValues) => {
-
-    if (value) {
-      form.reset();
-      // Önce initial values'ı set et
-      form.setValues(value);
-
-      form.setInitialValues(clone(value));
-      // Sonra form values'larını set et
-
-      open();
-
-    }
-  }
-
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
-    
-    const result = await service.updateDuty({
+
+    const result = await service.addMeetingType({
       ...values,
       name: values.name.trim()
     });
 
-    if (result == true) {
+    if (result === true) {
 
       toast.success('İşlem başarılı!');
       
@@ -74,14 +56,14 @@ const UserEdit = forwardRef<DutyEditDialogControllerRef, DutyEditProps>(({onSave
       if (onSaveSuccess) {
         onSaveSuccess();
       }
-      form.reset();
       
       close();
+      form.reset();
       setIsDisabledSubmit(false);
 
       return;
     }
-    else if (result?.data == false && result?.errors?.length > 0) {
+    else if (result?.data === false && result?.errors?.length > 0) {
 
       toast.warning(result.errors[0]);
 
@@ -92,10 +74,9 @@ const UserEdit = forwardRef<DutyEditDialogControllerRef, DutyEditProps>(({onSave
   };
 
   const confirmDialogHandleConfirm = () => {
-    // Silme işlemini burada yapın
     confirmModalRef.current?.close();
-    form.reset();
     close();
+    form.reset();
   };
 
   const confirmDialogHandleCancel = () => {
@@ -108,21 +89,13 @@ const UserEdit = forwardRef<DutyEditDialogControllerRef, DutyEditProps>(({onSave
       confirmModalRef.current?.open();
     } else {
       // Eğer form boşsa direkt kapat
-      form.reset();
       close();
+      form.reset();
     }
   }
 
-  useEffect(() => {
-    if (form.isDirty()) {
-      setIsDisabledSubmit(false);
-       return;
-    }
-     setIsDisabledSubmit(true);
-  }, [form.values]);
-
   useImperativeHandle(ref, () => ({
-    openDialog,
+    open,
     close,
   }));
 
@@ -132,7 +105,7 @@ const UserEdit = forwardRef<DutyEditDialogControllerRef, DutyEditProps>(({onSave
       onClose={() => {
         dialogClose();
       }}
-      title="Görev Düzenle"
+      title="Yeni Toplantı Türü Ekle"
       centered
       size="700"
       overlayProps={{
@@ -145,13 +118,12 @@ const UserEdit = forwardRef<DutyEditDialogControllerRef, DutyEditProps>(({onSave
           <Grid>
             <Grid.Col span={6}>
               <TextInput
-                label="Görev Adı"
-                placeholder="görev giriniz"
-                value={form.values.name}
+                label="Toplantı Türü Adı"
+                placeholder="toplantı türü giriniz"
                 required
                 {...form.getInputProps('name')}
               />
-          </Grid.Col>
+            </Grid.Col>
 
           <Flex
             mih={50}
@@ -161,8 +133,8 @@ const UserEdit = forwardRef<DutyEditDialogControllerRef, DutyEditProps>(({onSave
             direction="row"
             wrap="wrap">
             <Grid.Col span={6}>
-              <Switch 
-                label="Görev Durumu" 
+              <Switch
+                label="Toplantı Türü Durumu" 
                 checked={form.values.isActive}
                 onChange={(event) => form.setFieldValue('isActive', event.currentTarget.checked)}
               />
@@ -172,7 +144,7 @@ const UserEdit = forwardRef<DutyEditDialogControllerRef, DutyEditProps>(({onSave
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
               İptal
             </Button>
-            <Button type="submit" variant="filled" disabled={isDisabledSubmit} size="xs"  leftSection={<IconCheck size={14} />} radius="xs">
+            <Button type="submit" variant="filled" size="xs" disabled={isDisabledSubmit}  leftSection={<IconCheck size={14} />} radius="xs">
               Kaydet
             </Button>
           </Grid.Col>
@@ -189,4 +161,4 @@ const UserEdit = forwardRef<DutyEditDialogControllerRef, DutyEditProps>(({onSave
   </>);
 });
 
-export default UserEdit;
+export default MeetingTypeAdd;
