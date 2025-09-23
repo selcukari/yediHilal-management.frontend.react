@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { IconSearch, IconEdit, IconTrash, IconPlus } from '@tabler/icons-react';
 import {
-  Container, Grid, TextInput, Badge, ActionIcon, Stack, Group, Title, Text, Paper, Table, LoadingOverlay, Button,
+  Container, Grid, TextInput, Badge, Flex, ActionIcon, Stack, Group, Title, Text, Paper, Table, LoadingOverlay, Button,
 } from '@mantine/core';
 import { omit } from 'ramda';
 import { useDisclosure } from '@mantine/hooks';
@@ -11,6 +11,10 @@ import { useBranchService } from '../services/branchService';
 import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
 import { dateFormatStrings } from '../utils/dateFormatStrings';
+import { MenuActionButton } from '../components'
+import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToExcel';
+import { type PdfTableColumn } from '../utils/repor/exportToPdf';
+import { calculateColumnWidthMember } from '../utils/repor/calculateColumnWidth';
 
 interface Column {
   field: keyof BranchType;
@@ -61,7 +65,7 @@ export default function Duty() {
   const service = useBranchService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
   // Filtrelenmiş veriler
-  const filteredUsers = useMemo(() => {
+  const filteredBranchs = useMemo(() => {
     if (!searchText) return resultData;
     
     return resultData.filter(branch => branch.branchName.toLowerCase().includes(searchText.trim().toLowerCase()));
@@ -118,7 +122,7 @@ export default function Duty() {
     );
   };
 
-  const rowsTable = filteredUsers.map((item) => (
+  const rowsTable = filteredBranchs.map((item) => (
     <Table.Tr key={item.id}>
       {rowHeaders.map((header) => {
         if (header.field === 'isRent') {
@@ -205,6 +209,42 @@ export default function Duty() {
       fetchBranch();
     }, 1000);
   };
+  
+  // useMemo hook'u ile sütunları önbelleğe alıyoruz
+  const pdfTableColumns = useMemo((): PdfTableColumn[] => {
+
+    const newCols: Column[] = rowHeaders.filter(col => col.field !== 'actions');
+
+    return newCols.map(col => ({
+      key: col.field,
+      title: col.header,
+      // İsteğe bağlı olarak genişlik ayarları ekleyebilirsiniz
+      width: calculateColumnWidthMember(col.field) // Özel genişlik hesaplama fonksiyonu
+    }));
+  }, [rowHeaders]);
+  const excelTableColumns = useMemo((): ColumnDefinition[] => {
+
+    const newCols: Column[] = rowHeaders.filter(col => col.field !== 'actions');
+
+    return newCols.map(col => ({
+      key: col.field as keyof ValueData,
+      header: col.header,
+      // İsteğe bağlı olarak genişlik ayarları ekleyebilirsiniz
+    }));
+  }, [rowHeaders]);
+  const reportTitle = (): string => {
+    return "Şubeler Raporu";
+  }
+
+  // raportdata
+  const raportVehicleData = useMemo(() => {
+    return filteredBranchs.map((branch: BranchType) => ({
+      ...branch,
+      isRent: branch.isRent ? "Evet" : "Hayır",
+      branchHeadFullName: `${branch.branchHeadFullName} (${branch.branchHeadPhone || '-'})`,
+      rentalPrice: `${branch.rentalPrice ?? "-"} ₺`,
+    }))
+  }, [filteredBranchs])
 
   return (
       <Container size="xl">
@@ -236,7 +276,6 @@ export default function Duty() {
           >
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
-
                 <Grid.Col span={4}>
                   <TextInput
                     label="Şube Ara"
@@ -246,7 +285,26 @@ export default function Duty() {
                     onChange={(event) => setSearchText(event.currentTarget.value)}
                   />
                 </Grid.Col>
-
+                <Grid.Col span={2}>
+                  <Flex
+                  mih={50}
+                  gap="md"
+                  justify="flex-end"
+                  align="flex-end"
+                  direction="row"
+                  wrap="wrap"
+                >
+                  <MenuActionButton
+                  reportTitle={reportTitle()}
+                  excelColumns={excelTableColumns}
+                  valueData={raportVehicleData}
+                  pdfColumns={pdfTableColumns}
+                  type={2}
+                  isMailDisabled={true}
+                  isSmsDisabled={true}
+                  />
+                </Flex>
+              </Grid.Col>
               </Grid>
             </Paper>
           </div>

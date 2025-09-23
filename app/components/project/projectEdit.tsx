@@ -144,7 +144,7 @@ const ProjectEdit = forwardRef<ProjectEditDialogControllerRef, UserEditProps>(({
       onClose={() => {
         dialogClose();
       }}
-      title="Kullanıcı Düzenle"
+      title="Proje Düzenle"
       centered
       size="700"
       overlayProps={{
