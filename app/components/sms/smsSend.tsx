@@ -22,7 +22,7 @@ type ValueParams = {
   toUsers: Array<string>;
   toPhoneNumbers: Array<string>;
   toCountryCodes: Array<string>;
-  personType: number;
+  personType?: number;
   count: number;
 }
 
@@ -72,6 +72,7 @@ const SmsSend = forwardRef<SmsSendDialogControllerRef, unknown>((_props, ref) =>
     const newValue = {
       ...values,
       ...omit(['toPhoneNumbers', 'toCountryCodes'], valueParams),
+      personType: valueParams.personType || 2,
       toPhoneNumbersWithCountryCode: valueParams.toPhoneNumbers.map((phone, index) => ({
         telephone: phone,
         countryCode: valueParams.toCountryCodes[index] || ""

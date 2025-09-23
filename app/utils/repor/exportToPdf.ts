@@ -176,10 +176,21 @@ private addTable(
     tableWidth: 'auto', // Tablo genişliği ayarı
     willDrawCell: (data: any) => {
      if (data.section === 'body') {
+      // uyeler modulu sms/mail renkleri
         if (data.cell.raw === 'Evet') {
           doc.setTextColor(0, 128, 0); // Yeşil
         } else if (data.cell.raw === 'Hayir') {
           doc.setTextColor(255, 0, 0); // Kırmızı
+        } // proje module öncelik renkleri
+        else if (data.cell.raw === 'Acil') {
+          doc.setTextColor(255, 0, 0); // Kırmızı
+        } else if (data.cell.raw === 'Yüksek') {
+          doc.setTextColor(255, 165, 0); // turuncu
+        }
+        else if (data.cell.raw === 'Düşük') {
+          doc.setTextColor(0, 128, 0); // Yeşil
+        } else if (data.cell.raw === 'Orta') {
+          doc.setTextColor(0, 0, 255); // mavi
         }
     }
     },

@@ -13,6 +13,11 @@ import { priorityMockData } from '../utils/priorityMockData';
 import ProjectAdd, { type ProjectAddDialogControllerRef } from '../components/project/projectAdd';
 import ProjectEdit, { type ProjectEditDialogControllerRef } from '../components/project/projectEdit';
 import { randaomColor } from '../utils/randaomColor';
+import { MenuActionButton } from '../components'
+import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToExcel';
+import { type PdfTableColumn } from '../utils/repor/exportToPdf';
+import { calculateColumnWidthMember } from '../utils/repor/calculateColumnWidth';
+
 interface ProjectData {
   id: number;
   numberOfParticipant: number;
@@ -25,6 +30,10 @@ interface ProjectData {
   finisDate: string;
   createDate: string;
 }
+interface Column {
+  field: keyof ProjectData;
+  header: string;
+}
 
 export default function Project() {
   const [projectData, setProjectData] = useState<ProjectData[]>([]);
@@ -35,6 +44,17 @@ export default function Project() {
   const projectEditRef = useRef<ProjectEditDialogControllerRef>(null);
 
   const service = useProjectService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+
+  const [rowHeaders, setRowHeaders] = useState<Column[]>([
+    { field: 'id', header: 'Id' },
+    { field: 'name', header: 'Proje Adı' },
+    { field: 'numberOfParticipant', header: 'Katılımcı Sayısı' },
+    { field: 'priority', header: 'Öncelik' },
+    { field: 'responsibleFullName', header: 'Sorumlu' },
+    { field: 'note', header: 'Note' },
+    { field: 'createDate', header: 'Başlangıç T.' },
+    { field: 'finisDate', header: 'Bitiş T.' }
+  ]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -106,7 +126,11 @@ export default function Project() {
   };
 
    // Öncelik değerlerine göre renk döndüren fonksiyon
-  const getPriorityColor = (priorityValue: string) => {
+  const getPriorityColor = (priorityValue: string, isFinish: boolean) => {
+    // Eğer iş tamamlandıysa her zaman gri döndür
+    if (isFinish) {
+      return 'gray';
+    }
     switch(priorityValue) {
       case 'urgent': return 'red';
       case 'high': return 'orange';
@@ -122,8 +146,8 @@ export default function Project() {
     
     return projectData.filter(project => 
       project.name.toLowerCase().includes(searchText.toLowerCase()) ||
-      project.responsibleFullName.toLowerCase().includes(searchText.toLowerCase()) ||
-      project.note.toLowerCase().includes(searchText.toLowerCase())
+      project.responsibleFullName?.toLowerCase().includes(searchText.toLowerCase()) ||
+      project.note?.toLowerCase().includes(searchText.toLowerCase())
     );
   }, [projectData, searchText]);
 
@@ -136,7 +160,7 @@ export default function Project() {
       <Table.Td>{element.numberOfParticipant}</Table.Td>
       <Table.Td>{
         <Badge 
-            color={getPriorityColor(element.priority)} 
+            color={getPriorityColor(element.priority, !!element.finisDate)} 
             variant="filled"
           >
           {priorityInfo?.label || element.priority}
@@ -173,6 +197,41 @@ export default function Project() {
     if (projectData.length < 0) return 0;
     return projectData.reduce((total, item) => total + item.numberOfParticipant, 0);
   };
+  // useMemo hook'u ile sütunları önbelleğe alıyoruz
+  const pdfTableColumns = useMemo((): PdfTableColumn[] => {
+
+    const newCols: Column[] = rowHeaders;
+
+    return newCols.map(col => ({
+      key: col.field,
+      title: col.header,
+      // İsteğe bağlı olarak genişlik ayarları ekleyebilirsiniz
+      width: calculateColumnWidthMember(col.field) // Özel genişlik hesaplama fonksiyonu
+    }));
+  }, [rowHeaders]);
+  const excelTableColumns = useMemo((): ColumnDefinition[] => {
+
+    const newCols: Column[] = rowHeaders;
+
+    return newCols.map(col => ({
+      key: col.field as keyof ValueData,
+      header: col.header,
+      // İsteğe bağlı olarak genişlik ayarları ekleyebilirsiniz
+    }));
+  }, [rowHeaders]);
+  const reportTitle = (): string => {
+    return "Projeler Raporu";
+  }
+
+  // raportdata
+  const raportProjectData = useMemo(() => {
+    return filteredProjects.map((project: ProjectData) => ({
+      ...project,
+      createDate: formatDate(project.createDate, dateFormatStrings.dateTimeFormatWithoutSecond),
+      finisDate: project.finisDate ? formatDate(project.finisDate, dateFormatStrings.dateTimeFormatWithoutSecond) : '-',
+      priority: priorityMockData.find(x => x.value === project.priority)?.label || project.priority
+    }))
+  }, [filteredProjects])
 
   return (
     <Container size="xl">
@@ -227,7 +286,27 @@ export default function Project() {
                     onChange={(event) => setSearchText(event.currentTarget.value)}
                   />
                 </Grid.Col>
-                <Grid.Col span={4} offset={3}>
+                <Grid.Col span={2}>
+                  <Flex
+                  mih={50}
+                  gap="md"
+                  justify="flex-end"
+                  align="flex-end"
+                  direction="row"
+                  wrap="wrap"
+                >
+                  <MenuActionButton
+                  reportTitle={reportTitle()}
+                  excelColumns={excelTableColumns}
+                  valueData={raportProjectData}
+                  pdfColumns={pdfTableColumns}
+                  type={2}
+                  isMailDisabled={true}
+                  isSmsDisabled={true}
+                  />
+                </Flex>
+              </Grid.Col>
+                <Grid.Col span={4} offset={2}>
                 <Flex mih={50} gap="md" justify="flex-end" align="flex-end" direction="row" wrap="wrap">
                 <Button variant="filled" leftSection={<IconPlus size={14} />}  onClick={() => projectAddRef.current?.open()}>Yeni Ekle</Button>
                 </Flex>
@@ -250,7 +329,7 @@ export default function Project() {
                     <Table.Th>Öncelik</Table.Th>
                     <Table.Th>Sorumlu</Table.Th>
                     <Table.Th>Note</Table.Th>
-                    <Table.Th>Başlangıç</Table.Th>
+                    <Table.Th>Başlangıç Tarih</Table.Th>
                     <Table.Th>Bitiş</Table.Th>
                     <Table.Th>İşlemler</Table.Th>
                   </Table.Tr>

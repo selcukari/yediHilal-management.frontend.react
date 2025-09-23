@@ -93,7 +93,7 @@ export function MenuActionButton({
 
     smsSendRef.current?.openDialog({
       toUsers: newUserData.map(value => value.fullName), toCountryCodes: newUserData.map(value => value.countryCode),
-      toPhoneNumbers: newUserData.map(value => value.phone), type: 2, count: newUserData.length || 0
+      toPhoneNumbers: newUserData.map(value => value.phone), personType: 2, count: newUserData.length || 0
    });
   };
 

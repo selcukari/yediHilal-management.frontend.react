@@ -10,7 +10,7 @@ interface SmsParams {
   toUsers: Array<string>;
   toPhoneNumbersWithCountryCode: Array<PhoneNumbersWithCountryCode>;
   count: number;
-  personType: number;
+  personType?: number;
   smsType: string;
 }
 
