@@ -1,3 +1,4 @@
+import { omit } from 'ramda';
 import { createApi } from './api';
 import { useAuth } from '~/authContext';
 
@@ -41,6 +42,21 @@ export function useSmsService(controller: string) {
       return error;
     }
   };
+  const sendWhatsApp = async (params: SmsParams) => {
 
-  return { getSms, sendSms };
+    try {
+      const res = await api.post(`/${controller}/sendWhatsApp`, {
+        ...omit(['count', 'toPhoneNumbersWithCountryCode'], params),
+        recipients: params.toPhoneNumbersWithCountryCode?.map(item =>
+          `+${item.countryCode}${item.telephone}`
+        )
+      });
+
+      return res.data.data;
+    } catch (error: any) {
+      return error;
+    }
+  };
+
+  return { getSms, sendSms, sendWhatsApp };
 }

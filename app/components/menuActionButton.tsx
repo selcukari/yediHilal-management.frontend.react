@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { Menu, Button, LoadingOverlay, Divider } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconFileTypePdf, IconMessage, IconSend2, IconFileExcel } from '@tabler/icons-react';
+import { IconFileTypePdf, IconMessage, IconSend2, IconFileExcel, IconBrandWhatsapp } from '@tabler/icons-react';
 import { type PdfConfig, type PdfTableColumn, PdfHelperService } from '../utils/repor/exportToPdf';
 import { type ColumnDefinition, exportToExcel } from '../utils/repor/exportToExcel';
 import MailSend, { type MailSendDialogControllerRef } from '../components/mail/mailSend';
@@ -21,6 +21,7 @@ export interface MenuActionButtonProps {
   type?: number;
   isSmsDisabled?: boolean;
   isMailDisabled?: boolean;
+  isWhatsAppDisabled?: boolean;
 }
 
 export interface ValueData {
@@ -32,6 +33,7 @@ export function MenuActionButton({
   reportTitle = "",
   isSmsDisabled = false,
   isMailDisabled = false,
+  isWhatsAppDisabled = false,
   pdfColumns = [],
   excelColumns = [],
   valueData = [],
@@ -88,10 +90,10 @@ export function MenuActionButton({
    });
 
   };
-  const sendSms = () => { // sms gönderme işlemi burada phone ulke kodu ile birlikte olabilir
+  const sendSms = (smsType: string) => { // sms/whatsApp gönderme işlemi burada phone ulke kodu ile birlikte olabilir
     const newUserData = valueData?.filter(value => value.isSms && value.phone) || []
 
-    smsSendRef.current?.openDialog({
+    smsSendRef.current?.openDialog(smsType, {
       toUsers: newUserData.map(value => value.fullName), toCountryCodes: newUserData.map(value => value.countryCode),
       toPhoneNumbers: newUserData.map(value => value.phone), personType: 2, count: newUserData.length || 0
    });
@@ -114,7 +116,8 @@ export function MenuActionButton({
         <Menu.Item leftSection={<IconFileExcel size={14} />} onClick={exportExcel} >Rapor-Excel</Menu.Item>
         <Divider my="md" />
         <Menu.Item leftSection={<IconSend2 size={14} />} onClick={sendMail}disabled={isMailDisabled}>Mail-Gönder</Menu.Item>
-        <Menu.Item leftSection={<IconMessage size={14} />} onClick={sendSms} disabled={isSmsDisabled}>Sms-Gönder</Menu.Item> 
+        <Menu.Item leftSection={<IconMessage size={14} />} onClick={() => sendSms("sms")} disabled={isSmsDisabled}>Sms-Gönder</Menu.Item> 
+        <Menu.Item leftSection={<IconBrandWhatsapp size={14} />} onClick={() => sendSms("whatsApp")} disabled={isWhatsAppDisabled}>WhatsApp-Gönder</Menu.Item> 
       </Menu.Dropdown>
     </Menu>
     <MailSend ref={mailSendRef} />

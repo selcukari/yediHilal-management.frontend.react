@@ -414,6 +414,7 @@ export default function Member() {
                     pdfColumns={pdfTableColumns}
                     type={2}
                     isSmsDisabled={true}
+                    // isWhatsAppDisabled={true}
                     />
                   </Flex>
                 </Grid.Col>

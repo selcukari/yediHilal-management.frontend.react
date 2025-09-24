@@ -10,7 +10,7 @@ import { useSmsService } from '../../services/smsService';
 import { toast } from '../../utils/toastMessages';
 
 export type SmsSendDialogControllerRef = {
-  openDialog: (value: ValueParams) => void;
+  openDialog: (smsType: string, value: ValueParams) => void;
   close: () => void;
 };
 
@@ -28,11 +28,11 @@ type ValueParams = {
 
 type FormValues = {
   message: string;
-  smsType: string;
 };
 
 const SmsSend = forwardRef<SmsSendDialogControllerRef, unknown>((_props, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
+  const [smsType, setSmsType] = useState<string>("");
   const [visibleLoading, openLoading] = useDisclosure(false);
   const [valueParams, setValueParams] = useState<ValueParams>({ toUsers: [], toPhoneNumbers: [], toCountryCodes: [], personType: 2, count: 0 });
 
@@ -42,8 +42,7 @@ const SmsSend = forwardRef<SmsSendDialogControllerRef, unknown>((_props, ref) =>
 
   const form = useForm<FormValues>({
     initialValues: {
-      message: "",
-      smsType: "sms",
+      message: ""
     },
     validate: {
       message: (value) => (value.trim().length < 10 ? 'Mesaj en az 10 karakter olmalı' : null),
@@ -54,9 +53,10 @@ const SmsSend = forwardRef<SmsSendDialogControllerRef, unknown>((_props, ref) =>
     return !form.isValid();
   }, [form.values]);
 
-   const openDialog = (value: ValueParams) => {
+   const openDialog = (smsType: string, value: ValueParams) => {
 
     if (value) {
+      setSmsType(smsType);
       form.reset();
       // Önce initial values'ı set et
       setValueParams(value);
@@ -78,9 +78,22 @@ const SmsSend = forwardRef<SmsSendDialogControllerRef, unknown>((_props, ref) =>
         countryCode: valueParams.toCountryCodes[index] || ""
       }))
     }
-    const result = await service.sendSms(newValue);
 
-    if (result === true) {
+    let result: any = false;
+
+    if (smsType === "sms") {
+      result = await service.sendSms({
+        ...newValue,
+        smsType: smsType
+      });
+    } else {
+      result = await service.sendWhatsApp({
+        ...newValue,
+        smsType: smsType
+      });
+    }
+
+    if (result === true || (result?.message ?? "")?.includes("başarıyla")) {
 
       toast.success('İşlem başarılı!');
       
@@ -91,9 +104,9 @@ const SmsSend = forwardRef<SmsSendDialogControllerRef, unknown>((_props, ref) =>
 
       return;
     }
-    if (result?.data === false && result?.errors?.length > 0) {
+    if ((result?.data === false && result?.errors?.length > 0) || result?.message) {
 
-      toast.warning(result.errors[0]);
+      toast.warning(result.errors?.[0] ?? result?.message);
 
     } else {
       toast.error('Bir hata oluştu!');
@@ -140,7 +153,7 @@ const SmsSend = forwardRef<SmsSendDialogControllerRef, unknown>((_props, ref) =>
       onClose={() => {
         dialogClose();
       }}
-      title="Mesaj Gönder"
+      title={`${smsType.toUpperCase()}/Mesaj Gönder`}
       centered
       size="600"
       overlayProps={{
