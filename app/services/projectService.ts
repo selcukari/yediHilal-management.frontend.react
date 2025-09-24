@@ -1,11 +1,6 @@
 import { createApi } from './api';
 import { useAuth } from '~/authContext';
 
-interface DutyDataParams {
-  name: string;
-  isActive: boolean;
-}
-
 type ProjectType = {
   name: string;
   responsibleId?: number;

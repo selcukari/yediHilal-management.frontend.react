@@ -1,18 +1,19 @@
-import { forwardRef, useImperativeHandle, useState, useRef } from 'react';
+import { forwardRef, useImperativeHandle, useEffect, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, TextInput, Flex, Button, Stack, Grid, Switch, Textarea } from '@mantine/core';
+import { Modal, TextInput, Button, Stack, Grid, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DateTimePicker } from '@mantine/dates';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { PrioritySelect } from '../addOrEdit/prioritySelect';
+import { ProvinceSelect } from '../addOrEdit/provinceSelect';
+import { MeetingTypeSelect } from '../addOrEdit/meetingTypeSelect';
 import { ResponsibleUserSelect } from '../addOrEdit/responsibleUserSelect';
-import { useProjectService } from '../../services/projectService';
-import { useUserService } from '../../services/userService';
+import { useMeetingService } from '../../services/meetingService';
 import { toast } from '../../utils/toastMessages'; 
 
-export type ProjectAddDialogControllerRef = {
+export type MeetingAddDialogControllerRef = {
   open: () => void;
   close: () => void;
 };
@@ -24,50 +25,65 @@ interface UserAddProps {
 type FormValues = {
   name: string;
   responsibleId?: string | null;
-  responsibleFullName?: string | null;
-  numberOfParticipant: number;
-  note: string;
-  isActive: boolean;
+  meetingTypeId?: string | null;
+  provinceId?: string | null;
+  address?: string | null;
+  participantCount: number;
+  duration?: number;
+  participants: string;
+  notes?: string;
   priority: string;
-  finisDate?: string | null;
+  time: string | null;
 };
 
-const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
+const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
-  
-  const service = useProjectService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
-  const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+
+  const service = useMeetingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
   const form = useForm<FormValues>({
     initialValues: {
       name: '',
       responsibleId: '',
-      responsibleFullName: '',
-      numberOfParticipant: 10,
-      note: '',
+      meetingTypeId: "",
+      provinceId: '',
+      address: '',
+      duration: 1,
+      participants: "",
+      participantCount: 5,
+      notes: '',
       priority: '',
-      isActive: true,
-    },
+      time: '',},
     validate: {
-      name: (value) => (value.trim().length < 5 ? 'Proje başlık en az 5 karakter olmalı' : null),
+      name: (value) => (value.trim().length < 5 ? 'Toplantı başlık en az 5 karakter olmalı' : null),
       responsibleId: (value) => (value ? null : 'Sorumlu kişi alanı zorunlu'),
-      numberOfParticipant: (value) => (value >= 10 ? null : 'Katılıncı sayısı en az 10 olmalı'),
       priority: (value) => (value ? null : 'Öncelik alanı zorunlu'),
+      participants: (value) => (value.trim().length < 10 ? 'Katılıncı alanı boş olmaz' : null),
+      time: (value) => (value ? null : 'Toplantı zamanı alanı zorunlu'),
     },
   });
 
+  useEffect(() => {
+    if (form.isDirty()) {
+      setIsDisabledSubmit(false);
+
+      return;
+    }
+
+    setIsDisabledSubmit(true);
+  }, [form.values]);
+
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
-    const getUser = await serviceUser.user(parseInt(values.responsibleId ?? "1"));
 
-
-    const result = await service.addProject({
+    const result = await service.addMeeting({
       ...values,
-      ...(values.finisDate ? { finisDate: new Date(values.finisDate).toISOString()} : {}),
-      responsibleFullName: getUser?.fullName ? getUser.fullName : undefined,
-      responsibleId: values.responsibleId ? parseInt(values.responsibleId) : undefined,
+      responsibleId: values.responsibleId ? parseInt(values.responsibleId) : 1,
+      meetingTypeId: values.meetingTypeId ? parseInt(values.meetingTypeId) : 1,
+      provinceId: values.provinceId ? parseInt(values.provinceId) : 1,
     });
 
     if (result === true) {
@@ -121,13 +137,15 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
     close,
   }));
 
+  const errorTime = form.errors.time;
+
   return (<>
     <Modal
       opened={opened}
       onClose={() => {
         dialogClose();
       }}
-      title="Yeni Proje Ekle"
+      title="Yeni Toplantı Ekle"
       centered
       size="700"
       overlayProps={{
@@ -140,10 +158,37 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
           <Grid>
             <Grid.Col span={6}>
               <TextInput
-                label="Proje Adı"
+                label="Toplantı Başlığı"
                 placeholder="başlık giriniz"
                 required
                 {...form.getInputProps('name')}
+              />
+            </Grid.Col>
+            <Grid.Col span={6}>
+              <MeetingTypeSelect
+                required={true}
+                form={form} 
+              />
+            </Grid.Col>
+            <Grid.Col span={6}>
+              <ResponsibleUserSelect
+                required={true}
+                form={form}
+              />
+            </Grid.Col>
+            <Grid.Col span={6}>
+              <ProvinceSelect 
+                form={form}
+                required={true}
+                label="İl" 
+                placeholder="İl Seçiniz" 
+                countryId={"1"}
+              />
+            </Grid.Col>
+            <Grid.Col span={6}>
+              <PrioritySelect
+                required={true}
+                form={form} 
               />
             </Grid.Col>
 
@@ -152,58 +197,48 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
               label="Katılımcı Sayısı"
               placeholder="sayı giriniz"
               type='number'
-              {...form.getInputProps('numberOfParticipant')}
-            />
-          </Grid.Col>
-
-          <Grid.Col span={6}>
-            <PrioritySelect
-              required={true}
-              form={form} 
-            />
-          </Grid.Col>
-
-          <Grid.Col span={6}>
-            <ResponsibleUserSelect
-              required={true}
-              form={form}
-            />
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <DateTimePicker
-              dropdownType="modal"
-              label="Bitiş Tarihi"
-              placeholder="bitiş tarihi"
-              required
-              clearable
-              minDate={new Date()}
-              onChange={(value) => form.setFieldValue('finisDate', value)}
+              {...form.getInputProps('participantCount')}
             />
           </Grid.Col>
           <Grid.Col span={6}>
             <Textarea
               mt="md"
-              label="Note giriniz"
-              placeholder="messaj..."
+              label="Katılıncılar giriniz"
+              placeholder="katılıncılar..."
               withAsterisk
-              {...form.getInputProps('note')}
+              {...form.getInputProps('participants')}
             />
           </Grid.Col>
-          <Flex
-            mih={50}
-            gap="md"
-            justify="center"
-            align="flex-end"
-            direction="row"
-            wrap="wrap">
-            <Grid.Col span={6}>
-              <Switch
-                label="Proje Durumu" 
-                checked={form.values.isActive}
-                onChange={(event) => form.setFieldValue('isActive', event.currentTarget.checked)}
-              />
-            </Grid.Col>
-          </Flex>
+          <Grid.Col span={6}>
+            <DateTimePicker
+              dropdownType="modal"
+              label="Toplantı Tarihi"
+              placeholder="toplantı tarihi"
+              required
+              error={errorTime}
+              clearable
+              minDate={new Date()}
+              onChange={(value) => form.setFieldValue('time', value)}
+            />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <Textarea
+              mt="md"
+              label="Alınan Kararlar giriniz"
+              placeholder="messaj..."
+              withAsterisk
+              {...form.getInputProps('notes')}
+            />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <Textarea
+              mt="md"
+              label="Adres giriniz"
+              placeholder="adres..."
+              withAsterisk
+              {...form.getInputProps('address')}
+            />
+          </Grid.Col>
           <Grid.Col span={6} offset={4}>
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
               İptal
@@ -225,4 +260,4 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
   </>);
 });
 
-export default ProjectAdd;
+export default MeetingAdd;

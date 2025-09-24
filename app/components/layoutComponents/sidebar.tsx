@@ -67,11 +67,6 @@ const menuItems = [
     label: 'Toplantı Yönetimi',
     key: 'meeting',
     link: '/meetings',
-    children: [
-      { label: 'A Toplantı', key: 'a-meeting', link: '/a-meeting' },
-      { label: 'B Toplantı', key: 'b-meeting', link: '/b-meeting' },
-      { label: 'Toplantılar', key: 'meeting-all', link: '/meetings' },
-    ],
   },
   {
     icon: IconCar,

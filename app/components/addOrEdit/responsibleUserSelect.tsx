@@ -8,10 +8,9 @@ interface ResponsibleUserSelectProps {
   countryId?: string;
   isDisabled?: boolean;
   required?: boolean;
-  onResponsibleChange?: (val: string | null, name?: string | null) => void;
 }
 
-export function ResponsibleUserSelect({ form, countryId, onResponsibleChange, isDisabled = false, required = false }: ResponsibleUserSelectProps) {
+export function ResponsibleUserSelect({ form, countryId, isDisabled = false, required = false }: ResponsibleUserSelectProps) {
   const [responsiblesUsers, setResponsiblesUsers] = useState<{ value: string; label: string }[]>([]);
   
   const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
@@ -40,30 +39,19 @@ export function ResponsibleUserSelect({ form, countryId, onResponsibleChange, is
     }
   };
 
-  const handleChange = (value: string | null) => {
-    if (!value) return;
-
-    else if (onResponsibleChange) {
-      onResponsibleChange(value, responsiblesUsers.find(i => i.value == value)?.label);
-    }
-  };
-   // Form'dan error mesajını al
-  const error = form.errors.responsibleId;
-
   return (
     <Select
       label="Sorumlu"
       placeholder="Sorumlu Seçiniz"
       data={responsiblesUsers}
-      error={error}
       searchable
       clearable
-      value={form.values.responsibleId}
+      // value={form.values.responsibleId}
       required={required}
       disabled={isDisabled}
       maxDropdownHeight={200}
       nothingFoundMessage="Sorumlu bulunamadı..."
-      onChange={handleChange}
+      {...form.getInputProps('responsibleId')}
     />
   );
 }
