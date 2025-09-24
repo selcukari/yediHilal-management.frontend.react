@@ -1,7 +1,7 @@
 import { forwardRef, useImperativeHandle, useEffect, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { clone } from 'ramda';
-import { Modal, TextInput, Button, Stack, Grid, Textarea } from '@mantine/core';
+import { Modal, TextInput, Button, Text, Stack, Grid, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DateTimePicker } from '@mantine/dates';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
@@ -10,7 +10,7 @@ import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { toast } from '../../utils/toastMessages';
 import { ProvinceSelect } from '../addOrEdit/provinceSelect';
 import { MeetingTypeSelect } from '../addOrEdit/meetingTypeSelect';
-
+import { RichTextEditorTiptap } from '../richTextEditorTiptap';
 import { useMeetingService } from '../../services/meetingService';
 import { PrioritySelect } from '../addOrEdit/prioritySelect';
 import { ResponsibleUserSelect } from '../addOrEdit/responsibleUserSelect';
@@ -236,17 +236,6 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
               onChange={(value) => form.setFieldValue('time', value)}
             />
           </Grid.Col>
-
-          <Grid.Col span={6}>
-            <Textarea
-              mt="md"
-              label="Alınan Kararlar giriniz"
-              placeholder="messaj..."
-              withAsterisk
-              value={form.values.notes}
-              {...form.getInputProps('notes')}
-            />
-          </Grid.Col>
           <Grid.Col span={6}>
             <Textarea
               mt="md"
@@ -257,7 +246,15 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
               {...form.getInputProps('address')}
             />
           </Grid.Col>
-
+          <Grid.Col span={10}>
+            <Text>Alınan Kararlar <span style={{ color: 'red' }}>*</span></Text>
+            <RichTextEditorTiptap
+              form={form}
+              required={true}
+              emitVaue={"notes"}
+              {...form.getInputProps('notes')}
+            />
+          </Grid.Col>
           <Grid.Col span={6} offset={4}>
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
               İptal

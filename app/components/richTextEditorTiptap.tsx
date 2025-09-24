@@ -13,16 +13,17 @@ interface RichTextEditorTiptapProps {
   form: UseFormReturnType<any>;
   required?: boolean;
   value?: string;
+  emitVaue?: string;
 }
 
-function RichTextEditorTiptap({form, required=false, value=""}: RichTextEditorTiptapProps) {
+function RichTextEditorTiptap({form, required=false, value="", emitVaue = "body"}: RichTextEditorTiptapProps) {
   const [error, setError] = useState("İçerik en az 10 karakter olmalıdır.");
   const editor = useEditor({
     extensions: [StarterKit, Underline, Highlight, Placeholder.configure({ placeholder: 'içerik mesajı...' })],
     content: "",
      onUpdate: ({ editor }) => {
        const html = editor.getHTML();
-       form.setFieldValue('body', html);
+       form.setFieldValue(emitVaue, html);
 
        // Real-time validation
       if (required) {

@@ -19,6 +19,7 @@ import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToEx
 import { type PdfTableColumn } from '../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../utils/repor/calculateColumnWidth';
 import { useAuth } from '~/authContext';
+import { stripHtml } from '../utils/stripHtml';
 interface MeetingData {
   id: number;
   name: string;
@@ -213,7 +214,7 @@ export default function Meeting() {
       <Table.Td>{element.participantCount}</Table.Td>
       <Table.Td>{element.responsibleFullName}</Table.Td>
       <Table.Td>{element.meetingTypeName}</Table.Td>
-      <Table.Td>{element.notes?.substring(0,20)}</Table.Td>
+      <Table.Td>{stripHtml(element.notes)?.substring(0,20)}</Table.Td>
       <Table.Td>{element.duration}</Table.Td>
       <Table.Td>{formatDate(element.time, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
       <Table.Td>{formatDate(element.createDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>

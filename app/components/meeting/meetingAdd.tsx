@@ -1,6 +1,6 @@
 import { forwardRef, useImperativeHandle, useEffect, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, TextInput, Button, Stack, Grid, Textarea } from '@mantine/core';
+import { Modal, TextInput, Button, Stack, Text, Grid, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DateTimePicker } from '@mantine/dates';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
@@ -12,6 +12,7 @@ import { MeetingTypeSelect } from '../addOrEdit/meetingTypeSelect';
 import { ResponsibleUserSelect } from '../addOrEdit/responsibleUserSelect';
 import { useMeetingService } from '../../services/meetingService';
 import { toast } from '../../utils/toastMessages'; 
+import { RichTextEditorTiptap } from '../richTextEditorTiptap';
 
 export type MeetingAddDialogControllerRef = {
   open: () => void;
@@ -222,21 +223,21 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
             />
           </Grid.Col>
           <Grid.Col span={6}>
-            <Textarea
-              mt="md"
-              label="Alınan Kararlar giriniz"
-              placeholder="messaj..."
-              withAsterisk
-              {...form.getInputProps('notes')}
-            />
+           <Textarea
+             mt="md"
+             label="Adres giriniz"
+             placeholder="adres..."
+             withAsterisk
+             {...form.getInputProps('address')}
+           />
           </Grid.Col>
-          <Grid.Col span={6}>
-            <Textarea
-              mt="md"
-              label="Adres giriniz"
-              placeholder="adres..."
-              withAsterisk
-              {...form.getInputProps('address')}
+          <Grid.Col span={10}>
+            <Text>Alınan Kararlar <span style={{ color: 'red' }}>*</span></Text>
+            <RichTextEditorTiptap
+              form={form}
+              required={true}
+              emitVaue={"notes"}
+              {...form.getInputProps('notes')}
             />
           </Grid.Col>
           <Grid.Col span={6} offset={4}>
