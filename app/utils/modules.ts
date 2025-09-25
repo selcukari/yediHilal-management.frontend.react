@@ -15,5 +15,5 @@ export const modulesMockData = [
    { key: 'safe', url: '/safe', label: "Kasa Modül" },
    { key: 'branch', url: '/safe', label: "Şubeler Modül" },
    { key: 'settings', url: '/settings', label: "Ayarlar Modül" },
-   { key: 'automaticMessageManagenet', url: '/automaticMessageManagenet', label: "Otomatik Mesaj Modül" },
+   { key: 'automaticMessageManagenet', url: '/automaticMessageManagenets', label: "Otomatik Mesaj Modül" },
 ];

@@ -82,7 +82,7 @@ const menuItems = [
     icon: IconSettingsAutomation,
     label: 'Otomatik Mesaj Yönetimi',
     key: 'automaticMessageManagenet',
-    link: '/vehicles',
+    link: '/automaticMessageManagenets',
     children: [
       { label: 'Otomatik Sms/WhatsApp Yön.', key: 'automaticSmsManagement', link: '/automaticSmsManagement' },
       { label: 'Otomatik Mail Yön.', key: 'automaticMailManagement', link: '/automaticMailManagement' },
