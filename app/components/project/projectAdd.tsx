@@ -1,6 +1,6 @@
 import { forwardRef, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, TextInput, Flex, Button, Stack, Grid, Switch, Textarea } from '@mantine/core';
+import { Modal, TextInput, Flex, Button, Stack, Grid, Switch, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DateTimePicker } from '@mantine/dates';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
@@ -10,7 +10,8 @@ import { PrioritySelect } from '../addOrEdit/prioritySelect';
 import { ResponsibleUserSelect } from '../addOrEdit/responsibleUserSelect';
 import { useProjectService } from '../../services/projectService';
 import { useUserService } from '../../services/userService';
-import { toast } from '../../utils/toastMessages'; 
+import { toast } from '../../utils/toastMessages';
+import { RichTextEditorTiptap } from '../richTextEditorTiptap';
 
 export type ProjectAddDialogControllerRef = {
   open: () => void;
@@ -27,7 +28,6 @@ type FormValues = {
   responsibleFullName?: string | null;
   numberOfParticipant: number;
   note: string;
-  isActive: boolean;
   priority: string;
   finisDate?: string | null;
 };
@@ -48,7 +48,6 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
       numberOfParticipant: 10,
       note: '',
       priority: '',
-      isActive: true,
     },
     validate: {
       name: (value) => (value.trim().length < 5 ? 'Proje başlık en az 5 karakter olmalı' : null),
@@ -180,30 +179,14 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
               onChange={(value) => form.setFieldValue('finisDate', value)}
             />
           </Grid.Col>
-          <Grid.Col span={6}>
-            <Textarea
-              mt="md"
-              label="Note giriniz"
-              placeholder="messaj..."
-              withAsterisk
+          <Grid.Col span={10}>
+            <Text>Alınan Notlar</Text>
+            <RichTextEditorTiptap
+              form={form}
+              emitVaue={"note"}
               {...form.getInputProps('note')}
             />
           </Grid.Col>
-          <Flex
-            mih={50}
-            gap="md"
-            justify="center"
-            align="flex-end"
-            direction="row"
-            wrap="wrap">
-            <Grid.Col span={6}>
-              <Switch
-                label="Proje Durumu" 
-                checked={form.values.isActive}
-                onChange={(event) => form.setFieldValue('isActive', event.currentTarget.checked)}
-              />
-            </Grid.Col>
-          </Flex>
           <Grid.Col span={6} offset={4}>
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
               İptal

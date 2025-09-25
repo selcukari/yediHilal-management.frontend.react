@@ -18,6 +18,7 @@ import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToEx
 import { type PdfTableColumn } from '../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../utils/repor/calculateColumnWidth';
 import { useAuth } from '~/authContext';
+import { stripHtml } from '../utils/stripHtml';
 interface ProjectData {
   id: number;
   numberOfParticipant: number;
@@ -168,7 +169,7 @@ export default function Project() {
           </Badge>
       }</Table.Td>
       <Table.Td>{element.responsibleFullName}</Table.Td>
-      <Table.Td>{element.note}</Table.Td>
+      <Table.Td>{stripHtml(element.note)?.substring(0,25)}</Table.Td>
       <Table.Td>{formatDate(element.createDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
       <Table.Td>{formatDate(element.finisDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
       <Table.Td>

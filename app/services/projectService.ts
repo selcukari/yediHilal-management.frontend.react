@@ -7,7 +7,7 @@ type ProjectType = {
   responsibleFullName?: string;
   numberOfParticipant: number;
   note: string;
-  isActive: boolean;
+  isActive?: boolean;
   priority: string;
   finisDate?: string | null;
 };
