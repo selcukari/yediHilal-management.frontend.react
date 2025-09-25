@@ -73,8 +73,6 @@ const ProjectEdit = forwardRef<ProjectEditDialogControllerRef, UserEditProps>(({
     }
   }
 
-
-
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
 

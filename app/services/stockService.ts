@@ -19,8 +19,10 @@ interface StockUsedExpenseParams {
   isDelivery: boolean;
   type: string;
   title: string;
-  address: string;
-  note: string;
+  address?: string;
+  note?: string;
+  projectId?: number | null;
+  projectName?: string | null;
 }
 
 interface UpdateStockUsedExpenseParams {
@@ -30,8 +32,8 @@ interface UpdateStockUsedExpenseParams {
   isDelivery: boolean;
   type: string;
   title: string;
-  address: string;
-  note: string;
+  address?: string;
+  note?: string;
 }
 
 export function useStockService(controller: string) {

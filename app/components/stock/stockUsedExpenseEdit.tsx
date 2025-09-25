@@ -1,14 +1,15 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, Fragment, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, TextInput, Flex, Button, Stack, Grid, Title, Textarea, Switch } from '@mantine/core';
+import { Modal, TextInput, Flex, Button, Stack, Grid, Select, Title, Textarea, Switch } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { clone } from 'ramda';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useStockService } from '../../services/stockService';
+import { useProjectService } from '../../services/projectService';
 import { toast } from '../../utils/toastMessages';
 import { useAuth } from '~/authContext';
-
 
 interface StockUsedData {
   id: number;
@@ -22,15 +23,20 @@ interface StockDataParams {
   type: string;
   isDelivery: boolean;
   title: string;
-  address: string;
-  note: string;
+  address?: string;
+  note?: string;
+  projectId?: number;
+  projectName?: string;
 }
 
 type FormValues = {
-  isDelivery: boolean;
+  isDelivery?: boolean;
   title: string;
-  address: string;
-  note: string;
+  address?: string;
+  note?: string;
+  projectId?: number;
+  items: StockItem[];
+
 };
 
 interface StockItem {
@@ -40,7 +46,7 @@ interface StockItem {
 }
 
 export type StockUsedExpenseEditDialogControllerRef = {
-  openDialog: (dialogTitle: string, value: StockUsedData, stockDataItems: StockItem[]) => void;
+  openDialog: (dialogTitle: string, value: FormValues, stockDataItems: StockItem[]) => void;
   close: () => void;
 };
 interface UserAddProps {
@@ -51,10 +57,13 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [stockDataFirtsItems, setStockDataFirstItems] = useState<StockItem[]>([]);
   const [dialogTitle, setDialogTitle] = useState("");
-  
+  const [projectData, setProjectData] = useState<any[]>([]);
   const [stockData, setStockData] = useState<any>({ items: [], id: 0 });
   const [opened, { open, close }] = useDisclosure(false);
+
+  const serviceProject = useProjectService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const service = useStockService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
+  
   const { currentUser } = useAuth();
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
@@ -65,6 +74,7 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
       title: '',
       address: '',
       note: '',
+      items: []
     },
     validate: {
       title: (value) => (value.trim().length < 5 ? 'Başlık en az 5 karakter olmalı' : null),
@@ -80,6 +90,26 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
 
     setIsDisabledSubmit(true);
   }, [form.values]);
+
+  const fetchProjects = async () => {
+    try {
+      
+      const getProjects: any[] | null = await serviceProject.getProjects();
+      
+      if (getProjects) {
+        setProjectData(getProjects);
+      } else {
+        toast.info('Hiçbir veri yok!');
+        setProjectData([]);
+      }
+    } catch (error: any) {
+      toast.error(`User yüklenirken hata: ${error.message}`);
+    }
+  };
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
 
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
@@ -108,11 +138,11 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
       id: stockData.id,
       buyerId: currentUser?.id as number,
       items: JSON.stringify(newItems),
-      isDelivery: values.isDelivery,
+      isDelivery: !!values.isDelivery,
       type: stockData.type,
       title: values.title,
       address: values.address,
-      note: values.note
+      note: values.note,
     }
 
     const result = await service.updateStockUsedExpense(newStockValue);
@@ -163,10 +193,10 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
     }
   }
 
-  const openDialog = (dialogTitle: string, value: StockUsedData, stockDataItems: StockItem[]) => {
+  const openDialog = (dialogTitle: string, value: FormValues, stockDataItems: StockItem[]) => {
+      console.log("openDialog:value:", value)
 
     if (value) {
-      form.reset();
         let newStockDataItems = stockDataItems;
 
       const matchingItems = value.items.filter((valueItem: StockItem) => 
@@ -191,6 +221,13 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
       setStockData(value);
       setDialogTitle(dialogTitle);
       setStockDataFirstItems((newStockDataItems))
+
+       form.setValues(value);
+      
+      form.setInitialValues(clone(value));
+      // Sonra form values'larını set et
+
+      form.reset();
       open();
 
     }
@@ -220,30 +257,30 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
     setIsDisabledSubmit(false);
   };
 
-   const rowItems = () => {
-      if (!stockData?.items) return null;
-  
-      return stockData.items.map((item: any, index: number) => (
-        <Fragment key={`item-${index}`}>
-          <Grid.Col span={2}>
-            <Flex mih={50} gap="md" justify="center" align="center" direction="row" wrap="wrap">
-              <Title order={4}>{item.name}:</Title>
-            </Flex>
-          </Grid.Col>
-          <Grid.Col span={1.5}>
-            <TextInput
-              placeholder={`${item.name} giriniz`}
-              value={item.count.toString()}
-              onChange={(event) => {
-                const value = parseInt(event.target.value) || 0;
-                handleItemChange(item.key, value);
-              }}
-              type="number"
-              min={0}
-            />
-          </Grid.Col>
-        </Fragment>
-      ));
+  const rowItems = () => {
+     if (!stockData?.items) return null;
+ 
+     return stockData.items.map((item: any, index: number) => (
+       <Fragment key={`item-${index}`}>
+         <Grid.Col span={2}>
+           <Flex mih={50} gap="md" justify="center" align="center" direction="row" wrap="wrap">
+             <Title order={4}>{item.name}:</Title>
+           </Flex>
+         </Grid.Col>
+         <Grid.Col span={1.5}>
+           <TextInput
+             placeholder={`${item.name} giriniz`}
+             value={item.count.toString()}
+             onChange={(event) => {
+               const value = parseInt(event.target.value) || 0;
+               handleItemChange(item.key, value);
+             }}
+             type="number"
+             min={0}
+           />
+         </Grid.Col>
+       </Fragment>
+     ));
     };
 
   return (<>
@@ -265,26 +302,33 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
           <Grid>
             <Grid.Col span={6}>
               <TextInput
-                label="Etkinlik/Program Adı"
+                label="Başlık Adı"
                 placeholder="Başlık giriniz"
-                required
+                required value={form.values.title}
                 {...form.getInputProps('title')}
               />
-             </Grid.Col>
+            </Grid.Col>
+            <Grid.Col span={6}>
+              <Select
+                label="Proje/Etkinlik Alanı"
+                placeholder="proje/etkinlik Seçiniz"
+                data={projectData.map(item => ({ value: item.id?.toString(), label: item.name }))}
+                searchable clearable maxDropdownHeight={200} disabled
+                nothingFoundMessage="proje/etkinlik bulunamadı..."
+                value={form.values.projectId?.toString() ?? null}
+              />
+            </Grid.Col>
              <Grid.Col span={6}>
               <TextInput
-                label="Adres"
-                placeholder="Adres giriniz"
-                required
+                label="Adres" placeholder="Adres giriniz"
+                value={form.values.address ?? ""}
                 {...form.getInputProps('address')}
               />
              </Grid.Col>
              <Grid.Col span={10} offset={1}>
               <Textarea
-                mt="md"
-                label="Note"
-                placeholder="messaj..."
-                withAsterisk
+                mt="md" label="Note" placeholder="messaj..."
+                withAsterisk value={form.values.note}
                 {...form.getInputProps('note')}
               />
             </Grid.Col>

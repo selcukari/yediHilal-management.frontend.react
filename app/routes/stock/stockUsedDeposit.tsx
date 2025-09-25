@@ -34,6 +34,8 @@ interface StockUsedData {
   note?: string;
   buyerInformations?: any;
   isDelivery?: boolean;
+  projectId?: number;
+  projectName?: string;
 }
 
 interface StockData {
@@ -65,6 +67,7 @@ export default function StockUsedDeposit() {
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
     { field: 'id', header: 'Id' },
     { field: 'title', header: 'Başlık' },
+    { field: 'projectName', header: 'Proje Adı' },
     { field: 'address', header: 'Adres' },
     { field: 'note', header: 'Note' },
     { field: 'items', header: 'Giderler' },
@@ -227,6 +230,8 @@ export default function StockUsedDeposit() {
           title: stockUsed.title,
           address: stockUsed.address,
           note: stockUsed.note,
+          projectId: stockUsed.projectId,
+          projectName: stockUsed.projectName,
           createDate: formatDate(stockUsed.createDate, dateFormatStrings.dateTimeFormatWithoutSecond),
           updateDate: formatDate(stockUsed.updateDate, dateFormatStrings.dateTimeFormatWithoutSecond),
         })));
@@ -352,6 +357,7 @@ export default function StockUsedDeposit() {
                   type={2}
                   isMailDisabled={true}
                   isSmsDisabled={true}
+                  isWhatsAppDisabled={true}
                   />
                   </Flex>
                 </Grid.Col>
