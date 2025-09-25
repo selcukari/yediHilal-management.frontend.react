@@ -17,7 +17,7 @@ import { MenuActionButton } from '../components'
 import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToExcel';
 import { type PdfTableColumn } from '../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../utils/repor/calculateColumnWidth';
-
+import { useAuth } from '~/authContext';
 interface ProjectData {
   id: number;
   numberOfParticipant: number;
@@ -44,6 +44,7 @@ export default function Project() {
   const projectEditRef = useRef<ProjectEditDialogControllerRef>(null);
 
   const service = useProjectService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+  const { currentUser } = useAuth();
 
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
     { field: 'id', header: 'Id' },
@@ -175,7 +176,7 @@ export default function Project() {
           <ActionIcon 
             variant="light" 
             color="blue"
-            disabled={element.finisDate ? true : false}
+            disabled={(currentUser?.id.toString()) as string == element.responsibleId.toString() ? false : true}
             onClick={() => handleEdit(element)}
           >
             <IconEdit size={16} />
@@ -183,7 +184,7 @@ export default function Project() {
           <ActionIcon 
             variant="light" 
             color="red"
-            disabled={element.finisDate ? true : false}
+            disabled={(currentUser?.id.toString()) as string == element.responsibleId.toString() ? (element.finisDate ? true : false) : true}
             onClick={() => handleDelete(element.id)}
           >
             <IconTrash size={16} />
@@ -220,7 +221,7 @@ export default function Project() {
     }));
   }, [rowHeaders]);
   const reportTitle = (): string => {
-    return "Projeler Raporu";
+    return "Projeler Raporu"; 
   }
 
   // raportdata
