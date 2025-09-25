@@ -30,6 +30,7 @@ type FormValues = {
   note: string;
   priority: string;
   finisDate?: string | null;
+  budget?: number;
 };
 
 const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
@@ -48,6 +49,7 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
       numberOfParticipant: 10,
       note: '',
       priority: '',
+      budget: undefined
     },
     validate: {
       name: (value) => (value.trim().length < 5 ? 'Proje başlık en az 5 karakter olmalı' : null),
@@ -166,6 +168,14 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
             <ResponsibleUserSelect
               required={true}
               form={form}
+            />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <TextInput
+              label="Ayrılan Bütçe"
+              placeholder="bütçe giriniz(₺)"
+              type='number'
+              {...form.getInputProps('budget')}
             />
           </Grid.Col>
           <Grid.Col span={6}>

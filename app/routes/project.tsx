@@ -30,6 +30,7 @@ interface ProjectData {
   responsibleFullName: string;
   finisDate: string;
   createDate: string;
+  budget?: number;
 }
 interface Column {
   field: keyof ProjectData;
@@ -53,6 +54,7 @@ export default function Project() {
     { field: 'numberOfParticipant', header: 'Katılımcı Sayısı' },
     { field: 'priority', header: 'Öncelik' },
     { field: 'responsibleFullName', header: 'Sorumlu' },
+    { field: 'budget', header: 'Bütçe ₺' },
     { field: 'note', header: 'Note' },
     { field: 'createDate', header: 'Başlangıç T.' },
     { field: 'finisDate', header: 'Bitiş T.' }
@@ -169,6 +171,7 @@ export default function Project() {
           </Badge>
       }</Table.Td>
       <Table.Td>{element.responsibleFullName}</Table.Td>
+      <Table.Td>{element.budget}</Table.Td>
       <Table.Td>{stripHtml(element.note)?.substring(0,25)}</Table.Td>
       <Table.Td>{formatDate(element.createDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
       <Table.Td>{formatDate(element.finisDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
@@ -330,6 +333,7 @@ export default function Project() {
                     <Table.Th>Katılımcı Sayısı</Table.Th>
                     <Table.Th>Öncelik</Table.Th>
                     <Table.Th>Sorumlu</Table.Th>
+                    <Table.Th>Bütçe</Table.Th>
                     <Table.Th>Note</Table.Th>
                     <Table.Th>Başlangıç Tarih</Table.Th>
                     <Table.Th>Bitiş</Table.Th>

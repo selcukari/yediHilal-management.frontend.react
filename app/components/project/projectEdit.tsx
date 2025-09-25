@@ -31,6 +31,7 @@ type FormValues = {
   note: string;
   priority: string;
   finisDate?: string | null;
+  budget?: number;
 };
 
 const ProjectEdit = forwardRef<ProjectEditDialogControllerRef, UserEditProps>(({onSaveSuccess}, ref) => {
@@ -49,6 +50,7 @@ const ProjectEdit = forwardRef<ProjectEditDialogControllerRef, UserEditProps>(({
       numberOfParticipant: 10,
       note: '',
       priority: '',
+      budget: undefined,
     },
     validate: {
       name: (value) => (value.trim().length < 5 ? 'Proje başlık en az 5 karakter olmalı' : null),
@@ -185,7 +187,13 @@ const ProjectEdit = forwardRef<ProjectEditDialogControllerRef, UserEditProps>(({
               isDisabled
              />
           </Grid.Col>
-
+          <Grid.Col span={6}>
+            <TextInput
+              label="Ayrılan Bütçe" placeholder="bütçe giriniz(₺)"
+              type='number' value={form.values.budget}
+              {...form.getInputProps('budget')}
+            />
+          </Grid.Col>
           <Grid.Col span={6}>
             <DateTimePicker
               dropdownType="modal"
