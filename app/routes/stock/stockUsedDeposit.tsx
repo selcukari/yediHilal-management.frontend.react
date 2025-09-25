@@ -302,7 +302,7 @@ export default function StockUsedDeposit() {
           {/* Sayfa Başlığı */}
           <Group justify="space-between" align="center">
             <div>
-              <Title order={2}>Stock Emanet Sayfası</Title>
+              <Title order={2}>Stok Emanet Sayfası</Title>
               <Text size="sm" c="dimmed">
                 Toolbar Filtreleme Alanı
               </Text>
@@ -362,7 +362,7 @@ export default function StockUsedDeposit() {
           {/* Örnek Tablo */}
           <Paper shadow="xs" p="lg" withBorder>
             <Stack gap="md">
-              <Title order={4}>Son Stock Emanetler({rowsTable?.length || 0})</Title>
+              <Title order={4}>Son Stok Emanetler({rowsTable?.length || 0})</Title>
               <Table.ScrollContainer minWidth={400} maxHeight={700}>
                 <Table striped highlightOnHover withColumnBorders>
                   <Table.Thead>
