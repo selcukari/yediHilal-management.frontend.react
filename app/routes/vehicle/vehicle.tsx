@@ -388,6 +388,7 @@ export default function Vehicle() {
                   type={2}
                   isMailDisabled={true}
                   isSmsDisabled={true}
+                  isWhatsAppDisabled={true}
                   />
                 </Flex>
               </Grid.Col>

@@ -343,6 +343,7 @@ export default function Stock() {
                   type={2}
                   isMailDisabled={true}
                   isSmsDisabled={true}
+                  isWhatsAppDisabled={true}
                   />
                 </Flex>
                 </Grid.Col>

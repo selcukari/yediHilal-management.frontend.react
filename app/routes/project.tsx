@@ -308,6 +308,7 @@ export default function Project() {
                   type={2}
                   isMailDisabled={true}
                   isSmsDisabled={true}
+                  isWhatsAppDisabled={true}
                   />
                 </Flex>
               </Grid.Col>
