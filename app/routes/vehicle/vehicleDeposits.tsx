@@ -17,7 +17,7 @@ import { MenuActionButton } from '../../components'
 import { type ColumnDefinition, type ValueData } from '../../utils/repor/exportToExcel';
 import { type PdfTableColumn } from '../../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../../utils/repor/calculateColumnWidth';
-
+import { mockDataFuelLevel } from '../../utils/vehicleMockData';
 interface Column {
   field: keyof VehicleData;
   header: string;
@@ -192,6 +192,8 @@ export default function VehicleDeposit() {
   const raportVehicleData = useMemo(() => {
     return filteredVehicleDeposits.map((vehicleDeposit: VehicleData) => ({
       ...vehicleDeposit,
+      fuelLevelStart: mockDataFuelLevel.find(fuel => fuel.id == vehicleDeposit.fuelLevelStart)?.name,
+      fuelLevelEnd: mockDataFuelLevel.find(fuel => fuel.id == vehicleDeposit.fuelLevelEnd)?.name,
       givenByFullName: `${vehicleDeposit.givenByFullName}(${vehicleDeposit.givenByPhone})`,
       createDate: formatDate(vehicleDeposit.createDate, dateFormatStrings.dateTimeFormatWithoutSecond),
       returnDate: formatDate(vehicleDeposit.returnDate, dateFormatStrings.dateTimeFormatWithoutSecond),
@@ -205,8 +207,8 @@ export default function VehicleDeposit() {
       <Table.Td>{vehicleDeposit.note}</Table.Td>
       <Table.Td>{vehicleDeposit.mileageStart}</Table.Td>
       <Table.Td>{vehicleDeposit.mileageEnd}</Table.Td>
-      <Table.Td>{vehicleDeposit.fuelLevelStart}</Table.Td>
-      <Table.Td>{vehicleDeposit.fuelLevelEnd}</Table.Td>
+      <Table.Td>{mockDataFuelLevel.find(fuel => fuel.id == vehicleDeposit.fuelLevelStart)?.name}</Table.Td>
+      <Table.Td>{mockDataFuelLevel.find(fuel => fuel.id == vehicleDeposit.fuelLevelEnd)?.name}</Table.Td>
       <Table.Td>{`${vehicleDeposit.givenToFullName}(${vehicleDeposit.givenToPhone})`}</Table.Td>
       <Table.Td>{`${vehicleDeposit.givenByFullName}(${vehicleDeposit.givenByPhone})`}</Table.Td>
       <Table.Td style={{ color: diffDateTimeForColor(vehicleDeposit.createDate) }}>
@@ -291,6 +293,7 @@ export default function VehicleDeposit() {
                  type={2}
                  isMailDisabled={true}
                  isSmsDisabled={true}
+                 isWhatsAppDisabled={true}
                  />
                 </Flex>
               </Grid.Col>

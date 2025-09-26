@@ -18,7 +18,6 @@ const sectionTitles = {
   dashboard: 'Dashboard',
   users: 'Kullanıcılar',
   documents: 'Dökümanlar',
-  reports: 'Raporlar',
   settings: 'Ayarlar',
 };
 

@@ -18,9 +18,6 @@ interface SidebarProps {
 const menuItems = [
   { icon: IconUsers, label: 'Üye Yönetimi', key: 'member', link: '/' },
   { icon: IconUser, label: 'Kullanıcı Yönetimi', key: 'user', link: '/users' },
-  { icon: IconMail, label: 'Gön. Mail Lis.', key: 'mail', link: '/mails' },
-  { icon: IconMessage, label: 'Gön. Sms Lis.', key: 'sms', link: '/sms' },
-  { icon: IconChartBar, label: 'Raporlar', key: 'report', link: '/reports' },
   { icon: IconCoin, label: 'Kasa Yönetimi', key: 'safe', link: '/safe' },
   {
     icon: IconClipboardList,
@@ -33,12 +30,6 @@ const menuItems = [
       { label: 'Depo', key: 'stock-depo', link: '/stocks' },
     ],
   },
-  { icon: IconSettings, label: 'Ayarlar', key: 'setting', link: '/settings',
-    children: [
-      { label: 'Görevler', key: 'duty', link: '/settings-duty' },
-      { label: 'Toplantı Türleri', key: 'meetingType', link: '/settings-meetingType' },
-    ],
-   },
   {
     icon: IconFileCheck,
     label: 'Proje Yönetimi',
@@ -78,7 +69,15 @@ const menuItems = [
       { label: 'Araçlar', key: 'vehicles', link: '/vehicles' },
     ],
   },
-   {
+  { icon: IconMail, label: 'Gön. Mail Lis.', key: 'mail', link: '/mails' },
+  { icon: IconMessage, label: 'Gön. Sms Lis.', key: 'sms', link: '/sms' },
+  { icon: IconSettings, label: 'Ayarlar', key: 'setting', link: '/settings',
+    children: [
+      { label: 'Görevler', key: 'duty', link: '/settings-duty' },
+      { label: 'Toplantı Türleri', key: 'meetingType', link: '/settings-meetingType' },
+    ],
+  },
+  {
     icon: IconSettingsAutomation,
     label: 'Otomatik Mesaj Yönetimi',
     key: 'automaticMessageManagenet',

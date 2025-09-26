@@ -10,7 +10,7 @@ const mockDataTransmissionTypes =[
 ];
 
 const mockDataFuelLevel =[
-  {id: "full", name: "Full"},
+  {id: "full", name: "Dolu"},
   {id: "empty", name: "Boş"},
   {id: "1/2", name: "1/2"},
   {id: "3/4", name: "3/4"},

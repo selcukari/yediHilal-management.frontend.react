@@ -4,7 +4,6 @@ export const modulesMockData = [
    // herkes mail ve sms gonderecek list sayfalarınada girsin
    // { key: 'mail', url: '/mails', label: 'Mail Modül' },
    // { key: 'sms', url: '/sms', label: 'Sms Modül' },
-   { key: 'report', url: '/reports', label: 'Rapor Modül' },
    { key: 'stock', url: '/stocks', label: 'Stock Modül' },
    { key: 'finance', url: '/finances', label: 'Maliye Modül' },
    { key: 'meeting', url: '/meetings', label: 'Toplantı Modül' },
