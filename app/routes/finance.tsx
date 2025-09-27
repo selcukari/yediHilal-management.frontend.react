@@ -1,136 +1,152 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { IconSearch, IconFilter } from '@tabler/icons-react';
 import {
-  Container, Grid, TextInput, Text, Stack, Title, RingProgress,
-  Paper, Button, LoadingOverlay, Flex, Table, Group,
+  Container, Grid, TextInput, Stack, Button, Flex, Group, Title, Text, Paper, Table, LoadingOverlay,
 } from '@mantine/core';
-import { IconSearch, IconPlus } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
+import { useTransactionFinanceService } from '../services/transactionFinanceService';
 import { toast } from '../utils/toastMessages';
-// import ItemAdd, { type ItemAddDialogControllerRef } from '../components/stock/stockAdd';
 import { formatDate } from '../utils/formatDate';
+import {  PaymentType, PaymentTypeStatus } from '../components'
+import { dateFormatStrings } from '../utils/dateFormatStrings';
+import { useAuth } from '~/authContext';
 
-interface ProjectItem {
-  name: string;
-  key: string;
-  count: number;
-  color: string;
-  value?: number;
-  tooltip?: string;
+interface Column {
+  field: string;
+  header: string;
 }
 
-interface ProjectData {
-  id: number;
-  updateUserId: number;
-  updateUserFullName: string;
-  createDate: string;
-  items: ProjectItem[];
-}
-
-export default function Finance() {
-  const [projectData, setProjectData] = useState<ProjectData | null>(null);
+export default function Mail() {
+  const [resultData, setResultData] = useState<any[]>([]);
+  const [searchText, setSearchText] = useState("");
+  const [paymentTypeIds, setPaymentTypeIds] = useState<string[] | null>(null);
+  const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
+  const [paymentTypesData, setPaymentTypesData] = useState<any[]>([]);
   const [visible, { open, close }] = useDisclosure(false);
-  const [searchText, setSearchText] = useState('');
+  
+  const [rowHeaders, setRowHeaders] = useState<Column[]>([
+    { field: 'id', header: 'Id' },
+    { field: 'sender', header: 'Gönderen' },
+    { field: 'receiver', header: 'Alıcı' },
+    { field: 'amount', header: 'Miktar' },
+    { field: 'transactionType', header: 'İşlem Türü' },
+    { field: 'status', header: 'Durum' },
+    { field: 'transactionDate', header: 'İşlem Tarihi' },
+    { field: 'receiverAccount', header: 'Alıcı Hesabı' },
+    { field: 'transactionReference', header: 'işlem Referansı' },
+    { field: 'paymentType', header: 'Ödeme Türü' },
+    { field: 'description', header: 'Açıklama' },
+    { field: 'processedAt', header: 'işlenme tarihi' },
+    { field: 'createDate', header: 'Kayıt Tarihi' },
+  ]);
 
-  // const itemAddRef = useRef<ItemAddDialogControllerRef>(null);
+  const { isLoggedIn } = useAuth();
+
+  const service = useTransactionFinanceService(import.meta.env.VITE_APP_API_FINANCE_CONTROLLER);
+
+  // Filtrelenmiş veriler
+  const filteredUsers = useMemo(() => {
+    if (!searchText) return resultData;
+    
+    return resultData.filter(finance =>
+      finance.sender.toLowerCase().includes(searchText.trim().toLowerCase()) ||
+      finance.description.toLowerCase().includes(searchText.trim().toLowerCase())
+    );
+  }, [resultData, searchText]);
 
   useEffect(() => {
-    setTimeout(() => {
-        // fetchProject();
+    if (isLoggedIn) {
+      setTimeout(() => {
+        fetchTransactionFinance();
       }, 1000);
+    }
   }, []);
 
-  const fetchProject = async () => {
-    open();
-    try {
-      
-      if (true) {
-      
+  const onPaymentTypeChange = (paymentTypeValues: string[] | null): void => {
+    setPaymentTypeIds(paymentTypeValues)
+  };
+
+  const onPaymentTypeStatusChange = (statusValues: string | null): void => {
+    setPaymentStatus(statusValues)
+  };
+
+  const rowsTable = filteredUsers.map((item) => (
+    <Table.Tr key={item.id}>
+      {rowHeaders.map((header) => {
+       if (header.field === 'paymentType') {
+          return (
+            <Table.Td key={header.field}>
+              {item[header.field] ? `${paymentTypesData.find(i => i.id == item[header.field]).name}`: "-"}
+            </Table.Td>
+          );
+        }
+        return (
+          <Table.Td key={header.field}>
+            {item[header.field] || '-'}
+          </Table.Td>
+        );
+      })}
+    </Table.Tr>
+  ));
+
+  const fetchTransactionFinance = async () => {
+     open();
+
+     try {
+      const filterModel = {
+        paymentTypeIds: (paymentTypeIds && paymentTypeIds?.length > 0) ? paymentTypeIds?.join(",") : undefined,
+        status: paymentStatus || undefined
+      };
+
+      const getFinances = await service.getFinances(filterModel);
+      if (getFinances) {
+        setResultData(getFinances.map((finance: any) => ({
+          id: finance.id,
+          sender: finance.sender,
+          receiver: finance.receiver,
+          amount: finance.amount,
+          transactionType: finance.transactionType,
+          status: finance.status,
+          transactionDate: formatDate(finance.transactionDate, dateFormatStrings.dateTimeFormatWithoutSecond),
+          receiverAccount: finance.receiverAccount,
+          transactionReference: finance.transactionReference,
+          paymentType: finance.paymentType,
+          description: finance.description,
+          processedAt: formatDate(finance.processedAt, dateFormatStrings.dateTimeFormatWithoutSecond),
+          createDate: formatDate(finance.createDate, dateFormatStrings.dateTimeFormatWithoutSecond),
+        })));
+       
       } else {
         toast.info('Hiçbir veri yok!');
-        setProjectData(null);
+
+        setResultData([]);
       }
+        close();
     } catch (error: any) {
-      toast.error(`Stok yüklenirken hata: ${error.message}`);
-    } finally {
+      toast.error(`Mail yüklenirken hata: ${error.message}`);
       close();
     }
   };
 
-  const handleSaveSuccess = () => {
-    setTimeout(() => {
-      fetchProject();
-    }, 1500);
-  };
-
-  const elements = [
-  { id: 6, count: 23, responsible: 'Ali',name: "finance name test 1", createDate: "2025-08-31T13:52:20.289Z", finisDate: "2025-11-25T13:52:20.289Z"  },
-  { id: 7, count: 17, responsible: 'Ahmet',name: "finance name test 12", createDate: "2025-08-31T13:52:20.289Z", finisDate: "2025-11-25T13:52:20.289Z"  },
-  { id: 39, count: 27, responsible: 'Fatma',name: "finance name test 13", createDate: "2025-08-31T13:52:20.289Z", finisDate: "2025-11-25T13:52:20.289Z"  },
-  { id: 56, count: 47, responsible: 'Fırat',name: "Pfinanceroje name test 14", createDate: "2025-08-31T13:52:20.289Z", finisDate: "2025-11-25T13:52:20.289Z"  },
-  { id: 58, count: 48, responsible: 'Ayşe', name: "finance name test 15", createDate: "2025-08-31T13:52:20.289Z", finisDate: "2025-11-25T13:52:20.289Z" },
-];
-
-  const rowItems = elements.map((element) => (
-    <Table.Tr key={element.id}>
-      <Table.Td>{element.id}</Table.Td>
-      <Table.Td>{element.name}</Table.Td>
-      <Table.Td>{element.count}</Table.Td>
-      <Table.Td>{element.responsible}</Table.Td>
-      <Table.Td>{formatDate(element.createDate)}</Table.Td>
-      <Table.Td>{formatDate(element.finisDate)}</Table.Td>
-    </Table.Tr>
-  ));
-
-  const calculateTotal = () => {
-    if (!elements) return 0;
-    return elements.reduce((total, item) => total + item.count, 0);
-  };
-
-  const handleAddItem = () => {
-   console.log("proje ekle");
-  }
-
-  const randaomColor = () => {
-    const colors = ["dark", "gray", "red", "pink", "grape", "violet", "indigo", "blue", "cyan", "teal", "green", "lime", "yellow", "orange"];
-    const index = Math.floor(Math.random() * colors.length);
-
-    return colors[index];
-  }
-
   return (
-    <Container size="xl">
-      <LoadingOverlay
-        visible={visible}
-        zIndex={1000}
-        overlayProps={{ radius: 'sm', blur: 2 }}
-        loaderProps={{ color: 'pink', type: 'bars' }}
-      />
-      <Stack gap="lg">
-        {/* Sayfa Başlığı */}
-          <Flex mih={50} gap="md" justify="center" align="center" direction="row" wrap="wrap">
-            <RingProgress
-              size={170}
-              thickness={16}
-              label={
-                <Text size="xs" ta="center" px="xs" style={{ pointerEvents: 'none' }}>
-                  Genel Toplam: {calculateTotal()}
-                </Text>
-              }
-              sections={(elements || []).map(item => ({
-                value: (item.count / Math.max(calculateTotal(), 1)) * 100,
-                color: randaomColor(),
-                tooltip: `${item.name}: ${item.count}`
-              }))}
-            />
-          </Flex>
+      <Container size="xl">
+        <LoadingOverlay
+          visible={visible}
+          zIndex={1000}
+          overlayProps={{ radius: 'sm', blur: 2 }}
+          loaderProps={{ color: 'pink', type: 'bars' }}
+        />
+        <Stack gap="lg">
+          {/* Sayfa Başlığı */}
           <Group justify="space-between" align="center">
             <div>
-              <Title order={2}>Maliye Sayfası</Title>
+              <Title order={2}>Kasa Sayfası</Title>
               <Text size="sm" c="dimmed">
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
           </Group>
+
           {/* İçerik Kartları */}
           <div
             style={{
@@ -141,47 +157,66 @@ export default function Finance() {
           >
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
+
                 <Grid.Col span={4}>
                   <TextInput
-                    label="Maliye Ara"
+                    label="Alıcı veya Açıklama Ara"
                     placeholder="text giriniz"
                     leftSection={<IconSearch size={18} />}
                     value={searchText}
                     onChange={(event) => setSearchText(event.currentTarget.value)}
                   />
                 </Grid.Col>
-                <Grid.Col span={4} offset={3}>
-                <Flex mih={50} gap="md" justify="flex-end" align="flex-end" direction="row" wrap="wrap">
-                <Button variant="filled" leftSection={<IconPlus size={14} />}  onClick={handleAddItem}>Yeni Ekle</Button>
-                </Flex>
-              </Grid.Col>
+                <Grid.Col span={3}>
+                  <PaymentType
+                    onPaymentTypeChange={onPaymentTypeChange}
+                    paymentTypesData={(value) => setPaymentTypesData(value)}
+                  ></PaymentType>
+                </Grid.Col>
+                <Grid.Col span={3}>
+                  <PaymentTypeStatus
+                    onPaymentTypeStatusChange={onPaymentTypeStatusChange}
+                  ></PaymentTypeStatus>
+                </Grid.Col>
+                <Grid.Col span={2}>
+                  <Flex
+                    mih={50}
+                    gap="md"
+                    justify="flex-end"
+                    align="flex-end"
+                    direction="row"
+                    wrap="wrap"
+                  >
+                    <Button
+                      leftSection={<IconFilter size={14} />}
+                      onClick={fetchTransactionFinance}>
+                      Filtrele
+                    </Button>
+                  </Flex>
+                </Grid.Col>
               </Grid>
             </Paper>
           </div>
-            
-        {/* Stok Formu */}
-        <Paper shadow="xs" p="lg" withBorder>
-          <Stack gap="md">
-            <Title order={4}>Son Maliyeler({rowItems?.length || 0})</Title>
-            <Table.ScrollContainer minWidth={400} maxHeight={700}>
-              <Table striped highlightOnHover withColumnBorders>
-                <Table.Thead>
-                  <Table.Tr>
-                    <Table.Th>Id</Table.Th>
-                    <Table.Th>Maliye Adı</Table.Th>
-                    <Table.Th>Katılımcı Sayısı</Table.Th>
-                    <Table.Th>Sorumlu</Table.Th>
-                    <Table.Th>Başlangıç</Table.Th>
-                    <Table.Th>Bitiş</Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>{rowItems}</Table.Tbody>
-              </Table>
-            </Table.ScrollContainer>
-          </Stack>
-        </Paper>
-      </Stack>
-        {/* <ItemAdd ref={itemAddRef} onSaveSuccess={handleSaveSuccess} /> */}
-    </Container>
+
+          {/* Örnek Tablo */}
+          <Paper shadow="xs" p="lg" withBorder>
+            <Stack gap="md">
+              <Title order={4}>Son İşlemler({rowsTable?.length || 0})</Title>
+              <Table.ScrollContainer minWidth={400} maxHeight={700}>
+                <Table striped highlightOnHover withColumnBorders>
+                  <Table.Thead>
+                    <Table.Tr>
+                      {rowHeaders.map((header) => (
+                        <Table.Th key={header.field}>{header.header}</Table.Th>
+                      ))}
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>{rowsTable}</Table.Tbody>
+                </Table>
+              </Table.ScrollContainer>
+            </Stack>
+          </Paper>
+        </Stack>
+      </Container>
   );
 }

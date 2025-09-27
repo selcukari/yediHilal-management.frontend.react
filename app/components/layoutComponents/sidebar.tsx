@@ -18,7 +18,7 @@ interface SidebarProps {
 const menuItems = [
   { icon: IconUsers, label: 'Üye Yönetimi', key: 'member', link: '/' },
   { icon: IconUser, label: 'Kullanıcı Yönetimi', key: 'user', link: '/users' },
-  { icon: IconCoin, label: 'Kasa Yönetimi', key: 'safe', link: '/safe' },
+  { icon: IconCoin, label: 'Finans Yönetimi', key: 'finance', link: '/finances' },
   {
     icon: IconClipboardList,
     label: 'Stock Yönetimi',
@@ -41,17 +41,6 @@ const menuItems = [
     label: 'Şubeler Yönetimi',
     key: 'branch',
     link: '/branches',
-  },
-   {
-    icon: IconReportMoney,
-    label: 'Maliye Yönetimi',
-    key: 'finance',
-    link: '/finances',
-    children: [
-      { label: 'A Maliye', key: 'a-finance', link: '/a-finances' },
-      { label: 'B Maliye', key: 'b-finance', link: '/b-finances' },
-      { label: 'Maliyeler', key: 'finance-all', link: '/finances' },
-    ],
   },
   {
     icon: IconCalendarTime,

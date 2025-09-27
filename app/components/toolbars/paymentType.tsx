@@ -1,7 +1,7 @@
 import { MultiSelect } from '@mantine/core';
 import { useState, useEffect } from 'react';
 import { toast } from '../../utils/toastMessages';
-import { useTransactionSafeService } from '../../services/transactionSafeService';
+import { useTransactionFinanceService } from '../../services/transactionFinanceService';
 
 interface PaymentTypeProps {
   onPaymentTypeChange: (vals: string[] | null) => void;
@@ -12,7 +12,7 @@ export function PaymentType({ onPaymentTypeChange, paymentTypesData }: PaymentTy
   const [paymentType, setPaymentType] = useState<string[] | undefined>(undefined);
   const [paymentTypes, setPaymentTypes] = useState<{ value: string; label: string }[]>([]);
   
-  const service = useTransactionSafeService(import.meta.env.VITE_APP_API_SAFE_CONTROLLER);
+  const service = useTransactionFinanceService(import.meta.env.VITE_APP_API_FINANCE_CONTROLLER);
 
   useEffect(() => {
     fetchPaymentData();

@@ -1,12 +1,12 @@
 import { createApi } from './api';
 import { useAuth } from '~/authContext';
 
-interface SafeParams {
+interface FinanceParams {
   status?: string;
   paymentTypeIds?: string;
 }
 
-export function useTransactionSafeService(controller: string) {
+export function useTransactionFinanceService(controller: string) {
   const { getCurrentToken, logout } = useAuth();
   const api = createApi(getCurrentToken() ?? undefined, logout);
 
@@ -21,10 +21,10 @@ export function useTransactionSafeService(controller: string) {
     }
   };
 
-  const getSafe = async (params: SafeParams) => {
+  const getFinances = async (params: FinanceParams) => {
 
     try {
-      const res = await api.get(`/${controller}/getSafe`, {
+      const res = await api.get(`/${controller}/getFinances`, {
         params: {
           ...(params.paymentTypeIds ? { paymentTypeIds: params.paymentTypeIds} : {}),
           ...(params.status ? { status: params.status} : {}),
@@ -37,5 +37,5 @@ export function useTransactionSafeService(controller: string) {
     }
   };
 
-  return { getPaymentTypes, getSafe };
+  return { getPaymentTypes, getFinances };
 }
