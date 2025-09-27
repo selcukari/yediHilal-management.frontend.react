@@ -16,8 +16,14 @@ interface Column {
   header: string;
 }
 
+interface FinanceCurrentBalanceType {
+  currentBalance: number;
+  updateDate: string;
+}
+
 export default function Mail() {
   const [resultData, setResultData] = useState<any[]>([]);
+  const [financeCurrentBalance, setFinanceCurrentBalance] = useState<FinanceCurrentBalanceType | null>(null);
   const [searchText, setSearchText] = useState("");
   const [paymentTypeIds, setPaymentTypeIds] = useState<string[] | null>(null);
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
@@ -99,6 +105,7 @@ export default function Mail() {
       };
 
       const getFinances = await service.getFinances(filterModel);
+      const getFinanceCurrentBalance: FinanceCurrentBalanceType = await service.getFinanceCurrentBalance();
       if (getFinances) {
         setResultData(getFinances.map((finance: any) => ({
           id: finance.id,
@@ -115,11 +122,14 @@ export default function Mail() {
           processedAt: formatDate(finance.processedAt, dateFormatStrings.dateTimeFormatWithoutSecond),
           createDate: formatDate(finance.createDate, dateFormatStrings.dateTimeFormatWithoutSecond),
         })));
+
+        setFinanceCurrentBalance(getFinanceCurrentBalance);
        
       } else {
         toast.info('Hiçbir veri yok!');
 
         setResultData([]);
+        setFinanceCurrentBalance(null);
       }
         close();
     } catch (error: any) {
@@ -130,17 +140,24 @@ export default function Mail() {
 
   return (
       <Container size="xl">
-        <LoadingOverlay
-          visible={visible}
-          zIndex={1000}
-          overlayProps={{ radius: 'sm', blur: 2 }}
-          loaderProps={{ color: 'pink', type: 'bars' }}
-        />
+        <LoadingOverlay visible={visible} zIndex={1000} overlayProps={{ radius: 'sm', blur: 2 }} loaderProps={{ color: 'pink', type: 'bars' }}/>
         <Stack gap="lg">
           {/* Sayfa Başlığı */}
+          <Flex mih={50} gap="md" justify="center" align="center" direction="row" wrap="wrap">
+              <div>
+                <Group align="center" gap="xs">
+                  <Title order={2}>{`Güncel Bakiye: ${Intl.NumberFormat('tr-TR').format(financeCurrentBalance?.currentBalance ?? 1)}`}
+                  </Title>
+                  <Text size="sm" c="dimmed">₺</Text>
+                </Group>
+                <Text size="sm" c="dimmed">
+                  {`Son Güncelleme Tarihi: ${formatDate(financeCurrentBalance?.updateDate, dateFormatStrings.dateTimeFormatWithoutSecond)}`}
+                </Text>
+              </div>
+          </Flex>
           <Group justify="space-between" align="center">
             <div>
-              <Title order={2}>Kasa Sayfası</Title>
+              <Title order={2}>Finans Sayfası</Title>
               <Text size="sm" c="dimmed">
                 Toolbar Filtreleme Alanı
               </Text>
@@ -179,14 +196,7 @@ export default function Mail() {
                   ></PaymentTypeStatus>
                 </Grid.Col>
                 <Grid.Col span={2}>
-                  <Flex
-                    mih={50}
-                    gap="md"
-                    justify="flex-end"
-                    align="flex-end"
-                    direction="row"
-                    wrap="wrap"
-                  >
+                  <Flex mih={50} gap="md" justify="flex-end" align="flex-end" direction="row" wrap="wrap">
                     <Button
                       leftSection={<IconFilter size={14} />}
                       onClick={fetchTransactionFinance}>

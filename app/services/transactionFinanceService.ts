@@ -21,6 +21,17 @@ export function useTransactionFinanceService(controller: string) {
     }
   };
 
+  const getFinanceCurrentBalance = async () => {
+
+    try {
+      const res = await api.get(`/${controller}/getFinanceCurrentBalance`);
+
+      return res.data.data;
+    } catch (error: any) {
+      return error;
+    }
+  };
+
   const getFinances = async (params: FinanceParams) => {
 
     try {
@@ -37,5 +48,5 @@ export function useTransactionFinanceService(controller: string) {
     }
   };
 
-  return { getPaymentTypes, getFinances };
+  return { getPaymentTypes, getFinances, getFinanceCurrentBalance };
 }
