@@ -183,7 +183,7 @@ export default function MeetingType() {
 
                 <Grid.Col span={4}>
                   <TextInput
-                    label="Görev Ara"
+                    label="Toplantı Türü Ara"
                     placeholder="text giriniz"
                     leftSection={<IconSearch size={18} />}
                     value={searchText}
