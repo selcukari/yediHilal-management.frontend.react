@@ -10,6 +10,13 @@ interface NavbarProps {
   opened: boolean;
   toggle: () => void;
 }
+interface DutiesType {
+  ids: string;
+  names: string;
+  createDate: string;
+  authorizedPersonId: number; // yetkili kişi tarafından atandı id
+  authorizedPersonName: string; // yetkili kişi tarafından atandı name
+}
 
 export function Navbar({ opened, toggle }: NavbarProps) {
   const { isLoggedIn, logout, currentUser } = useAuth();
@@ -32,6 +39,8 @@ export function Navbar({ opened, toggle }: NavbarProps) {
 
         if (getUser) {
 
+          const duties = (getUser.duties ? JSON.parse(getUser.duties): []) as DutiesType[];
+
           userEditRef.current?.openDialog({
           id: getUser.id,
           fullName: getUser.fullName,
@@ -43,11 +52,14 @@ export function Navbar({ opened, toggle }: NavbarProps) {
           isActive: getUser.isActive,
           password: getUser.password,
           moduleRoles: getUser.moduleRoles,
+          responsibilities: getUser.responsibilities,
           roleId: getUser.roleId.toString(),
           countryId: getUser.countryId.toString(),
           provinceId: getUser.provinceId?.toString(),
+          hierarchy: getUser.hierarchy ? getUser.hierarchy.toString() : undefined,
+          dutiesIds: duties && duties[duties.length -1].ids as string,
+          duties: duties, 
           deleteMessageTitle: getUser.deleteMessageTitle?.toString(),
-          createdDate: getUser.createdDate,
           updateDate: getUser.updateDate,
         });
 
