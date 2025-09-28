@@ -4,7 +4,7 @@ import {
 } from '@mantine/core';
 import {
   IconUser, IconMail, IconUsers, IconSettings, IconMessage, IconChartBar, IconFileCheck, IconCar, IconCoin,
-  IconChevronRight, IconClipboardList, IconCalendarTime, IconSettingsAutomation, IconChevronDown, IconReportMoney,
+  IconChevronRight, IconClipboardList, IconCalendarTime, IconSettingsAutomation, IconChevronDown, IconBuildings,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
 import { useAuth } from '~/authContext';
@@ -37,7 +37,7 @@ const menuItems = [
     link: '/projects',
   },
   {
-    icon: IconFileCheck,
+    icon: IconBuildings,
     label: 'Şubeler Yönetimi',
     key: 'branch',
     link: '/branches',
