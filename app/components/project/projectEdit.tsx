@@ -12,6 +12,7 @@ import { useProjectService } from '../../services/projectService';
 import { PrioritySelect } from '../addOrEdit/prioritySelect';
 import { ResponsibleUserSelect } from '../addOrEdit/responsibleUserSelect';
 import { RichTextEditorTiptap } from '../richTextEditorTiptap';
+import { FileUpload } from '../fileInput';
 
 export type ProjectEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -32,6 +33,8 @@ type FormValues = {
   priority: string;
   finisDate?: string | null;
   budget?: number;
+  files?: any[]; // file
+  fileUrls?: string; // kayıtlı fileurls
 };
 
 const ProjectEdit = forwardRef<ProjectEditDialogControllerRef, UserEditProps>(({onSaveSuccess}, ref) => {
@@ -77,11 +80,16 @@ const ProjectEdit = forwardRef<ProjectEditDialogControllerRef, UserEditProps>(({
 
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
+    // Dosya form değerlerinden al
+    const files = form.values.files || [];
+    console.log("files:", files);
 
     const result = await service.updateProject({
       ...values,
       ...(values.finisDate ? { finisDate: new Date(values.finisDate).toISOString()} : {}),
       responsibleId: undefined,
+      budget: values.budget?.toString(),
+      files: files.length > 0 ? files : undefined,
     });
 
     if (result == true) {
@@ -204,6 +212,12 @@ const ProjectEdit = forwardRef<ProjectEditDialogControllerRef, UserEditProps>(({
               minDate={new Date()}
               onChange={(value) => form.setFieldValue('finisDate', value)}
             />
+          </Grid.Col>
+          <Grid.Col>
+            <FileUpload
+                form={form}
+                required={false}
+              />
           </Grid.Col>
           <Grid.Col span={10}>
             <Text>Alınan Notlar</Text>

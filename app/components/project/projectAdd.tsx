@@ -1,6 +1,6 @@
 import { forwardRef, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, TextInput, Flex, Button, Stack, Grid, Switch, Text } from '@mantine/core';
+import { Modal, TextInput, Button, Stack, Grid, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DateTimePicker } from '@mantine/dates';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
@@ -12,6 +12,7 @@ import { useProjectService } from '../../services/projectService';
 import { useUserService } from '../../services/userService';
 import { toast } from '../../utils/toastMessages';
 import { RichTextEditorTiptap } from '../richTextEditorTiptap';
+import { FileUpload } from '../fileInput';
 
 export type ProjectAddDialogControllerRef = {
   open: () => void;
@@ -31,6 +32,7 @@ type FormValues = {
   priority: string;
   finisDate?: string | null;
   budget?: number;
+  files?: any[]; // Yeni alan: Google Drive URL'leri
 };
 
 const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
@@ -49,7 +51,8 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
       numberOfParticipant: 10,
       note: '',
       priority: '',
-      budget: undefined
+      budget: undefined,
+      files: [],
     },
     validate: {
       name: (value) => (value.trim().length < 5 ? 'Proje başlık en az 5 karakter olmalı' : null),
@@ -61,39 +64,51 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
 
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
-    const getUser = await serviceUser.user(parseInt(values.responsibleId ?? "1"));
+    
+    try {
+      // Dosya form değerlerinden al
+      const files = form.values.files || [];
 
 
-    const result = await service.addProject({
-      ...values,
-      ...(values.finisDate ? { finisDate: new Date(values.finisDate).toISOString()} : {}),
-      responsibleFullName: getUser?.fullName ? getUser.fullName : undefined,
-      responsibleId: values.responsibleId ? parseInt(values.responsibleId) : undefined,
-    });
+      const getUser = await serviceUser.user(parseInt(values.responsibleId ?? "1"));
 
-    if (result === true) {
+      // Proje verilerini hazırla (dosya bilgilerini de ekle)
+      const projectData = {
+        ...values,
+        ...(values.finisDate ? { finisDate: new Date(values.finisDate).toISOString()} : {}),
+        responsibleFullName: getUser?.fullName ? getUser.fullName : undefined,
+        responsibleId: values.responsibleId?.toString(),
+        budget: values.budget?.toString(),
+        files: files.length > 0 ? files : undefined,
+      };
 
-      toast.success('İşlem başarılı!');
-      
-      // onSaveSuccess event'ini tetikle
-      if (onSaveSuccess) {
-        onSaveSuccess();
+      const result = await service.addProject(projectData);
+
+      if (result === true) {
+        toast.success('Proje başarıyla eklendi!');
+        
+        // onSaveSuccess event'ini tetikle
+        if (onSaveSuccess) {
+          onSaveSuccess();
+        }
+        
+        close();
+        form.reset();
+        setIsDisabledSubmit(false);
+        return;
       }
       
-      close();
-      form.reset();
+      if (result?.data === false && result?.errors?.length > 0) {
+        toast.warning(result.errors[0]);
+      } else {
+        toast.error('Proje eklenirken bir hata oluştu!');
+      }
+    } catch (error) {
+      console.error('Submit error:', error);
+      toast.error('İşlem sırasında bir hata oluştu!');
+    } finally {
       setIsDisabledSubmit(false);
-
-      return;
     }
-    if (result?.data === false && result?.errors?.length > 0) {
-
-      toast.warning(result.errors[0]);
-
-    } else {
-      toast.error('Bir hata oluştu!');
-    }
-    setIsDisabledSubmit(false);
   };
 
   const confirmDialogHandleConfirm = () => {
@@ -108,7 +123,6 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
 
   const dialogClose = () => {
      if (!isEquals(form.getInitialValues(), form.getValues())) {
-
       confirmModalRef.current?.open();
     } else {
       // Eğer form boşsa direkt kapat
@@ -188,6 +202,12 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
               minDate={new Date()}
               onChange={(value) => form.setFieldValue('finisDate', value)}
             />
+          </Grid.Col>
+          <Grid.Col>
+            <FileUpload
+                form={form}
+                required={false}
+              />
           </Grid.Col>
           <Grid.Col span={10}>
             <Text>Alınan Notlar</Text>

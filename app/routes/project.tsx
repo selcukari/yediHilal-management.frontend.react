@@ -31,6 +31,7 @@ interface ProjectData {
   finisDate: string;
   createDate: string;
   budget?: number;
+  fileUrls?: string;
 }
 interface Column {
   field: keyof ProjectData;
@@ -89,6 +90,7 @@ export default function Project() {
   const handleEdit = (value: ProjectData) => {
     projectEditRef.current?.openDialog({
       ...value,
+      fileUrls: value.fileUrls,
       responsibleId: value.responsibleId.toString()
     });
   };
