@@ -22,17 +22,18 @@ export function FileUpload({ form, required = false }: FileUploadProps) {
     if (!files) return;
 
     // Sadece PDF, PNG ve JPEG dosyalarını kabul et
-    const allowedTypes = ['text/plain','application/pdf', 'image/png', 'image/jpeg', 'image/jpg',
+    const allowedTypes = ['text/plain','application/pdf', 'image/png', 'image/jpeg', 'image/jpg', 'application/x-zip-compressed',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
     const validFiles = files.filter(file => {
+      console.log("file:", file)
       const isValidType = allowedTypes.includes(file.type);
-      const isValidSize = file.size <= 10 * 1024 * 1024; // 10MB limit
+      const isValidSize = file.size <= 20 * 1024 * 1024; // 10MB limit
       
       if (!isValidType) {
-        toast.warning(`${file.name} - Sadece PDF, PNG, Txt, Word, Excel ve JPEG dosyaları yüklenebilir`);
+        toast.warning(`${file.name} - Sadece PDF, PNG, Txt, Word, Excel, Zip ve JPEG dosyaları yüklenebilir`);
       }
       if (!isValidSize) {
-        toast.warning(`${file.name} - Dosya boyutu 10MB'den küçük olmalı`);
+        toast.warning(`${file.name} - Dosya boyutu 20MB'den küçük olmalı`);
       }
       
       return isValidType && isValidSize;
@@ -111,11 +112,11 @@ export function FileUpload({ form, required = false }: FileUploadProps) {
     <Stack gap="sm">
       <FileInput
         label="Dosya Yükle"
-        description="Sadece PDF, PNG ve JPEG dosyaları yüklenebilir (Max: 10MB)"
+        description="Sadece PDF, PNG, TXT, Zip ve JPEG dosyaları yüklenebilir (Max: 10MB)"
         placeholder="Dosya seçin"
         multiple clearable 
         radius="lg"
-        accept=".txt,.pdf,.png,.jpeg,.jpg,.docx,.xlsx"
+        accept=".txt,.pdf,.png,.jpeg,.jpg,.docx,.xlsx,.zip"
         onChange={handleFileChange}
         leftSection={<IconUpload style={{ width: rem(18), height: rem(18) }} />}
         required={required}
