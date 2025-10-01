@@ -2,9 +2,10 @@ import { createApi } from './api';
 import { useAuth } from '~/authContext';
 
 interface BranchDataParams {
+  id?: number;
   branchName: string;
-  provinceId?: number;
-  branchHeadId: number;
+  provinceId?: string;
+  branchHeadId?: string;
   address?: string | null;
   phone?: string | null;
   email?: string | null;
@@ -14,6 +15,7 @@ interface BranchDataParams {
   createDate?: string | null;
   rentalPrice?: number;
   isRent: boolean;
+  files?: any[];
 }
 
 export function useBranchService(controller: string) {
@@ -43,9 +45,29 @@ export function useBranchService(controller: string) {
   };
 
   const addBranch = async (params: BranchDataParams) => {
+    // FormData oluştur
+    const formData = new FormData()
 
     try {
-      const res = await api.post(`/${controller}/addBranch`, params);
+      // Temel proje verilerini ekle
+      formData.append('branchName', params.branchName);
+      formData.append('branchHeadId', params.branchHeadId || '');
+      formData.append('provinceId', params.provinceId || '');
+      formData.append('address', params.address || '');
+      formData.append('phone', params.phone || "");
+      formData.append('email', params?.email || '');
+      formData.append('socialMedias', params.socialMedias || '');
+      formData.append('openingDate', params.openingDate || '');
+      formData.append('rentalPrice', params.rentalPrice?.toString() || '0');
+      formData.append('openingDate', params.openingDate || '');
+      formData.append('isRent', params.isRent ? "1" : '');
+
+      // Dosyaları ekle
+      (params.files || []).forEach((file: File) => {
+        formData.append('files', file);
+      });
+
+      const res = await api.post(`/${controller}/addBranch`, formData);
 
       return res.data.data;
     } catch (error: any) {
@@ -54,9 +76,27 @@ export function useBranchService(controller: string) {
   };
 
   const updateBranch = async (params: BranchDataParams) => {
-
+    // FormData oluştur
+    const formData = new FormData()
     try {
-      const res = await api.put(`/${controller}/updateBranch`, params);
+      // Temel proje verilerini ekle
+      formData.append('id', params.id?.toString() || "");
+      formData.append('branchName', params.branchName);
+      formData.append('branchHeadId', params.branchHeadId || '');
+      formData.append('address', params.address || '');
+      formData.append('phone', params.phone || "");
+      formData.append('email', params?.email || '');
+      formData.append('socialMedias', params.socialMedias || '');
+      formData.append('openingDate', params.openingDate || '');
+      formData.append('rentalPrice', params.rentalPrice?.toString() || '0');
+      formData.append('openingDate', params.openingDate || '');
+      formData.append('isRent', params.isRent ? "1" : '');
+
+      // Dosyaları ekle
+      (params.files || []).forEach((file: File) => {
+        formData.append('files', file);
+      });
+      const res = await api.put(`/${controller}/updateBranch`, formData);
 
       return res.data.data;
     } catch (error: any) {

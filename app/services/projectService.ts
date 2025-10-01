@@ -2,7 +2,7 @@ import { createApi } from './api';
 import { useAuth } from '~/authContext';
 
 type ProjectType = {
-  id?: number; 
+  id?: number;
   name: string;
   responsibleId?: string;
   responsibleFullName?: string;
@@ -12,7 +12,7 @@ type ProjectType = {
   priority: string;
   finisDate?: string | null;
   budget?: string | null;
-  files?: any[]; // Yeni alan: Google Drive URL'leri
+  files?: any[];
 };
 
 export function useProjectService(controller: string) {
@@ -50,7 +50,7 @@ export function useProjectService(controller: string) {
       formData.append('name', params.name);
       formData.append('note', params.note || '');
       formData.append('finisDate', params.finisDate || '');
-      formData.append('budget', params.budget?.toString() || '');
+      formData.append('budget', params.budget?.toString() || '0');
       formData.append('priority', params.priority);
       formData.append('responsibleFullName', params?.responsibleFullName || '');
       formData.append('responsibleId', params.responsibleId?.toString() || '');

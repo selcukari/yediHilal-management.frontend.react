@@ -82,7 +82,6 @@ const ProjectEdit = forwardRef<ProjectEditDialogControllerRef, UserEditProps>(({
     setIsDisabledSubmit(true);
     // Dosya form değerlerinden al
     const files = form.values.files || [];
-    console.log("files:", files);
 
     const result = await service.updateProject({
       ...values,
@@ -215,8 +214,8 @@ const ProjectEdit = forwardRef<ProjectEditDialogControllerRef, UserEditProps>(({
           </Grid.Col>
           <Grid.Col>
             <FileUpload
-                form={form}
-                required={false}
+              form={form}
+              required={false}
               />
           </Grid.Col>
           <Grid.Col span={10}>

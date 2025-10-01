@@ -12,6 +12,7 @@ import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useUserService } from '../../services/userService';
 import { useBranchService } from '../../services/branchService';
 import { toast } from '../../utils/toastMessages';
+import { FileUpload } from '../fileInput';
 
 export type BranchEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -35,6 +36,7 @@ type FormValues = {
   rentalPrice?: number;
   isRent: boolean;
   isActive: boolean;
+  files?: any[];
 };
 type GetUserData = {
   id: string;
@@ -74,6 +76,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
       rentalPrice: 1000,
       isRent: true,
       isActive: true,
+      files: []
     },
     validate: {
       branchName: (value) => (value.trim().length < 5 ? 'Şube Adı en az 5 karakter olmalı' : null),
@@ -87,13 +90,16 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
 
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
-
+    // Dosya form değerlerinden al
+    const files = form.values.files || [];
+    
     const result = await service.updateBranch({
       ...omit(['isActive', 'provinceId'], values),
+      files: files.length > 0 ? files : undefined,
       branchName: values.branchName.trim(),
       isRent: values.isRent,
       rentalPrice: values.isRent ? values.rentalPrice : undefined,
-      branchHeadId: values.branchHeadId ? parseInt(values.branchHeadId) : 1,
+      branchHeadId: values.branchHeadId as string,
     });
 
     if (result === true) {
@@ -328,6 +334,12 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
               value={form.values.rentalPrice}
               {...form.getInputProps('rentalPrice')}
             />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <FileUpload
+              form={form}
+              required={false}
+              />
           </Grid.Col>
           {/* dagişen sancaktar baskana baglı olanlar listesi */}
           {(rowsSancaktarUserTable())?.length > 0 &&

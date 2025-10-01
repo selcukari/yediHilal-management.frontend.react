@@ -14,6 +14,7 @@ import { RichTextEditorTiptap } from '../richTextEditorTiptap';
 import { useMeetingService } from '../../services/meetingService';
 import { PrioritySelect } from '../addOrEdit/prioritySelect';
 import { ResponsibleUserSelect } from '../addOrEdit/responsibleUserSelect';
+import { FileUpload } from '../fileInput';
 
 export type MeetingEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -37,6 +38,8 @@ type FormValues = {
   notes?: string;
   priority: string;
   time: string | null;
+  files?: any[]; // file
+  fileUrls?: string; // kayıtlı fileurls
 };
 
 const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>(({onSaveSuccess}, ref) => {
@@ -92,13 +95,14 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
     }
   }
 
-
-
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
-
+    // Dosya form değerlerinden al
+    const files = form.values.files || [];
+    
     const result = await service.updateMeeting({
       ...values,
+      files: files.length > 0 ? files : undefined,
       responsibleId: values.responsibleId ? parseInt(values.responsibleId) : 1,
       meetingTypeId: values.meetingTypeId ? parseInt(values.meetingTypeId) : 1,
       provinceId: values.provinceId ? parseInt(values.provinceId) : 1,
@@ -234,6 +238,12 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
               required error={errorTime} clearable minDate={new Date()}
               value={form.values.time}
               onChange={(value) => form.setFieldValue('time', value)}
+            />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <FileUpload
+              form={form}
+              required={false}
             />
           </Grid.Col>
           <Grid.Col span={6}>

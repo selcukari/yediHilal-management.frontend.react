@@ -69,7 +69,6 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
       // Dosya form değerlerinden al
       const files = form.values.files || [];
 
-
       const getUser = await serviceUser.user(parseInt(values.responsibleId ?? "1"));
 
       // Proje verilerini hazırla (dosya bilgilerini de ekle)

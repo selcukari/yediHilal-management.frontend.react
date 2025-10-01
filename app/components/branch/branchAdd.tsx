@@ -12,6 +12,7 @@ import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useUserService } from '../../services/userService';
 import { useBranchService } from '../../services/branchService';
 import { toast } from '../../utils/toastMessages';
+import { FileUpload } from '../fileInput';
 
 export type BranchAddDialogControllerRef = {
   openDialog: () => void;
@@ -24,7 +25,7 @@ interface UserAddProps {
 
 type FormValues = {
   branchName: string;
-  provinceId: number;
+  provinceId: string;
   branchHeadId: string | null;
   address?: string | null;
   phone?: string | null;
@@ -35,6 +36,7 @@ type FormValues = {
   createDate?: string | null;
   rentalPrice?: number;
   isRent: boolean;
+  files?: any[];
 };
 type GetUserData = {
   id: string;
@@ -55,7 +57,7 @@ const BranchAdd = forwardRef<BranchAddDialogControllerRef, UserAddProps>(({onSav
   const form = useForm<FormValues>({
     initialValues: {
       branchName: '',
-      provinceId: 0,
+      provinceId: "",
       branchHeadId: "",
       address:"",
       phone: "",
@@ -66,6 +68,7 @@ const BranchAdd = forwardRef<BranchAddDialogControllerRef, UserAddProps>(({onSav
       createDate: "",
       rentalPrice: 1000,
       isRent: true,
+      files: [],
     },
     validate: {
       branchName: (value) => (value.trim().length < 5 ? 'Şube Adı en az 5 karakter olmalı' : null),
@@ -79,13 +82,16 @@ const BranchAdd = forwardRef<BranchAddDialogControllerRef, UserAddProps>(({onSav
 
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
+    // Dosya form değerlerinden al
+    const files = form.values.files || [];
 
     const result = await service.addBranch({
       ...values,
+      files: files.length > 0 ? files : undefined,
       rentalPrice: values.isRent ? values.rentalPrice : undefined,
       branchName: values.branchName.trim(),
-      provinceId: values.provinceId ? parseInt(values.provinceId.toString()) : 1,
-      branchHeadId: values.branchHeadId ? parseInt(values.branchHeadId) : 1,
+      provinceId: values.provinceId as string,
+      branchHeadId: values.branchHeadId as string,
     });
 
     if (result === true) {
@@ -268,6 +274,12 @@ const BranchAdd = forwardRef<BranchAddDialogControllerRef, UserAddProps>(({onSav
               disabled={!form.values.isRent} required={form.values.isRent}
               {...form.getInputProps('rentalPrice')}
             />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <FileUpload
+              form={form}
+              required={false}
+              />
           </Grid.Col>
           <Grid.Col span={6} offset={4}>
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">

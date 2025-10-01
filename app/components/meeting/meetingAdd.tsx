@@ -13,6 +13,7 @@ import { ResponsibleUserSelect } from '../addOrEdit/responsibleUserSelect';
 import { useMeetingService } from '../../services/meetingService';
 import { toast } from '../../utils/toastMessages'; 
 import { RichTextEditorTiptap } from '../richTextEditorTiptap';
+import { FileUpload } from '../fileInput';
 
 export type MeetingAddDialogControllerRef = {
   open: () => void;
@@ -35,6 +36,7 @@ type FormValues = {
   notes?: string;
   priority: string;
   time: string | null;
+  files?: any[];
 };
 
 const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
@@ -57,6 +59,7 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
       participantCount: 5,
       notes: '',
       priority: '',
+      files: [],
       time: '',},
     validate: {
       name: (value) => (value.trim().length < 5 ? 'Toplantı başlık en az 5 karakter olmalı' : null),
@@ -79,9 +82,12 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
 
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
+    // Dosya form değerlerinden al
+    const files = form.values.files || [];
 
     const result = await service.addMeeting({
       ...values,
+      files: files.length > 0 ? files : undefined,
       responsibleId: values.responsibleId ? parseInt(values.responsibleId) : 1,
       meetingTypeId: values.meetingTypeId ? parseInt(values.meetingTypeId) : 1,
       provinceId: values.provinceId ? parseInt(values.provinceId) : 1,
@@ -230,6 +236,12 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
              withAsterisk
              {...form.getInputProps('address')}
            />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <FileUpload
+              form={form}
+              required={false}
+            />
           </Grid.Col>
           <Grid.Col span={10}>
             <Text>Alınan Kararlar <span style={{ color: 'red' }}>*</span></Text>

@@ -25,7 +25,6 @@ export function FileUpload({ form, required = false }: FileUploadProps) {
     const allowedTypes = ['text/plain','application/pdf', 'image/png', 'image/jpeg', 'image/jpg', 'application/x-zip-compressed',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
     const validFiles = files.filter(file => {
-      console.log("file:", file)
       const isValidType = allowedTypes.includes(file.type);
       const isValidSize = file.size <= 20 * 1024 * 1024; // 10MB limit
       
@@ -112,7 +111,7 @@ export function FileUpload({ form, required = false }: FileUploadProps) {
     <Stack gap="sm">
       <FileInput
         label="Dosya Yükle"
-        description="Sadece PDF, PNG, TXT, Zip ve JPEG dosyaları yüklenebilir (Max: 10MB)"
+        description="Sadece PDF, PNG, TXT, Zip ve JPEG dosyaları yüklenebilir (Max: 20MB)"
         placeholder="Dosya seçin"
         multiple clearable 
         radius="lg"
@@ -123,7 +122,7 @@ export function FileUpload({ form, required = false }: FileUploadProps) {
       />
 
       {/* Edit yapıldıgında Form'a eklenmiş dosyaların listesi */}
-      {form.values.fileUrls?.split(",")?.map((fileUrl: string, index: number) => (
+      {form.values.fileUrls && form.values.fileUrls?.split(",")?.map((fileUrl: string, index: number) => (
         <Group key={index} justify="space-between" bg="gray.0" p="xs" style={{ borderRadius: '4px' }}>
           <Group gap="sm">
             <IconFile size={16} />
