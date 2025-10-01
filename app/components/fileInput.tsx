@@ -22,14 +22,14 @@ export function FileUpload({ form, required = false }: FileUploadProps) {
     if (!files) return;
 
     // Sadece PDF, PNG ve JPEG dosyalarını kabul et
-    const allowedTypes = ['text/plain','application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
+    const allowedTypes = ['text/plain','application/pdf', 'image/png', 'image/jpeg', 'image/jpg',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
     const validFiles = files.filter(file => {
-      console.log("file:", file)
       const isValidType = allowedTypes.includes(file.type);
       const isValidSize = file.size <= 10 * 1024 * 1024; // 10MB limit
       
       if (!isValidType) {
-        toast.warning(`${file.name} - Sadece PDF, PNG ve JPEG dosyaları yüklenebilir`);
+        toast.warning(`${file.name} - Sadece PDF, PNG, Txt, Word, Excel ve JPEG dosyaları yüklenebilir`);
       }
       if (!isValidSize) {
         toast.warning(`${file.name} - Dosya boyutu 10MB'den küçük olmalı`);
@@ -115,7 +115,7 @@ export function FileUpload({ form, required = false }: FileUploadProps) {
         placeholder="Dosya seçin"
         multiple clearable 
         radius="lg"
-        accept=".txt,.pdf,.png,.jpeg,.jpg"
+        accept=".txt,.pdf,.png,.jpeg,.jpg,.docx,.xlsx"
         onChange={handleFileChange}
         leftSection={<IconUpload style={{ width: rem(18), height: rem(18) }} />}
         required={required}

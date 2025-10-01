@@ -194,7 +194,7 @@ const VehicleEdit = forwardRef<VehicleEditDialogControllerRef, VehicleEditProps>
       onClose={() => {
         dialogClose();
       }}
-      title="Yeni Ürün Ekle"
+      title="Araç Düzenle"
       centered
       size="700"
       overlayProps={{

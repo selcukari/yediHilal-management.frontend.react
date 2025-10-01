@@ -184,7 +184,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
     close,
   }));
   const [rowSancaktarUserHeaders, setRowSancaktarUserHeaders] = useState<TableHeader[]>([
-    { field: 'fullName', header: 'Görevi' },
+    { field: 'fullName', header: 'İsim' },
     { field: 'phone', header: 'Telefon' },
   ]);
 

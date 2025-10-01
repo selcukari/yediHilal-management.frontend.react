@@ -183,7 +183,7 @@ const VehicleAdd = forwardRef<VehicleAddDialogControllerRef, VehicleAddProps>(({
       onClose={() => {
         dialogClose();
       }}
-      title="Yeni Ürün Ekle"
+      title="Yeni Araç Ekle"
       centered
       size="700"
       overlayProps={{
