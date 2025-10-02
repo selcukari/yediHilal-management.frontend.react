@@ -76,6 +76,9 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
         return null; // Geçerli
       },
       email: (value) => {
+        if (form.values.isMail) {
+          return /^\S+@\S+$/.test(value) ? null : 'Geçersiz email adresi';
+        }
         if (!value?.trim()) return null;
 
         return /^\S+@\S+$/.test(value) ? null : 'Geçersiz email adresi';
