@@ -85,6 +85,7 @@ const ProjectEdit = forwardRef<ProjectEditDialogControllerRef, UserEditProps>(({
 
     const result = await service.updateProject({
       ...values,
+      name: values.name.trim(),
       ...(values.finisDate ? { finisDate: new Date(values.finisDate).toISOString()} : {}),
       responsibleId: undefined,
       budget: values.budget?.toString(),

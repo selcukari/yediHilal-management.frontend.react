@@ -88,11 +88,6 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
 
         return /^\S+@\S+$/.test(value) ? null : 'Geçersiz email adresi';
       },
-      countryCode: (value) => {
-        if (!value?.trim()) return null;
-
-        return /^[0-9]+$/.test(value) ? null : 'Geçersiz ülkekodu';
-      },
       phone: (value) => {
 
         if (!form.values.referenceId) {
@@ -155,6 +150,7 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
 
     const newMemberValue = {
       ...omit(['createdDate', 'updateDate'], values),
+      fullName: values.fullName.trim(),
       deleteMessageTitle: (values.isActive ? undefined : (values.deleteMessageTitle ? values.deleteMessageTitle.trim() : undefined )),
       typeIds: values.typeIds ? values.typeIds : typeIdVoluntarily,
       provinceId: values.provinceId ? parseInt(values.provinceId) : undefined,
@@ -283,20 +279,14 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
           </Grid.Col>
 
           <Grid.Col span={2}>
-            <TextInput
-              label="Ülke Kodu"
-              placeholder="Ülke kodu giriniz"
-              value={form.values.countryCode}
-              disabled={isDisabledCountryCode}
-              {...form.getInputProps('countryCode')}
+            <TextInput label="Ülke Kodu" placeholder="Ülke kodu giriniz" value={form.values.countryCode} disabled={isDisabledCountryCode}
+              type='number' {...form.getInputProps('countryCode')}
             />
           </Grid.Col>
 
           <Grid.Col span={4}>
             <TextInput
-              label="Telefon"
-              placeholder="505 555 5555"
-              value={form.values.phone}
+              label="Telefon" placeholder="505 555 5555" value={form.values.phone}
               disabled={isDisabledPhone}
               {...form.getInputProps('phone')}
             />
@@ -313,10 +303,9 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
 
           <Grid.Col span={6}>
             <TextInput
-              label="Doğum Tarih"
-              placeholder="Doğum Tarihini giriniz"
+              label="Doğum Tarih" placeholder="Doğum Tarihini giriniz(2000)"
               value={form.values.dateOfBirth}
-              {...form.getInputProps('dateOfBirth')}
+              type='number' {...form.getInputProps('dateOfBirth')}
             />
           </Grid.Col>
 

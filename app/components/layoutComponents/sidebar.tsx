@@ -3,7 +3,7 @@ import {
   NavLink, Flex, Text, Stack, Divider, Group, ScrollArea, AppShell,
 } from '@mantine/core';
 import {
-  IconUser, IconMail, IconUsers, IconSettings, IconMessage, IconChartBar, IconFileCheck, IconCar, IconCoin,
+  IconUser, IconMail, IconUsers, IconSettings, IconMessage, IconExternalLink, IconFileCheck, IconCar, IconCoin,
   IconChevronRight, IconClipboardList, IconCalendarTime, IconSettingsAutomation, IconChevronDown, IconBuildings,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
@@ -75,6 +75,12 @@ const menuItems = [
       { label: 'Otomatik Sms/WhatsApp Yön.', key: 'automaticSmsManagement', link: '/automaticSmsManagement' },
       { label: 'Otomatik Mail Yön.', key: 'automaticMailManagement', link: '/automaticMailManagement' },
     ],
+  },
+    {
+    icon: IconExternalLink,
+    label: 'Dış Link Üye Ekle',
+    key: 'memberCreate',
+    link: '/memberCreate',
   },
 ];
 

@@ -100,9 +100,6 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
 
         return null; // Geçerli
       },
-      countryCode: (value) => {
-        return /^[0-9]+$/.test(value) ? null : 'Geçersiz ülkekodu';
-      },
       phone: (value) => {
         return /^[0-9]+$/.test(value) ? null : 'Sadece rakam girebilirsiniz';
       },
@@ -135,6 +132,7 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
 
     const newMemberValue = {
       ...values,
+      fullName: values.fullName.trim(),
       deleteMessageTitle: (values.isActive ? undefined : (values.deleteMessageTitle ? values.deleteMessageTitle.trim() : undefined )),
       provinceId: values.provinceId ? parseInt(values.provinceId) : undefined,
       countryId: values.countryId ? parseInt(values.countryId) : undefined,
@@ -300,7 +298,7 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
             <TextInput
               label="Ülke Kodu"
               placeholder="Ülke kodu giriniz"
-              required
+              required type='number'
               {...form.getInputProps('countryCode')}
             />
           </Grid.Col>

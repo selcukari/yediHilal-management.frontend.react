@@ -116,10 +116,6 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
 
         return null; // Geçerli
       },
-      countryCode: (value) => {
-
-        return /^[0-9]+$/.test(value) ? null : 'Geçersiz ülkekodu';
-      },
       phone: (value) => {
         return /^[0-9]+$/.test(value) ? null : 'Sadece rakam girebilirsiniz';
       },
@@ -231,6 +227,7 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
     const newUserValue = {
       ...omit(['createdDate', 'updateDate', 'dutiesIds'], values),
       deleteMessageTitle: (values.isActive ? undefined : (values.deleteMessageTitle ? values.deleteMessageTitle.trim() : undefined )),
+      fullName: values.fullName.trim(),
       provinceId: values.provinceId ? parseInt(values.provinceId) : undefined,
       countryId: values.countryId ? parseInt(values.countryId) : undefined,
       roleId: values.roleId ? parseInt(values.roleId) : undefined,
@@ -365,7 +362,7 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
               label="Ülke Kodu"
               placeholder="Ülke kodu giriniz"
               value={form.values.countryCode}
-              required
+              required type='number'
               {...form.getInputProps('countryCode')}
             />
           </Grid.Col>

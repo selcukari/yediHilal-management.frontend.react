@@ -87,6 +87,7 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
 
     const result = await service.addMeeting({
       ...values,
+      name: values.name.trim(),
       files: files.length > 0 ? files : undefined,
       responsibleId: values.responsibleId ? parseInt(values.responsibleId) : 1,
       meetingTypeId: values.meetingTypeId ? parseInt(values.meetingTypeId) : 1,

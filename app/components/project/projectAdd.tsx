@@ -74,6 +74,7 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
       // Proje verilerini hazırla (dosya bilgilerini de ekle)
       const projectData = {
         ...values,
+        name: values.name.trim(),
         ...(values.finisDate ? { finisDate: new Date(values.finisDate).toISOString()} : {}),
         responsibleFullName: getUser?.fullName ? getUser.fullName : undefined,
         responsibleId: values.responsibleId?.toString(),

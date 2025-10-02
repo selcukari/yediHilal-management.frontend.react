@@ -5,7 +5,7 @@ import {
   ActionIcon, LoadingOverlay, Flex,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Country, Province, MemberType, MenuActionButton } from '../components'
+import { Country, ProgramType, Province, MemberType, MenuActionButton } from '../components'
 import MemberAdd, { type MemberAddDialogControllerRef } from '../components/members/memberAdd';
 import MemberEdit, { type MemberEditDialogControllerRef } from '../components/members/memberEdit';
 import ConfirmModalMessage, { type ConfirmModalMessageRef } from '../components/confirmModalMessage';
@@ -23,6 +23,7 @@ type filterModels = {
   provinceIds?: string[] | null;
   typeIds?: string[] | null;
   searchText?: string;
+  programTypeId?: string | null;
   isActive: boolean;
 }
 
@@ -53,6 +54,7 @@ export default function Member() {
     { field: 'identificationNumber', header: 'Kimlik' },
     { field: 'referenceFullName', header: 'Referans İsmi' },
     { field: 'referencePhone', header: 'Referans Telefon' },
+    { field: 'programTypeName', header: 'Program Türü' },
     { field: 'dateOfBirth', header: 'Doğum Yılı' },
     { field: 'countryName', header: 'Ülke' },
     { field: 'provinceName', header: 'İl' },
@@ -202,8 +204,11 @@ export default function Member() {
       provinceIds: (filterModel.provinceIds && filterModel.provinceIds?.length > 0) ? filterModel.provinceIds?.join(",") : undefined,
       typeIds: (filterModel.typeIds && filterModel.typeIds?.length > 0) ? filterModel.typeIds?.join(",") : undefined,
       searchText: (filterModel.searchText && filterModel.searchText.length > 3 ? filterModel.searchText.trim() : undefined),
+      programTypeId: filterModel.programTypeId ? parseInt(filterModel.programTypeId) : null 
     }
-     try {
+    console.log("params:", params)
+    console.log("params:filterModel.programTypeId:", filterModel.programTypeId)
+    try {
 
       const getMembers = await service.members(params);
       if (getMembers) {
@@ -260,7 +265,7 @@ export default function Member() {
   const pdfTableColumns = useMemo((): PdfTableColumn[] => {
 
     const newCols: Column[] = rowHeaders.filter(col =>
-      col.field != 'updateDate' && col.field != 'countryCode' && col.field != 'actions');
+      col.field != 'updateDate' && col.field != 'countryCode' && col.field != 'programTypeName' && col.field != 'actions');
 
     return newCols.map(col => ({
       key: col.field,
@@ -275,7 +280,7 @@ export default function Member() {
   const excelTableColumns = useMemo((): ColumnDefinition[] => {
 
     const newCols: Column[] = rowHeaders.filter(col =>
-      col.field != 'updateDate' && col.field != 'countryCode' && col.field != 'actions');
+      col.field != 'updateDate' && col.field != 'countryCode' && col.field != 'actions' && col.field != 'programTypeName');
 
     return newCols.map(col => ({
       key: col.field as keyof ValueData,
@@ -343,6 +348,14 @@ export default function Member() {
 
                 <Grid.Col span={4}>
                   <Province onProvinceChange={onProvinceChange} countryId={selectedCountry}/>
+                </Grid.Col>
+                <Grid.Col span={4}>
+                  <ProgramType
+                    onProgramTypeChange={(value) => setFilterModel(prev => ({
+                      ...prev,
+                      programTypeId: value
+                    }))}
+                  ></ProgramType>
                 </Grid.Col>
 
                 <Grid.Col span={4}>

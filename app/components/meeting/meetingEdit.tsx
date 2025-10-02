@@ -102,6 +102,7 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
     
     const result = await service.updateMeeting({
       ...values,
+      name: values.name.trim(),
       files: files.length > 0 ? files : undefined,
       responsibleId: values.responsibleId ? parseInt(values.responsibleId) : 1,
       meetingTypeId: values.meetingTypeId ? parseInt(values.meetingTypeId) : 1,

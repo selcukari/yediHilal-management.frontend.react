@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, TextInput, Button, Stack, Grid, Select, Group, Switch, Textarea } from '@mantine/core';
+import { Modal, TextInput, Button, Stack, Grid, Group, Switch, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
@@ -14,7 +14,7 @@ import { MemberTypeSelect } from '../addOrEdit/memberTypeSelect';
 
 export type MemberAddDialogControllerRef = {
   open: () => void;
-  close: () => void;
+  close: () => void; 
 };
 
 interface MemberAddProps {
@@ -80,11 +80,6 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
 
         return /^\S+@\S+$/.test(value) ? null : 'Geçersiz email adresi';
       },
-      countryCode: (value) => {
-        if (!value?.trim()) return null;
-
-        return /^[0-9]+$/.test(value) ? null : 'Geçersiz ülkekodu';
-      },
       phone: (value) => {
 
         if (!form.values.referenceId) {
@@ -131,6 +126,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
     setIsDisabledSelect(true);
     const newMemberValue = {
       ...values,
+      fullName: values.fullName.trim(),
       deleteMessageTitle: (values.isActive ? undefined : (values.deleteMessageTitle ? values.deleteMessageTitle.trim() : undefined )),
       typeIds: values.typeIds ? values.typeIds : typeIdVoluntarily,
       provinceId: values.provinceId ? parseInt(values.provinceId) : undefined,
@@ -180,7 +176,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
   };
 
   const confirmDialogHandleCancel = () => {
-    console.log('İşlem iptal edildi');
+    toast.info("İşlem iptal edildi");
   };
 
   const dialogClose = () => {
@@ -258,10 +254,8 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
 
           <Grid.Col span={2}>
             <TextInput
-              label="Ülke Kodu"
-              placeholder="Ülke kodu giriniz"
-              disabled={isDisabledCountryCode}
-              {...form.getInputProps('countryCode')}
+              label="Ülke Kodu" placeholder="Ülke kodu giriniz" disabled={isDisabledCountryCode}
+              type='number' {...form.getInputProps('countryCode')}
             />
           </Grid.Col>
 
@@ -284,9 +278,8 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
 
           <Grid.Col span={6}>
             <TextInput
-              label="Doğum Tarih"
-              placeholder="Doğum Tarihini giriniz"
-              {...form.getInputProps('dateOfBirth')}
+              label="Doğum Tarih" placeholder="Doğum Tarihini giriniz"
+              type='number' {...form.getInputProps('dateOfBirth')}
             />
           </Grid.Col>
 

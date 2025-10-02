@@ -24,6 +24,7 @@ type MemberParams = {
   countryId?: string | null;
   isActive: boolean;
   provinceIds?: string | null;
+  programTypeId: number | null;
   searchText?: string;
 };
 
@@ -66,6 +67,18 @@ export function useMemberService(controller: string) {
     }
   };
 
+  const addExternalMember = async (params: UserDataParams) => {
+
+    try {
+      const res = await api.post(`/${controller}/addExternalMember`, params);
+
+      return res.data.data;
+    } catch (error: any) {
+
+      return error;
+    }
+  };
+
   
   const members = async (params: MemberParams) => {
     try {
@@ -97,5 +110,5 @@ export function useMemberService(controller: string) {
     }
   };
 
-  return { addMember, members, updateMember, deleteMember, membersInCache };
+  return { addMember, members, updateMember, deleteMember, membersInCache, addExternalMember };
 }

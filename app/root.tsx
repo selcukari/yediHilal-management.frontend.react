@@ -11,10 +11,13 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLocation,
 } from "react-router";
+import { useState, useEffect } from 'react';
 import { Notifications } from '@mantine/notifications';
 import { AuthProvider } from './authContext';
 import { Layout as AppLayout } from './components';
+import { CustomLayout } from './components';
 import ProtectedRoute from './protectedRoute'
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -60,18 +63,31 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return (<>
-  <MantineProvider theme={theme}>
-    <Notifications position="top-right" />
-    <AuthProvider>
-      <AppLayout>
-        <ProtectedRoute>
-          <Outlet></Outlet>
-        </ProtectedRoute>
-        </AppLayout>
-    </AuthProvider>
+  const location = useLocation();
+  const [locationPathname, setLocationPathname] = useState<boolean>(true);
+
+  useEffect(() => {
+    setLocationPathname(location.pathname !== '/memberCreate');
+  }, [location.pathname]);
+
+  return (
+    <MantineProvider theme={theme}>
+      <Notifications position="top-right" />
+      {locationPathname ? (
+        <AuthProvider>
+          <AppLayout>
+            <ProtectedRoute>
+              <Outlet />
+            </ProtectedRoute>
+          </AppLayout>
+        </AuthProvider>
+      ) : (
+        <CustomLayout>
+          <Outlet />
+        </CustomLayout>
+      )}
     </MantineProvider>
-  </>);
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
