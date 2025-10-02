@@ -215,7 +215,7 @@ export default function MeetingType() {
           </Paper>
         </Stack>
         <MeetingTypeEdit ref={meetingTypeEdit} onSaveSuccess={handleSaveSuccess} />
-        <MeetingTypeEdit ref={meetingTypeEdit} onSaveSuccess={handleSaveSuccess} />
+        <MeetingTypeAdd ref={meetingTypeAdd} onSaveSuccess={handleSaveSuccess} />
       </Container>
   );
 }
