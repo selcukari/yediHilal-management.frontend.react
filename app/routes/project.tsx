@@ -95,7 +95,6 @@ export default function Project() {
     });
   };
   const handleDelete = async (id: number) => {
-    console.log("handleDelete: id:", id);
     open();
 
     try {
@@ -164,7 +163,7 @@ export default function Project() {
       <Table.Td>{element.id}</Table.Td>
       <Table.Td>{element.name}</Table.Td>
       <Table.Td>{element.numberOfParticipant}</Table.Td>
-      <Table.Td>{
+      <Table.Td>{ 
         <Badge 
             color={getPriorityColor(element.priority, !!element.finisDate)} 
             variant="filled"

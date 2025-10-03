@@ -3,7 +3,7 @@ import {
   NavLink, Flex, Text, Stack, Divider, Group, ScrollArea, AppShell,
 } from '@mantine/core';
 import {
-  IconUser, IconMail, IconUsers, IconSettings, IconMessage, IconExternalLink, IconFileCheck, IconCar, IconCoin,
+  IconUser, IconMail, IconLibrary, IconUsers, IconSettings, IconMessage, IconExternalLink, IconFileCheck, IconCar, IconCoin,
   IconChevronRight, IconClipboardList, IconCalendarTime, IconSettingsAutomation, IconChevronDown, IconBuildings,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
@@ -60,6 +60,12 @@ const menuItems = [
   },
   { icon: IconMail, label: 'Gön. Mail Lis.', key: 'mail', link: '/mails' },
   { icon: IconMessage, label: 'Gön. Sms Lis.', key: 'sms', link: '/sms' },
+  {
+    icon: IconLibrary,
+    label: 'Evrak Takip',
+    key: 'documentTracking',
+    link: '/documentTrackings',
+  },
   { icon: IconSettings, label: 'Ayarlar', key: 'setting', link: '/settings',
     children: [
       { label: 'Görevler', key: 'duty', link: '/settings-duty' },
@@ -76,7 +82,7 @@ const menuItems = [
       { label: 'Otomatik Mail Yön.', key: 'automaticMailManagement', link: '/automaticMailManagement' },
     ],
   },
-    {
+   {
     icon: IconExternalLink,
     label: 'Dış Link Üye Ekle',
     key: 'memberCreate',

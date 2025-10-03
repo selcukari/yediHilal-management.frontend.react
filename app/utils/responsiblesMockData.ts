@@ -5,7 +5,8 @@ export const responsiblesMockData = [
    { key: 'finance', label: 'Maliye Modül' },
    { key: 'meeting', label: 'Toplantı Modül' },
    { key: 'vehicle', label: 'Araç Modül' },
-   { key: 'settings', label: 'Ayarlar Modül' },
+   { key: 'setting', label: 'Ayarlar Modül' },
    { key: 'branch', label: 'Şubeler Modül' },
+   { key: 'documentTracking', label: 'Evrak Takip' },
    { key: 'automaticMessageManagenet', label: 'Otomatik Mesaj Modül' },
 ];

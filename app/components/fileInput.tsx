@@ -107,18 +107,18 @@ export function FileUpload({ form, required = false }: FileUploadProps) {
     }
   }
 
+  const error = form.errors.files;
+
   return (
     <Stack gap="sm">
       <FileInput
         label="Dosya Yükle"
         description="Sadece PDF, PNG, TXT, Zip ve JPEG dosyaları yüklenebilir (Max: 20MB)"
-        placeholder="Dosya seçin"
-        multiple clearable 
-        radius="lg"
+        placeholder="Dosya seçin" multiple clearable radius="lg"
         accept=".txt,.pdf,.png,.jpeg,.jpg,.docx,.xlsx,.zip"
         onChange={handleFileChange}
+        error={error} required={required}
         leftSection={<IconUpload style={{ width: rem(18), height: rem(18) }} />}
-        required={required}
       />
 
       {/* Edit yapıldıgında Form'a eklenmiş dosyaların listesi */}
