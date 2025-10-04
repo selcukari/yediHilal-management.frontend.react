@@ -1,3 +1,4 @@
+import { omit } from 'ramda';
 import { createApi } from './api';
 import { useAuth } from '~/authContext';
 
@@ -84,11 +85,9 @@ export function useMemberService(controller: string) {
   const members = async (params: MemberParams) => {
     try {
       const newParams = {
-        ...params,
-        dateRange: {
-          startDate: params.dateRange[0],
-          endDate: params.dateRange[1],
-        }
+        ...omit(['dateRange'], params),
+        startDate: params.dateRange[0],
+        endDate: params.dateRange[1],
       };
       
       const res = await api.get(`/${controller}/getMembersBy`,{
