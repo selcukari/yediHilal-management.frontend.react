@@ -8,5 +8,6 @@ export const responsiblesMockData = [
    { key: 'setting', label: 'Ayarlar Modül' },
    { key: 'branch', label: 'Şubeler Modül' },
    { key: 'documentTracking', label: 'Evrak Takip' },
+   { key: 'phoneCallTracking', label: 'Telefon Arama Takip' },
    { key: 'automaticMessageManagenet', label: 'Otomatik Mesaj Modül' },
 ];

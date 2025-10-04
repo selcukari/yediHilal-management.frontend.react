@@ -5,59 +5,91 @@ import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
-import { useDocumentTrackingService } from '../../services/documentTrackingService';
+import { usePhoneCallTrackingService } from '../../services/phoneCallTrackingService';
+import { useUserService } from '../../services/userService';
 import { toast } from '../../utils/toastMessages';
 import { FileUpload } from '../fileInput';
-import { useAuth } from '~/authContext';
 
-export type DocumentTrackingAddDialogControllerRef = {
+export type PhoneCallTrackingAddDialogControllerRef = {
   open: () => void;
   close: () => void;
 };
 
-interface DocumentTrackingAddProps {
+interface PhoneCallTrackingAddProps {
   onSaveSuccess?: () => void; // Yeni prop
 }
 
 type FormValues = {
   name: string;
   note?: string | null;
+  responsibleId?: string | null;
   files?: any[];
 };
+type GetUserData = {
+  id: string;
+  fullName: string;
+}
 
-const DocumentTrackingAdd = forwardRef<DocumentTrackingAddDialogControllerRef, DocumentTrackingAddProps>(({onSaveSuccess}, ref) => {
+const PhoneCallTrackingAdd = forwardRef<PhoneCallTrackingAddDialogControllerRef, PhoneCallTrackingAddProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
+  const [userData, setUserData] = useState<GetUserData[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
   
-  const service = useDocumentTrackingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+  const service = usePhoneCallTrackingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+  const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
   const confirmModalRef = useRef<ConfirmModalRef>(null);
-  const { currentUser } = useAuth();
 
   const form = useForm<FormValues>({
     initialValues: {
       name: '',
       note: "",
+      responsibleId: '',
       files: [],
     },
     validate: {
-      name: (value) => (value.trim().length < 5 ? 'Belge Adı en az 5 karakter olmalı' : null),
+      name: (value) => (value.trim().length < 5 ? 'Arama Takip Adı en az 5 karakter olmalı' : null),
       files: (value) => {
         return value && value?.length > 0 ? null : 'En az bir tane dosya eklenmeli';
       },
+      responsibleId: (value) => (value ? null : 'Sorumlu kişi alanı zorunlu'),
     },
   });
+
+  const fetchUsers = async () => {
+    try {
+      const params = {
+        countryId: "1",
+        isActive: true,
+      }
+      const getUsers: any[] | null = await serviceUser.users(params);
+      
+      if (getUsers) {
+        setUserData(getUsers.map((i: any) => ({ id: i.id.toString(), fullName: i.fullName })));
+      } else {
+        toast.info('Hiçbir veri yok!');
+        setUserData([]);
+      }
+    } catch (error: any) {
+      toast.error(`User yüklenirken hata: ${error.message}`);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  },[]);
 
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
     // Dosya form değerlerinden al
     const files = form.values.files || [];
+    const responsibleFullName = userData.find(user => user.id == values.responsibleId)?.fullName;
 
-    const result = await service.addDocumentTracking({
+    const result = await service.addPhoneCallTracking({
       ...values,
       files: files.length > 0 ? files : undefined,
-      responsibleId: currentUser?.id?.toString() as string,
-      responsibleFullName: currentUser?.fullName as string,
+      responsibleId: values.responsibleId as string,
+      responsibleFullName: responsibleFullName as string,
     });
 
     if (result === true) {
@@ -124,7 +156,7 @@ const DocumentTrackingAdd = forwardRef<DocumentTrackingAddDialogControllerRef, D
       onClose={() => {
         dialogClose();
       }}
-      title="Yeni Evrak Ekle"
+      title="Yeni Arama Takip Ekle"
       centered
       size="400"
       overlayProps={{
@@ -144,10 +176,18 @@ const DocumentTrackingAdd = forwardRef<DocumentTrackingAddDialogControllerRef, D
               wrap="wrap">
             <Grid.Col span={10}>
               <TextInput
-                label="Evrak Adı"
-                placeholder="evrak adı giriniz"
+                label="Arama Takip Adı"
+                placeholder="arama takip adı giriniz"
                 required
                 {...form.getInputProps('name')}
+              />
+            </Grid.Col>
+            <Grid.Col span={10}>
+              <Select
+                label="Sorumlu" placeholder="sorumlu Seçiniz"
+                data={userData.map(item => ({ value: item.id, label: item.fullName }))}
+                searchable clearable maxDropdownHeight={200} nothingFoundMessage="sorumlu kişi bulunamadı..."
+                required onChange={(value) => form.setFieldValue('responsibleId', value)}
               />
             </Grid.Col>
           <Grid.Col span={10}>
@@ -185,4 +225,4 @@ const DocumentTrackingAdd = forwardRef<DocumentTrackingAddDialogControllerRef, D
   </>);
 });
 
-export default DocumentTrackingAdd;
+export default PhoneCallTrackingAdd;

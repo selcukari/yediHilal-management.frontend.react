@@ -4,7 +4,7 @@ import {
 } from '@mantine/core';
 import {
   IconUser, IconMail, IconLibrary, IconUsers, IconSettings, IconMessage, IconExternalLink, IconFileCheck, IconCar, IconCoin,
-  IconChevronRight, IconClipboardList, IconCalendarTime, IconSettingsAutomation, IconChevronDown, IconBuildings,
+  IconChevronRight, IconClipboardList, IconPhoneCall, IconCalendarTime, IconSettingsAutomation, IconChevronDown, IconBuildings,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
 import { useAuth } from '~/authContext';
@@ -60,6 +60,12 @@ const menuItems = [
   },
   { icon: IconMail, label: 'Gön. Mail Lis.', key: 'mail', link: '/mails' },
   { icon: IconMessage, label: 'Gön. Sms Lis.', key: 'sms', link: '/sms' },
+  {
+    icon: IconPhoneCall,
+    label: 'Arama Takip',
+    key: 'phoneCallTracking',
+    link: '/phoneCallTrackings',
+  },
   {
     icon: IconLibrary,
     label: 'Evrak Takip',
