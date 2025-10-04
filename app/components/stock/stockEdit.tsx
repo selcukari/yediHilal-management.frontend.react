@@ -4,13 +4,14 @@ import { clone, omit } from 'ramda';
 import { Modal, TextInput, Button, Stack, Grid, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DateTimePicker } from '@mantine/dates';
-import { IconCancel, IconCheck } from '@tabler/icons-react';
+import { IconCancel, IconCheck, IconCalendar } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { toast } from '../../utils/toastMessages';
 import { useStockService } from '../../services/stockService';
 import stripSpecialCharacters from '../../utils/stripSpecialCharacters';
 import { useAuth } from '~/authContext';
+import { DayRenderer } from '../../components';
 
 export type StockEditDialogControllerRef = {
   openDialog: (value: FormValues, values: GetStockData[]) => void;
@@ -248,15 +249,9 @@ const StockEdit = forwardRef<StockEditDialogControllerRef, UserEditProps>(({onSa
             />
           </Grid.Col>
           <Grid.Col span={6}>
-            <DateTimePicker
-              dropdownType="modal"
-              label="Son Kullanma Tarihi"
-              placeholder="son tarihi"
-              required
-              clearable
-              value={form.values.expirationDate}
-              minDate={new Date()}
-              onChange={(value) => form.setFieldValue('expirationDate', value)}
+            <DateTimePicker dropdownType="modal" label="Son Kullanma Tarihi" placeholder="son tarihi" required clearable value={form.values.expirationDate}
+              minDate={new Date()} leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
+              onChange={(value) => form.setFieldValue('expirationDate', value)} locale="tr" renderDay={DayRenderer}
             />
            </Grid.Col>
 

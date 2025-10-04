@@ -4,7 +4,7 @@ import { clone } from 'ramda';
 import { Modal, TextInput, Button, Stack, Grid, Textarea, Select } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DateTimePicker } from '@mantine/dates';
-import { IconCancel, IconCheck } from '@tabler/icons-react';
+import { IconCancel, IconCheck, IconCalendar } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useVehicleService } from '../../services/vehicleService';
@@ -13,7 +13,7 @@ import { toast } from '../../utils/toastMessages';
 import { useAuth } from '~/authContext';
 import type { VehicleData } from '../../routes/vehicle/vehicle';
 import { mockDataFuelLevel } from '../../utils/vehicleMockData';
-
+import { DayRenderer } from '../../components';
 interface VehicleDepositEditProps {
   onSaveSuccess?: () => void; // Yeni prop
 }
@@ -273,9 +273,9 @@ const VehicleDepositEdit = forwardRef<VehicleDepositEditDialogControllerRef, Veh
           </Grid.Col>
           <Grid.Col span={4}>
             <DateTimePicker
-              dropdownType="modal" label="Teslim Tarihi" placeholder="teslim tarihi" clearable
-              minDate={new Date()} value={form.values.returnDate}
-              onChange={(value) => form.setFieldValue('returnDate', value)}
+              dropdownType="modal" label="Teslim Tarihi" placeholder="teslim tarihi" clearable renderDay={DayRenderer}
+              minDate={new Date()} value={form.values.returnDate} leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
+              onChange={(value) => form.setFieldValue('returnDate', value)} locale="tr"
             />
            </Grid.Col>
           <Grid.Col span={6}>

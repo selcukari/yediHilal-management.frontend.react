@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { IconSearch, IconFilter, IconEdit, IconTrash, IconPlus } from '@tabler/icons-react';
+import { IconSearch, IconFilter, IconEdit, IconTrash, IconPlus, IconCalendar } from '@tabler/icons-react';
 import {
   Container, Grid, TextInput, Switch, Stack, Group, Title, Text, Button, Paper, Table, Badge,
   ActionIcon, LoadingOverlay, Flex,
 } from '@mantine/core';
+import { DatePickerInput } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
 import { Country, ProgramType, Province, MemberType, MenuActionButton } from '../components'
 import MemberAdd, { type MemberAddDialogControllerRef } from '../components/members/memberAdd';
@@ -17,12 +18,14 @@ import { dateFormatStrings } from '../utils/dateFormatStrings';
 import { type PdfTableColumn } from '../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../utils/repor/calculateColumnWidth';
 import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToExcel';
+import { DayRenderer } from '../components';
 
 type filterModels = {
   countryId?: string | null;
   provinceIds?: string[] | null;
   typeIds?: string[] | null;
   searchText?: string;
+  dateRange: [string | null, string | null];
   programTypeId?: string | null;
   isActive: boolean;
 }
@@ -36,7 +39,7 @@ export default function Member() {
   const [resultData, setResultData] = useState<any[]>([]);
   const [isDisabledDeleteAction, setDisabledDeleteAction]= useState(false);
   const [selectedCountry, setSelectedCountry] = useState<string | null | undefined>(null);
-  const [filterModel, setFilterModel] = useState<filterModels>({ isActive: true, countryId: '1' });
+  const [filterModel, setFilterModel] = useState<filterModels>({ isActive: true, countryId: '1', dateRange: [null, null] });
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null); // Silinecek öğenin ID'sini tut
   const [selectedCountryName, setSelectedCountryName] = useState<string>('Türkiye'); // Yeni state
   const [selectedMemberTypeName, setSelectedMemberTypeName] = useState<string[]>([]);
@@ -206,8 +209,7 @@ export default function Member() {
       searchText: (filterModel.searchText && filterModel.searchText.length > 3 ? filterModel.searchText.trim() : undefined),
       programTypeId: filterModel.programTypeId ? parseInt(filterModel.programTypeId) : null 
     }
-    console.log("params:", params)
-    console.log("params:filterModel.programTypeId:", filterModel.programTypeId)
+
     try {
 
       const getMembers = await service.members(params);
@@ -342,14 +344,14 @@ export default function Member() {
           >
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
-                <Grid.Col span={4}>
+                <Grid.Col span={3}>
                   <Country onCountryChange={onCountrySelected}/>
                 </Grid.Col>
 
-                <Grid.Col span={4}>
+                <Grid.Col span={3}>
                   <Province onProvinceChange={onProvinceChange} countryId={selectedCountry}/>
                 </Grid.Col>
-                <Grid.Col span={4}>
+                <Grid.Col span={3}>
                   <ProgramType
                     onProgramTypeChange={(value) => setFilterModel(prev => ({
                       ...prev,
@@ -358,7 +360,7 @@ export default function Member() {
                   ></ProgramType>
                 </Grid.Col>
 
-                <Grid.Col span={4}>
+                <Grid.Col span={3}>
                   <TextInput
                     label="Ad soyad, telefon ve kimlik ara"
                     placeholder="text giriniz"
@@ -368,8 +370,15 @@ export default function Member() {
                       searchText: event.currentTarget?.value}))}
                   />
                 </Grid.Col>
-
-                <Grid.Col span={4}>
+                <Grid.Col span={3}>
+                  <DatePickerInput type="range" label="Tarih aralığını seç" placeholder="tarih aralığını seç" leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
+                    clearable locale="tr" renderDay={DayRenderer}
+                    onChange={(value) => setFilterModel(prev => ({
+                      ...prev,
+                      dateRange: value}))}
+                  />
+                </Grid.Col>
+                <Grid.Col span={3}>
                   <MemberType
                     onMemberTypeChange={onMemberTypeChange}
                   ></MemberType>
@@ -395,7 +404,7 @@ export default function Member() {
                     />
                   </Flex>
                 </Grid.Col>
-                <Grid.Col span={4}>
+                <Grid.Col span={2} offset={0.5}>
                   <Flex
                     mih={50}
                     gap="md"
@@ -411,7 +420,7 @@ export default function Member() {
                     </Button>
                   </Flex>
                 </Grid.Col>
-                <Grid.Col span={2} offset={0.5}>
+                <Grid.Col span={2}>
                   <Flex
                     mih={50}
                     gap="md"

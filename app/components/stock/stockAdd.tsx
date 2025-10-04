@@ -1,16 +1,17 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, TextInput, Button, Stack, Grid, PasswordInput, Group, Switch, Textarea } from '@mantine/core';
+import { omit } from 'ramda';
+import { Modal, TextInput, Button, Stack, Grid, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DateTimePicker } from '@mantine/dates';
-import { IconCancel, IconCheck } from '@tabler/icons-react';
+import { IconCancel, IconCheck, IconCalendar } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useStockService } from '../../services/stockService';
 import { toast } from '../../utils/toastMessages';
 import { useAuth } from '~/authContext';
 import stripSpecialCharacters from '../../utils/stripSpecialCharacters';
-import { omit } from 'ramda';
+import { DayRenderer } from '../../components';
 
 export type StockAddDialogControllerRef = {
   openDialog: (values: GetDtockData[]) => void;
@@ -233,14 +234,9 @@ const StockAdd = forwardRef<StockAddDialogControllerRef, UserAddProps>(({onSaveS
             />
           </Grid.Col>
           <Grid.Col span={6}>
-            <DateTimePicker
-              dropdownType="modal"
-              label="Son Kullanma Tarihi"
-              placeholder="son tarihi"
-              required
-              clearable
-              minDate={new Date()}
-              onChange={(value) => form.setFieldValue('expirationDate', value)}
+            <DateTimePicker dropdownType="modal" label="Son Kullanma Tarihi" placeholder="son tarihi" required clearable
+              minDate={new Date()} leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
+              onChange={(value) => form.setFieldValue('expirationDate', value)} locale="tr" renderDay={DayRenderer}
             />
            </Grid.Col>
           <Grid.Col span={6}>

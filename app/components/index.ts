@@ -13,3 +13,4 @@ export { PaymentType } from './toolbars/paymentType';
 export { PaymentTypeStatus } from './toolbars/paymentTypeStatus';
 export { CustomLayout } from './layoutComponents/CustomLayout';
 export { ProgramType } from './toolbars/programType';
+export { DayRenderer } from './dayRenderer';

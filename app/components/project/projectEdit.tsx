@@ -4,7 +4,7 @@ import { clone } from 'ramda';
 import { Modal, TextInput, Button, Stack, Grid, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DateTimePicker } from '@mantine/dates';
-import { IconCancel, IconCheck } from '@tabler/icons-react';
+import { IconCancel, IconCheck, IconCalendar } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { toast } from '../../utils/toastMessages';
@@ -13,6 +13,7 @@ import { PrioritySelect } from '../addOrEdit/prioritySelect';
 import { ResponsibleUserSelect } from '../addOrEdit/responsibleUserSelect';
 import { RichTextEditorTiptap } from '../richTextEditorTiptap';
 import { FileUpload } from '../fileInput';
+import { DayRenderer } from '../../components';
 
 export type ProjectEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -203,14 +204,9 @@ const ProjectEdit = forwardRef<ProjectEditDialogControllerRef, UserEditProps>(({
             />
           </Grid.Col>
           <Grid.Col span={6}>
-            <DateTimePicker
-              dropdownType="modal"
-              label="Bitiş Tarihi"
-              placeholder="bitiş tarihi"
-              required
-              clearable
-              minDate={new Date()}
-              onChange={(value) => form.setFieldValue('finisDate', value)}
+            <DateTimePicker dropdownType="modal" label="Bitiş Tarihi" placeholder="bitiş tarihi" required clearable
+              minDate={new Date()} leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
+              onChange={(value) => form.setFieldValue('finisDate', value)} locale="tr" renderDay={DayRenderer}
             />
           </Grid.Col>
           <Grid.Col>

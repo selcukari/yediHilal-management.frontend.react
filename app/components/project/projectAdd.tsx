@@ -3,7 +3,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { Modal, TextInput, Button, Stack, Grid, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DateTimePicker } from '@mantine/dates';
-import { IconCancel, IconCheck } from '@tabler/icons-react';
+import { IconCancel, IconCheck, IconCalendar } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { PrioritySelect } from '../addOrEdit/prioritySelect';
@@ -13,6 +13,7 @@ import { useUserService } from '../../services/userService';
 import { toast } from '../../utils/toastMessages';
 import { RichTextEditorTiptap } from '../richTextEditorTiptap';
 import { FileUpload } from '../fileInput';
+import { DayRenderer } from '../../components';
 
 export type ProjectAddDialogControllerRef = {
   open: () => void;
@@ -193,13 +194,9 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
             />
           </Grid.Col>
           <Grid.Col span={6}>
-            <DateTimePicker
-              dropdownType="modal"
-              label="Bitiş Tarihi"
-              placeholder="bitiş tarihi"
-              required
-              clearable
-              minDate={new Date()}
+            <DateTimePicker dropdownType="modal" label="Bitiş Tarihi" placeholder="bitiş tarihi" required
+              clearable leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
+              minDate={new Date()} locale="tr" renderDay={DayRenderer}
               onChange={(value) => form.setFieldValue('finisDate', value)}
             />
           </Grid.Col>

@@ -5,7 +5,7 @@ import { DateInput } from '@mantine/dates';
 import { Modal, TextInput, Button, Stack, Textarea, Title, Table, Paper, Grid, Flex, Switch, Select } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { subDays } from 'date-fns';
-import { IconCancel, IconCheck } from '@tabler/icons-react';
+import { IconCancel, IconCheck, IconCalendar } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import { ProvinceSelect } from '../addOrEdit/provinceSelect';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
@@ -13,6 +13,7 @@ import { useUserService } from '../../services/userService';
 import { useBranchService } from '../../services/branchService';
 import { toast } from '../../utils/toastMessages';
 import { FileUpload } from '../fileInput';
+import { DayRenderer } from '../../components';
 
 export type BranchEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -307,8 +308,8 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
           </Grid.Col>
           <Grid.Col span={4}>
            <DateInput
-              label="Açılış Tarihi" placeholder="açılış tarihi" clearable minDate={subDays(new Date(), 30)}
-              value={form.values.openingDate}
+              label="Açılış Tarihi" placeholder="açılış tarihi" clearable minDate={subDays(new Date(), 30)} locale="tr" renderDay={DayRenderer}
+              value={form.values.openingDate} leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
               onChange={(value) => form.setFieldValue('openingDate', value)}
            />
           </Grid.Col>

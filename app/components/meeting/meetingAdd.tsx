@@ -3,7 +3,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { Modal, TextInput, Button, Stack, Text, Grid, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DateTimePicker } from '@mantine/dates';
-import { IconCancel, IconCheck } from '@tabler/icons-react';
+import { IconCancel, IconCheck, IconCalendar } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { PrioritySelect } from '../addOrEdit/prioritySelect';
@@ -14,6 +14,7 @@ import { useMeetingService } from '../../services/meetingService';
 import { toast } from '../../utils/toastMessages'; 
 import { RichTextEditorTiptap } from '../richTextEditorTiptap';
 import { FileUpload } from '../fileInput';
+import { DayRenderer } from '../../components';
 
 export type MeetingAddDialogControllerRef = {
   open: () => void;
@@ -218,13 +219,9 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
             />
           </Grid.Col>
           <Grid.Col span={6}>
-            <DateTimePicker
-              dropdownType="modal"
-              label="Toplantı Tarihi"
-              placeholder="toplantı tarihi"
-              required
-              error={errorTime}
-              clearable
+            <DateTimePicker dropdownType="modal" label="Toplantı Tarihi" placeholder="toplantı tarihi" required
+              error={errorTime} locale="tr" renderDay={DayRenderer}
+              clearable leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
               minDate={new Date()}
               onChange={(value) => form.setFieldValue('time', value)}
             />

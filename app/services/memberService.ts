@@ -25,6 +25,7 @@ type MemberParams = {
   isActive: boolean;
   provinceIds?: string | null;
   programTypeId: number | null;
+  dateRange: [string | null, string | null];
   searchText?: string;
 };
 
@@ -82,9 +83,16 @@ export function useMemberService(controller: string) {
   
   const members = async (params: MemberParams) => {
     try {
-
+      const newParams = {
+        ...params,
+        dateRange: {
+          startDate: params.dateRange[0],
+          endDate: params.dateRange[1],
+        }
+      };
+      
       const res = await api.get(`/${controller}/getMembersBy`,{
-        params
+        params: newParams
       });
 
       return res.data.data;

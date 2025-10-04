@@ -3,7 +3,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { Modal, TextInput, Button, Stack, Grid, Textarea, Select } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DateTimePicker } from '@mantine/dates';
-import { IconCancel, IconCheck } from '@tabler/icons-react';
+import { IconCancel, IconCheck, IconCalendar } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useVehicleService } from '../../services/vehicleService';
@@ -11,7 +11,7 @@ import { toast } from '../../utils/toastMessages';
 import { useAuth } from '~/authContext';
 import stripSpecialCharacters from '../../utils/stripSpecialCharacters';
 import { mockDataFuelTypes, mockDataTransmissionTypes, mockDataFuelLevel } from '../../utils/vehicleMockData';
-
+import { DayRenderer } from '../../components';
 interface VehicleAddProps {
   onSaveSuccess?: () => void; // Yeni prop
 }
@@ -281,23 +281,15 @@ const VehicleAdd = forwardRef<VehicleAddDialogControllerRef, VehicleAddProps>(({
             />
           </Grid.Col>
           <Grid.Col span={6}>
-            <DateTimePicker
-              dropdownType="modal"
-              label="Sigorta Tarihi"
-              placeholder="sigorta tarihi"
-              clearable
-              minDate={new Date()}
-              onChange={(value) => form.setFieldValue('insuranceDate', value)}
+            <DateTimePicker dropdownType="modal" label="Sigorta Tarihi" placeholder="sigorta tarihi" clearable renderDay={DayRenderer}
+              minDate={new Date()} leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
+              onChange={(value) => form.setFieldValue('insuranceDate', value)} locale="tr"
             />
            </Grid.Col>
            <Grid.Col span={6}>
-            <DateTimePicker
-              dropdownType="modal"
-              label="Muane Tarihi"
-              placeholder="muane tarihi"
-              clearable
-              minDate={new Date()}
-              onChange={(value) => form.setFieldValue('inspectionDate', value)}
+            <DateTimePicker dropdownType="modal" label="Muane Tarihi" placeholder="muane tarihi" clearable renderDay={DayRenderer}
+              minDate={new Date()} leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
+              onChange={(value) => form.setFieldValue('inspectionDate', value)} locale="tr"
             />
            </Grid.Col>
           <Grid.Col span={6}>
