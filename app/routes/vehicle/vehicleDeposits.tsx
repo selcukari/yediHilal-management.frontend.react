@@ -61,8 +61,8 @@ export default function VehicleDeposit() {
     { field: 'mileageEnd', header: 'Kilometre Bitiş' },
     { field: 'fuelLevelStart', header: 'Yakıt Başlangıç' },
     { field: 'fuelLevelEnd', header: 'Yakıt Bitiş' },
-    { field: 'givenToFullName', header: 'Teslim Eden' },
-    { field: 'givenByFullName', header: 'Teslim Alan' },
+    { field: 'givenToFullName', header: 'Araç Teslim Eden' },
+    { field: 'givenByFullName', header: 'Araç Kullanan' },
     { field: 'createDate', header: 'İlk Kayıt' },
     { field: 'returnDate', header: 'Teslim Tarih' },
   ]);
@@ -316,8 +316,8 @@ export default function VehicleDeposit() {
                     <Table.Th>Kilometre Bitiş</Table.Th>
                     <Table.Th>Yakıt Başlangıç</Table.Th>
                     <Table.Th>Yakıt Bitiş</Table.Th>
-                    <Table.Th>Teslim Eden</Table.Th>
-                    <Table.Th>Teslim Alan</Table.Th>
+                    <Table.Th>Araç Teslim Eden</Table.Th>
+                    <Table.Th>Araç Kullanan</Table.Th>
                     <Table.Th>İlk Kayıt</Table.Th>
                     <Table.Th>Teslim Tarih</Table.Th>
                     <Table.Th>İşlemler</Table.Th>

@@ -202,7 +202,7 @@ const VehicleDepositEdit = forwardRef<VehicleDepositEditDialogControllerRef, Veh
       onClose={() => {
         dialogClose();
       }}
-      title="Yeni Ürün Ekle"
+      title="Güncelle Emanet Araç"
       centered
       size="700"
       overlayProps={{
@@ -224,8 +224,8 @@ const VehicleDepositEdit = forwardRef<VehicleDepositEditDialogControllerRef, Veh
             </Grid.Col>
             <Grid.Col span={4}>
               <Select
-                label="Teslim Alan Kişi"
-                placeholder="teslim alan Seçiniz"
+                label="Araç Alan Kişi"
+                placeholder="araç alan Seçiniz"
                 data={userData.map(item => ({ value: item.id, label: item.fullName }))}
                 searchable clearable required maxDropdownHeight={200} nothingFoundMessage="teslim alan bulunamadı..."
                 value={form.values.givenById}
