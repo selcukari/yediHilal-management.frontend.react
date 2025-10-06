@@ -8,5 +8,6 @@ export default [
   route("automaticSmsManagement", "routes/automaticSmsManagement.tsx"), route("automaticMailManagement", "routes/automaticMailManagement.tsx"),
   route("branches", "routes/branch.tsx"), route("settings-duty", "routes/settings/duty.tsx"), route("settings-meetingType", "routes/settings/meetingType.tsx"),
   route("memberCreate", "routes/memberCreate.tsx"), route("documentTrackings", "routes/documentTracking.tsx"), route("phoneCallTrackings", "routes/phoneCallTracking.tsx"),
+  route("privacyPolicy", "routes/privacyPolicy.tsx"),
 ] satisfies RouteConfig;
 

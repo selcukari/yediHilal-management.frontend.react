@@ -68,7 +68,7 @@ export default function App() {
   const [locationPathname, setLocationPathname] = useState<boolean>(true);
 
   useEffect(() => {
-    setLocationPathname(location.pathname !== '/memberCreate');
+    setLocationPathname(!['/memberCreate', '/privacyPolicy'].includes(location.pathname));
   }, [location.pathname]);
 
   return (

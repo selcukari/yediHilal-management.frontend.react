@@ -9,10 +9,9 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
 
   useEffect(() => {
 
-    if (location.pathname == "/memberCreate") {
+    if (["/memberCreate", "/privacyPolicy"].includes(location.pathname)) {
       // Sadece dişlink icin üye eklemek
-      navigate("memberCreate");
-
+      navigate(location.pathname)
       return;
     }
 

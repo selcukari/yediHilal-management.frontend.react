@@ -13,7 +13,7 @@ export function Footer() {
             size="sm"
             c="dimmed"
             component="a"
-            href="#"
+            href="privacyPolicy"
             style={{ textDecoration: 'none', cursor: 'pointer' }}
           >
             Gizlilik Politikası
