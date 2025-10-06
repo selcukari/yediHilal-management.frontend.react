@@ -1,21 +1,23 @@
 import { useRef } from 'react';
-import { Group, Image,  Title,  Button,  Avatar,  Menu, Box,  Burger, AppShell} from '@mantine/core';
-import { IconBell, IconLogout, IconUser, IconSettings} from '@tabler/icons-react';
+import { Group, Image, Title, Button, Avatar, Menu, Box, Burger, AppShell } from '@mantine/core';
+import { IconBell, IconLogout, IconUser, IconSettings } from '@tabler/icons-react';
 import { useAuth } from '../../authContext';
 import { useNavigate } from "react-router";
 import { toast } from '../../utils/toastMessages';
 import UserEdit, { type UserEditDialogControllerRef } from '../../components/users/userEdit';
 import { useUserService } from '~/services/userService';
+
 interface NavbarProps {
   opened: boolean;
   toggle: () => void;
 }
+
 interface DutiesType {
   ids: string;
   names: string;
   createDate: string;
-  authorizedPersonId: number; // yetkili kişi tarafından atandı id
-  authorizedPersonName: string; // yetkili kişi tarafından atandı name
+  authorizedPersonId: number;
+  authorizedPersonName: string;
 }
 
 export function Navbar({ opened, toggle }: NavbarProps) {
@@ -23,25 +25,22 @@ export function Navbar({ opened, toggle }: NavbarProps) {
   const navigate = useNavigate();
   
   const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
-
   const userEditRef = useRef<UserEditDialogControllerRef>(null);
 
-   const handleSaveSuccess = () => {
-
+  const handleSaveSuccess = () => {
     setTimeout(() => {
       navigate("/")
     }, 500);
   };
 
-    const handleEdit = async() => {
-      if (currentUser?.id) {
-        const getUser = await service.user(currentUser.id as number);
+  const handleEdit = async () => {
+    if (currentUser?.id) {
+      const getUser = await service.user(currentUser.id as number);
 
-        if (getUser) {
+      if (getUser) {
+        const duties = (getUser.duties ? JSON.parse(getUser.duties) : []) as DutiesType[];
 
-          const duties = (getUser.duties ? JSON.parse(getUser.duties): []) as DutiesType[];
-
-          userEditRef.current?.openDialog({
+        userEditRef.current?.openDialog({
           id: getUser.id,
           fullName: getUser.fullName,
           identificationNumber: getUser.identificationNumber,
@@ -57,22 +56,21 @@ export function Navbar({ opened, toggle }: NavbarProps) {
           countryId: getUser.countryId.toString(),
           provinceId: getUser.provinceId?.toString(),
           hierarchy: getUser.hierarchy ? getUser.hierarchy.toString() : undefined,
-          dutiesIds: duties && duties[duties.length -1].ids as string,
+          dutiesIds: duties && duties[duties.length - 1].ids as string,
           duties: duties, 
           deleteMessageTitle: getUser.deleteMessageTitle?.toString(),
           updateDate: getUser.updateDate,
         });
-
-        }
-        else {
-          toast.info('Hiçbir veri yok!');
-        }
-      };
+      } else {
+        toast.info('Hiçbir veri yok!');
+      }
+    }
   };
   
   return (
     <AppShell.Header>
       <Group h="100%" px="md" justify="space-between">
+        {/* Sol taraf: Burger menu + Logo */}
         <Group>
           <Burger
             opened={opened}
@@ -87,50 +85,54 @@ export function Navbar({ opened, toggle }: NavbarProps) {
             radius="md"
             src="https://yedihilal.org/wp-content/uploads/2023/12/yedihilal-yatayLogo.png"
           />
-          
-           <Box style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
+        </Group>
+
+        {/* Orta: Başlık - sadece desktop'ta */}
+        <Box visibleFrom="sm" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
           <Title order={3} c="blue">
             YediHilal Yönetim
           </Title>
         </Box>
-        </Group>
-        
+
+        {/* Sağ taraf: Bildirimler ve Profil */}
         <Group>
-          <Button variant="subtle" leftSection={<IconBell size={16} />}>
+          {/* Bildirimler butonu - sadece desktop'ta göster */}
+          <Button variant="subtle" leftSection={<IconBell size={16} />} visibleFrom="sm">
             Bildirimler
           </Button>
           
-          
-          { isLoggedIn ? (
+          {/* Profil menüsü - hem desktop hem mobile'da */}
+          {isLoggedIn ? (
             <Menu shadow="md" width={200}>
-            <Menu.Target>
-              <Button variant="subtle" leftSection={<Avatar size="sm" />}>
-                Profil
-              </Button>
-            </Menu.Target>
+              <Menu.Target>
+                <Button variant="subtle" leftSection={<Avatar size="sm" />}>
+                  <Box component="span" visibleFrom="sm">Profil</Box>
+                </Button>
+              </Menu.Target>
 
-            <Menu.Dropdown>
-              <Menu.Label>Hesap</Menu.Label>
-              <Menu.Item leftSection={<IconUser size={14} />} onClick={handleEdit}>
-                Profili Düzenle
-              </Menu.Item>
-              <Menu.Item leftSection={<IconSettings size={14} />}>
-                Ayarlar
-              </Menu.Item>
+              <Menu.Dropdown>
+                <Menu.Label>Hesap</Menu.Label>
+                <Menu.Item leftSection={<IconUser size={14} />} onClick={handleEdit}>
+                  Profili Düzenle
+                </Menu.Item>
+                <Menu.Item leftSection={<IconSettings size={14} />}>
+                  Ayarlar
+                </Menu.Item>
 
-              <Menu.Divider />
+                <Menu.Divider />
 
-              <Menu.Item
-                color="red"
-                onClick={logout}
-                leftSection={<IconLogout size={14} />}
-              >
-                Çıkış Yap
-              </Menu.Item>
-            </Menu.Dropdown>
-            </Menu>) : (
-
-          <Button>Giriş Yap</Button>)}
+                <Menu.Item
+                  color="red"
+                  onClick={logout}
+                  leftSection={<IconLogout size={14} />}
+                >
+                  Çıkış Yap
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          ) : (
+            <Button>Giriş Yap</Button>
+          )}
         </Group>
       </Group>
       <UserEdit ref={userEditRef} onSaveSuccess={handleSaveSuccess} />

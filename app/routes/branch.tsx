@@ -263,7 +263,16 @@ export default function Duty() {
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
-            <Button variant="filled" leftSection={<IconPlus size={14} />} onClick={() => branchAddRef.current?.openDialog()}>Yeni Ekle</Button>
+            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />} onClick={() => branchAddRef.current?.openDialog()}>Yeni Ekle</Button>
+            {/* Mobile için sadece icon buton */}
+            <Button 
+              variant="filled" 
+              onClick={() => branchAddRef.current?.openDialog()}
+              hiddenFrom="xs"
+              p="xs"
+            >
+              <IconPlus size={18} />
+            </Button>
           </Group>
 
           {/* İçerik Kartları */}
@@ -276,7 +285,7 @@ export default function Duty() {
           >
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
-                <Grid.Col span={4}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 4}}>
                   <TextInput
                     label="Şube Ara"
                     placeholder="text giriniz"
@@ -285,7 +294,7 @@ export default function Duty() {
                     onChange={(event) => setSearchText(event.currentTarget.value)}
                   />
                 </Grid.Col>
-                <Grid.Col span={2}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
                   <Flex
                   mih={50}
                   gap="md"

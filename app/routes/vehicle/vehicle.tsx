@@ -314,7 +314,16 @@ export default function Vehicle() {
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
-              <Button variant="filled" leftSection={<IconPlus size={14} />}  onClick={handleAddItem}>Yeni Ekle</Button>
+            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />}  onClick={handleAddItem}>Yeni Ekle</Button>
+            {/* Mobile için sadece icon buton */}
+            <Button 
+              variant="filled" 
+              onClick={handleAddItem}
+              hiddenFrom="xs"
+              p="xs"
+            >
+              <IconPlus size={18} />
+            </Button>
           </Group>
           {/* İçerik Kartları */}
           <div
@@ -326,7 +335,7 @@ export default function Vehicle() {
           >
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
-                <Grid.Col span={4}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 4}}>
                   <TextInput
                     label="Plaka/Marka/Model Ara"
                     placeholder="text giriniz"
@@ -335,7 +344,7 @@ export default function Vehicle() {
                     onChange={(event) => setSearchText(event.currentTarget.value)}
                   />
                 </Grid.Col>
-                <Grid.Col span={2}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
                   <Select
                     label="Yakıt Tipi"
                     placeholder="yakıt Seçiniz"
@@ -347,7 +356,7 @@ export default function Vehicle() {
                     onChange={(value) => setfuelType(value)}
                   />
                 </Grid.Col>
-                <Grid.Col span={2}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
                   <Select
                     label="Vites Tipi"
                     placeholder="vites Seçiniz"
@@ -359,7 +368,7 @@ export default function Vehicle() {
                     onChange={(value) => setTransmissionType(value)}
                   />
                 </Grid.Col>
-                <Grid.Col span={2}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
                   <Select
                     label="Yakıt Durumu"
                     placeholder="yakıt durumu Seçiniz"
@@ -371,7 +380,7 @@ export default function Vehicle() {
                     onChange={(value) => setFuelLevel(value)}
                   />
                 </Grid.Col>
-                 <Grid.Col span={2}>
+                 <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
                   <Flex
                   mih={50}
                   gap="md"

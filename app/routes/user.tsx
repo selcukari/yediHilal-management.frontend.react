@@ -310,22 +310,31 @@ export default function User() {
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
-            <Button variant="filled" leftSection={<IconPlus size={14} />} onClick={() => userAddRef.current?.openDialog()}>Yeni Ekle</Button>
+            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />} onClick={() => userAddRef.current?.openDialog()}>Yeni Ekle</Button>
+            {/* Mobile için sadece icon buton */}
+            <Button 
+              variant="filled" 
+              onClick={() => userAddRef.current?.openDialog()}
+              hiddenFrom="xs"
+              p="xs"
+            >
+              <IconPlus size={18} />
+            </Button>
           </Group>
 
           {/* İçerik Kartları */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
-                <Grid.Col span={4}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
                   <Country onCountryChange={onCountrySelected}/>
                 </Grid.Col>
 
-                <Grid.Col span={4}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
                   <Province onProvinceChange={onProvinceChange} countryId={selectedCountry}/>
                 </Grid.Col>
 
-                <Grid.Col span={4}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
                   <TextInput
                     label="Ad soyad, telefon ve kimlik ara"
                     placeholder="text giriniz"
@@ -335,12 +344,10 @@ export default function User() {
                       searchText: event.currentTarget?.value}))}
                   />
                 </Grid.Col>
-
-                <Grid.Col span={4}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
                   <Role onRoleChange={onRoleChange}></Role>
                 </Grid.Col>
-
-                <Grid.Col span={2}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
                   <Flex
                     mih={50}
                     gap="md"
@@ -360,7 +367,7 @@ export default function User() {
                     />
                   </Flex>
                 </Grid.Col>
-                <Grid.Col span={4}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
                   <Flex
                     mih={50}
                     gap="md"

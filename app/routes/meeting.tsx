@@ -315,7 +315,16 @@ export default function Meeting() {
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
-            <Button variant="filled" leftSection={<IconPlus size={14} />}  onClick={() => meetingAddRef.current?.open()}>Yeni Ekle</Button>
+            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />}  onClick={() => meetingAddRef.current?.open()}>Yeni Ekle</Button>
+            {/* Mobile için sadece icon buton */}
+            <Button 
+              variant="filled" 
+              onClick={() => meetingAddRef.current?.open()}
+              hiddenFrom="xs"
+              p="xs"
+            >
+              <IconPlus size={18} />
+            </Button>
           </Group>
           {/* İçerik Kartları */}
           <div
@@ -327,7 +336,7 @@ export default function Meeting() {
           >
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
-                <Grid.Col span={4}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 4}}>
                   <TextInput
                     label="Toplantı Adı/Sorumlu Ara"
                     placeholder="text giriniz"
@@ -336,10 +345,10 @@ export default function Meeting() {
                     onChange={(event) => setSearchText(event.currentTarget.value)}
                   />
                 </Grid.Col>
-                <Grid.Col span={2}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
                   <Province onProvinceChange={onProvinceChange} countryId={selectedCountry}/>
                 </Grid.Col>
-                <Grid.Col span={2}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
                   <Flex
                   mih={50}
                   gap="md"

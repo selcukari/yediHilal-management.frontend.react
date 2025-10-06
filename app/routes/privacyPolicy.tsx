@@ -14,7 +14,7 @@ export default function PrivacyPolicy() {
             Gizlilik Politikası
           </Title>
           <Text c="dimmed" size="lg">
-            Son güncellenme: {new Date().toLocaleDateString('tr-TR')}
+            Son güncellenme: {new Date("2025-10-06T21:27:11.702Z").toLocaleDateString('tr-TR')}
           </Text>
         </div>
 

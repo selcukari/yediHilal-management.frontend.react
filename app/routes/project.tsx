@@ -272,6 +272,16 @@ export default function Project() {
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
+            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />}  onClick={() => projectAddRef.current?.open()}>Yeni Ekle</Button>
+                 {/* Mobile için sadece icon buton */}
+                <Button 
+                  variant="filled" 
+                  onClick={() => projectAddRef.current?.open()}
+                  hiddenFrom="xs"
+                  p="xs"
+                >
+                  <IconPlus size={18} />
+                </Button>
           </Group>
           {/* İçerik Kartları */}
           <div
@@ -283,7 +293,7 @@ export default function Project() {
           >
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
-                <Grid.Col span={4}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 4}}>
                   <TextInput
                     label="Proje Ara"
                     placeholder="text giriniz"
@@ -292,7 +302,7 @@ export default function Project() {
                     onChange={(event) => setSearchText(event.currentTarget.value)}
                   />
                 </Grid.Col>
-                <Grid.Col span={2}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
                   <Flex
                   mih={50}
                   gap="md"
@@ -311,11 +321,6 @@ export default function Project() {
                   isSmsDisabled={true}
                   isWhatsAppDisabled={true}
                   />
-                </Flex>
-              </Grid.Col>
-                <Grid.Col span={4} offset={2}>
-                <Flex mih={50} gap="md" justify="flex-end" align="flex-end" direction="row" wrap="wrap">
-                <Button variant="filled" leftSection={<IconPlus size={14} />}  onClick={() => projectAddRef.current?.open()}>Yeni Ekle</Button>
                 </Flex>
               </Grid.Col>
               </Grid>

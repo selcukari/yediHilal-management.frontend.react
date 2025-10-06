@@ -233,7 +233,16 @@ export default function DocumentTracking() {
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
-            <Button variant="filled" leftSection={<IconPlus size={14} />} onClick={() => phoneCallTrackingAddRef.current?.open()}>Yeni Ekle</Button>
+            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />} onClick={() => phoneCallTrackingAddRef.current?.open()}>Yeni Ekle</Button>
+            {/* Mobile için sadece icon buton */}
+            <Button 
+              variant="filled" 
+              onClick={() => phoneCallTrackingAddRef.current?.open()}
+              hiddenFrom="xs"
+              p="xs"
+            >
+              <IconPlus size={18} />
+            </Button>
           </Group>
 
           {/* İçerik Kartları */}
@@ -246,7 +255,7 @@ export default function DocumentTracking() {
           >
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
-                <Grid.Col span={4}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 4}}>
                   <TextInput
                     label="Takip Evrak Ara"
                     placeholder="text giriniz"

@@ -312,6 +312,16 @@ export default function StockUsedDeposit() {
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
+            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />}  onClick={handleAddItem}>Yeni Emanet Ekle</Button>
+            {/* Mobile için sadece icon buton */}
+            <Button 
+              variant="filled" 
+              onClick={handleAddItem}
+              hiddenFrom="xs"
+              p="xs"
+            >
+              <IconPlus size={18} />
+            </Button>
           </Group>
 
           {/* İçerik Kartları */}
@@ -325,7 +335,7 @@ export default function StockUsedDeposit() {
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
 
-                <Grid.Col span={4}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 4}}>
                   <TextInput
                     label="Başlık/Note/Emanetci İsim Ara"
                     placeholder="text giriniz"
@@ -335,12 +345,7 @@ export default function StockUsedDeposit() {
                   />
                 </Grid.Col>
                 
-                <Grid.Col span={4}>
-                <Flex mih={50} gap="md" justify="flex-end" align="flex-end" direction="row" wrap="wrap">
-                  <Button variant="filled" leftSection={<IconPlus size={14} />}  onClick={handleAddItem}>Yeni Emanet Ekle</Button>
-                </Flex>
-                </Grid.Col>
-                <Grid.Col span={2} offset={2}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 4}}>
                   <Flex
                   mih={50}
                   gap="md"

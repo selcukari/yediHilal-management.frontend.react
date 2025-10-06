@@ -150,7 +150,7 @@ export default function Mail() {
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
 
-                <Grid.Col span={4}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 4}}>
                   <TextInput
                     label="Konu veya içerik Ara"
                     placeholder="text giriniz"

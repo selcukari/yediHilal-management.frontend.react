@@ -302,10 +302,18 @@ export default function Stock() {
                   Toolbar Filtreleme Alanı
                 </Text>
               </div>
-              <Button variant="filled" leftSection={<IconPlus size={14} />} onClick={() => stockAddRef.current?.openDialog(
+              <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />} onClick={() => stockAddRef.current?.openDialog(
                 stockData.map(x => pick(['id', 'name', 'nameKey'], x))
               )}>Yeni Ekle</Button>
-              
+              {/* Mobile için sadece icon buton */}
+              <Button 
+                variant="filled" 
+                onClick={() => stockAddRef.current?.openDialog(stockData.map(x => pick(['id', 'name', 'nameKey'], x)))}
+                hiddenFrom="xs"
+                p="xs"
+              >
+                <IconPlus size={18} />
+              </Button>
             </Group>
             {/* İçerik Kartları */}
           <div
@@ -317,7 +325,7 @@ export default function Stock() {
           >
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
-                <Grid.Col span={4}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 4}}>
                   <TextInput
                     label="Ürün adı veya Kullanıcı Ara"
                     placeholder="text giriniz"
@@ -326,7 +334,7 @@ export default function Stock() {
                     onChange={(event) => setSearchText(event.currentTarget.value)}
                   />
                 </Grid.Col>
-                <Grid.Col span={4}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 4}}>
                   <Flex
                   mih={50}
                   gap="md"

@@ -331,7 +331,16 @@ export default function Member() {
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
-            <Button variant="filled" leftSection={<IconPlus size={14} />} onClick={() => memberAddRef.current?.open()}>Yeni Ekle</Button>
+            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />} onClick={() => memberAddRef.current?.open()}>Yeni Ekle</Button>
+            {/* Mobile için sadece icon buton */}
+            <Button 
+              variant="filled" 
+              onClick={() => memberAddRef.current?.open()}
+              hiddenFrom="xs"
+              p="xs"
+            >
+              <IconPlus size={18} />
+            </Button>
           </Group>
 
           {/* İçerik Kartları */}
@@ -344,14 +353,14 @@ export default function Member() {
           >
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
-                <Grid.Col span={3}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 3}}>
                   <Country onCountryChange={onCountrySelected}/>
                 </Grid.Col>
 
-                <Grid.Col span={3}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 3}}>
                   <Province onProvinceChange={onProvinceChange} countryId={selectedCountry}/>
                 </Grid.Col>
-                <Grid.Col span={3}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 3}}>
                   <ProgramType
                     onProgramTypeChange={(value) => setFilterModel(prev => ({
                       ...prev,
@@ -360,7 +369,7 @@ export default function Member() {
                   ></ProgramType>
                 </Grid.Col>
 
-                <Grid.Col span={3}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 3}}>
                   <TextInput
                     label="Ad soyad, telefon ve kimlik ara"
                     placeholder="text giriniz"
@@ -370,7 +379,7 @@ export default function Member() {
                       searchText: event.currentTarget?.value}))}
                   />
                 </Grid.Col>
-                <Grid.Col span={3}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 3}}>
                   <DatePickerInput type="range" label="Tarih aralığını seç" placeholder="tarih aralığını seç" leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
                     clearable locale="tr" renderDay={DayRenderer}
                     onChange={(value) => setFilterModel(prev => ({
@@ -378,13 +387,13 @@ export default function Member() {
                       dateRange: value}))}
                   />
                 </Grid.Col>
-                <Grid.Col span={3}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 3}}>
                   <MemberType
                     onMemberTypeChange={onMemberTypeChange}
                   ></MemberType>
                 </Grid.Col>
 
-                <Grid.Col span={1.5}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
                   <Flex
                     mih={50}
                     gap="md"
@@ -404,7 +413,7 @@ export default function Member() {
                     />
                   </Flex>
                 </Grid.Col>
-                <Grid.Col span={2} offset={0.5}>
+                <Grid.Col span={{ base: 6, sm: 3, md: 2}}>
                   <Flex
                     mih={50}
                     gap="md"
@@ -420,7 +429,7 @@ export default function Member() {
                     </Button>
                   </Flex>
                 </Grid.Col>
-                <Grid.Col span={2}>
+                <Grid.Col span={{ base: 6, sm: 3, md: 2}}>
                   <Flex
                     mih={50}
                     gap="md"

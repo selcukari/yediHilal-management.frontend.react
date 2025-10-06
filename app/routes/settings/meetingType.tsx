@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { IconSearch, IconEdit, IconTrash } from '@tabler/icons-react';
+import { IconSearch, IconEdit, IconTrash, IconPlus } from '@tabler/icons-react';
 import {
   Container, Grid, TextInput, ActionIcon, Stack, Group, Title, Text, Paper, Table, LoadingOverlay, Button,
 } from '@mantine/core';
@@ -167,7 +167,16 @@ export default function MeetingType() {
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
-            <Button variant="filled" onClick={() => meetingTypeAdd.current?.open()}>Yeni Ekle</Button>
+            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />} onClick={() => meetingTypeAdd.current?.open()}>Yeni Ekle</Button>
+            {/* Mobile için sadece icon buton */}
+            <Button 
+              variant="filled" 
+              onClick={() => meetingTypeAdd.current?.open()}
+              hiddenFrom="xs"
+              p="xs"
+            >
+              <IconPlus size={18} />
+            </Button>
           </Group>
 
           {/* İçerik Kartları */}
@@ -181,7 +190,7 @@ export default function MeetingType() {
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
 
-                <Grid.Col span={4}>
+                <Grid.Col span={{ base: 12, sm: 6, md: 4}}>
                   <TextInput
                     label="Toplantı Türü Ara"
                     placeholder="text giriniz"
