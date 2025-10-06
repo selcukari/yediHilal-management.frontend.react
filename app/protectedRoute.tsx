@@ -9,7 +9,14 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
 
   useEffect(() => {
 
-    if (!loading && !isLoggedIn) {
+    if (location.pathname == "/memberCreate") {
+      // Sadece dişlink icin üye eklemek
+      navigate("memberCreate");
+
+      return;
+    }
+
+    if (!isLoggedIn) {
       // Sadece giriş yapmamış kullanıcıları login'e yönlendir
       navigate("login");
 

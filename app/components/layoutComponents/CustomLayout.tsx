@@ -8,7 +8,6 @@ interface LayoutProps {
 }
 
 export function CustomLayout({ children }: LayoutProps = {}) {
-  console.log("children:", children)
   return (
     <AppShell
       header={{ height: 0 }}

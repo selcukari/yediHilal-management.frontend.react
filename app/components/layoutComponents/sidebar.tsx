@@ -136,6 +136,11 @@ export function Sidebar({ active, setActive }: SidebarProps) {
 
     setActive(key);
 
+    if(key == 'memberCreate') {
+      navigate(link);
+      return;
+    }
+
     if(currentUser.moduleRoles?.includes(key)) {
       navigate(link);
       return;
