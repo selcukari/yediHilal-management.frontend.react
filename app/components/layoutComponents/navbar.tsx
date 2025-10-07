@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { Group, Image, Title, Button, Avatar, Menu, Box, Burger, AppShell, Switch, useMantineColorScheme } from '@mantine/core';
-import { IconBell, IconLogout, IconUser, IconSettings, IconMoon, IconSun } from '@tabler/icons-react';
+import { IconBell, IconLogout, IconUser, IconMoon, IconSun } from '@tabler/icons-react';
 import { useAuth } from '../../authContext';
 import { useNavigate } from "react-router";
 import { toast } from '../../utils/toastMessages';
@@ -73,18 +73,9 @@ export function Navbar({ opened, toggle }: NavbarProps) {
       <Group h="100%" px="md" justify="space-between">
         {/* Sol taraf: Burger menu + Logo */}
         <Group>
-          <Burger
-            opened={opened}
-            onClick={toggle}
-            hiddenFrom="sm"
-            size="sm"
+          <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm"
           />
-          <Image
-            h={50}
-            w="auto"
-            fit="contain"
-            radius="md"
-            src="https://yedihilal.org/wp-content/uploads/2023/12/yedihilal-yatayLogo.png"
+          <Image h={50} w="auto" fit="contain" radius="md" src="https://yedihilal.org/wp-content/uploads/2023/12/yedihilal-yatayLogo.png"
           />
         </Group>
 
@@ -98,9 +89,9 @@ export function Navbar({ opened, toggle }: NavbarProps) {
         {/* Sağ taraf: Bildirimler ve Profil */}
         <Group>
           {/* Bildirimler butonu - sadece desktop'ta göster */}
-          <Button variant="subtle" leftSection={<IconBell size={16} />} visibleFrom="sm">
+          {false && <Button variant="subtle" leftSection={<IconBell size={16} />} visibleFrom="sm">
             Bildirimler
-          </Button>
+          </Button> }
           
           {/* Profil menüsü - hem desktop hem mobile'da */}
           {isLoggedIn ? (
