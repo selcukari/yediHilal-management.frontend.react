@@ -105,7 +105,6 @@ const BranchEdit = forwardRef<DocumentTrackingEditDialogControllerRef, DocumentT
     }
   }
   const openDialog = (value: FormValues) => {
-    console.log("openDialog:", value)
     if (value) {
       form.setValues((value));
 
