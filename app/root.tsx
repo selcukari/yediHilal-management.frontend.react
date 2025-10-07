@@ -15,12 +15,15 @@ import {
   useLocation,
 } from "react-router";
 import { useState, useEffect } from 'react';
+import { useNavigate } from "react-router";
 import { Notifications } from '@mantine/notifications';
 import { AuthProvider } from './authContext';
 import { Layout as AppLayout } from './components';
 import { CustomLayout } from './components';
 import ProtectedRoute from './protectedRoute'
 import type { Route } from "./+types/root";
+import { Container, Title, Text, Button, Group, Stack, Code, Alert } from '@mantine/core';
+import { IconAlertCircle, IconHome, IconRefresh } from '@tabler/icons-react';
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
@@ -92,32 +95,90 @@ export default function App() {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message = "Oops!";
-  let details = "An unexpected error occurred.";
+  const navigate = useNavigate();
+  let title = "Oops!";
+  let message = "An unexpected error occurred.";
+  let status = 500;
   let stack: string | undefined;
 
   if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? "404" : "Error";
-    details =
+    status = error.status;
+    title = error.status === 404 ? "404 - Sayfa Bulunamadı" : "Hata";
+    message =
       error.status === 404
-        ? "The requested page could not be found."
-        : error.statusText || details;
-  } else if (import.meta.env.DEV && error && error instanceof Error) {
-    details = error.message;
+        ? "Aradığınız sayfa bulunamadı. Sayfa taşınmış veya silinmiş olabilir."
+        : error.statusText || message;
+  } else if (import.meta.env.VITE_APP_IS_DEV && error && error instanceof Error) {
+    message = error.message;
     stack = error.stack;
   }
 
+  const is404 = status === 404;
+
   return (
     <AppLayout>
-      <div className="pt-16 p-4 container mx-auto">
-        <h1>{message}</h1>
-        <p>{details}</p>
-        {stack && (
-          <pre className="w-full p-4 overflow-x-auto">
-            <code>{stack}</code>
-          </pre>
-        )}
-      </div>
+      <Container size="md" py={80}>
+        <Stack align="center" gap="xl">
+          {/* 404 için özel ikon ve renk */}
+          {is404 ? (
+            <Alert 
+              color="red" 
+              title={title}
+              icon={<IconAlertCircle size={24} />}
+              w="100%"
+              variant="filled"
+            >
+              <Text c="white" size="lg" fw={500}>
+                {message}
+              </Text>
+            </Alert>
+          ) : (
+            <Alert 
+              color="orange" 
+              title={title}
+              icon={<IconAlertCircle size={24} />}
+              w="100%"
+            >
+              <Text size="lg" fw={500}>
+                {message}
+              </Text>
+            </Alert>
+          )}
+
+          {/* Görsel - 404 için özel */}
+          {is404 && (
+            <div style={{ textAlign: 'center' }}>
+              <Title 
+                c="red" 
+                size={120} 
+                style={{ 
+                  fontWeight: 900,
+                  opacity: 0.7,
+                  lineHeight: 1 
+                }}
+              >
+                404
+              </Title>
+              <Text size="xl" c="dimmed" fw={500}>
+                Sayfa Bulunamadı
+              </Text>
+            </div>
+          )}
+
+          {/* Aksiyon butonları */}
+          <Group>
+            <Button
+              size="lg"
+              leftSection={<IconHome size={18} />}
+              onClick={() => navigate('/')}
+              variant={is404 ? "filled" : "light"}
+              color={is404 ? "red" : "blue"}
+            >
+              Ana Sayfaya Dön
+            </Button>
+          </Group>
+        </Stack>
+      </Container>
     </AppLayout>
   );
 }

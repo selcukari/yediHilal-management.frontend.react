@@ -33,7 +33,7 @@ export default function Login() {
         setTimeout(() => {
           navigate("/");
           window.location.reload(); // Sayfayı yenile ile gorunmeyen menuler gelmemesi icin
-        }, 1000);
+        }, 300);
       } else {
         close()
         toast.error('Giriş başarısız. E-posta ve şifrenizi kontrol edin.');

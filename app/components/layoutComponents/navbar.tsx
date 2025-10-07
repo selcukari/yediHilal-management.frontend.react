@@ -1,6 +1,6 @@
 import { useRef } from 'react';
-import { Group, Image, Title, Button, Avatar, Menu, Box, Burger, AppShell } from '@mantine/core';
-import { IconBell, IconLogout, IconUser, IconSettings } from '@tabler/icons-react';
+import { Group, Image, Title, Button, Avatar, Menu, Box, Burger, AppShell, Switch, useMantineColorScheme } from '@mantine/core';
+import { IconBell, IconLogout, IconUser, IconSettings, IconMoon, IconSun } from '@tabler/icons-react';
 import { useAuth } from '../../authContext';
 import { useNavigate } from "react-router";
 import { toast } from '../../utils/toastMessages';
@@ -21,8 +21,9 @@ interface DutiesType {
 }
 
 export function Navbar({ opened, toggle }: NavbarProps) {
-  const { isLoggedIn, logout, currentUser } = useAuth();
+  const { isLoggedIn, logout, login, currentUser } = useAuth();
   const navigate = useNavigate();
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   
   const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const userEditRef = useRef<UserEditDialogControllerRef>(null);
@@ -115,12 +116,21 @@ export function Navbar({ opened, toggle }: NavbarProps) {
                 <Menu.Item leftSection={<IconUser size={14} />} onClick={handleEdit}>
                   Profili Düzenle
                 </Menu.Item>
-                <Menu.Item leftSection={<IconSettings size={14} />}>
-                  Ayarlar
+                {/* Dark/Light Mode Switch */}
+                <Menu.Item
+                  leftSection={colorScheme === 'dark' ? <IconMoon size={14} /> : <IconSun size={14} />}
+                  rightSection={
+                    <Switch
+                      size="sm"
+                      checked={colorScheme === 'dark'}
+                      onChange={() => toggleColorScheme()}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  }
+                >
+                  {colorScheme === 'dark' ? 'Dark Mod' : 'Light Mod'}
                 </Menu.Item>
-
                 <Menu.Divider />
-
                 <Menu.Item
                   color="red"
                   onClick={logout}
@@ -131,7 +141,7 @@ export function Navbar({ opened, toggle }: NavbarProps) {
               </Menu.Dropdown>
             </Menu>
           ) : (
-            <Button>Giriş Yap</Button>
+            <Button onClick={() => navigate("/login")}>Giriş Yap</Button>
           )}
         </Group>
       </Group>
