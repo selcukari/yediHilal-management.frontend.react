@@ -253,7 +253,7 @@ export default function User() {
   const pdfTableColumns = useMemo((): PdfTableColumn[] => {
 
     const newCols: Column[] = rowHeaders.filter(col =>
-      col.field != 'updateDate' && col.field != 'countryCode' && col.field != 'actions');
+      col.field != 'updateDate' && col.field != 'countryCode' && col.field != 'actions' && col.field != 'countryName');
 
     return newCols.map(col => ({
       key: col.field,
@@ -268,7 +268,7 @@ export default function User() {
   const excelTableColumns = useMemo((): ColumnDefinition[] => {
 
     const newCols: Column[] = rowHeaders.filter(col =>
-      col.field != 'updateDate' && col.field != 'countryCode' && col.field != 'actions');
+      col.field != 'updateDate' && col.field != 'countryCode' && col.field != 'actions' && col.field != 'countryName');
 
     return newCols.map(col => ({
       key: col.field as keyof ValueData,
@@ -297,6 +297,14 @@ export default function User() {
 
     return `${selectedCountryName}/Tüm İller/Tüm Roller/${isActiveText} Kullanıcı Raporu`;
   };
+
+   // raportdata
+  const raportUserData = useMemo(() => {
+    return resultData.map((user: any) => ({
+      ...user,
+      duties: user["duties"] && user["duties"][user["duties"].length-1]?.names,
+    }))
+  }, [resultData])
 
   return (
       <Container size="xl">
@@ -334,7 +342,11 @@ export default function User() {
                   <Province onProvinceChange={onProvinceChange} countryId={selectedCountry}/>
                 </Grid.Col>
 
+              
                 <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
+                  <Role onRoleChange={onRoleChange}></Role>
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, sm: 6, md: 3}}>
                   <TextInput
                     label="Ad soyad, telefon ve kimlik ara"
                     placeholder="text giriniz"
@@ -343,9 +355,6 @@ export default function User() {
                       ...prev,
                       searchText: event.currentTarget?.value}))}
                   />
-                </Grid.Col>
-                <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
-                  <Role onRoleChange={onRoleChange}></Role>
                 </Grid.Col>
                 <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
                   <Flex
@@ -367,7 +376,7 @@ export default function User() {
                     />
                   </Flex>
                 </Grid.Col>
-                <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
+                <Grid.Col span={{ base: 5, sm: 4, md: 1}}>
                   <Flex
                     mih={50}
                     gap="md"
@@ -383,18 +392,21 @@ export default function User() {
                     </Button>
                   </Flex>
                 </Grid.Col>
-                { false && 
-                <Grid.Col span={4}>
-                  <Flex mih={50} gap="md" direction="row" wrap="wrap">
+                <Grid.Col span={{ base: 5, sm: 4, md: 2}}>
+                  <Flex mih={50} gap="md" justify="flex-start"
+                    align="flex-end" direction="row" wrap="wrap">
                     <MenuActionButton
                     reportTitle={reportTitle()}
                     excelColumns={excelTableColumns}
-                    valueData={resultData}
+                    valueData={raportUserData}
                     pdfColumns={pdfTableColumns}
                     type={2}
+                    isMailDisabled={true}
+                    isSmsDisabled={true}
+                    isWhatsAppDisabled={true}
                     />
                   </Flex>
-                </Grid.Col>}
+                </Grid.Col>
               </Grid>
             </Paper>
           </div>
