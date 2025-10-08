@@ -198,9 +198,8 @@ export default function MemberCreate() {
             </Grid.Col>
 
             <Grid.Col span={2}>
-                <TextInput label="Ülke Kodu" placeholder="Ülke kodu giriniz" required type='number'
-                {...form.getInputProps('countryCode')}
-                />
+                <TextInput label="Ülke Kodu" placeholder="Ülke kodu giriniz" type='number' disabled={true}
+                  value={form.values.countryCode}/>
             </Grid.Col>
 
             <Grid.Col span={4}>

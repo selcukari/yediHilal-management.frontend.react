@@ -56,7 +56,6 @@ export default function AutomaticMailManagement() {
       const response = await service.getAutomaticMailFields();
 
       if (response) {
-        console.log("response:", response)
         form.setValues((pick(['id', 'subject', 'isActive', 'updateDate', 'body'], response) as FormValues));
        
         form.setInitialValues(pick(['id', 'subject', 'isActive', 'updateDate', 'body'],response));
@@ -94,7 +93,7 @@ export default function AutomaticMailManagement() {
 
     } catch (error: any) {
       close()
-      toast.error('Bir hata oluştu!');
+      toast.error('Bir hata oluştu!', error.message);
     }
   };
 

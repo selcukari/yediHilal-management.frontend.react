@@ -21,7 +21,7 @@ interface DutiesType {
 }
 
 export function Navbar({ opened, toggle }: NavbarProps) {
-  const { isLoggedIn, logout, login, currentUser } = useAuth();
+  const { isLoggedIn, logout, currentUser } = useAuth();
   const navigate = useNavigate();
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   
@@ -67,7 +67,7 @@ export function Navbar({ opened, toggle }: NavbarProps) {
       }
     }
   };
-  
+
   return (
     <AppShell.Header>
       <Group h="100%" px="md" justify="space-between">
