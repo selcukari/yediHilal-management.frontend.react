@@ -19,7 +19,6 @@ interface MeetingTypeAddProps {
 
 type FormValues = {
   name: string;
-  isActive: boolean;
 };
 
 const MeetingTypeAdd = forwardRef<MeetingTypeAddDialogControllerRef, MeetingTypeAddProps>(({onSaveSuccess}, ref) => {
@@ -33,7 +32,6 @@ const MeetingTypeAdd = forwardRef<MeetingTypeAddDialogControllerRef, MeetingType
   const form = useForm<FormValues>({
     initialValues: {
       name: '',
-      isActive: true,
     },
     validate: {
       name: (value) => (value.trim().length < 5 ? 'Toplantı Türü Adı en az 5 karakter olmalı' : null),
@@ -84,7 +82,7 @@ const MeetingTypeAdd = forwardRef<MeetingTypeAddDialogControllerRef, MeetingType
   };
 
   const dialogClose = () => {
-     if (!isEquals(form.getInitialValues(), form.getValues())) {
+    if (!isEquals(form.getInitialValues(), form.getValues())) {
 
       confirmModalRef.current?.open();
     } else {
@@ -116,7 +114,7 @@ const MeetingTypeAdd = forwardRef<MeetingTypeAddDialogControllerRef, MeetingType
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap="md">
           <Grid>
-            <Grid.Col span={6}>
+            <Grid.Col span={6} offset={3}>
               <TextInput
                 label="Toplantı Türü Adı"
                 placeholder="toplantı türü giriniz"
@@ -124,22 +122,6 @@ const MeetingTypeAdd = forwardRef<MeetingTypeAddDialogControllerRef, MeetingType
                 {...form.getInputProps('name')}
               />
             </Grid.Col>
-
-          <Flex
-            mih={50}
-            gap="md"
-            justify="center"
-            align="flex-end"
-            direction="row"
-            wrap="wrap">
-            <Grid.Col span={6}>
-              <Switch
-                label="Toplantı Türü Durumu" 
-                checked={form.values.isActive}
-                onChange={(event) => form.setFieldValue('isActive', event.currentTarget.checked)}
-              />
-            </Grid.Col>
-          </Flex>
           <Grid.Col span={6} offset={4}>
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
               İptal

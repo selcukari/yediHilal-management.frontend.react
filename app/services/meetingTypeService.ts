@@ -3,7 +3,6 @@ import { useAuth } from '~/authContext';
 
 interface MeetingTypeDataParams {
   name: string;
-  isActive: boolean;
 }
 
 export function useMeetingTypeService(controller: string) {
