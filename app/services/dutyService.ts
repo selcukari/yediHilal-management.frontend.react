@@ -3,7 +3,6 @@ import { useAuth } from '~/authContext';
 
 interface DutyDataParams {
   name: string;
-  isActive: boolean;
 }
 
 export function useDutyService(controller: string) {

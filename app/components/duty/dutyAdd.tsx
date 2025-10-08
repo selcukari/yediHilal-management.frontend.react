@@ -1,6 +1,6 @@
-import { forwardRef, useImperativeHandle, useState, useRef } from 'react';
+import { forwardRef, useImperativeHandle, useEffect, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, TextInput, Flex, Button, Stack, Grid, Switch } from '@mantine/core';
+import { Modal, TextInput, Flex, Button, Stack, Grid } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
@@ -19,7 +19,6 @@ interface UserAddProps {
 
 type FormValues = {
   name: string;
-  isActive: boolean;
 };
 
 const DutyAdd = forwardRef<DutyAddDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
@@ -32,7 +31,6 @@ const DutyAdd = forwardRef<DutyAddDialogControllerRef, UserAddProps>(({onSaveSuc
   const form = useForm<FormValues>({
     initialValues: {
       name: '',
-      isActive: true,
     },
     validate: {
       name: (value) => (value.trim().length < 5 ? 'Görev Adı en az 5 karakter olmalı' : null),
@@ -71,6 +69,16 @@ const DutyAdd = forwardRef<DutyAddDialogControllerRef, UserAddProps>(({onSaveSuc
     }
     setIsDisabledSubmit(false);
   };
+
+  useEffect(() => {
+    if (form.isDirty()) {
+
+      setIsDisabledSubmit(false);
+      return;
+    }
+
+    setIsDisabledSubmit(true);
+  }, [form.values]);
 
   const confirmDialogHandleConfirm = () => {
     confirmModalRef.current?.close();
@@ -115,30 +123,15 @@ const DutyAdd = forwardRef<DutyAddDialogControllerRef, UserAddProps>(({onSaveSuc
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap="md">
           <Grid>
-            <Grid.Col span={6}>
+            <Grid.Col span={6} offset={3}>
               <TextInput
                 label="Görev Adı"
                 placeholder="görev giriniz"
                 required
                 {...form.getInputProps('name')}
               />
-            </Grid.Col>
 
-          <Flex
-            mih={50}
-            gap="md"
-            justify="center"
-            align="flex-end"
-            direction="row"
-            wrap="wrap">
-            <Grid.Col span={6}>
-              <Switch
-                label="Görev Durumu" 
-                checked={form.values.isActive}
-                onChange={(event) => form.setFieldValue('isActive', event.currentTarget.checked)}
-              />
             </Grid.Col>
-          </Flex>
           <Grid.Col span={6} offset={4}>
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
               İptal
