@@ -132,7 +132,7 @@ export function Navbar({ opened, toggle }: NavbarProps) {
               </Menu.Dropdown>
             </Menu>
           ) : (
-            <Button onClick={() => navigate("/login")}>Giriş Yap</Button>
+            <Button visibleFrom='sm' onClick={() => navigate("/login")}>Giriş Yap</Button>
           )}
         </Group>
       </Group>
