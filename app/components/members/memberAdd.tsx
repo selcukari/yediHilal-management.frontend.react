@@ -281,7 +281,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
 
           <Grid.Col span={6}>
             <TextInput
-              label="Doğum Tarih" placeholder="Doğum Tarihini giriniz"
+              label="Doğum Tarih" placeholder="yıl giriniz(2000)"
               type='number' {...form.getInputProps('dateOfBirth')}
             />
           </Grid.Col>

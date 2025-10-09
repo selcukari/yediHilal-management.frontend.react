@@ -150,9 +150,9 @@ export default function MemberCreate() {
         </Flex>
         <Group justify="space-between" align="center">
           <div>
-            <Title order={2}>Üye Oluştur</Title>
+            <Title order={2}>Kayıt Form</Title>
             <Text size="sm" c="dimmed">
-              Yeni üye ekleyin
+              Yeni kayıt ekle
             </Text> 
           </div>
           <Button 
@@ -214,7 +214,7 @@ export default function MemberCreate() {
 
             <Grid.Col span={{ base: 4, sm: 2, md: 2}}>
                 <TextInput
-                label="Doğum Tarih" placeholder="Doğum Tarihini giriniz(2000)"
+                label="Doğum Tarih" placeholder="yıl giriniz(2000)"
                 type='number' {...form.getInputProps('dateOfBirth')}
                 />
             </Grid.Col>

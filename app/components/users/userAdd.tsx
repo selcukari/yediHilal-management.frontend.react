@@ -314,8 +314,8 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
 
           <Grid.Col span={6}>
             <TextInput
-              label="Doğum Tarih(Yıl)"
-              placeholder="Doğum Tarihini giriniz(yıl)"
+              label="Doğum Tarih"
+              placeholder="yıl giriniz(2000)"
               {...form.getInputProps('dateOfBirth')}
             />
           </Grid.Col>

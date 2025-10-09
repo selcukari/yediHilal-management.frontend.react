@@ -379,8 +379,8 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
 
           <Grid.Col span={6}>
             <TextInput
-              label="Doğum Tarih(Yıl)"
-              placeholder="Doğum Tarihini giriniz(yıl)"
+              label="Doğum Tarih"
+              placeholder="yıl giriniz(2000)"
               value={form.values.dateOfBirth}
               {...form.getInputProps('dateOfBirth')}
             />
