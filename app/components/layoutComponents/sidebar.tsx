@@ -3,7 +3,7 @@ import {
   NavLink, Flex, Text, Stack, Divider, Group, ScrollArea, AppShell,
 } from '@mantine/core';
 import {
-  IconUser, IconMail, IconLibrary, IconUsers, IconSettings, IconMessage, IconExternalLink, IconFileCheck, IconCar, IconCoin,
+  IconUser, IconMail, IconLibrary, IconUsers, IconSettings, IconMessage, IconExternalLink, IconFileCheck, IconCar, IconCoin, IconBubbleText,
   IconChevronRight, IconClipboardList, IconPhoneCall, IconCalendarTime, IconSettingsAutomation, IconChevronDown, IconBuildings,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
@@ -18,7 +18,13 @@ interface SidebarProps {
 const menuItems = [
   { icon: IconUsers, label: 'Üye Yönetimi', key: 'member', link: '/' },
   { icon: IconUser, label: 'Kullanıcı Yönetimi', key: 'user', link: '/users' },
-  { icon: IconCoin, label: 'Finans Yönetimi', key: 'finance', link: '/finances' },
+  { icon: IconCoin, label: 'Finans Yönetimi', key: 'finance', link: '/finances',
+    children: [
+      { label: 'Finans', key: 'finance', link: '/finances' },
+      { label: 'Arama Takip', key: 'phoneCallTracking', link: '/phoneCallTrackings',
+  },
+    ],
+  },
   {
     icon: IconClipboardList,
     label: 'Stok Yönetimi',
@@ -58,13 +64,11 @@ const menuItems = [
       { label: 'Araçlar', key: 'vehicles', link: '/vehicles' },
     ],
   },
-  { icon: IconMail, label: 'Gön. Mail Lis.', key: 'mail', link: '/mails' },
-  { icon: IconMessage, label: 'Gön. Sms Lis.', key: 'sms', link: '/sms' },
-  {
-    icon: IconPhoneCall,
-    label: 'Arama Takip',
-    key: 'phoneCallTracking',
-    link: '/phoneCallTrackings',
+  { icon: IconBubbleText, label: 'İletişim', key: 'communication', link: '/communication',
+    children: [
+      { icon: IconMail, label: 'Gön. Mail Lis.', key: 'mail', link: '/mails' },
+      { icon: IconMessage, label: 'Gön. Sms Lis.', key: 'sms', link: '/sms' },
+    ]
   },
   {
     icon: IconLibrary,
@@ -146,7 +150,7 @@ export function Sidebar({ active, setActive }: SidebarProps) {
       return;
     }
 
-    if ([2,3].includes(currentUser?.roleId) && !['/', '/mails', '/sms'].includes(link)) {
+    if ([2,3].includes(currentUser?.roleId) && !['/', '/communication'].includes(link)) {
       toast.error('Bu işlem için yetkiniz bulunmamaktadır.');
       return;
     }
