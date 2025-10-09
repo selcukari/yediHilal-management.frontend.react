@@ -40,8 +40,8 @@ export function ModuleSelect({ form, required = false, isDisabled = false }: Mod
 
   return (
     <MultiSelect
-      label="Modül"
-      placeholder="Modül Seçiniz"
+      label="Modül yetki"
+      placeholder="modül seçiniz"
       data={modules}
       searchable
       clearable
