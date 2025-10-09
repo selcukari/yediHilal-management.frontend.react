@@ -1,27 +1,33 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { IconSearch, IconEdit, IconTrash, IconPlus } from '@tabler/icons-react';
+import { IconSearch, IconEdit, IconTrash, IconPlus, IconCalendar } from '@tabler/icons-react';
 import {
   Container, Grid, TextInput, Badge, Flex, ActionIcon, Stack, Group, Title, Text, Paper, Table, LoadingOverlay, Button,
 } from '@mantine/core';
 import { omit } from 'ramda';
+import { DatePickerInput } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
 import DocumentTrackingAdd, { type DocumentTrackingAddDialogControllerRef } from '../components/documentTracking/documentTrackingAdd';
 import DocumentTrackingEdit, { type DocumentTrackingEditDialogControllerRef } from '../components/documentTracking/documentTrackingEdit';
 import { useDocumentTrackingService } from '../services/documentTrackingService';
 import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
+import { DayRenderer } from '../components';
 import { dateFormatStrings } from '../utils/dateFormatStrings';
-
+import { MenuActionButton } from '../components'
+import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToExcel';
+import { type PdfTableColumn } from '../utils/repor/exportToPdf';
+import { calculateColumnWidthMember } from '../utils/repor/calculateColumnWidth';
 interface Column {
   field: keyof DocumentTrackingType;
   header: string;
 }
 
-interface DocumentTrackingType {
+interface DocumentTrackingType { 
   id: number;
   name: string;
   responsibleId: string;
   responsibleFullName: string;
+  responsiblePhone: string;
   fileUrls: string;
   createDate?: string | null;
   updateDate?: string | null;
@@ -33,12 +39,14 @@ interface DocumentTrackingType {
 export default function DocumentTracking() {
   const [resultData, setResultData] = useState<DocumentTrackingType[]>([]);
   const [searchText, setSearchText] = useState('');
+  const [rangeDate, setRangeDate] = useState<[string | null, string | null]>([null, null] )
   const [visible, { open, close }] = useDisclosure(false);
   
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
     { field: 'id', header: 'Id' },
     { field: 'name', header: 'Evrak Adı' },
     { field: 'responsibleFullName', header: 'Sorumlu' },
+    { field: 'responsiblePhone', header: 'Sorumlu Telefon' },
     { field: 'fileUrls', header: 'Evraklar' },
     { field: 'note', header: 'Note' },
     { field: 'createDate', header: 'İlk Kayıt T.' },
@@ -51,11 +59,31 @@ export default function DocumentTracking() {
   const service = useDocumentTrackingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
   // Filtrelenmiş veriler
-  const filteredBranchs = useMemo(() => {
-    if (!searchText) return resultData;
-    
-    return resultData.filter(branch => branch.name.toLowerCase().includes(searchText.trim().toLowerCase()));
-  }, [resultData, searchText]);
+  const filteredDocumentTrackings = useMemo(() => {
+  if (!resultData) return [];
+
+  return resultData.filter(branch => {
+    // metin arama kontrolü
+    const matchesSearch = !searchText 
+      || branch.name?.toLowerCase().includes(searchText.trim().toLowerCase());
+
+    // tarih aralığı kontrolü
+    const [startDate, endDate] = rangeDate;
+
+    if (!startDate || !endDate) return matchesSearch;
+
+    const created = new Date(branch.createDate || "");
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    // gün sonunu da dahil etmek için
+    end.setHours(23, 59, 59, 999);
+
+    const isInRange = created >= start && created <= end;
+
+    return matchesSearch && isInRange;
+  });
+}, [resultData, searchText, rangeDate]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -118,7 +146,7 @@ export default function DocumentTracking() {
     }
   };
 
-  const rowsTable = filteredBranchs.map((item) => (
+  const rowsTable = filteredDocumentTrackings.map((item) => (
     <Table.Tr key={item.id}>
       {rowHeaders.map((header) => {
     
@@ -199,6 +227,33 @@ export default function DocumentTracking() {
       fetchDocumentTracking();
     }, 1000);
   };
+  // useMemo hook'u ile sütunları önbelleğe alıyoruz
+  const pdfTableColumns = useMemo((): PdfTableColumn[] => {
+
+    const newCols: Column[] = rowHeaders.filter(col =>
+      col.field != 'updateDate' && col.field != 'note' && col.field != 'actions' && col.field != 'fileUrls');
+
+    return newCols.map(col => ({
+      key: col.field,
+      title: col.header,
+      // İsteğe bağlı olarak genişlik ayarları ekleyebilirsiniz
+      width: calculateColumnWidthMember(col.field) // Özel genişlik hesaplama fonksiyonu
+    }));
+  }, [rowHeaders]);
+  const excelTableColumns = useMemo((): ColumnDefinition[] => {
+
+    const newCols: Column[] = rowHeaders.filter(col =>
+      col.field != 'updateDate' && col.field != 'note' && col.field != 'actions' && col.field != 'fileUrls');
+
+    return newCols.map(col => ({
+      key: col.field as keyof ValueData,
+      header: col.header,
+      // İsteğe bağlı olarak genişlik ayarları ekleyebilirsiniz
+    }));
+  }, [rowHeaders]);
+  const reportTitle = (): string => {
+    return "Evraklar Raporu"; 
+  }
   
   return (
       <Container size="xl">
@@ -247,6 +302,32 @@ export default function DocumentTracking() {
                     value={searchText}
                     onChange={(event) => setSearchText(event.currentTarget.value)}
                   />
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, sm: 6, md: 3}}>
+                  <DatePickerInput type="range" label="Tarih aralığını seç" placeholder="tarih aralığını seç" leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
+                    clearable locale="tr" renderDay={DayRenderer}
+                    onChange={(value) => setRangeDate(value)}
+                  />
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
+                  <Flex
+                  mih={50}
+                  gap="md"
+                  justify="flex-end"
+                  align="flex-end"
+                  direction="row"
+                  wrap="wrap">
+                    <MenuActionButton
+                    reportTitle={reportTitle()}
+                    excelColumns={excelTableColumns}
+                    valueData={filteredDocumentTrackings}
+                    pdfColumns={pdfTableColumns}
+                    type={2}
+                    isMailDisabled={true}
+                    isSmsDisabled={true}
+                    isWhatsAppDisabled={true}
+                    />
+                  </Flex>
                 </Grid.Col>
               </Grid>
             </Paper>

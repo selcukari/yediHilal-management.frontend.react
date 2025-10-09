@@ -58,6 +58,7 @@ const DocumentTrackingAdd = forwardRef<DocumentTrackingAddDialogControllerRef, D
       files: files.length > 0 ? files : undefined,
       responsibleId: currentUser?.id?.toString() as string,
       responsibleFullName: currentUser?.fullName as string,
+      responsiblePhone: `${currentUser?.countryCode}${currentUser?.phone}` as string,
     });
 
     if (result === true) {

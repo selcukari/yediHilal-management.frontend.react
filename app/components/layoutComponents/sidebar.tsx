@@ -21,7 +21,7 @@ const menuItems = [
   { icon: IconCoin, label: 'Finans Yönetimi', key: 'finance', link: '/finances' },
   {
     icon: IconClipboardList,
-    label: 'Stock Yönetimi',
+    label: 'Stok Yönetimi',
     key: 'stock',
     link: '/stocks',
     children: [

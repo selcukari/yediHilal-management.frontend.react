@@ -6,6 +6,7 @@ interface DocumentTrackingDataParams {
   name: string;
   responsibleId?: string;
   responsibleFullName?: string;
+  responsiblePhone?: string;
   note?: string | null;
   files?: any[];
 }
@@ -45,6 +46,7 @@ export function useDocumentTrackingService(controller: string) {
       formData.append('name', params.name);
       formData.append('responsibleId', params.responsibleId || '');
       formData.append('responsibleFullName', params.responsibleFullName || '');
+      formData.append('responsiblePhone', params.responsiblePhone || '');
       formData.append('note', params.note || '');
 
       // Dosyaları ekle
@@ -68,6 +70,7 @@ export function useDocumentTrackingService(controller: string) {
       formData.append('id', params.id?.toString() || "");
       formData.append('name', params.name);
       formData.append('responsibleId', params.responsibleId || '');
+      formData.append('responsiblePhone', params.responsiblePhone || '');
       formData.append('responsibleFullName', params.responsibleFullName || '');
       formData.append('note', params.note || '');
 
