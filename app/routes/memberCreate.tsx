@@ -11,6 +11,7 @@ import { CountrySelect } from '../components/addOrEdit/countrySelect';
 import { ProvinceSelect } from '../components/addOrEdit/provinceSelect';
 import { ProgramTypeSelect } from '../components/addOrEdit/programTypeSelect';
 import { MemberTypeSelect } from '../components/addOrEdit/memberTypeSelect';
+import { ChatComponent } from '../components/chatComponent';
 import { isEquals } from '~/utils/isEquals';
 import { toast } from '../utils/toastMessages';
 import { useMemberService } from '../services/memberService';
@@ -33,6 +34,7 @@ type FormValues = {
 
 export default function MemberCreate() {
    const [isDisabledSelect, setIsDisabledSelect] = useState(false);
+   const [showChat, setShowChat] = useState(false);
 
     const confirmModalRef = useRef<ConfirmModalRef>(null);
     const approvedConfirmModalRef = useRef<ApprovedConfirmModalRef>(null);
@@ -146,79 +148,78 @@ export default function MemberCreate() {
         <Flex mih={50} gap="md" justify="center" align="flex-end" direction="row" wrap="wrap">
             <Image h={50} w="auto" fit="contain" radius="md" src="https://yedihilal.org/wp-content/uploads/2023/12/yedihilal-yatayLogo.png"/>
         </Flex>
-        <Group justify="center" align="center">
+        <Group justify="space-between" align="center">
           <div>
             <Title order={2}>Üye Oluştur</Title>
             <Text size="sm" c="dimmed">
               Yeni üye ekleyin
             </Text> 
           </div>
+          <Button 
+            variant="light" onClick={() => setShowChat(!showChat)} color="blue" visibleFrom='sm'>
+            {showChat ? 'Chat\'i Kapat' : 'AI Asistan\'ı Aç'}
+          </Button>
         </Group>
 
         {/* İçerik Kartları */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '1rem',
-          }}
-        >
+        <Grid>
+          {/* Form Kısmı */}
+          <Grid.Col span={showChat ? 8 : 12}>
           <Paper shadow="xs" p="lg" withBorder>
             <form onSubmit={form.onSubmit(handleSubmit)}>
             <Stack gap="md">
             <Grid>
-                <Grid.Col span={6}>
+              <Grid.Col span={6}>
                 <TextInput
-                    label="Ad Soyad" placeholder="İsim giriniz" required
-                    {...form.getInputProps('fullName')}
-                />
+                  label="Ad Soyad" placeholder="İsim giriniz" required
+                  {...form.getInputProps('fullName')}
+              />
             </Grid.Col>
 
             <Grid.Col span={6}>
-                <TextInput label="Kimlik" placeholder="Kimlik numarası giriniz"
-                {...form.getInputProps('identificationNumber')}
-                />
+              <TextInput label="Kimlik" placeholder="Kimlik numarası giriniz"
+                {...form.getInputProps('identificationNumber')}/>
             </Grid.Col>
 
             <Grid.Col span={6}>
-                <MemberTypeSelect form={form} required={true}
+              <MemberTypeSelect form={form} required={true}
                 {...form.getInputProps('typeIds')}
-                ></MemberTypeSelect>
+              ></MemberTypeSelect>
             </Grid.Col>
 
             <Grid.Col span={6}>
-                <CountrySelect form={form} disabled={true} />
+              <CountrySelect form={form} disabled={true} />
             </Grid.Col>
 
             <Grid.Col span={6}>
-                <ProvinceSelect  form={form}  label="İl"  placeholder="İl Seçiniz" required={true} countryId={form.values.countryId} />
+              <ProvinceSelect  form={form}  label="İl"  placeholder="İl Seçiniz" required={true} countryId={form.values.countryId} />
             </Grid.Col>
             <Grid.Col span={6}>
-                <ProgramTypeSelect  form={form} required={true} />
+              <ProgramTypeSelect  form={form} required={true} />
             </Grid.Col>
 
-            <Grid.Col span={2}>
-                <TextInput label="Ülke Kodu" placeholder="Ülke kodu giriniz" type='number' disabled={true}
-                  value={form.values.countryCode}/>
+            <Grid.Col span={{ base: 4, sm: 4, md: 2}}>
+              <TextInput label="Ülke Kodu" placeholder="Ülke kodu giriniz" type='number' disabled={true}
+                value={form.values.countryCode}/>
             </Grid.Col>
 
-            <Grid.Col span={4}>
-                <TextInput
+            <Grid.Col span={{ base: 8, sm: 4, md: 2}}>
+              <TextInput
                 label="Telefon"
                 placeholder="505 555 5555"
                 required type='number'
                 {...form.getInputProps('phone')}
-                />
+              />
             </Grid.Col>
 
-            <Grid.Col span={6}>
+            <Grid.Col span={{ base: 4, sm: 2, md: 2}}>
                 <TextInput
                 label="Doğum Tarih" placeholder="Doğum Tarihini giriniz(2000)"
                 type='number' {...form.getInputProps('dateOfBirth')}
                 />
             </Grid.Col>
 
-            <Grid.Col span={6}>
+            <Grid.Col span={{ base: 8, sm: 4, md: 2}}>
                 <TextInput
                 label="Email"
                 placeholder="Email giriniz"
@@ -226,36 +227,46 @@ export default function MemberCreate() {
                 />
             </Grid.Col>
 
-            <Grid.Col span={6}>
+            <Grid.Col span={{ base: 8, sm: 4, md: 4}}>
                 <fieldset style={{ border: '1px solid #e9ecef', borderRadius: '8px', padding: '16px' }}>
                 <legend style={{ padding: '0 8px', fontWeight: 600 }}>Durum Ayarları</legend>
                 <Group gap="lg">
-                    <Switch 
+                  <Switch 
                     label="Sms Durumu" 
                     checked={form.values.isSms}
                     onChange={(event) => form.setFieldValue('isSms', event.currentTarget.checked)}
-                    />
-                    <Switch 
+                  />
+                  <Switch 
                     label="Mail Durumu" 
                     checked={form.values.isMail}
                     onChange={(event) => form.setFieldValue('isMail', event.currentTarget.checked)}
-                    />
+                  />
                 </Group>
                 </fieldset>
             </Grid.Col>
             <Grid.Col span={6} offset={4}>
                 <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
-                İptal
+                  İptal
                 </Button>
                 <Button type="submit" variant="filled" size="xs" disabled={isDisabledSelect}  leftSection={<IconCheck size={14} />} radius="xs">
-                Kaydet
+                  Kaydet
                 </Button>
             </Grid.Col>
             </Grid>
             </Stack>
         </form>
           </Paper>
-        </div>
+        </Grid.Col>
+        {/* Chat Kısmı */}
+          {showChat && (
+            <Grid.Col span={4} visibleFrom='sm'>
+              <ChatComponent 
+                title="YediHilal Bilgilendirme Asistanı"
+                height={600}
+              />
+            </Grid.Col>
+          )}
+        </Grid>
       </Stack>
       <ConfirmModal 
         ref={confirmModalRef}
