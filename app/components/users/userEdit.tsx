@@ -51,7 +51,6 @@ type FormValues = {
   isActive: boolean;
   countryId: string;
   roleId: string;
-  hierarchy?: string | null;
   moduleRoles: string;
   provinceId: string;
   createdDate?: string;
@@ -62,19 +61,11 @@ type FormValues = {
   dutiesIds?: string;
   deleteMessageTitle?: string;
 };
-type GetUserData = {
-  id: string;
-  fullName: string;
-}
 
 const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSaveSuccess}, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
   const [resultDutyData, setresultDutyData] = useState<DutiesType[]>([]);
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
-  const [userData, setUserData] = useState<GetUserData[]>([]);
-  // Sadece sancaktar id tutmak için ve sube baskanının uyelerini eklemek icin
-  const [sancaktarDutyId, setSancaktarDutyId] = useState<string>("10");
-  const [branchHeadDutyId, setBranchHeadDutyIdDutyId] = useState<string>("9");
   
   const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   
@@ -99,7 +90,6 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
       password: '',
       moduleRoles: '',
       responsibilities: '',
-      hierarchy: '',
       duties: [],
       dutiesIds: '',
       deleteMessageTitle: '',
@@ -165,7 +155,6 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
   const openDialog = (value: FormValues) => {
 
     if (value) {
-      fetchUsers();
       setresultDutyData(value.duties as DutiesType[] || []);
       form.reset();
       // Önce initial values'ı set et
@@ -177,29 +166,6 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
       open();
     }
   }
-  const fetchUsers = async () => {
-    try {
-      const params = {
-        countryId: "1",
-        isActive: true,
-      }
-      const getUsers: any[] | null = await service.users(params);
-      
-      if (getUsers) {
-        const newUsers = getUsers.map(u => ({
-          ...u,
-          duties: u.duties ? last(JSON.parse(u.duties as string)) : { ids: "", names: "" }
-        }));
-
-        setUserData(newUsers.filter(u => u.duties?.ids?.includes(branchHeadDutyId) && u.id != form.values.id)?.map((i: any) => ({ id: i.id.toString(), fullName: i.fullName })));
-      } else {
-        toast.info('Hiçbir veri yok!');
-        setUserData([]);
-      }
-    } catch (error: any) {
-      toast.error(`User yüklenirken hata: ${error.message}`);
-    }
-  };
 
   const isDisabledRoleComponent = useMemo(() => {
     return currentUser?.roleId != 1; // admin roleId
@@ -232,7 +198,6 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
       countryId: values.countryId ? parseInt(values.countryId) : undefined,
       roleId: values.roleId ? parseInt(values.roleId) : undefined,
       duties: resultDutyData ? JSON.stringify(resultDutyData) : undefined,
-      hierarchy: (values.dutiesIds?.toString() || "")?.includes(sancaktarDutyId) && values.hierarchy ? parseInt(values.hierarchy) : undefined,
     }
 
     const result = await service.updateUser(newUserValue);
@@ -296,13 +261,6 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
     openDialog,
     close,
   }));
-
-  const isDisabledBranchHead = useMemo(() => {
-    if (form.values.dutiesIds?.includes(sancaktarDutyId)) {
-      return !isDisabledRoleComponent;
-    }
-    return false;
-  },[form.values.dutiesIds]);
 
   return (<>
     <Modal
@@ -417,18 +375,6 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
               required={isDisabledRoleComponent}
               isDisabled={isDisabledRoleComponent}
               {...form.getInputProps('dutiesIds')}
-            />
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <Select
-              label="Bağlı old. Şube Başkanı"
-              placeholder="şube başkan Seçiniz"
-              data={userData.map(item => ({ value: item.id, label: item.fullName }))}
-              searchable clearable maxDropdownHeight={200}
-              nothingFoundMessage="şube başkan alan bulunamadı..."
-              value={form.values.hierarchy}
-              disabled={!isDisabledBranchHead} required={isDisabledBranchHead}
-              onChange={(value) => form.setFieldValue('hierarchy', value)}
             />
           </Grid.Col>
           <Grid.Col span={6}>
