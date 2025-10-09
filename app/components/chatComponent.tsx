@@ -59,8 +59,6 @@ export function ChatComponent({ title = "AI Asistan", height = 400 }: ChatCompon
     try {
       const aiResponse = await service.sendMessageOpenApi({message: inputMessage});
 
-      console.log("aiResponse:", aiResponse)
-      
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: aiResponse.message,
