@@ -214,16 +214,16 @@ export default function MemberCreate() {
 
             <Grid.Col span={{ base: 4, sm: 2, md: 2}}>
                 <TextInput
-                label="Doğum Tarih" placeholder="yıl giriniz(2000)"
-                type='number' {...form.getInputProps('dateOfBirth')}
+                  label="Doğum Tarih" placeholder="yıl giriniz(2000)"
+                  type='number' {...form.getInputProps('dateOfBirth')}
                 />
             </Grid.Col>
 
             <Grid.Col span={{ base: 8, sm: 4, md: 2}}>
                 <TextInput
-                label="Email"
-                placeholder="Email giriniz"
-                {...form.getInputProps('email')}
+                  label="Email"
+                  placeholder="Email giriniz"
+                  {...form.getInputProps('email')}
                 />
             </Grid.Col>
 
