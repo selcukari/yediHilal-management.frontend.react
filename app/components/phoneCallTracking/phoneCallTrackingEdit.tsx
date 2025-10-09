@@ -191,7 +191,7 @@ const PhoneCallTrackingEdit = forwardRef<PhoneCallTrackingEditDialogControllerRe
             <Grid.Col span={10}>
               <Select
                 label="Sorumlu" placeholder="sorumlu Seçiniz"
-                data={userData.map(item => ({ value: item.id, label: item.fullName }))}
+                data={userData.map(item => ({ value: item.id, label: item.fullName }))} disabled={isDisabledSubmit}
                 searchable clearable maxDropdownHeight={200} nothingFoundMessage="sorumlu kişi bulunamadı..."
                 required value={form.values.responsibleId} onChange={(value) => form.setFieldValue('responsibleId', value)}
               />
