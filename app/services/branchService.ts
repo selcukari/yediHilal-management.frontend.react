@@ -13,6 +13,7 @@ interface BranchDataParams {
   openingDate?: string | null;
   updateDate?: string | null;
   createDate?: string | null;
+  branchSancaktars?: string | null;
   rentalPrice?: number;
   isRent: boolean;
   files?: any[];
@@ -90,6 +91,7 @@ export function useBranchService(controller: string) {
       formData.append('openingDate', params.openingDate || '');
       formData.append('rentalPrice', params.rentalPrice?.toString() || '0');
       formData.append('openingDate', params.openingDate || '');
+      formData.append('branchSancaktars', params.branchSancaktars || '');
       formData.append('isRent', params.isRent ? "1" : '');
 
       // Dosyaları ekle

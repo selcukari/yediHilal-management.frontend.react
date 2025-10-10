@@ -25,8 +25,8 @@ type MemberParams = {
   countryId?: string | null;
   isActive: boolean;
   provinceIds?: string | null;
-  programTypeId: number | null;
-  dateRange: [string | null, string | null];
+  programTypeId?: number | null;
+  dateRange?: [string | null, string | null];
   searchText?: string;
 };
 
@@ -86,8 +86,8 @@ export function useMemberService(controller: string) {
     try {
       const newParams = {
         ...omit(['dateRange'], params),
-        startDate: params.dateRange[0],
-        endDate: params.dateRange[1],
+        startDate: params.dateRange?.[0] ?? null,
+        endDate: params.dateRange?.[1] ?? null,
       };
       
       const res = await api.get(`/${controller}/getMembersBy`,{

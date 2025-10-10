@@ -2,10 +2,10 @@ import { forwardRef, useImperativeHandle, useState, useRef, useEffect } from 're
 import { useDisclosure } from '@mantine/hooks';
 import { last, clone, omit } from 'ramda';
 import { DateInput } from '@mantine/dates';
-import { Modal, TextInput, Button, Stack, Textarea, Title, Table, Paper, Grid, Flex, Switch, Select } from '@mantine/core';
+import { Modal, TextInput, Button, Stack,ActionIcon, Group, Textarea, Title, Table, Paper, Grid, Flex, Switch, Select } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { subDays } from 'date-fns';
-import { IconCancel, IconCheck, IconCalendar } from '@tabler/icons-react';
+import { IconCancel, IconCheck, IconCalendar, IconTrash, IconPlus } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import { ProvinceSelect } from '../addOrEdit/provinceSelect';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
@@ -14,6 +14,8 @@ import { useBranchService } from '../../services/branchService';
 import { toast } from '../../utils/toastMessages';
 import { FileUpload } from '../fileInput';
 import { DayRenderer } from '../../components';
+import SancaktarAdd, { type SancaktarAddDialogControllerRef } from './sancaktarAdd';
+
 
 export type BranchEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -22,6 +24,15 @@ export type BranchEditDialogControllerRef = {
 
 interface UserAddProps {
   onSaveSuccess?: () => void; // Yeni prop
+}
+
+type SancaktarDataGorevatama = {
+  memberId: string;
+  memberFullName: string;
+  memberPhone?: string | null;
+  branchDuty: string;
+  isActive: string;
+  actions?: any
 }
 
 type FormValues = {
@@ -37,6 +48,7 @@ type FormValues = {
   rentalPrice?: number;
   isRent: boolean;
   isActive: boolean;
+  branchSancaktars?: string | null;
   files?: any[];
 };
 type GetUserData = {
@@ -46,7 +58,7 @@ type GetUserData = {
   countryCode?: string;
 }
 interface TableHeader {
-  field: keyof GetUserData;
+  field: keyof SancaktarDataGorevatama;
   header: string;
 }
 
@@ -54,13 +66,14 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
   const [branchHeadUserData, setBranchHeadUserData] = useState<GetUserData[]>([]);
-  const [sancaktarUserData, setSancaktarUserData] = useState<GetUserData[]>([]);
+  const [sancaktarUserData, setSancaktarUserData] = useState<SancaktarDataGorevatama[]>([]);
   const [branchHeadDutyId, setBranchHeadDutyIdDutyId] = useState<string>("9");
   const [sancaktarDutyId, setSancaktarDutyId] = useState<string>("10");
   
   const service = useBranchService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
+  const sancaktarAddRef = useRef<SancaktarAddDialogControllerRef>(null);
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
   const form = useForm<FormValues>({
@@ -74,6 +87,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
       email:"",
       socialMedias: "",
       openingDate: "",
+      branchSancaktars: "",
       rentalPrice: 1000,
       isRent: true,
       isActive: true,
@@ -101,6 +115,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
       isRent: values.isRent,
       rentalPrice: values.isRent ? values.rentalPrice : undefined,
       branchHeadId: values.branchHeadId as string,
+      branchSancaktars: sancaktarUserData ? JSON.stringify(sancaktarUserData) : ""
     });
 
     if (result === true) {
@@ -128,6 +143,15 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
     setIsDisabledSubmit(false);
   };
 
+  const handleSaveSuccessForSancaktar = (sancaktarData: SancaktarDataGorevatama) => {
+
+    setSancaktarUserData(prev => [
+      ...prev,
+      sancaktarData // eklemek istediğin nesne
+    ]);
+
+  };
+
   const confirmDialogHandleConfirm = () => {
     confirmModalRef.current?.close();
     close();
@@ -153,6 +177,8 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
       fetchUsers();
       form.setValues((value));
 
+      setSancaktarUserData(value.branchSancaktars ? JSON.parse(value.branchSancaktars) : []);
+
       form.setInitialValues(clone(value));
       // Sonra form values'larını set et
       form.reset();
@@ -175,11 +201,9 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
         }));
 
         setBranchHeadUserData(newUsers.filter(u => u.duties?.ids?.includes(branchHeadDutyId))?.map((i: any) => ({ id: i.id.toString(), fullName: i.fullName })));
-        setSancaktarUserData(newUsers.filter(u => u.duties?.ids?.includes(sancaktarDutyId) && (u.hierarchy || "")?.toString() == (form.values.branchHeadId)?.toString())?.map((i: any) => ({ id: i.id.toString(), fullName: i.fullName, phone: i.phone, countryCode: i.countryCode })));
       } else {
         toast.info('Hiçbir veri yok!');
         setBranchHeadUserData([]);
-        setSancaktarUserData([]);
       }
     } catch (error: any) {
       toast.error(`User yüklenirken hata: ${error.message}`);
@@ -190,19 +214,51 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
     openDialog,
     close,
   }));
+
+  useEffect(() => {
+
+  }, [sancaktarUserData])
+
+  const handleDeleteSancaktar = (memberId: string) => {
+    setSancaktarUserData(prev =>
+      prev.map(item =>
+        item.memberId == memberId
+          ? { ...item, isActive: "0" }
+          : item                      
+      )
+    );
+  }
+
   const [rowSancaktarUserHeaders, setRowSancaktarUserHeaders] = useState<TableHeader[]>([
-    { field: 'fullName', header: 'İsim' },
-    { field: 'phone', header: 'Telefon' },
+    { field: 'memberFullName', header: 'İsim' },
+    { field: 'memberPhone', header: 'Telefon' }, 
+    { field: 'branchDuty', header: 'Görevi' },
+    { field: 'actions', header: 'İşlemler' },
   ]);
 
   const rowsSancaktarUserTable = () => {
-    return sancaktarUserData?.map((item) => (
-      <Table.Tr key={item.id}>
+    return sancaktarUserData?.filter((i: SancaktarDataGorevatama) => i.isActive == "1")?.map((item) => (
+      <Table.Tr key={item.memberId}>
         {rowSancaktarUserHeaders.map((header) => {
-          if (header.field === 'phone') {
+          if (header.field === 'memberPhone') {
             return (
               <Table.Td key={header.field}>
-                {`+${item["countryCode"]}${item["phone"]}`}
+                {`${item["memberPhone"]}`}
+              </Table.Td>
+            );
+          }
+          if (header.field === 'actions') {
+            return (
+              <Table.Td key={header.field}>
+                <Group gap="xs">
+                  <ActionIcon 
+                    variant="light" 
+                    color="red"
+                    onClick={() => handleDeleteSancaktar(item.memberId)}
+                  >
+                    <IconTrash size={16} />
+                  </ActionIcon>
+                </Group>
               </Table.Td>
             );
           }
@@ -216,35 +272,6 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
       </Table.Tr>
     ))
   };
-
-  const fetchUsersForSancaktar = async () => {
-    try {
-      const params = {
-        countryId: "1",
-        isActive: true,
-      }
-      const getUsers: any[] | null = await serviceUser.users(params);
-      
-      if (getUsers) {
-        const newUsers = getUsers.map(u => ({
-          ...u,
-          duties: u.duties ? last(JSON.parse(u.duties as string)) : { ids: "", names: "" }
-        }));
-
-        setSancaktarUserData(newUsers.filter(u => u.duties?.ids?.includes(sancaktarDutyId) && (u.hierarchy || "")?.toString() == (form.values.branchHeadId)?.toString())?.map((i: any) => ({ id: i.id.toString(), fullName: i.fullName, phone: i.phone, countryCode: i.countryCode })));
-      } else {
-        toast.info('Hiçbir veri yok!');
-        setSancaktarUserData([]);
-      }
-    } catch (error: any) {
-      toast.error(`User yüklenirken hata: ${error.message}`);
-    }
-  };
-
-  useEffect(() => {
-    fetchUsersForSancaktar();
-    rowsSancaktarUserTable();
-  }, [form.values.branchHeadId]);
 
   return (<>
     <Modal
@@ -339,8 +366,20 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
           <Grid.Col span={6}>
             <FileUpload
               form={form}
-              required={false}
+              required={false} 
               />
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />}  onClick={() => sancaktarAddRef.current?.openDialog()}>Üye Ekle</Button>
+               {/* Mobile için sadece icon buton */}
+              <Button 
+                variant="filled" 
+                onClick={() => sancaktarAddRef.current?.openDialog()}
+                hiddenFrom="xs"
+                p="xs"
+              >
+                <IconPlus size={18} />
+              </Button>
           </Grid.Col>
           {/* dagişen sancaktar baskana baglı olanlar listesi */}
           {(rowsSancaktarUserTable())?.length > 0 &&
@@ -354,7 +393,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
             <Grid.Col span={12}>
             <Paper shadow="xs" p="lg" withBorder>
               <Stack gap="md">
-                <Title order={2}>Sancaktarlar</Title>
+                <Title order={2}>Üyeler</Title>
                 <Table.ScrollContainer minWidth={500} maxHeight={700}>
                   <Table striped highlightOnHover withColumnBorders>
                     <Table.Thead>
@@ -385,11 +424,8 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
       </form>
     </Modal>
       {/* confirm Dialog */}
-    <ConfirmModal 
-      ref={confirmModalRef}
-      onConfirm={confirmDialogHandleConfirm}
-      onCancel={confirmDialogHandleCancel}
-    />
+    <ConfirmModal ref={confirmModalRef} onConfirm={confirmDialogHandleConfirm} onCancel={confirmDialogHandleCancel}/>
+    <SancaktarAdd  ref={sancaktarAddRef} onSaveSuccess={handleSaveSuccessForSancaktar}/>
   </>);
 });
 

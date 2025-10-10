@@ -103,6 +103,7 @@ export default function Member() {
       typeIds: item.typeIds.toString(),
       isSms: item.isSms,
       isMail: item.isMail,
+      sancaktarGorev: item.sancaktarGorev ?? "",
       referenceId: item.referenceId ? item.referenceId.toString() : '',
       countryId: item.countryId.toString(),
       provinceId: item.provinceId?.toString(),
