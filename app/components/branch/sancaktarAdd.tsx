@@ -117,7 +117,7 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
       const params = {
         countryId: "1",
         isActive: true,
-        typeIds: "10" // görevli üye tipindekiler gelsin
+        typeIds: "10" // "görevli" üye tipindekiler gelsin "membertypes"
       }
   
       const getMembers = await service.members(params);

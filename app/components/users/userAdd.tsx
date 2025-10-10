@@ -41,17 +41,10 @@ type FormValues = {
   dutiesIds?: string;
   deleteMessageTitle?: string;
 };
-type GetUserData = {
-  id: string;
-  fullName: string;
-}
 
 const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
-  const [userData, setUserData] = useState<GetUserData[]>([]);
-  // Sadece sancaktar id tutmak için ve sube baskanının uyelerini eklemek icin
-  const [sancaktarDutyId, setSancaktarDutyId] = useState<string>("10");
 
   const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
