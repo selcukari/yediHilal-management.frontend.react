@@ -18,6 +18,10 @@ import { DutySelect } from '../addOrEdit/dutySelect';
 import { formatDate } from '../../utils/formatDate';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import { useAuth } from '~/authContext';
+import { MenuActionButton } from '../../components'
+import { type ColumnDefinition, type ValueData } from '../../utils/repor/exportToExcel';
+import { type PdfTableColumn } from '../../utils/repor/exportToPdf';
+import { calculateColumnWidthMember } from '../../utils/repor/calculateColumnWidth';
 interface DutiesType {
   ids: string;
   names?: string;
@@ -132,8 +136,8 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
     { field: 'authorizedPersonName', header: 'Atayan Kişi' },
   ]);
 
-  const rowsDutyTable = resultDutyData?.map((item) => (
-    <Table.Tr key={item.ids}>
+  const rowsDutyTable = resultDutyData?.map((item, index) => (
+    <Table.Tr key={index}>
       {rowDutyHeaders.map((header) => {
         if (header.field === 'authorizedPersonName') {
           return (
@@ -262,6 +266,38 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
     close,
   }));
 
+   // useMemo hook'u ile sütunları önbelleğe alıyoruz
+  const pdfTableColumns = useMemo((): PdfTableColumn[] => {
+    const newCols: TableHeader[] = rowDutyHeaders;
+    return newCols.map(col => ({
+      key: col.field,
+      title: col.header,
+      // İsteğe bağlı olarak genişlik ayarları ekleyebilirsiniz
+      width: calculateColumnWidthMember(col.field) // Özel genişlik hesaplama fonksiyonu
+    }));
+  }, [rowDutyHeaders]);
+
+  const excelTableColumns = useMemo((): ColumnDefinition[] => {
+    const newCols: TableHeader[] = rowDutyHeaders;
+    return newCols.map(col => ({
+      key: col.field as keyof ValueData,
+      header: col.header,
+      // İsteğe bağlı olarak genişlik ayarları ekleyebilirsiniz
+    }));
+  }, [rowDutyHeaders]);
+  const reportTitle = (): string => {
+    return `${form.values.fullName } kullanıcı Geçmiş Görev Raporu`; 
+  }
+
+  // raportdata
+  const raportProjectData = useMemo(() => {
+    return resultDutyData.map((dutiesType: DutiesType) => ({
+      ...dutiesType,
+      authorizedPersonName: dutiesType.authorizedPersonName ?
+        `${dutiesType.authorizedPersonName}-${form.values.countryCode}${form.values.phone}` : "",
+    }))
+  }, [resultDutyData])
+  
   return (<>
     <Modal
       opened={opened}
@@ -417,6 +453,29 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
               {...form.getInputProps('deleteMessageTitle')}
             />
           </Grid.Col>
+          {rowsDutyTable?.length > 0 &&
+          <Grid.Col span={{ base: 12, sm: 6, md: 4}}>
+            <Flex
+            mih={50}
+            gap="md"
+            justify="flex-end"
+            align="flex-end"
+            direction="row"
+            wrap="wrap"
+          >
+            <MenuActionButton
+            reportTitle={reportTitle()}
+            excelColumns={excelTableColumns}
+            valueData={raportProjectData}
+            pdfColumns={pdfTableColumns}
+            type={2}
+            isMailDisabled={true}
+            isSmsDisabled={true}
+            isWhatsAppDisabled={true}
+            />
+          </Flex>
+          </Grid.Col>
+          }
           {/* dagişen duty(görev) listesi */}
           {rowsDutyTable?.length > 0 &&
           <Flex
