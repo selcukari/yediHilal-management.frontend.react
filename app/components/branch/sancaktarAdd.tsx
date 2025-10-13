@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useEffect, useState, useRef } from 'react';
+import { forwardRef, useImperativeHandle, useEffect, useState, useRef, useMemo } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { Modal, TextInput, Select, Button, Stack, Grid } from '@mantine/core';
 import { useForm } from '@mantine/form';
@@ -9,7 +9,7 @@ import { useMemberService } from '../../services/memberService';
 import { toast } from '../../utils/toastMessages';
 
 export type SancaktarAddDialogControllerRef = {
-  openDialog: () => void;
+  openDialog: (ids?: string[] | null) => void;
   close: () => void;
 };
 
@@ -40,6 +40,7 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
   const [sancaktarData, setSancaktarData] = useState<GetSancaktarData[]>([]);
+  const [sancaktarDataIds, setSancaktarDataIds] = useState<string[] | null>(null);
   
   const service = useMemberService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
 
@@ -133,8 +134,9 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
     }
   };
 
-  const openDialog = () => {
+  const openDialog = (ids?: string[] | null) => {
     fetchMembers();
+    setSancaktarDataIds(ids ?? null);
     form.reset();
 
     open();
@@ -144,6 +146,14 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
     openDialog,
     close,
   }));
+  
+  const sancaktarDataReview = useMemo(() => {
+    return sancaktarData.map(item => ({
+    value: item.id,
+    label: item.fullName,
+    disabled: sancaktarDataIds?.includes(item.id) ?? false
+  }));
+  }, [sancaktarData]);
 
   return (<>
     <Modal
@@ -165,7 +175,7 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
             <Grid.Col span={6}>
                 <Select
                   label="Üy Ekle " placeholder="üye Seçiniz"
-                  data={sancaktarData.map(item => ({ value: item.id, label: item.fullName }))}
+                  data={sancaktarDataReview}
                   searchable clearable maxDropdownHeight={200} nothingFoundMessage="üye bulunamadı..."
                   required onChange={(value) => form.setFieldValue('memberId', value)}
                 />

@@ -68,7 +68,6 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
   const [branchHeadUserData, setBranchHeadUserData] = useState<GetUserData[]>([]);
   const [sancaktarUserData, setSancaktarUserData] = useState<SancaktarDataGorevatama[]>([]);
   const [branchHeadDutyId, setBranchHeadDutyIdDutyId] = useState<string>("9");
-  const [sancaktarDutyId, setSancaktarDutyId] = useState<string>("10");
   
   const service = useBranchService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
@@ -370,11 +369,12 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
               />
           </Grid.Col>
           <Grid.Col span={4}>
-            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />}  onClick={() => sancaktarAddRef.current?.openDialog()}>Üye Ekle</Button>
+            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />} 
+              onClick={() => sancaktarAddRef.current?.openDialog(sancaktarUserData?.filter((i: SancaktarDataGorevatama) => i.isActive == "1")?.map((item => item.memberId)))}>Üye Ekle</Button>
                {/* Mobile için sadece icon buton */}
               <Button 
                 variant="filled" 
-                onClick={() => sancaktarAddRef.current?.openDialog()}
+                onClick={() => sancaktarAddRef.current?.openDialog(sancaktarUserData?.filter((i: SancaktarDataGorevatama) => i.isActive == "1")?.map((item => item.memberId)))}
                 hiddenFrom="xs"
                 p="xs"
               >
