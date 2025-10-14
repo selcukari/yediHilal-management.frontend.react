@@ -257,7 +257,7 @@ export default function DocumentTracking() {
               <Grid>
                 <Grid.Col span={{ base: 12, sm: 6, md: 4}}>
                   <TextInput
-                    label="Takip Evrak Ara"
+                    label="Telefon Ara"
                     placeholder="text giriniz"
                     leftSection={<IconSearch size={18} />}
                     value={searchText}
