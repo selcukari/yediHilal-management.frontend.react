@@ -370,7 +370,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
           </Grid.Col>
           <Grid.Col span={4}>
             <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />} 
-              onClick={() => sancaktarAddRef.current?.openDialog(sancaktarUserData?.filter((i: SancaktarDataGorevatama) => i.isActive == "1")?.map((item => item.memberId)))}>Üye Ekle</Button>
+              onClick={() => sancaktarAddRef.current?.openDialog(sancaktarUserData?.filter((i: SancaktarDataGorevatama) => i.isActive == "1")?.map((item => item.memberId)))}>Görev Ekle</Button>
                {/* Mobile için sadece icon buton */}
               <Button 
                 variant="filled" 

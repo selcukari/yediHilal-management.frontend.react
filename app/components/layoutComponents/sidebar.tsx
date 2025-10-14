@@ -4,7 +4,7 @@ import {
 } from '@mantine/core';
 import {
   IconUser, IconMail, IconLibrary, IconUsers, IconSettings, IconMessage, IconExternalLink, IconFileCheck, IconCar, IconCoin, IconBubbleText,
-  IconChevronRight, IconClipboardList, IconPhoneCall, IconCalendarTime, IconSettingsAutomation, IconChevronDown, IconBuildings,
+  IconChevronRight, IconClipboardList, IconPhoneCall, IconBuilding, IconCalendarTime, IconSettingsAutomation, IconChevronDown, IconBuildings,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
 import { useAuth } from '~/authContext';
@@ -15,26 +15,21 @@ interface SidebarProps {
   setActive: (key: string) => void;
 }
 
-const menuItems = [
+interface MenuItem {
+  icon?: any;
+  label: string;
+  key: string;
+  link: string;
+  children?: MenuItem[];
+}
+
+const menuItems: MenuItem[] = [
   { icon: IconUsers, label: 'Üye Yönetimi', key: 'member', link: '/' },
-  { icon: IconUser, label: 'Kullanıcı Yönetimi', key: 'user', link: '/users' },
-  { icon: IconCoin, label: 'Finans Yönetimi', key: 'finance', link: '/finances',
+  { label: 'Finans Yönetimi', key: 'finance', link: '/financeManagements',
     children: [
-      { label: 'Finans', key: 'finance', link: '/finances' },
-      { label: 'Arama Takip', key: 'phoneCallTracking', link: '/phoneCallTrackings',
-  },
-    ],
-  },
-  {
-    icon: IconClipboardList,
-    label: 'Stok Yönetimi',
-    key: 'stock',
-    link: '/stocks',
-    children: [
-      { label: 'Emanetler', key: 'stockDeposit', link: '/stockDeposits' },
-      { label: 'Giderler', key: 'stockExpense', link: '/stockExpenses' },
-      { label: 'Depo', key: 'stock-depo', link: '/stocks' },
-    ],
+      { icon: IconCoin, label: 'Finans', key: 'finance', link: '/finances' },
+      { icon: IconPhoneCall, label: 'Arama Takip', key: 'phoneCallTracking', link: '/phoneCallTrackings' },
+    ], 
   },
   {
     icon: IconFileCheck,
@@ -48,40 +43,33 @@ const menuItems = [
     key: 'branch',
     link: '/branches',
   },
-  {
-    icon: IconCalendarTime,
-    label: 'Toplantı Yönetimi',
-    key: 'meeting',
-    link: '/meetings',
-  },
-  {
-    icon: IconCar,
-    label: 'Araç Yönetimi',
-    key: 'vehicle',
-    link: '/vehicles',
-    children: [
-      { label: 'Emanet Araçlar', key: 'vehicleDeposits', link: '/vehicleDeposits' },
-      { label: 'Araçlar', key: 'vehicles', link: '/vehicles' },
-    ],
-  },
-  { icon: IconBubbleText, label: 'İletişim', key: 'communication', link: '/communication',
+  { icon: IconBubbleText, label: 'İletişim', key: 'communication', link: '/communications',
     children: [
       { icon: IconMail, label: 'Gön. Mail Lis.', key: 'mail', link: '/mails' },
       { icon: IconMessage, label: 'Gön. Sms Lis.', key: 'sms', link: '/sms' },
     ]
   },
   {
-    icon: IconLibrary,
-    label: 'Evrak Takip',
-    key: 'documentTracking',
-    link: '/documentTrackings',
+    icon: IconBuilding, label: 'İdari Yönetim', key: 'administrativeManagement', link: '/administrativeManagements',
+    children: [
+      { icon: IconCalendarTime, label: 'Toplantı', key: 'meeting', link: '/meetings'},
+      {icon: IconLibrary, label: 'Evrak Takip', key: 'documentTracking', link: '/documentTrackings'},
+      { icon: IconCar, label: 'Araç Yönetimi', key: 'vehicleManagement', link: '/vehicleManagements',
+        children: [{ label: 'Emanet Araçlar', key: 'vehicleDeposits', link: '/vehicleDeposits' }, { label: 'Araçlar', key: 'vehicles', link: '/vehicles' }, ],
+      },
+      { icon: IconClipboardList, label: 'Stok Yönetimi', key: 'stock', link: '/stocks',
+        children: [ { label: 'Emanetler', key: 'stockDeposit', link: '/stockDeposits' },   { label: 'Giderler', key: 'stockExpense', link: '/stockExpenses' },   { label: 'Depo', key: 'stock-depo', link: '/stocks' },],
+      },
+    ]
   },
+ 
   { icon: IconSettings, label: 'Ayarlar', key: 'setting', link: '/settings',
     children: [
       { label: 'Görevler', key: 'duty', link: '/settings-duty' },
       { label: 'Toplantı Türleri', key: 'meetingType', link: '/settings-meetingType' },
     ],
   },
+  { icon: IconUser, label: 'Kullanıcı Yönetimi', key: 'user', link: '/users' },
   {
     icon: IconSettingsAutomation,
     label: 'Otomatik Mesaj Yönetimi',
@@ -100,6 +88,96 @@ const menuItems = [
   },
 ];
 
+// Recursive function to find all menu items including nested children
+const findAllMenuItems = (items: MenuItem[]): MenuItem[] => {
+  const allItems: MenuItem[] = [];
+  
+  items.forEach(item => {
+    allItems.push(item);
+    if (item.children) {
+      allItems.push(...findAllMenuItems(item.children));
+    }
+  });
+  
+  return allItems;
+};
+
+// Recursive function to find parent keys for a given key
+const findParentKeys = (items: MenuItem[], targetKey: string, parentKeys: string[] = []): string[] => {
+  for (const item of items) {
+    if (item.key === targetKey) {
+      return parentKeys;
+    }
+    
+    if (item.children) {
+      const found = findParentKeys(item.children, targetKey, [...parentKeys, item.key]);
+      if (found.length > 0) {
+        return found;
+      }
+    }
+  }
+  
+  return [];
+};
+
+// Recursive NavLink component for nested menus
+const RecursiveNavLink = ({ 
+  item, 
+  active, 
+  openedItems, 
+  setOpenedItems, 
+  handleMenuItemClick,
+  level = 0 
+}: { 
+  item: MenuItem;
+  active: string;
+  openedItems: string[];
+  setOpenedItems: (items: string[]) => void;
+  handleMenuItemClick: (key: string, link: string, hasChildren: boolean) => void;
+  level?: number;
+}) => {
+  const hasChildren = !!item.children && item.children.length > 0;
+  const isActive = item.key === active || (item.children && item.children.some(child => child.key === active));
+  const isOpened = openedItems.includes(item.key);
+
+  const handleClick = () => {
+    handleMenuItemClick(item.key, item.link, hasChildren);
+  };
+
+  return (
+    <NavLink
+      active={isActive}
+      label={item.label}
+      leftSection={item.icon ? <item.icon size="1rem" stroke={1.5} /> : undefined}
+      rightSection={
+        hasChildren ? (
+          isOpened ? 
+            <IconChevronDown size="0.8rem" stroke={1.5} /> : 
+            <IconChevronRight size="0.8rem" stroke={1.5} />
+        ) : undefined
+      }
+      onClick={handleClick}
+      opened={isOpened}
+      variant="filled"
+      childrenOffset={28}
+    >
+      {hasChildren && isOpened && (
+        item?.children?.map((child) => (
+          <RecursiveNavLink
+            key={child.key}
+            item={child}
+            active={active}
+            openedItems={openedItems}
+            setOpenedItems={setOpenedItems}
+            handleMenuItemClick={handleMenuItemClick}
+            level={level + 1}
+          />
+        ))
+      )}
+    </NavLink>
+  );
+};
+
 export function Sidebar({ active, setActive }: SidebarProps) {
   const { isLoggedIn, currentUser } = useAuth();
   const [openedItems, setOpenedItems] = useState<string[]>([]);
@@ -110,20 +188,23 @@ export function Sidebar({ active, setActive }: SidebarProps) {
   // URL'e göre aktif menüyü belirle
   useEffect(() => {
     const currentPath = location.pathname;
-    const activeItem = menuItems.find(item => item.link === currentPath) || 
-      menuItems.flatMap(item => item.children || []).find(child => child.link === currentPath);
+    const allItems = findAllMenuItems(menuItems);
+    const activeItem = allItems.find(item => item.link === currentPath);
     
     if (activeItem) {
       setActive(activeItem.key);
       
-      // Eğer aktif öğe bir alt menü öğesiyse, ana menüyü de açık hale getir
-      const parentItem = menuItems.find(item => 
-        item.children && item.children.some(child => child.key === activeItem.key)
-      );
-      
-      if (parentItem && !openedItems.includes(parentItem.key)) {
-        setOpenedItems([...openedItems, parentItem.key]);
-      }
+      // Aktif öğenin tüm parent'larını açık hale getir
+      const parentKeys = findParentKeys(menuItems, activeItem.key);
+      setOpenedItems(prev => {
+        const newOpenedItems = [...prev];
+        parentKeys.forEach(key => {
+          if (!newOpenedItems.includes(key)) {
+            newOpenedItems.push(key);
+          }
+        });
+        return newOpenedItems;
+      });
     }
   }, [location.pathname, setActive]);
 
@@ -174,37 +255,14 @@ export function Sidebar({ active, setActive }: SidebarProps) {
           </Flex>
           
           {menuItems.map((item) => (
-            <div key={item.key}>
-              <NavLink
-                active={item.key === active || (item.children || []).some(child => child.key === active)}
-                label={item.label}
-                leftSection={<item.icon size="1rem" stroke={1.5} />}
-                rightSection={
-                  item.children ? (
-                    openedItems.includes(item.key) ? 
-                      <IconChevronDown size="0.8rem" stroke={1.5} /> : 
-                      <IconChevronRight size="0.8rem" stroke={1.5} />
-                  ) : (
-                    <IconChevronRight size="0.8rem" stroke={1.5} />
-                  )
-                }
-                onClick={() => handleMenuItemClick(item.key, item.link, !!item.children)}
-                opened={openedItems.includes(item.key)}
-                variant="filled"
-                childrenOffset={28}
-              >
-                {item.children && openedItems.includes(item.key) && (
-                  item.children.map((child) => (
-                    <NavLink
-                      key={child.key}
-                      label={child.label}
-                      active={child.key === active}
-                      onClick={() => handleMenuItemClick(item.key, child.link)}
-                    />
-                  ))
-                )}
-              </NavLink>
-            </div>
+            <RecursiveNavLink
+              key={item.key}
+              item={item}
+              active={active}
+              openedItems={openedItems}
+              setOpenedItems={setOpenedItems}
+              handleMenuItemClick={handleMenuItemClick}
+            />
           ))}
         </Stack>
       </AppShell.Section> }

@@ -12,7 +12,6 @@ import { useUserService } from '../../services/userService';
 import { RoleSelect } from '../addOrEdit/roleSelect';
 import { toast } from '../../utils/toastMessages';
 import { ModuleSelect } from '../addOrEdit/moduleSelect';
-import { ResponsibleSelect } from '../addOrEdit/responsibleSelect';
 import { areNumberSequencesEqual } from '../../utils/areNumberSequencesEqual';
 import { DutySelect } from '../addOrEdit/dutySelect';
 import { formatDate } from '../../utils/formatDate';
@@ -60,7 +59,6 @@ type FormValues = {
   createdDate?: string;
   password: string;
   updateDate?: string;
-  responsibilities?: string;
   duties?: DutiesType[];
   dutiesIds?: string;
   deleteMessageTitle?: string;
@@ -93,7 +91,6 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
       updateDate: "",
       password: '',
       moduleRoles: '',
-      responsibilities: '',
       duties: [],
       dutiesIds: '',
       deleteMessageTitle: '',
@@ -418,13 +415,6 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
               form={form}
               isDisabled={isDisabledRoleComponent}
               {...form.getInputProps('moduleRoles')}
-            />
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <ResponsibleSelect
-              form={form}
-              isDisabled={isDisabledRoleComponent}
-              {...form.getInputProps('responsibilities')}
             />
           </Grid.Col>
           <Flex

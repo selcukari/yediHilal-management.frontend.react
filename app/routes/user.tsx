@@ -94,8 +94,6 @@ export default function User() {
       isActive: item.isActive,
       password: item.password,
       moduleRoles: item.moduleRoles,
-      hierarchy: item.hierarchy ? item.hierarchy.toString() : undefined,
-      responsibilities: item.responsibilities,
       roleId: item.roleId.toString(),
       countryId: item.countryId.toString(),
       provinceId: item.provinceId?.toString(),
