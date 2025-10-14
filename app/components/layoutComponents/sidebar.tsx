@@ -231,7 +231,7 @@ export function Sidebar({ active, setActive }: SidebarProps) {
       return;
     }
 
-    if ([2,3].includes(currentUser?.roleId) && !['/', '/communication'].includes(link)) {
+    if ([2,3].includes(currentUser?.roleId)) {
       toast.error('Bu işlem için yetkiniz bulunmamaktadır.');
       return;
     }
