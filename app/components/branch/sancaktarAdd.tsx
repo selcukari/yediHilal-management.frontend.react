@@ -6,6 +6,7 @@ import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useMemberService } from '../../services/memberService';
+import { useBranchDutyService } from '../../services/branchDutyService';
 import { toast } from '../../utils/toastMessages';
 
 export type SancaktarAddDialogControllerRef = {
@@ -17,7 +18,8 @@ type SancaktarDataGorevatama = {
   memberId: string;
   memberFullName: string;
   memberPhone?: string | null;
-  branchDuty: string;
+  branchDutyName: string;
+  branchDutyId: string;
   isActive: string;
 }
 
@@ -26,7 +28,7 @@ interface SancaktarAddProps {
 }
 
 type FormValues = {
-  branchDuty: string;
+  branchDutyId: string;
   memberId: string | null;
 };
 
@@ -41,18 +43,20 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
   const [opened, { open, close }] = useDisclosure(false);
   const [sancaktarData, setSancaktarData] = useState<GetSancaktarData[]>([]);
   const [sancaktarDataIds, setSancaktarDataIds] = useState<string[] | null>(null);
+  const [branchDuty, setBranchDuty] = useState<any>(null);
+  const [branchDutyData, setBranchDutyData] = useState<any[]>([])
   
   const service = useMemberService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
+  const serviceBranchDuty =  useBranchDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
   const form = useForm<FormValues>({
     initialValues: {
-      branchDuty: '',
+      branchDutyId: '',
       memberId: ""
     },
     validate: {
-      branchDuty: (value) => (value.trim().length < 5 ? 'Görev Adı en az 5 karakter olmalı' : null),
     },
   });
 
@@ -67,7 +71,8 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
           memberId: values.memberId ?? "",
           memberFullName: memberFind?.fullName ?? "",
           memberPhone: memberFind?.phone,
-          branchDuty: values.branchDuty.trim(),
+          branchDutyName: (branchDuty.name || ""),
+          branchDutyId: (branchDuty.id || ""),
           isActive: "1"
         });
 
@@ -133,9 +138,26 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
       toast.error(`üyeler yüklenirken hata: ${error.message}`);
     }
   };
+  const fetchBranchDutys = async () => {
+    try {
+      
+  
+      const getBranchDuties = await serviceBranchDuty.getBranchDuties();
+      
+      if (getBranchDuties) {
+        setBranchDutyData(getBranchDuties);
+      } else {
+        toast.info('Hiçbir veri yok!');
+        setBranchDutyData([]);
+      }
+    } catch (error: any) {
+      toast.error(`getBranchDuties yüklenirken hata: ${error.message}`);
+    }
+  };
 
   const openDialog = (ids?: string[] | null) => {
     fetchMembers();
+    fetchBranchDutys();
     setSancaktarDataIds(ids ?? null);
     form.reset();
 
@@ -154,6 +176,21 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
     disabled: sancaktarDataIds?.includes(item.id) ?? false
   }));
   }, [sancaktarData]);
+
+  const handleChangeDuty = (value: string | null) => {
+    if (value) {
+
+      const getDuty = branchDutyData?.find(i => i.id.toString() == value);
+
+      if (getDuty){
+        setBranchDuty(getDuty)
+      }
+
+    }
+  }
+
+  // Form'dan error mesajını al
+  const error = form.errors.dutiesIds;
 
   return (<>
     <Modal
@@ -181,11 +218,13 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
                 />
               </Grid.Col>
             <Grid.Col span={6} offset={3}>
-              <TextInput
+              <Select
                 label="Görev Adı"
-                placeholder="görev giriniz"
-                required
-                {...form.getInputProps('branchDuty')}
+                placeholder="görev seçiniz"
+                data={branchDutyData.map(item => ({ value: item.id?.toString(), label: item.name }))}
+                searchable clearable maxDropdownHeight={200} required
+                nothingFoundMessage="görev bulunamadı..."
+                onChange={handleChangeDuty}
               />
 
             </Grid.Col>

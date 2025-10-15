@@ -256,14 +256,14 @@ const PhoneCallTrackingEdit = forwardRef<PhoneCallTrackingEditDialogControllerRe
               align="center"
               direction="row"
               wrap="wrap">
-            <Grid.Col span={12}>
+            <Grid.Col span={4}>
               <TextInput
                 label="Arama Takip Adı" placeholder="arama takip adı giriniz" required
                 value={form.values.name}
                 {...form.getInputProps('name')}
               />
             </Grid.Col>
-            <Grid.Col span={12}>
+            <Grid.Col span={4}>
               <Select
                 label="Sorumlu" placeholder="sorumlu Seçiniz"
                 data={userData.map(item => ({ value: item.id, label: item.fullName }))} disabled={isDisabledSubmit}
@@ -271,7 +271,7 @@ const PhoneCallTrackingEdit = forwardRef<PhoneCallTrackingEditDialogControllerRe
                 required value={form.values.responsibleId} onChange={(value) => form.setFieldValue('responsibleId', value)}
               />
             </Grid.Col>
-            <Grid.Col span={12}>
+            <Grid.Col span={4}>
             <Textarea
               mt="md" label="Note" placeholder="note..."
               withAsterisk minRows={3}
@@ -279,6 +279,7 @@ const PhoneCallTrackingEdit = forwardRef<PhoneCallTrackingEditDialogControllerRe
               {...form.getInputProps('note')}
             />
             </Grid.Col>
+          </Flex>
             
             {/* Members Tablosu */}
             {membersData.length > 0 && (
@@ -298,7 +299,6 @@ const PhoneCallTrackingEdit = forwardRef<PhoneCallTrackingEditDialogControllerRe
                 </Paper>
               </Grid.Col>
             )}
-          </Flex>
           <Grid.Col span={6} offset={4}>
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
               İptal

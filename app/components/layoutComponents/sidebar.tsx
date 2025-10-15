@@ -66,6 +66,7 @@ const menuItems: MenuItem[] = [
   { icon: IconSettings, label: 'Ayarlar', key: 'setting', link: '/settings',
     children: [
       { label: 'Görevler', key: 'duty', link: '/settings-duty' },
+      { label: 'Üye Görevler', key: 'branchDuty', link: '/settings-branchDuty' },
       { label: 'Toplantı Türleri', key: 'meetingType', link: '/settings-meetingType' },
     ],
   },

@@ -228,8 +228,6 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
       }
 
     }
-
-    console.log("handleChangeMember:", value)
   };
 
   useImperativeHandle(ref, () => ({

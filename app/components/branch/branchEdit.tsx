@@ -30,7 +30,8 @@ type SancaktarDataGorevatama = {
   memberId: string;
   memberFullName: string;
   memberPhone?: string | null;
-  branchDuty: string;
+  branchDutyName: string;
+  branchDutyId: string;
   isActive: string;
   actions?: any
 }
@@ -231,7 +232,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
   const [rowSancaktarUserHeaders, setRowSancaktarUserHeaders] = useState<TableHeader[]>([
     { field: 'memberFullName', header: 'İsim' },
     { field: 'memberPhone', header: 'Telefon' }, 
-    { field: 'branchDuty', header: 'Görevi' },
+    { field: 'branchDutyName', header: 'Görevi' },
     { field: 'actions', header: 'İşlemler' },
   ]);
 
