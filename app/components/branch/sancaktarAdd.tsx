@@ -21,6 +21,7 @@ type SancaktarDataGorevatama = {
   branchDutyName: string;
   branchDutyId: string;
   isActive: string;
+  createDate: string;
 }
 
 interface SancaktarAddProps { 
@@ -73,11 +74,11 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
           memberPhone: memberFind?.phone,
           branchDutyName: (branchDuty.name || ""),
           branchDutyId: (branchDuty.id || ""),
+          createDate: new Date().toISOString(),
           isActive: "1"
         });
 
       toast.success('Üye Eklendi!');
-
       }
       
       close();
@@ -141,7 +142,6 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
   const fetchBranchDutys = async () => {
     try {
       
-  
       const getBranchDuties = await serviceBranchDuty.getBranchDuties();
       
       if (getBranchDuties) {
@@ -189,9 +189,6 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
     }
   }
 
-  // Form'dan error mesajını al
-  const error = form.errors.dutiesIds;
-
   return (<>
     <Modal
       opened={opened}
@@ -211,7 +208,7 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
           <Grid>
             <Grid.Col span={6}>
                 <Select
-                  label="Üy Ekle " placeholder="üye Seçiniz"
+                  label="Üye Ekle " placeholder="üye Seçiniz"
                   data={sancaktarDataReview}
                   searchable clearable maxDropdownHeight={200} nothingFoundMessage="üye bulunamadı..."
                   required onChange={(value) => form.setFieldValue('memberId', value)}

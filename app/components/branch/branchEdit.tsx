@@ -15,7 +15,8 @@ import { toast } from '../../utils/toastMessages';
 import { FileUpload } from '../fileInput';
 import { DayRenderer } from '../../components';
 import SancaktarAdd, { type SancaktarAddDialogControllerRef } from './sancaktarAdd';
-
+import { dateFormatStrings } from '../../utils/dateFormatStrings';
+import { formatDate } from '../../utils/formatDate';
 
 export type BranchEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -34,6 +35,7 @@ type SancaktarDataGorevatama = {
   branchDutyId: string;
   isActive: string;
   actions?: any
+  createDate: string;
 }
 
 type FormValues = {
@@ -233,6 +235,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
     { field: 'memberFullName', header: 'İsim' },
     { field: 'memberPhone', header: 'Telefon' }, 
     { field: 'branchDutyName', header: 'Görevi' },
+    { field: 'createDate', header: 'Tarih' },
     { field: 'actions', header: 'İşlemler' },
   ]);
 
@@ -244,6 +247,13 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
             return (
               <Table.Td key={header.field}>
                 {`${item["memberPhone"]}`}
+              </Table.Td>
+            );
+          }
+          if (header.field === 'createDate') {
+            return (
+              <Table.Td key={header.field}>
+                {`${formatDate(item["createDate"], dateFormatStrings.dateTimeFormatWithoutSecond)}`}
               </Table.Td>
             );
           }
