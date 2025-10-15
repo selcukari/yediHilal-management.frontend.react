@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { IconSearch, IconFilter, IconEdit, IconTrash, IconPlus, IconCalendar } from '@tabler/icons-react';
+import { IconSearch, IconFilter, IconEdit, IconTrash, IconPlus, IconCalendar, IconPhoneCall } from '@tabler/icons-react';
 import {
   Container, Grid, TextInput, Switch, Stack, Group, Title, Text, Button, Paper, Table, Badge,
   ActionIcon, LoadingOverlay, Flex,
@@ -9,6 +9,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { Country, ProgramType, Province, MemberType, MenuActionButton } from '../components'
 import MemberAdd, { type MemberAddDialogControllerRef } from '../components/members/memberAdd';
 import MemberEdit, { type MemberEditDialogControllerRef } from '../components/members/memberEdit';
+import PhoneCallTrackingSend, { type PhoneCallTrackingSendDialogControllerRef } from '../components/members/phoneCallTrackingSend';
 import ConfirmModalMessage, { type ConfirmModalMessageRef } from '../components/confirmModalMessage';
 import { useMemberService } from '../services/memberService';
 import { toast } from '../utils/toastMessages';
@@ -68,19 +69,12 @@ export default function Member() {
 
   const memberAddRef = useRef<MemberAddDialogControllerRef>(null);
   const memberEditRef = useRef<MemberEditDialogControllerRef>(null);
+  const phoneCallTrackingRef = useRef<PhoneCallTrackingSendDialogControllerRef>(null);
   const confirmModalMessageRef = useRef<ConfirmModalMessageRef>(null);
 
   const { isLoggedIn } = useAuth();
 
   const service = useMemberService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      setTimeout(() => {
-        fetchMembers();
-      }, 1000);
-    }
-  }, []);
 
   const renderBoolean = (value: boolean) => {
     return (
@@ -234,6 +228,14 @@ export default function Member() {
       close();
     }
   };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      setTimeout(() => {
+        fetchMembers();
+      }, 1000);
+    }
+  }, []);
 
   const handleSaveSuccess = () => {
     setTimeout(() => {
@@ -450,6 +452,22 @@ export default function Member() {
                     />
                   </Flex>
                 </Grid.Col>
+                <Grid.Col span={{ base: 6, sm: 3, md: 2}}>
+                  <Flex
+                    mih={50}
+                    gap="md"
+                    justify="flex-start"
+                    align="flex-end"
+                    direction="row"
+                    wrap="wrap"
+                  >
+                    <Button
+                      leftSection={<IconPhoneCall size={14} />}
+                      onClick={() => phoneCallTrackingRef.current?.open()}>
+                      Arama Takip Olş.
+                    </Button>
+                  </Flex>
+                </Grid.Col>
               </Grid>
             </Paper>
           </div>
@@ -478,6 +496,7 @@ export default function Member() {
           onConfirm={confirmModalMessageHandleConfirm} onCancel={confirmModalMessageHandleCancel} />
         <MemberAdd ref={memberAddRef} onSaveSuccess={handleSaveSuccess} />
         <MemberEdit ref={memberEditRef} onSaveSuccess={handleSaveSuccess} />
+        <PhoneCallTrackingSend ref={phoneCallTrackingRef} onSaveSuccess={handleSaveSuccess} />
       </Container>
   );
 }

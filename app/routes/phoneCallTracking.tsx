@@ -22,12 +22,11 @@ interface PhoneCallTrackingType {
   name: string;
   responsibleId: string;
   responsibleFullName: string;
-  fileUrls: string;
+  members: string;
   createDate?: string | null;
   updateDate?: string | null;
   note: string | null;
   isActive: boolean;
-  isCompleted: boolean;
   actions?: any
 }
 
@@ -40,8 +39,6 @@ export default function DocumentTracking() {
     { field: 'id', header: 'Id' },
     { field: 'name', header: 'Evrak Adı' },
     { field: 'responsibleFullName', header: 'Sorumlu' },
-    { field: 'fileUrls', header: 'Evraklar' },
-    { field: 'isCompleted', header: 'Tamamlandı mı?' },
     { field: 'note', header: 'Note' },
     { field: 'createDate', header: 'İlk Kayıt T.' },
     { field: 'updateDate', header: 'Güncelleme T.' },
@@ -67,29 +64,10 @@ export default function DocumentTracking() {
 
   const handleEdit = (item: PhoneCallTrackingType) => {
      phoneCallTrackingEditRef.current?.openDialog({
-      ...omit(['actions', 'isActive', 'createDate', 'updateDate', 'responsibleFullName'], item),
-      responsibleId: item.responsibleId.toString()
+      ...item,
+      responsibleId: item.responsibleId ? item.responsibleId.toString() : '',
      });
   };
-  const getFileNameWithoutUUID = (url: string) => {
-    try {
-        const urlObj = new URL(url);
-        const pathParts = urlObj.pathname.split('/');
-        const fileNameWithExtension = pathParts[pathParts.length - 1];
-        const fileName = fileNameWithExtension.replace(/\.[^/.]+$/, "");
-        
-        // UUID'den önceki kısmı al (son _'ya kadar)
-        const lastUnderscoreIndex = fileName.lastIndexOf('_');
-        if (lastUnderscoreIndex !== -1) {
-          return fileName.substring(0, lastUnderscoreIndex);
-        }
-
-        return fileName;
-    } catch (error) {
-        console.error('Geçersiz URL:', url);
-        return null;
-    }
-  }
 
   const handleDelete = async (id: number) => {
     open();
@@ -120,36 +98,15 @@ export default function DocumentTracking() {
       close();
     }
   };
-  const renderBoolean = (value: boolean) => {
-    return (
-      <Badge color={value ? 'green' : 'red'}>
-        {value ? 'Evet' : 'Hayır'}
-      </Badge>
-    );
-  };
 
   const rowsTable = filteredPhoneCalls.map((item) => (
     <Table.Tr key={item.id}>
       {rowHeaders.map((header) => {
     
-        if (header.field === 'fileUrls') {
-          return (
-            <Table.Td key={header.field}>
-              {`${(item[header.field] || "")?.split(",").map((fileUrl: string) => getFileNameWithoutUUID(fileUrl)).join(",").substring(0,25)}`}
-            </Table.Td>
-          );
-        }
         if (header.field === 'note') {
           return (
             <Table.Td key={header.field}>
               {((item[header.field] || "")?.substring(0,25))}
-            </Table.Td>
-          );
-        }
-        if (header.field === 'isCompleted') {
-          return (
-            <Table.Td key={header.field}>
-              {renderBoolean(item[header.field])}
             </Table.Td>
           );
         }
@@ -165,7 +122,6 @@ export default function DocumentTracking() {
                 </ActionIcon>
                 <ActionIcon 
                   variant="light" color="red"
-                  disabled={item["isCompleted"]}
                   onClick={() => handleDelete(item.id)}
                 >
                   <IconTrash size={16} />
@@ -192,6 +148,7 @@ export default function DocumentTracking() {
       if (getphoneCallTrackings) {
         setResultData(getphoneCallTrackings.map((phoneCallTracking: PhoneCallTrackingType) => ({
           ...phoneCallTracking,
+          members: phoneCallTracking.members ? JSON.parse(phoneCallTracking.members) : [] as any[],
           updateDate: phoneCallTracking.updateDate ? formatDate(phoneCallTracking.updateDate, dateFormatStrings.defaultDateFormat) : null,
           createDate: phoneCallTracking.createDate ? formatDate(phoneCallTracking.createDate, dateFormatStrings.dateTimeFormatWithoutSecond) : null,
         })));
@@ -271,7 +228,7 @@ export default function DocumentTracking() {
           {/* Örnek Tablo */}
           <Paper shadow="xs" p="lg" withBorder>
             <Stack gap="md">
-              <Title order={4}>Son Arama Takip Evraklar({rowsTable?.length || 0})</Title>
+              <Title order={4}>Son Arama Takip({rowsTable?.length || 0})</Title>
               <Table.ScrollContainer minWidth={400} maxHeight={700}>
                 <Table striped highlightOnHover withColumnBorders>
                   <Table.Thead>

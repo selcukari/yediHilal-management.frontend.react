@@ -8,7 +8,6 @@ import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { usePhoneCallTrackingService } from '../../services/phoneCallTrackingService';
 import { useUserService } from '../../services/userService';
 import { toast } from '../../utils/toastMessages';
-import { FileUpload } from '../fileInput';
 
 export type PhoneCallTrackingAddDialogControllerRef = {
   open: () => void;
@@ -23,7 +22,6 @@ type FormValues = {
   name: string;
   note?: string | null;
   responsibleId?: string | null;
-  files?: any[];
 };
 type GetUserData = {
   id: string;
@@ -45,13 +43,9 @@ const PhoneCallTrackingAdd = forwardRef<PhoneCallTrackingAddDialogControllerRef,
       name: '',
       note: "",
       responsibleId: '',
-      files: [],
     },
     validate: {
       name: (value) => (value.trim().length < 5 ? 'Arama Takip Adı en az 5 karakter olmalı' : null),
-      files: (value) => {
-        return value && value?.length > 0 ? null : 'En az bir tane dosya eklenmeli';
-      },
       responsibleId: (value) => (value ? null : 'Sorumlu kişi alanı zorunlu'),
     },
   });
@@ -82,13 +76,11 @@ const PhoneCallTrackingAdd = forwardRef<PhoneCallTrackingAddDialogControllerRef,
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
     // Dosya form değerlerinden al
-    const files = form.values.files || [];
     const responsibleFullName = userData.find(user => user.id == values.responsibleId)?.fullName;
 
     const result = await service.addPhoneCallTracking({
       ...values,
-      files: files.length > 0 ? files : undefined,
-      responsibleId: values.responsibleId as string,
+      responsibleId: parseInt(values.responsibleId ?? "1") as number,
       responsibleFullName: responsibleFullName as string,
     });
 
@@ -196,12 +188,6 @@ const PhoneCallTrackingAdd = forwardRef<PhoneCallTrackingAddDialogControllerRef,
               withAsterisk minRows={5}
               {...form.getInputProps('note')}
             />
-          </Grid.Col>
-          <Grid.Col span={10}>
-            <FileUpload
-              form={form}
-              required={true}
-              />
           </Grid.Col>
           </Flex>
           <Grid.Col span={6} offset={4}>

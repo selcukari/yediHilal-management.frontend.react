@@ -3,12 +3,11 @@ import { useAuth } from '~/authContext';
 
 interface PhoneCallTrackingDataParams {
   id?: number;
-  name: string;
-  responsibleId?: string;
+  name?: string;
+  responsibleId?: number;
   responsibleFullName?: string;
-  isCompleted?: boolean;
   note?: string | null;
-  files?: any[];
+  members?: string | null;
 }
 
 export function usePhoneCallTrackingService(controller: string) {
@@ -38,22 +37,9 @@ export function usePhoneCallTrackingService(controller: string) {
   };
 
   const addPhoneCallTracking = async (params: PhoneCallTrackingDataParams) => {
-    // FormData oluştur
-    const formData = new FormData()
-
     try {
-      // Temel DocumentTracking verilerini ekle
-      formData.append('name', params.name);
-      formData.append('responsibleId', params.responsibleId || '');
-      formData.append('responsibleFullName', params.responsibleFullName || '');
-      formData.append('note', params.note || '');
 
-      // Dosyaları ekle
-      (params.files || []).forEach((file: File) => {
-        formData.append('files', file);
-      });
-
-      const res = await api.post(`/${controller}/addPhoneCallTracking`, formData);
+      const res = await api.post(`/${controller}/addPhoneCallTracking`, params);
 
       return res.data.data;
     } catch (error: any) {
@@ -62,22 +48,9 @@ export function usePhoneCallTrackingService(controller: string) {
   };
 
   const updatePhoneCallTracking = async (params: PhoneCallTrackingDataParams) => {
-    // FormData oluştur
-    const formData = new FormData()
     try {
-      // Temel DocumentTracking verilerini ekle
-      formData.append('id', params.id?.toString() || "");
-      formData.append('name', params.name);
-      formData.append('responsibleId', params.responsibleId || '');
-      formData.append('responsibleFullName', params.responsibleFullName || '');
-      formData.append('isCompleted', params.isCompleted ? "1" : '');
-      formData.append('note', params.note || '');
 
-      // Dosyaları ekle
-      (params.files || []).forEach((file: File) => {
-        formData.append('files', file);
-      });
-      const res = await api.put(`/${controller}/updatePhoneCallTracking`, formData);
+      const res = await api.put(`/${controller}/updatePhoneCallTracking`, params);
 
       return res.data.data;
     } catch (error: any) {
