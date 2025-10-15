@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, TextInput, Flex, Button, Stack, Grid, PasswordInput, Switch, Textarea } from '@mantine/core';
+import { Modal, TextInput, Flex, Button, Select, Stack, Grid, PasswordInput, Switch, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
@@ -13,6 +13,7 @@ import { toast } from '../../utils/toastMessages';
 import { DutySelect } from '../addOrEdit/dutySelect';
 import { ModuleSelect } from '../addOrEdit/moduleSelect';
 import { formatDate } from '../../utils/formatDate';
+import { useMemberService } from '../../services/memberService';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import { useAuth } from '~/authContext';
 
@@ -45,8 +46,10 @@ type FormValues = {
 const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
+  const [memberData, setMemberData] = useState<any[]>([]);
 
   const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+  const serviceMember = useMemberService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
 
   const { currentUser } = useAuth();
   
@@ -177,14 +180,57 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
     }
   }
 
+  const fetchMembers = async () => { 
+    try {
+      const params = {
+        countryId: "1",
+        isActive: true,
+        typeIds: "10" // "görevli" üye tipindekiler gelsin "membertypes"
+      }
+  
+      const getMembers = await serviceMember.members(params);
+      
+      if (getMembers) {
+        setMemberData(getMembers.map((i: any) => ({
+          id: i.id.toString(), fullName: i.fullName, phone: i.phone ?? "", identificationNumber: i.identificationNumber,
+          email: i.email, dateOfBirth: i.dateOfBirth?.toString() })));
+      } else {
+        toast.info('Hiçbir veri yok!');
+        setMemberData([]);
+      }
+    } catch (error: any) {
+      toast.error(`üyeler yüklenirken hata: ${error.message}`);
+    }
+  };
+
   const openDialog = () => {
 
     setTimeout(() => {
+      fetchMembers();
     }, 500);
     form.reset();
   
     open();
   }
+
+  const handleChangeMember = (value: string | null) => {
+
+    if (value) {
+      const getMember = memberData?.find(i => i.id.toString() == value);
+      if(getMember) {
+        form.setFieldValue("fullName", getMember.fullName ?? "");
+        form.setFieldValue("phone", getMember.phone ?? "");
+        form.setFieldValue("email", getMember.email ?? "");
+        form.setFieldValue("dateOfBirth", getMember.dateOfBirth ?? "");
+        form.setFieldValue("email", getMember.email ?? "");
+        form.setFieldValue("identificationNumber", getMember.identificationNumber ?? "");
+
+      }
+
+    }
+
+    console.log("handleChangeMember:", value)
+  };
 
   useImperativeHandle(ref, () => ({
     openDialog,
@@ -209,25 +255,29 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
         <Stack gap="md">
           <Grid>
             <Grid.Col span={6}>
-              <TextInput
-                label="Ad Soyad"
-                placeholder="İsim giriniz"
-                required
-                {...form.getInputProps('fullName')}
+              <Select
+                label="Üye İsmi"
+                placeholder="üye seçiniz"
+                data={memberData.map(item => ({ value: item.id?.toString(), label: item.fullName }))}
+                searchable clearable maxDropdownHeight={200} required
+                nothingFoundMessage="üye bulunamadı..."
+                onChange={handleChangeMember}
               />
             </Grid.Col>
 
           <Grid.Col span={6}>
             <TextInput
-              label="Kimlik"
+              label="T.C"
               placeholder="Kimlik numarası giriniz"
+              value={form.values.identificationNumber}
               {...form.getInputProps('identificationNumber')}
             />
           </Grid.Col>
 
           <Grid.Col span={6}>
             <CountrySelect 
-              form={form} 
+              form={form}
+              disabled={true}
             />
           </Grid.Col>
 
@@ -241,20 +291,11 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
             />
           </Grid.Col>
 
-          <Grid.Col span={2}>
-            <TextInput
-              label="Ülke Kodu"
-              placeholder="Ülke kodu giriniz"
-              required type='number'
-              {...form.getInputProps('countryCode')}
-            />
-          </Grid.Col>
-
           <Grid.Col span={4}>
             <TextInput
               label="Telefon"
               placeholder="505 555 5555"
-              required
+              required value={form.values.phone}
               {...form.getInputProps('phone')}
             />
           </Grid.Col>
@@ -262,7 +303,7 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
           <Grid.Col span={6}>
             <TextInput
               label="Doğum Tarih"
-              placeholder="yıl giriniz(2000)"
+              placeholder="yıl giriniz(2000)" value={form.values.dateOfBirth}
               {...form.getInputProps('dateOfBirth')}
             />
           </Grid.Col>
@@ -272,7 +313,7 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
               label="Email"
               placeholder="Email giriniz"
               required
-              type="email"
+              type="email" value={form.values.email}
               {...form.getInputProps('email')}
             />
           </Grid.Col>

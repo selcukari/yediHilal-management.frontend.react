@@ -84,6 +84,9 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
         return /^\S+@\S+$/.test(value) ? null : 'Geçersiz email adresi';
       },
       phone: (value) => {
+        if (form.values.isSms) {
+          return /^[0-9]+$/.test(value) ? null : 'Sadece rakam girebilirsiniz';
+        }
 
         if (!form.values.referenceId) {
 
