@@ -39,7 +39,7 @@ const menuItems: MenuItem[] = [
   },
   {
     icon: IconBuildings,
-    label: 'Şubeler Yönetimi',
+    label: 'Temsilcilik Yönetimi',
     key: 'branch',
     link: '/branches',
   },

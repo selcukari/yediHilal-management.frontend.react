@@ -72,7 +72,7 @@ const BranchAdd = forwardRef<BranchAddDialogControllerRef, UserAddProps>(({onSav
       files: [],
     },
     validate: {
-      branchName: (value) => (value.trim().length < 5 ? 'Şube Adı en az 5 karakter olmalı' : null),
+      branchName: (value) => (value.trim().length < 5 ? 'Temsilcilik Adı en az 5 karakter olmalı' : null),
       phone: (value) => {
         if (!value) return undefined;
 
@@ -189,7 +189,7 @@ const BranchAdd = forwardRef<BranchAddDialogControllerRef, UserAddProps>(({onSav
       onClose={() => {
         dialogClose();
       }}
-      title="Yeni Şube Ekle"
+      title="Yeni Temsilcilik Ekle"
       centered
       size="700"
       overlayProps={{
@@ -202,8 +202,8 @@ const BranchAdd = forwardRef<BranchAddDialogControllerRef, UserAddProps>(({onSav
           <Grid>
             <Grid.Col span={6}>
               <TextInput
-                label="Şube Adı"
-                placeholder="şube adı giriniz"
+                label="Temsilcilik Adı"
+                placeholder="Temsilcilik adı giriniz"
                 required
                 {...form.getInputProps('branchName')}
               />
@@ -219,9 +219,9 @@ const BranchAdd = forwardRef<BranchAddDialogControllerRef, UserAddProps>(({onSav
             </Grid.Col>
             <Grid.Col span={6}>
               <Select
-                label="Şube Başkanı" placeholder="şube başkan Seçiniz"
+                label="Temsilcilik Başkanı" placeholder="temsilcilik başkan Seçiniz"
                 data={userData.map(item => ({ value: item.id, label: item.fullName }))}
-                searchable clearable maxDropdownHeight={200} nothingFoundMessage="şube başkan alan bulunamadı..."
+                searchable clearable maxDropdownHeight={200} nothingFoundMessage="Temsilcilik başkan alan bulunamadı..."
                 required onChange={(value) => form.setFieldValue('branchHeadId', value)}
               />
             </Grid.Col>
