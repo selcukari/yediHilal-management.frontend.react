@@ -6,7 +6,7 @@ import { clone } from 'ramda';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
-import { useDutyService } from '../../services/dutyService';
+import { useMeetingTypeService } from '../../services/meetingTypeService';
 import { toast } from '../../utils/toastMessages';
 
 export type MeetingTypeEditDialogControllerRef = {
@@ -26,7 +26,7 @@ type FormValues = {
 const MeetingTypeEdit = forwardRef<MeetingTypeEditDialogControllerRef, MeetingTypeEditProps>(({onSaveSuccess}, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
-  const service = useDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+  const service = useMeetingTypeService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
@@ -59,7 +59,7 @@ const MeetingTypeEdit = forwardRef<MeetingTypeEditDialogControllerRef, MeetingTy
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
     
-    const result = await service.updateDuty({
+    const result = await service.updateMeetingType({
       ...values,
       name: values.name.trim()
     });
