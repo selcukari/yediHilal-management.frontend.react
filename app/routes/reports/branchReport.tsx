@@ -1,45 +1,33 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
-import { IconSearch, IconFilter, IconEdit, IconTrash, IconPlus } from '@tabler/icons-react';
+import { useState, useEffect, useMemo } from 'react';
+import { IconSearch, IconCalendar } from '@tabler/icons-react';
 import {
-  Container, Grid, TextInput, Switch, Stack, Group, Title, Text, Button, Paper, Table,
-  ActionIcon, LoadingOverlay, Flex,
+  Container, Grid, TextInput, Select, Stack, Group, Title, Text, Button, Paper, Table,
+  Badge, LoadingOverlay, Flex,
 } from '@mantine/core';
+import { isEmpty } from 'ramda';
+import { DatePickerInput } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
-import { Country, Province, MenuActionButton, Role } from '../../components'
-import UserAdd, { type UserAddDialogControllerRef } from '../../components/users/userAdd';
-import UserEdit, { type UserEditDialogControllerRef } from '../../components/users/userEdit';
-import ConfirmModalMessage, { type ConfirmModalMessageRef } from '../../components/confirmModalMessage';
-import { useUserService } from '../../services/userService';
+import { Province, MenuActionButton, UserDuty } from '../../components'
 import { useBranchService } from '../../services/branchService';
 import { toast } from '../../utils/toastMessages';
 import { formatDate } from '../../utils/formatDate';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
-import { useAuth } from '~/authContext';
 import { type PdfTableColumn } from '../../utils/repor/exportToPdf';
 import { calculateColumnWidthUser } from '../../utils/repor/calculateColumnWidth';
 import { type ColumnDefinition, type ValueData } from '../../utils/repor/exportToExcel';
+import { DayRenderer } from '../../components';
 
 type filterModels = {
-  countryId?: string | null;
   provinceIds?: string[] | null;
-  roleId?: string | null;
+  userDutyIds?: string[] | null;
   searchText?: string;
-  isActive: boolean;
+  statu?: string | null;
+  dateRange?: [string | null, string | null];
 }
-
 interface Column {
   field: string;
   header: string;
 }
-
-interface DutiesType {
-  ids: string;
-  names: string;
-  createDate: string;
-  authorizedPersonId: number; // yetkili kişi tarafından atandı id
-  authorizedPersonName: string; // yetkili kişi tarafından atandı name
-}
-
 interface BranchType {
   id: number;
   branchName: string;
@@ -60,7 +48,6 @@ interface BranchType {
   isRent: boolean;
   isActive: boolean;
   actions?: any
-  
 }
 type SancaktarDataGorevatama = {
   memberId: string;
@@ -71,45 +58,207 @@ type SancaktarDataGorevatama = {
   isActive: string;
   actions?: any
   createDate: string;
+  branchInfo: any;
+  userDutyId: number;
+  memberStatu: string;
 }
 
-export default function User() {
-  const [resultData, setResultData] = useState<any[]>([]);
+export default function BranchReport() {
   const [sancaktarUserData, setSancaktarUserData] = useState<SancaktarDataGorevatama[]>([]);
-  const [isDisabledDeleteAction, setDisabledDeleteAction]= useState(false);
   const [selectedCountry, setSelectedCountry] = useState<string | null | undefined>(null);
-  const [filterModel, setFilterModel] = useState<filterModels>({ isActive: true, countryId: '1' });
-  const [selectedCountryName, setSelectedCountryName] = useState<string>('Türkiye'); // Yeni state
-  const [selectedProvinceNames, setSelectedProvinceNames] = useState<string[]>([]); // Yeni state
-  const [selectedRoleName, setSelectedRoleName] = useState<string | null>(''); // Yeni state
+  const [filterModel, setFilterModel] = useState<filterModels>({});
   const [visible, { open, close }] = useDisclosure(false);
   
   const [rowHeaders, setRowHeaders] = useState([
-    { field: 'id', header: 'Id' },
-    { field: 'fullName', header: 'Ad Soyad' },
-    { field: 'roleName', header: 'Role' },
-    { field: 'duties', header: 'Görevi' },
-    { field: 'phoneWithCountryCode', header: 'Telefon' },
-    { field: 'email', header: 'Mail' },
-    { field: 'identificationNumber', header: 'Kimlik' },
-    { field: 'dateOfBirth', header: 'Doğum Yılı' },
-    { field: 'countryName', header: 'Ülke' },
-    { field: 'provinceName', header: 'İl' },
-    { field: 'createdDate', header: 'İlk Kayıt' },
-    { field: 'updateDate', header: 'Güncelleme' },
+    { field: 'memberId', header: 'Id' },
+    { field: 'memberFullName', header: 'Ad Soyad' },
+    { field: 'memberStatu', header: 'Görev Durumu' },
+    { field: 'userDutyName', header: 'Görevi' },
+    { field: 'memberPhone', header: 'Telefon' },
+    { field: 'createDate', header: 'Görev Tarihi' },
+
+    { field: 'branchName', header: 'Temsilcilik Adı' },
+    { field: 'branchProvince', header: 'Temsilcilik İl' },
+    { field: 'branchHeadFullName', header: 'Temsilcilik Başkanı' },
+    { field: 'branchHeadPhone', header: 'Temsilcilik Baş. Numarası' },
   ]);
 
+ const mockDataStatus =[
+  {id: "1", name: "Aktif"},
+  {id: "2", name: "Pasif"}
+];
 
-  const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceBranch = useBranchService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
-  const rowsTable = resultData.map((item) => (
-    <Table.Tr key={item.id}>
+  const renderBoolean = (value: boolean) => {
+    return (
+      <Badge color={value ? 'green' : 'red'}>
+        {value ? 'Evet' : 'Hayır'}
+      </Badge>
+    );
+  };
+
+  const onProvinceChange = (provinceValues: string[] | null): void => {
+
+    setFilterModel((prev) => ({
+      ...prev,
+      provinceIds: provinceValues,
+    }));
+  };
+
+  const onUserDutyChange = (provinceValues: string[] | null): void => {
+
+    setFilterModel((prev) => ({
+      ...prev,
+      userDutyIds: provinceValues,
+    }));
+  };
+
+  const fetchBranch = async () => {
+     open();
+  
+     try {
+  
+      const getBranches = await serviceBranch.getBranches();
+      if (getBranches) {
+        const resultData =getBranches.map((branch: BranchType) => ({
+          ...branch,
+          openingDate: branch.openingDate ? formatDate(branch.openingDate, dateFormatStrings.defaultDateFormat) : null,
+          createDate: branch.createDate ? formatDate(branch.createDate, dateFormatStrings.dateTimeFormatWithoutSecond) : null,
+          branchSancaktars: (() => {
+              try {
+                return JSON.parse(branch.branchSancaktars ?? "");
+              } catch {
+                return null;
+              }
+            })()
+        }));
+
+        // resultData kullanarak
+        const sancaktarData = resultData
+          .filter((branch: BranchType) => branch.branchSancaktars && Array.isArray(branch.branchSancaktars))
+          .flatMap((branch: any) => 
+            branch.branchSancaktars?.map((sancaktar: any) => ({
+              ...sancaktar,
+              memberStatu: sancaktar.isActive == "1" ? "1" : "2",
+              branchInfo: {
+                id: branch.id,
+                branchName: branch.branchName,
+                provinceName: branch.provinceName,
+                provinceId: branch.provinceId,
+                address: branch.address,
+                phone: branch.phone,
+                email: branch.email,
+                // sube başkan info
+                branchHeadFullName: branch.branchHeadFullName,
+                branchHeadId: branch.branchHeadId,
+                branchHeadPhone: branch.branchHeadPhone
+              }
+            }))
+          );
+
+        setSancaktarUserData(sancaktarData);
+      } else {
+        toast.info('Hiçbir veri yok!');
+  
+        setSancaktarUserData([]);
+      }
+        close();
+  
+    } catch (error: any) {
+        toast.error(`getDuties yüklenirken hata: ${error.message}`);
+      close();
+    }
+  };
+
+  useEffect(() => {
+      setTimeout(() => {
+        fetchBranch();
+      }, 500);
+  }, []);
+
+   // Filtrelenmiş toplantı verileri
+  const filteredBranchReports = useMemo(() => {
+    if (isEmpty(filterModel)) return sancaktarUserData;
+    
+    return sancaktarUserData.filter(branchData => {
+      const matchesSearch = filterModel.searchText ? (
+        branchData.memberFullName.toLowerCase().includes(filterModel.searchText.toLowerCase())
+        ) : true;
+  
+      const matchesProvince = filterModel.provinceIds && filterModel.provinceIds.length > 0
+        ? filterModel.provinceIds.includes(branchData.branchInfo.provinceId.toString())
+        : true;
+
+      const matchesUserDuty = filterModel.userDutyIds && filterModel.userDutyIds.length > 0
+        ? filterModel.userDutyIds.includes(branchData.userDutyId.toString())
+        : true;
+      
+      const matchesStatu = filterModel.statu ? (
+         filterModel.statu == branchData.memberStatu)
+        : true;
+
+       // Date range filtresi
+      const matchesDateRange = filterModel.dateRange ? (() => {
+        const [startDate, endDate] = filterModel.dateRange;
+        
+        const branchCreateDate = new Date(branchData.createDate);
+        
+        // Start date kontrolü (startDate varsa)
+        const afterStart = startDate ? branchCreateDate >= new Date(startDate) : true;
+        
+        // End date kontrolü (endDate varsa) - end date'in sonuna kadar (23:59:59)
+        const beforeEnd = endDate ? branchCreateDate <= new Date(endDate + 'T23:59:59.999Z') : true;
+        
+        return afterStart && beforeEnd;
+      })() : true;
+  
+      return matchesSearch && matchesProvince && matchesUserDuty && matchesStatu && matchesDateRange;
+    });
+  }, [sancaktarUserData, filterModel]);
+
+  const rowsTable = filteredBranchReports?.map((item: any) => (
+    <Table.Tr key={item.memberId}>
       {rowHeaders.map((header) => {
-        if (header.field === 'duties') {
+        if (header.field === 'createDate') {
           return (
             <Table.Td key={header.field}>
-              {item["duties"] && item["duties"][item["duties"].length-1]?.names}
+              {item["createDate"] ? formatDate(item["createDate"], dateFormatStrings.dateTimeFormatWithoutSecond): ""}
+            </Table.Td>
+          );
+        }
+        if (header.field === 'branchName') {
+          return (
+            <Table.Td key={header.field}>
+              {item["branchInfo"]["branchName"] || ""}
+            </Table.Td>
+          );
+        }
+        if (header.field === 'branchProvince') {
+          return (
+            <Table.Td key={header.field}>
+              {item["branchInfo"]["provinceName"] || ""}
+            </Table.Td>
+          );
+        }
+        if (header.field === 'branchHeadFullName') {
+          return (
+            <Table.Td key={header.field}>
+              {item["branchInfo"]["branchHeadFullName"] || ""}
+            </Table.Td>
+          );
+        }
+        if (header.field === 'branchHeadPhone') {
+          return (
+            <Table.Td key={header.field}>
+              {item["branchInfo"]["branchHeadPhone"] || ""}
+            </Table.Td>
+          );
+        }
+        if (header.field === 'memberStatu') {
+          return (
+            <Table.Td key={header.field}>
+              {renderBoolean(item[header.field] == "1")}
             </Table.Td>
           );
         }
@@ -123,126 +272,11 @@ export default function User() {
     </Table.Tr>
   ));
 
-  const onCountrySelected = (countryValue: string | null, countryName?: string): void => {
-    setSelectedCountryName(countryName || '');
-    setSelectedCountry(countryValue);
-    setSelectedProvinceNames([]);
-
-    setFilterModel((prev) => ({
-      ...prev,
-      provinceIds: [],
-      countryId: countryValue,
-    }));
-  }
-
-  const onProvinceChange = (provinceValues: string[] | null, provinceNames?: string[]): void => {
-    setSelectedProvinceNames(provinceNames || []);
-
-    setFilterModel((prev) => ({
-      ...prev,
-      provinceIds: provinceValues,
-    }));
-  };
-
-  const onRoleChange = (roleValue: string | null, roleName?: string | null): void => {
-    setSelectedRoleName(roleName || '');
-
-    setFilterModel((prev) => ({
-      ...prev,
-      roleId: roleValue,
-    }));
-  };
-
-  const fetchUsers = async () => {
-     open();
-
-    const params = {
-      ...filterModel,
-      provinceIds: (filterModel.provinceIds && filterModel.provinceIds?.length > 0) ? filterModel.provinceIds?.join(",") : undefined,
-      searchText: (filterModel.searchText && filterModel.searchText.length > 3 ? filterModel.searchText.trim() : undefined),
-    }
-     try {
-
-      const getUsers = await service.users(params);
-      if (getUsers) {
-        setResultData(getUsers.map((item: any) => ({
-          ...item,
-          createdDate: formatDate(item.createdDate, dateFormatStrings.dateTimeFormatWithoutSecond),
-          updateDate: formatDate(item.updateDate, dateFormatStrings.dateTimeFormatWithoutSecond),
-          phoneWithCountryCode: (item.countryCode && item.phone) ? `${item.countryCode}${item.phone}` : undefined,
-          duties: (item.duties && JSON.parse(item.duties)) as DutiesType[],
-        })));
-       
-      } else {
-        toast.info('Hiçbir veri yok!');
-
-        setResultData([]);
-      }
-        close();
-        setDisabledDeleteAction(!filterModel.isActive);
-    } catch (error: any) {
-
-      toast.error(`Kullanıcılar yüklenirken hata: ${error.message}`);
-      close();
-    }
-  };
-
-  const fetchBranch = async () => {
-     open();
-  
-     try {
-  
-      const getBranches = await serviceBranch.getBranches();
-      if (getBranches) {
-        setResultData(getBranches.map((branch: BranchType) => ({
-          ...branch,
-          openingDate: branch.openingDate ? formatDate(branch.openingDate, dateFormatStrings.defaultDateFormat) : null,
-          createDate: branch.createDate ? formatDate(branch.createDate, dateFormatStrings.dateTimeFormatWithoutSecond) : null,
-        })));
-
-        setSancaktarUserData(
-            getBranches
-              .filter((i: BranchType) => i.branchSancaktars)
-                .map((branch: BranchType) => ({
-                  ...branch,
-                  branchSancaktars: (() => {
-                    try {
-                    return JSON.parse(branch.branchSancaktars ?? "");
-                    } catch {
-                    return null;
-                    }
-                  })()
-                }))
-        );
-
-        console.log("setSancaktarUserData:", sancaktarUserData);
-       
-      } else {
-        toast.info('Hiçbir veri yok!');
-  
-        setResultData([]);
-      }
-        close();
-  
-    } catch (error: any) {
-        toast.error(`getDuties yüklenirken hata: ${error.message}`);
-      close();
-    }
-  };
-
-  useEffect(() => {
-      setTimeout(() => {
-        // fetchUsers();
-        fetchBranch();
-      }, 500);
-  }, []);
-
 
    // useMemo hook'u ile sütunları önbelleğe alıyoruz
   const pdfTableColumns = useMemo((): PdfTableColumn[] => {
 
-    const newCols: Column[] = rowHeaders.filter(col =>
-      col.field != 'updateDate' && col.field != 'countryCode' && col.field != 'actions' && col.field != 'countryName');
+    const newCols: Column[] = rowHeaders;
 
     return newCols.map(col => ({
       key: col.field,
@@ -256,8 +290,7 @@ export default function User() {
  // useMemo hook'u ile sütunları önbelleğe alıyoruz
   const excelTableColumns = useMemo((): ColumnDefinition[] => {
 
-    const newCols: Column[] = rowHeaders.filter(col =>
-      col.field != 'updateDate' && col.field != 'countryCode' && col.field != 'actions' && col.field != 'countryName');
+    const newCols: Column[] = rowHeaders;
 
     return newCols.map(col => ({
       key: col.field as keyof ValueData,
@@ -267,33 +300,21 @@ export default function User() {
   }, [rowHeaders]);
 
   const reportTitle = (): string => {
-    const isActiveText = filterModel.isActive ? 'Aktif' : 'Pasif';
-
-    if (selectedProvinceNames?.length > 0 && selectedRoleName) {
-      const provinceNames = selectedProvinceNames.join(",")
-
-      return `${selectedCountryName}/${provinceNames}/${selectedRoleName}/${isActiveText} Kullanıcı Raporu`;
-    }
-
-    if (!selectedRoleName && selectedProvinceNames?.length > 0) {
-      const provinceNames = selectedProvinceNames.join(",")
-      
-      return `${selectedCountryName}/${provinceNames}/Tüm Roller/${isActiveText} Kullanıcı Raporu`;
-    }
-    if (selectedRoleName && !(selectedProvinceNames?.length < 1)) {
-      return `${selectedCountryName}/Tüm İller/${selectedRoleName}/${isActiveText} Kullanıcı Raporu`;
-    }
-
-    return `${selectedCountryName}/Tüm İller/Tüm Roller/${isActiveText} Kullanıcı Raporu`;
+    return "Temsilcilik Rapor";
   };
 
    // raportdata
-  const raportUserData = useMemo(() => {
-    return resultData.map((user: any) => ({
-      ...user,
-      duties: user["duties"] && user["duties"][user["duties"].length-1]?.names,
+  const raportBranchData = useMemo(() => {
+    return filteredBranchReports.map((report: any) => ({
+      ...report,
+      branchName: report["branchInfo"]["branchName"] || "",
+      branchProvince: report["branchInfo"]["provinceName"] || "",
+      branchHeadFullName: report["branchInfo"]["branchHeadFullName"] || "",
+      branchHeadPhone: report["branchInfo"]["branchHeadPhone"] || "",
+      memberStatu: report["memberStatu"] == "1" ? "Evet" : "Hayır",
+      createDate: formatDate(report["createDate"], dateFormatStrings.dateTimeFormatWithoutSecond),
     }))
-  }, [resultData])
+  }, [filteredBranchReports])
 
   return (
       <Container size="xl">
@@ -302,7 +323,7 @@ export default function User() {
           {/* Sayfa Başlığı */}
           <Group justify="space-between" align="center">
             <div>
-              <Title order={2}>Kullanıcı Sayfası</Title>
+              <Title order={2}>Temsilcilik Rapor Sayfası</Title>
               <Text size="sm" c="dimmed">
                 Toolbar Filtreleme Alanı
               </Text>
@@ -314,20 +335,15 @@ export default function User() {
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
                 <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
-                  <Country onCountryChange={onCountrySelected}/>
-                </Grid.Col>
-
-                <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
                   <Province onProvinceChange={onProvinceChange} countryId={selectedCountry}/>
                 </Grid.Col>
 
-              
                 <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
-                  <Role onRoleChange={onRoleChange}></Role>
+                  <UserDuty onUserDutyChange={onUserDutyChange}></UserDuty>
                 </Grid.Col>
                 <Grid.Col span={{ base: 12, sm: 6, md: 3}}>
                   <TextInput
-                    label="Ad soyad, telefon ve kimlik ara"
+                    label="Görevli ara"
                     placeholder="text giriniz"
                     leftSection={<IconSearch size={18} />}
                     onChange={(event) => setFilterModel(prev => ({
@@ -335,41 +351,27 @@ export default function User() {
                       searchText: event.currentTarget?.value}))}
                   />
                 </Grid.Col>
-                <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
-                  <Flex
-                    mih={50}
-                    gap="md"
-                    justify="flex-start"
-                    align="flex-end"
-                    direction="row"
-                    wrap="wrap"
-                  >
-                    <Switch 
-                      label="Kullanıcı Durumu" 
-                      checked={filterModel.isActive}
-                      onChange={(event) => {
-                        setFilterModel(prev => ({
-                        ...prev,
-                        isActive: event.currentTarget?.checked
-                      }))}}
-                    />
-                  </Flex>
+                <Grid.Col span={{ base: 12, sm: 6, md: 3}}>
+                  <DatePickerInput type="range" label="Tarih aralığını seç" placeholder="tarih aralığını seç" leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
+                    clearable locale="tr" renderDay={DayRenderer}
+                    onChange={(value) => setFilterModel(prev => ({
+                      ...prev,
+                      dateRange: value}))}
+                  />
                 </Grid.Col>
-                <Grid.Col span={{ base: 5, sm: 4, md: 1}}>
-                  <Flex
-                    mih={50}
-                    gap="md"
-                    justify="flex-start"
-                    align="flex-end"
-                    direction="row"
-                    wrap="wrap"
-                  >
-                    <Button
-                      leftSection={<IconFilter size={14} />}
-                      onClick={fetchUsers}>
-                      Filtrele
-                    </Button>
-                  </Flex>
+                <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
+                  <Select
+                    label="Görev Durumu"
+                    placeholder="durum Seçiniz"
+                    data={mockDataStatus.map(item => ({ value: item.id, label: item.name }))}
+                    clearable maxDropdownHeight={200}
+                    nothingFoundMessage="durum bulunamadı..."
+                    onChange={(event) => {
+                      setFilterModel(prev => ({
+                      ...prev,
+                      statu: event
+                    }))}}
+                  />
                 </Grid.Col>
                 <Grid.Col span={{ base: 5, sm: 4, md: 2}}>
                   <Flex mih={50} gap="md" justify="flex-start"
@@ -377,7 +379,7 @@ export default function User() {
                     <MenuActionButton
                     reportTitle={reportTitle()}
                     excelColumns={excelTableColumns}
-                    valueData={raportUserData}
+                    valueData={raportBranchData}
                     pdfColumns={pdfTableColumns}
                     type={2}
                     isMailDisabled={true}
@@ -393,7 +395,7 @@ export default function User() {
           {/* Örnek Tablo */}
           <Paper shadow="xs" p="lg" withBorder>
             <Stack gap="md">
-              <Title order={4}>Son Kullanıcılar({rowsTable?.length || 0})</Title>
+              <Title order={4}>Son Görevliler({rowsTable?.length || 0})</Title>
               <Table.ScrollContainer minWidth={500} maxHeight={700}>
                 <Table striped highlightOnHover withColumnBorders>
                   <Table.Thead>

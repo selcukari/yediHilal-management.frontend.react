@@ -5,6 +5,7 @@ import {
 import {
   IconUser, IconMail, IconLibrary, IconUsers, IconSettings, IconMessage, IconExternalLink, IconFileCheck, IconCar, IconCoin, IconBubbleText,
   IconChevronRight, IconClipboardList, IconPhoneCall, IconBuilding, IconCalendarTime, IconSettingsAutomation, IconChevronDown, IconBuildings,
+  IconReport,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
 import { useAuth } from '~/authContext';
@@ -72,16 +73,9 @@ const menuItems: MenuItem[] = [
       },
     ]
   },
- 
-  { icon: IconSettings, label: 'Ayarlar', key: 'setting', link: '/settings',
-    children: [
-      { label: 'Üye Görevler', key: 'userDuty', link: '/settings-userDuty' },
-      { label: 'Toplantı Türleri', key: 'meetingType', link: '/settings-meetingType' },
-    ],
-  },
   { icon: IconUser, label: 'Kullanıcı Yönetimi', key: 'user', link: '/users' },
-   {
-    icon: IconSettingsAutomation,
+  {
+    icon: IconReport,
     label: 'Rapor Yönetimi',
     key: 'report',
     link: '/reports',
@@ -89,7 +83,13 @@ const menuItems: MenuItem[] = [
       { label: 'Temcilcilik Rapor', key: 'reportBranch', link: '/report-branch' },
     ],
   },
-   {
+  { icon: IconSettings, label: 'Ayarlar', key: 'setting', link: '/settings',
+    children: [
+      { label: 'Üye Görevler', key: 'userDuty', link: '/settings-userDuty' },
+      { label: 'Toplantı Türleri', key: 'meetingType', link: '/settings-meetingType' },
+    ],
+  },
+  {
     icon: IconExternalLink,
     label: 'Dış Link Üye Ekle',
     key: 'memberCreate',
