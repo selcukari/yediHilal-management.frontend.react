@@ -8,7 +8,6 @@ export const modulesMockData = [
    { key: 'branch', url: '/branch', label: "Temsilcilik Modül" },
    { key: 'phoneCallTracking', url: '/phoneCallTrackings', label: "Arama Takip Takip" },
    { key: 'settings', url: '/settings', label: "Ayarlar Modül" },
-   { key: 'automaticMessageManagenet', url: '/automaticMessageManagenets', label: "Otomatik Mesaj Modül" },
    { key: 'administrativeManagement', url: '/administrativeManagements', label: "İdari Yönetim Modül" },
-   { key: 'communication', url: '/communications', label: "İletişim Modül" },
+   { key: 'communication', url: '/communications', label: "İletişim Modül" }, { key: 'report', url: '/reports', label: "Rapor Modül" },
 ];

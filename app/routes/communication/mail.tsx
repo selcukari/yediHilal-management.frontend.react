@@ -4,14 +4,14 @@ import {
   Container, Grid, TextInput, Stack, Group, Title, Text, Paper, Table, LoadingOverlay,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useMailService } from '../services/mailService';
-import { toast } from '../utils/toastMessages';
-import { formatDate } from '../utils/formatDate';
-import { dateFormatStrings } from '../utils/dateFormatStrings';
-import { stripHtml } from '../utils/stripHtml';
+import { useMailService } from '../../services/mailService';
+import { toast } from '../../utils/toastMessages';
+import { formatDate } from '../../utils/formatDate';
+import { dateFormatStrings } from '../../utils/dateFormatStrings';
+import { stripHtml } from '../../utils/stripHtml';
 import { useAuth } from '~/authContext';
 
-interface Column {
+interface Column { 
   field: string;
   header: string;
 }

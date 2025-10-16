@@ -45,8 +45,18 @@ const menuItems: MenuItem[] = [
   },
   { icon: IconBubbleText, label: 'İletişim', key: 'communication', link: '/communications',
     children: [
-      { icon: IconMail, label: 'Gön. Mail Lis.', key: 'mail', link: '/mails' },
-      { icon: IconMessage, label: 'Gön. Sms Lis.', key: 'sms', link: '/sms' },
+      { icon: IconMail, label: 'Gön. Mail Lis.', key: 'mail', link: '/communication-mails' },
+      { icon: IconMessage, label: 'Gön. Sms Lis.', key: 'sms', link: '/communication-sms' },
+      {
+        icon: IconSettingsAutomation,
+        label: 'Otomatik Mesaj Yönetimi',
+        key: 'automaticMessageManagenet',
+        link: '/automaticMessageManagenets',
+        children: [
+          { label: 'Otomatik Sms/WhatsApp Yön.', key: 'automaticSmsManagement', link: '/communication-automaticSmsManagement' },
+          { label: 'Otomatik Mail Yön.', key: 'automaticMailManagement', link: '/communication-automaticMailManagement' },
+        ],
+      },
     ]
   },
   {
@@ -77,16 +87,6 @@ const menuItems: MenuItem[] = [
     link: '/reports',
     children: [
       { label: 'Temcilcilik Rapor', key: 'reportBranch', link: '/report-branch' },
-    ],
-  },
-  {
-    icon: IconSettingsAutomation,
-    label: 'Otomatik Mesaj Yönetimi',
-    key: 'automaticMessageManagenet',
-    link: '/automaticMessageManagenets',
-    children: [
-      { label: 'Otomatik Sms/WhatsApp Yön.', key: 'automaticSmsManagement', link: '/automaticSmsManagement' },
-      { label: 'Otomatik Mail Yön.', key: 'automaticMailManagement', link: '/automaticMailManagement' },
     ],
   },
    {

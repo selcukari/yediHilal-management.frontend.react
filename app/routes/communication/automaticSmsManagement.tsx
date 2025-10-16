@@ -5,11 +5,11 @@ import {
   LoadingOverlay } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
-import { useAuth } from '../authContext';
+import { useAuth } from '../../authContext';
 import { toast } from '~/utils/toastMessages';
 import { useAutomaticSmsFieldService } from '~/services/automaticSmsFieldService';
-import { dateFormatStrings } from '../utils/dateFormatStrings';
-import { formatDate } from '../utils/formatDate';
+import { dateFormatStrings } from '../../utils/dateFormatStrings';
+import { formatDate } from '../../utils/formatDate';
 
 type FormValues = {
   id: number;

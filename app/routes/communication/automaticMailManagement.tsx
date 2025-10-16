@@ -5,12 +5,12 @@ import {
   LoadingOverlay } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
-import { useAuth } from '../authContext';
+import { useAuth } from '../../authContext';
 import { toast } from '~/utils/toastMessages';
 import { useAutomaticMailFieldService } from '~/services/automaticMailFieldService';
-import { dateFormatStrings } from '../utils/dateFormatStrings';
-import { formatDate } from '../utils/formatDate';
-import { RichTextEditorTiptap } from '../components/richTextEditorTiptap';
+import { dateFormatStrings } from '../../utils/dateFormatStrings';
+import { formatDate } from '../../utils/formatDate';
+import { RichTextEditorTiptap } from '../../components/richTextEditorTiptap';
 
 type FormValues = {
   id: number;
@@ -59,7 +59,6 @@ export default function AutomaticMailManagement() {
         form.setValues((pick(['id', 'subject', 'isActive', 'updateDate', 'body'], response) as FormValues));
        
         form.setInitialValues(pick(['id', 'subject', 'isActive', 'updateDate', 'body'],response));
-        console.log("form.value:", form.values)
        
         close();
       } else {
