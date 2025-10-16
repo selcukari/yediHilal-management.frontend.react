@@ -10,7 +10,7 @@ import { ProvinceSelect } from '../addOrEdit/provinceSelect';
 import { RoleSelect } from '../addOrEdit/roleSelect';
 import { useUserService } from '../../services/userService';
 import { toast } from '../../utils/toastMessages';
-import { DutySelect } from '../addOrEdit/dutySelect';
+import { UserDutySelect } from '../addOrEdit/userDutySelect';
 import { ModuleSelect } from '../addOrEdit/moduleSelect';
 import { formatDate } from '../../utils/formatDate';
 import { useMemberService } from '../../services/memberService';
@@ -331,7 +331,7 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
             />
           </Grid.Col>
           <Grid.Col span={6}>
-            <DutySelect
+            <UserDutySelect
               form={form}
               required={true}
               {...form.getInputProps('dutiesIds')}

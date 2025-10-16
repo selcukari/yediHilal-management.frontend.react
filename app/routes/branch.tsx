@@ -258,7 +258,7 @@ export default function Duty() {
           {/* Sayfa Başlığı */}
           <Group justify="space-between" align="center">
             <div>
-              <Title order={2}>Şubeler Sayfası</Title>
+              <Title order={2}>Temsilcilik Sayfası</Title>
               <Text size="sm" c="dimmed">
                 Toolbar Filtreleme Alanı
               </Text>

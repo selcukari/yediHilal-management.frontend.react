@@ -1,7 +1,7 @@
 import { MultiSelect } from '@mantine/core';
 import { useState, useEffect } from 'react';
 import type { UseFormReturnType } from '@mantine/form';
-import { useDutyService } from '../../services/dutyService';
+import { useUserDutyService } from '../../services/userDutyService'; 
 
 interface DutySelectProps {
   form: UseFormReturnType<any>;
@@ -10,9 +10,9 @@ interface DutySelectProps {
   isDisabled?: boolean;
 }
 // gorevi
-export function DutySelect({ form, required = false, isDisabled = false }: DutySelectProps) {
+export function UserDutySelect({ form, required = false, isDisabled = false }: DutySelectProps) {
   const [duties, setDuties] = useState<{ value: string; label: string }[]>([]);
-  const service =  useDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+  const service =  useUserDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   
   useEffect(() => {
     fetchDutyData();
@@ -20,7 +20,7 @@ export function DutySelect({ form, required = false, isDisabled = false }: DutyS
 
   const fetchDutyData = async () => {
     try {
-      const response = await service.getDuties();
+      const response = await service.getUserDuties();
 
       if (response) {
         setDuties(

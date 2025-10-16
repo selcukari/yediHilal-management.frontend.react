@@ -65,12 +65,20 @@ const menuItems: MenuItem[] = [
  
   { icon: IconSettings, label: 'Ayarlar', key: 'setting', link: '/settings',
     children: [
-      { label: 'Görevler', key: 'duty', link: '/settings-duty' },
-      { label: 'Üye Görevler', key: 'branchDuty', link: '/settings-branchDuty' },
+      { label: 'Üye Görevler', key: 'userDuty', link: '/settings-userDuty' },
       { label: 'Toplantı Türleri', key: 'meetingType', link: '/settings-meetingType' },
     ],
   },
   { icon: IconUser, label: 'Kullanıcı Yönetimi', key: 'user', link: '/users' },
+   {
+    icon: IconSettingsAutomation,
+    label: 'Rapor Yönetimi',
+    key: 'report',
+    link: '/reports',
+    children: [
+      { label: 'Temcilcilik Rapor', key: 'reportBranch', link: '/report-branch' },
+    ],
+  },
   {
     icon: IconSettingsAutomation,
     label: 'Otomatik Mesaj Yönetimi',

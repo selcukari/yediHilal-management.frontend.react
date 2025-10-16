@@ -6,10 +6,10 @@ import { clone } from 'ramda';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
-import { useBranchDutyService } from '../../services/branchDutyService';
+import { useUserDutyService } from '../../services/userDutyService';
 import { toast } from '../../utils/toastMessages';
 
-export type BranchDutyEditDialogControllerRef = {
+export type UserDutyEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
   close: () => void;
 };
@@ -23,10 +23,10 @@ type FormValues = {
   name: string;
 };
 
-const BranchDutyEdit = forwardRef<BranchDutyEditDialogControllerRef, BranchDutyEditProps>(({onSaveSuccess}, ref) => {
+const UserDutyEdit = forwardRef<UserDutyEditDialogControllerRef, BranchDutyEditProps>(({onSaveSuccess}, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
-  const service = useBranchDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+  const service = useUserDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
@@ -59,7 +59,7 @@ const BranchDutyEdit = forwardRef<BranchDutyEditDialogControllerRef, BranchDutyE
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
     
-    const result = await service.updateBranchDuty({
+    const result = await service.updateUserDuty({
       ...values,
       name: values.name.trim()
     });
@@ -130,7 +130,7 @@ const BranchDutyEdit = forwardRef<BranchDutyEditDialogControllerRef, BranchDutyE
       onClose={() => {
         dialogClose();
       }}
-      title="Üye Görev Düzenle"
+      title="Görev Düzenle"
       centered
       size="700"
       overlayProps={{
@@ -171,4 +171,4 @@ const BranchDutyEdit = forwardRef<BranchDutyEditDialogControllerRef, BranchDutyE
   </>);
 });
 
-export default BranchDutyEdit;
+export default UserDutyEdit;

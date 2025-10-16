@@ -5,10 +5,10 @@ import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
-import { useDutyService } from '../../services/dutyService';
+import { useUserDutyService } from '../../services/userDutyService';
 import { toast } from '../../utils/toastMessages';
 
-export type DutyAddDialogControllerRef = {
+export type UserDutyAddDialogControllerRef = {
   open: () => void;
   close: () => void;
 };
@@ -21,10 +21,10 @@ type FormValues = {
   name: string;
 };
 
-const DutyAdd = forwardRef<DutyAddDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
+const UserDutyAdd = forwardRef<UserDutyAddDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
-  const service = useDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+  const service = useUserDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
@@ -40,7 +40,7 @@ const DutyAdd = forwardRef<DutyAddDialogControllerRef, UserAddProps>(({onSaveSuc
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
 
-    const result = await service.addDuty({
+    const result = await service.addUserDuty({
       ...values,
       name: values.name.trim()
     });
@@ -125,7 +125,7 @@ const DutyAdd = forwardRef<DutyAddDialogControllerRef, UserAddProps>(({onSaveSuc
           <Grid>
             <Grid.Col span={6} offset={3}>
               <TextInput
-                label="Görev Adı"
+                label="Üye Görev Adı"
                 placeholder="görev giriniz"
                 required
                 {...form.getInputProps('name')}
@@ -153,4 +153,4 @@ const DutyAdd = forwardRef<DutyAddDialogControllerRef, UserAddProps>(({onSaveSuc
   </>);
 });
 
-export default DutyAdd;
+export default UserDutyAdd;

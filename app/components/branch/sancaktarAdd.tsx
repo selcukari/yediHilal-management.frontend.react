@@ -6,7 +6,7 @@ import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useMemberService } from '../../services/memberService';
-import { useBranchDutyService } from '../../services/branchDutyService';
+import { useUserDutyService } from '../../services/userDutyService';
 import { toast } from '../../utils/toastMessages';
 
 export type SancaktarAddDialogControllerRef = {
@@ -18,8 +18,8 @@ type SancaktarDataGorevatama = {
   memberId: string;
   memberFullName: string;
   memberPhone?: string | null;
-  branchDutyName: string;
-  branchDutyId: string;
+  userDutyName: string;
+  userDutyId: string;
   isActive: string;
   createDate: string;
 }
@@ -29,7 +29,7 @@ interface SancaktarAddProps {
 }
 
 type FormValues = {
-  branchDutyId: string;
+  userDutyId: string;
   memberId: string | null;
 };
 
@@ -44,17 +44,17 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
   const [opened, { open, close }] = useDisclosure(false);
   const [sancaktarData, setSancaktarData] = useState<GetSancaktarData[]>([]);
   const [sancaktarDataIds, setSancaktarDataIds] = useState<string[] | null>(null);
-  const [branchDuty, setBranchDuty] = useState<any>(null);
-  const [branchDutyData, setBranchDutyData] = useState<any[]>([])
+  const [userDuty, setUserDuty] = useState<any>(null);
+  const [userDutyData, setUserDutyData] = useState<any[]>([])
   
   const service = useMemberService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
-  const serviceBranchDuty =  useBranchDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+  const serviceBranchDuty =  useUserDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
   const form = useForm<FormValues>({
     initialValues: {
-      branchDutyId: '',
+      userDutyId: '',
       memberId: ""
     },
     validate: {
@@ -72,8 +72,8 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
           memberId: values.memberId ?? "",
           memberFullName: memberFind?.fullName ?? "",
           memberPhone: memberFind?.phone,
-          branchDutyName: (branchDuty.name || ""),
-          branchDutyId: (branchDuty.id || ""),
+          userDutyName: (userDuty.name || ""),
+          userDutyId: (userDuty.id || ""),
           createDate: new Date().toISOString(),
           isActive: "1"
         });
@@ -142,13 +142,13 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
   const fetchBranchDutys = async () => {
     try {
       
-      const getBranchDuties = await serviceBranchDuty.getBranchDuties();
+      const getBranchDuties = await serviceBranchDuty.getUserDuties();
       
       if (getBranchDuties) {
-        setBranchDutyData(getBranchDuties);
+        setUserDutyData(getBranchDuties);
       } else {
         toast.info('Hiçbir veri yok!');
-        setBranchDutyData([]);
+        setUserDutyData([]);
       }
     } catch (error: any) {
       toast.error(`getBranchDuties yüklenirken hata: ${error.message}`);
@@ -180,10 +180,10 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
   const handleChangeDuty = (value: string | null) => {
     if (value) {
 
-      const getDuty = branchDutyData?.find(i => i.id.toString() == value);
+      const getDuty = userDutyData?.find(i => i.id.toString() == value);
 
       if (getDuty){
-        setBranchDuty(getDuty)
+        setUserDuty(getDuty)
       }
 
     }
@@ -218,7 +218,7 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
               <Select
                 label="Görev Adı"
                 placeholder="görev seçiniz"
-                data={branchDutyData.map(item => ({ value: item.id?.toString(), label: item.name }))}
+                data={userDutyData.map(item => ({ value: item.id?.toString(), label: item.name }))}
                 searchable clearable maxDropdownHeight={200} required
                 nothingFoundMessage="görev bulunamadı..."
                 onChange={handleChangeDuty}

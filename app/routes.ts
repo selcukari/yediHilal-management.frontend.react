@@ -6,8 +6,8 @@ export default [
   route("stockDeposits", "routes/stock/stockUsedDeposit.tsx"), route("projects", "routes/project.tsx"), route("finances", "routes/finance.tsx"),
   route("meetings", "routes/meeting.tsx"), route("vehicles", "routes/vehicle/vehicle.tsx"), route("vehicleDeposits", "routes/vehicle/vehicleDeposits.tsx"),
   route("automaticSmsManagement", "routes/automaticSmsManagement.tsx"), route("automaticMailManagement", "routes/automaticMailManagement.tsx"),
-  route("branches", "routes/branch.tsx"), route("settings-duty", "routes/settings/duty.tsx"), route("settings-branchDuty", "routes/settings/branchDuty.tsx"), route("settings-meetingType", "routes/settings/meetingType.tsx"),
+  route("branches", "routes/branch.tsx"), route("settings-userDuty", "routes/settings/userDuty.tsx"), route("settings-meetingType", "routes/settings/meetingType.tsx"),
   route("memberCreate", "routes/memberCreate.tsx"), route("documentTrackings", "routes/documentTracking.tsx"), route("phoneCallTrackings", "routes/phoneCallTracking.tsx"),
-  route("privacyPolicy", "routes/privacyPolicy.tsx"),
+  route("privacyPolicy", "routes/privacyPolicy.tsx"),route("report-branch", "routes/reports/branchReport.tsx"),
 ] satisfies RouteConfig;
 

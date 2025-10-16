@@ -13,7 +13,7 @@ import { RoleSelect } from '../addOrEdit/roleSelect';
 import { toast } from '../../utils/toastMessages';
 import { ModuleSelect } from '../addOrEdit/moduleSelect';
 import { areNumberSequencesEqual } from '../../utils/areNumberSequencesEqual';
-import { DutySelect } from '../addOrEdit/dutySelect';
+import { UserDutySelect } from '../addOrEdit/userDutySelect';
 import { formatDate } from '../../utils/formatDate';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import { useAuth } from '~/authContext';
@@ -403,7 +403,7 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
             />
           </Grid.Col>
           <Grid.Col span={6}>
-            <DutySelect
+            <UserDutySelect
               form={form}
               required={isDisabledRoleComponent}
               isDisabled={isDisabledRoleComponent}

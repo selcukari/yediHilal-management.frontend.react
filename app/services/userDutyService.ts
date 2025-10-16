@@ -5,14 +5,14 @@ interface DutyDataParams {
   name: string;
 }
 
-export function useDutyService(controller: string) {
+export function useUserDutyService(controller: string) {
   const { getCurrentToken, logout } = useAuth();
   const api = createApi(getCurrentToken() ?? undefined, logout);
 
-  const getDuties = async () => {
+  const getUserDuties = async () => {
 
     try {
-      const res = await api.get(`/${controller}/getDuties`);
+      const res = await api.get(`/${controller}/getUserDuties`);
 
       return res.data.data;
     } catch (error: any) {
@@ -20,10 +20,10 @@ export function useDutyService(controller: string) {
     }
   };
 
-  const deleteDuty = async (id: number) => {
+  const deleteUserDuty = async (id: number) => {
 
     try {
-      const res = await api.put(`/${controller}/deleteDuty?id=${id}`, null);
+      const res = await api.put(`/${controller}/deleteUserDuty?id=${id}`, null);
 
       return res.data.data;
     } catch (error: any) {
@@ -31,10 +31,10 @@ export function useDutyService(controller: string) {
     }
   };
 
-  const addDuty = async (params: DutyDataParams) => {
+  const addUserDuty = async (params: DutyDataParams) => {
 
     try {
-      const res = await api.post(`/${controller}/addDuty`, params);
+      const res = await api.post(`/${controller}/addUserDuty`, params);
 
       return res.data.data;
     } catch (error: any) {
@@ -42,10 +42,10 @@ export function useDutyService(controller: string) {
     }
   };
 
-  const updateDuty = async (params: DutyDataParams) => {
+  const updateUserDuty = async (params: DutyDataParams) => {
 
     try {
-      const res = await api.put(`/${controller}/updateDuty`, params);
+      const res = await api.put(`/${controller}/updateUserDuty`, params);
 
       return res.data.data;
     } catch (error: any) {
@@ -53,5 +53,5 @@ export function useDutyService(controller: string) {
     }
   };
 
-  return { getDuties, deleteDuty, addDuty, updateDuty };
+  return { getUserDuties, deleteUserDuty, addUserDuty, updateUserDuty };
 }

@@ -4,25 +4,25 @@ import {
   Container, Grid, TextInput, ActionIcon, Stack, Group, Title, Text, Paper, Table, LoadingOverlay, Button,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import DutyAdd, { type DutyAddDialogControllerRef } from '../../components/duty/dutyAdd';
-import DutyEdit, { type DutyEditDialogControllerRef } from '../../components/duty/dutyEdit';
-import { useDutyService } from '../../services/dutyService';
+import UserDutyAdd, { type UserDutyAddDialogControllerRef } from '../../components/userDuty/userDutyAdd';
+import UserDutyEdit, { type UserDutyEditDialogControllerRef } from '../../components/userDuty/userDutyEdit';
+import { useUserDutyService } from '../../services/userDutyService';
 import { toast } from '../../utils/toastMessages';
 
 interface Column {
-  field: keyof DutyType;
+  field: keyof UserDutyType;
   header: string;
 }
 
-interface DutyType {
+interface UserDutyType {
   id: number;
   name: string;
   isActive: boolean;
   actions?: any
 }
 
-export default function Duty() {
-  const [resultData, setResultData] = useState<DutyType[]>([]);
+export default function UserDuty() {
+  const [resultData, setResultData] = useState<UserDutyType[]>([]);
   const [searchText, setSearchText] = useState('');
   const [visible, { open, close }] = useDisclosure(false);
   
@@ -31,10 +31,10 @@ export default function Duty() {
     { field: 'name', header: 'Mesaj' },
     { field: 'actions', header: 'İşlemler' },
   ]);
-  const dutyAddRef = useRef<DutyAddDialogControllerRef>(null);
-  const dutyEditRef = useRef<DutyEditDialogControllerRef>(null);
+  const userDutyAddRef = useRef<UserDutyAddDialogControllerRef>(null);
+  const userDutyEditRef = useRef<UserDutyEditDialogControllerRef>(null);
 
-  const service = useDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+  const service = useUserDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
   // Filtrelenmiş veriler
   const filteredUsers = useMemo(() => {
@@ -48,9 +48,9 @@ export default function Duty() {
 
     try {
 
-      const getDuties = await service.getDuties();
+      const getDuties = await service.getUserDuties();
       if (getDuties) {
-        setResultData(getDuties.map((duty: DutyType) => ({
+        setResultData(getDuties.map((duty: UserDutyType) => ({
           id: duty.id,
           name: duty.name,
           isActive: duty.isActive
@@ -75,8 +75,8 @@ export default function Duty() {
     }, 1000);
   }, []);
 
-  const handleEdit = (item: DutyType) => {
-    dutyEditRef.current?.openDialog(item);
+  const handleEdit = (item: UserDutyType) => {
+    userDutyEditRef.current?.openDialog(item);
   };
 
   const handleDelete = async (id: number) => {
@@ -84,7 +84,7 @@ export default function Duty() {
 
      try {
 
-      const result = await service.deleteDuty(id);
+      const result = await service.deleteUserDuty(id);
       if (result == true) {
 
       toast.success('İşlem başarılı!');
@@ -167,11 +167,11 @@ export default function Duty() {
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
-            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14}/>} onClick={() => dutyAddRef.current?.open()}>Yeni Ekle</Button>
+            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14}/>} onClick={() => userDutyAddRef.current?.open()}>Yeni Ekle</Button>
             {/* Mobile için sadece icon buton */}
             <Button 
               variant="filled" 
-              onClick={() => dutyAddRef.current?.open()}
+              onClick={() => userDutyAddRef.current?.open()}
               hiddenFrom="xs"
               p="xs"
             >
@@ -223,8 +223,8 @@ export default function Duty() {
             </Stack>
           </Paper>
         </Stack>
-        <DutyAdd ref={dutyAddRef} onSaveSuccess={handleSaveSuccess} />
-        <DutyEdit ref={dutyEditRef} onSaveSuccess={handleSaveSuccess} />
+        <UserDutyAdd ref={userDutyAddRef} onSaveSuccess={handleSaveSuccess} />
+        <UserDutyEdit ref={userDutyEditRef} onSaveSuccess={handleSaveSuccess} />
       </Container>
   );
 }
