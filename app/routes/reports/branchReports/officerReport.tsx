@@ -83,10 +83,10 @@ export default function OfficerReport() {
     { field: 'branchHeadPhone', header: 'Temsilcilik Baş. Numarası' },
   ]);
 
- const mockDataStatus =[
-  {id: "1", name: "Aktif"},
-  {id: "2", name: "Pasif"}
-];
+  const mockDataStatus =[
+    {id: "1", name: "Aktif"},
+    {id: "2", name: "Pasif"}
+  ];
 
   const serviceBranch = useBranchService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 

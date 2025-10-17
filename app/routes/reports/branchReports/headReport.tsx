@@ -43,6 +43,7 @@ type BranchHeadDataType = {
   provinceId: number;
   isActive: string;
   actions?: any
+  statu: string;
   createDate: string;
   finisDate?: string | null;
 }
@@ -63,6 +64,11 @@ export default function HeadReport() {
 
     { field: 'branchName', header: 'Temsilcilik Adı' },
   ]);
+
+  const mockDataStatus =[
+    {id: "1", name: "Aktif"},
+    {id: "2", name: "Pasif"}
+  ];
 
   const serviceProvince = useProvinceService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
   const service = useBranchReportForHeadService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
@@ -100,6 +106,7 @@ export default function HeadReport() {
             branch.branchHeadsConvert?.map((sancaktar: any) => ({
               // sube başkan info
               ...sancaktar,
+              statu: sancaktar.isActive == "1" ? "1" : "2",
               branchInfo: {
                 branchName: branch.branchName,
               }
@@ -158,6 +165,10 @@ export default function HeadReport() {
       const matchesProvince = filterModel.provinceIds && filterModel.provinceIds.length > 0
         ? filterModel.provinceIds.includes(branchData.provinceId.toString())
         : true;
+
+      const matchesStatu = filterModel.statu ? (
+         filterModel.statu == branchData.statu)
+        : true;
       
        // Date range filtresi
       const matchesDateRange = filterModel.dateRange ? (() => {
@@ -174,7 +185,7 @@ export default function HeadReport() {
         return afterStart && beforeEnd;
       })() : true;
   
-      return matchesSearch && matchesProvince && matchesDateRange;
+      return matchesSearch && matchesProvince && matchesDateRange && matchesStatu;
     });
   }, [branchHeadData, filterModel]);
 
@@ -303,6 +314,20 @@ export default function HeadReport() {
                     onChange={(value) => setFilterModel(prev => ({
                       ...prev,
                       dateRange: value}))}
+                  />
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
+                  <Select
+                    label="Görev Durumu"
+                    placeholder="durum Seçiniz"
+                    data={mockDataStatus.map(item => ({ value: item.id, label: item.name }))}
+                    clearable maxDropdownHeight={200}
+                    nothingFoundMessage="durum bulunamadı..."
+                    onChange={(event) => {
+                      setFilterModel(prev => ({
+                      ...prev,
+                      statu: event
+                    }))}}
                   />
                 </Grid.Col>
                 <Grid.Col span={{ base: 5, sm: 4, md: 2}}>
