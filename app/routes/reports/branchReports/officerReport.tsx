@@ -7,15 +7,15 @@ import {
 import { isEmpty } from 'ramda';
 import { DatePickerInput } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
-import { Province, MenuActionButton, UserDuty } from '../../components'
-import { useBranchService } from '../../services/branchService';
-import { toast } from '../../utils/toastMessages';
-import { formatDate } from '../../utils/formatDate';
-import { dateFormatStrings } from '../../utils/dateFormatStrings';
-import { type PdfTableColumn } from '../../utils/repor/exportToPdf';
-import { calculateColumnWidthUser } from '../../utils/repor/calculateColumnWidth';
-import { type ColumnDefinition, type ValueData } from '../../utils/repor/exportToExcel';
-import { DayRenderer } from '../../components';
+import { Province, MenuActionButton, UserDuty } from '../../../components'
+import { useBranchService } from '../../../services/branchService';
+import { toast } from '../../../utils/toastMessages';
+import { formatDate } from '../../../utils/formatDate';
+import { dateFormatStrings } from '../../../utils/dateFormatStrings';
+import { type PdfTableColumn } from '../../../utils/repor/exportToPdf';
+import { calculateColumnWidthUser } from '../../../utils/repor/calculateColumnWidth';
+import { type ColumnDefinition, type ValueData } from '../../../utils/repor/exportToExcel';
+import { DayRenderer } from '../../../components';
 
 type filterModels = {
   provinceIds?: string[] | null;
@@ -63,7 +63,7 @@ type SancaktarDataGorevatama = {
   memberStatu: string;
 }
 
-export default function BranchReport() {
+export default function OfficerReport() {
   const [sancaktarUserData, setSancaktarUserData] = useState<SancaktarDataGorevatama[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<string | null | undefined>(null);
   const [filterModel, setFilterModel] = useState<filterModels>({});
@@ -323,7 +323,7 @@ export default function BranchReport() {
           {/* Sayfa Başlığı */}
           <Group justify="space-between" align="center">
             <div>
-              <Title order={2}>Temsilcilik Rapor Sayfası</Title>
+              <Title order={2}>Temsilcilik Görevli Rapor Sayfası</Title>
               <Text size="sm" c="dimmed">
                 Toolbar Filtreleme Alanı
               </Text>

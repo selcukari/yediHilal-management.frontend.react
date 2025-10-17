@@ -80,7 +80,9 @@ const menuItems: MenuItem[] = [
     key: 'report',
     link: '/reports',
     children: [
-      { label: 'Temcilcilik Rapor', key: 'reportBranch', link: '/report-branch' },
+      { label: 'Temcilcilik Rapor', key: 'reportBranch', link: '/reportBranchs',
+        children: [{ label: 'Görevli Rapor', key: 'report-officer', link: '/report-officer' }, { label: 'Başkan Rapor', key: 'report-head', link: '/report-head' }, ],
+      },
     ],
   },
   { icon: IconSettings, label: 'Ayarlar', key: 'setting', link: '/settings',
