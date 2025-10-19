@@ -6,6 +6,7 @@ export const modulesMockData = [
    { key: 'setting', url: '/settings', label: 'Ayarlar Modül' },
    { key: 'dashboard', url: '/dashboard', label: "Dashboard Modül" },
    { key: 'branch', url: '/branch', label: "Temsilcilik Modül" },
+   { key: 'universityBranch', url: '/university-branches', label: "Üniversite Modül" },
    { key: 'phoneCallTracking', url: '/phoneCallTrackings', label: "Arama Takip Takip" },
    { key: 'settings', url: '/settings', label: "Ayarlar Modül" },
    { key: 'administrativeManagement', url: '/administrativeManagements', label: "İdari Yönetim Modül" },

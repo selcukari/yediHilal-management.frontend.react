@@ -5,7 +5,7 @@ import {
 import {
   IconUser, IconMail, IconLibrary, IconUsers, IconSettings, IconMessage, IconExternalLink, IconFileCheck, IconCar, IconCoin, IconBubbleText,
   IconChevronRight, IconClipboardList, IconPhoneCall, IconBuilding, IconCalendarTime, IconSettingsAutomation, IconChevronDown, IconBuildings,
-  IconReport,
+  IconReport, IconSchool,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
 import { useAuth } from '~/authContext';
@@ -44,6 +44,12 @@ const menuItems: MenuItem[] = [
     key: 'branch',
     link: '/branches',
   },
+  {
+    icon: IconSchool,
+    label: 'Üniversite Yönetimi',
+    key: 'universityBranch',
+    link: '/university-branches',
+  },
   { icon: IconBubbleText, label: 'İletişim', key: 'communication', link: '/communications',
     children: [
       { icon: IconMail, label: 'Gön. Mail Lis.', key: 'mail', link: '/communication-mails' },
@@ -80,8 +86,11 @@ const menuItems: MenuItem[] = [
     key: 'report',
     link: '/reports',
     children: [
-      { label: 'Temcilcilik Rapor', key: 'reportBranch', link: '/reportBranchs',
+      { label: 'Temcilcilik Rapor', key: 'reportBranch', link: '/reportBranches',
         children: [{ label: 'Görevli Rapor', key: 'report-officer', link: '/report-officer' }, { label: 'Başkan Rapor', key: 'report-head', link: '/report-head' }, ],
+      },
+      { label: 'Üniversite Rapor', key: 'reportUniversityBranch', link: '/reportUniversityBranches',
+        children: [{ label: 'Görevli Rapor', key: 'report-uni-officer', link: '/report-uni-officer' },{ label: 'Başkan Rapor', key: 'report-uni-head', link: '/report-uni-head' }, ],
       },
     ],
   },

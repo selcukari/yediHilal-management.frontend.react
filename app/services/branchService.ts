@@ -60,7 +60,6 @@ export function useBranchService(controller: string) {
       formData.append('socialMedias', params.socialMedias || '');
       formData.append('openingDate', params.openingDate || '');
       formData.append('rentalPrice', params.rentalPrice?.toString() || '0');
-      formData.append('openingDate', params.openingDate || '');
       formData.append('isRent', params.isRent ? "1" : '');
 
       // Dosyaları ekle
@@ -90,7 +89,6 @@ export function useBranchService(controller: string) {
       formData.append('socialMedias', params.socialMedias || '');
       formData.append('openingDate', params.openingDate || '');
       formData.append('rentalPrice', params.rentalPrice?.toString() || '0');
-      formData.append('openingDate', params.openingDate || '');
       formData.append('branchSancaktars', params.branchSancaktars || '');
       formData.append('isRent', params.isRent ? "1" : '');
 
