@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router';
 import { useAuth } from '../authContext';
 import { toast } from '~/utils/toastMessages';
 
-export default function Login() {
+export default function UserLogin() {
   const { login, loading: authLoading, isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const [visible, { open, close }] = useDisclosure(false);
@@ -25,11 +25,10 @@ export default function Login() {
   const handleSubmit = async (values: typeof form.values) => {
     try {
       open()
-      const response = await login(values.email, values.password);
+      const response = await login(values.email, values.password, "userLogin");
 
       if (response == true) {
         close()
-
         setTimeout(() => {
           navigate("/");
           window.location.reload(); // Sayfayı yenile ile gorunmeyen menuler gelmemesi icin

@@ -1,4 +1,5 @@
 export { Layout } from './layoutComponents/layout';
+export { MemberLayout } from './memberLayoutComponents/layout';
 export { Navbar } from './layoutComponents/navbar';
 export { Sidebar } from './layoutComponents/sidebar';
 export { Footer } from './layoutComponents/footer';

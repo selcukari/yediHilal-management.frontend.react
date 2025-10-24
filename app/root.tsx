@@ -18,12 +18,13 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router";
 import { Notifications } from '@mantine/notifications';
 import { AuthProvider } from './authContext';
-import { Layout as AppLayout } from './components';
+import { Layout as AppLayout, MemberLayout } from './components';
 import { CustomLayout } from './components';
 import ProtectedRoute from './protectedRoute'
 import type { Route } from "./+types/root";
 import { Container, Title, Text, Button, Group, Stack, Code, Alert } from '@mantine/core';
 import { IconAlertCircle, IconHome, IconRefresh } from '@tabler/icons-react';
+import { getWithExpiry } from './utils/useLocalStorage';
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
@@ -69,22 +70,44 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   const location = useLocation();
   const [locationPathname, setLocationPathname] = useState<boolean>(true);
+  const [currentUserType, setCurrentUserType] = useState<string>("");
+
+  const [currentUser, setCurrentUser] = useState<any>(() => {
+    const storedUser = getWithExpiry("currentUser");
+    if (storedUser) {
+      try {
+        return JSON.parse(storedUser);
+      } catch {
+        localStorage.removeItem("currentUser");
+      }
+    }
+    return null;
+  });
 
   useEffect(() => {
+    setCurrentUserType(currentUser?.userType || "");
     setLocationPathname(!['/memberCreate', '/privacyPolicy'].includes(location.pathname));
-  }, [location.pathname]);
+  }, []);
 
   return (
     <MantineProvider theme={theme}>
       <Notifications position="top-right" />
-      {locationPathname ? (
-        <AuthProvider>
+      {locationPathname ? ( currentUserType === "userLogin" ?
+        (<AuthProvider>
           <AppLayout>
             <ProtectedRoute>
               <Outlet />
             </ProtectedRoute>
           </AppLayout>
+        </AuthProvider>) : (
+          <AuthProvider>
+          <MemberLayout>
+            <ProtectedRoute>
+              <Outlet />
+            </ProtectedRoute>
+          </MemberLayout>
         </AuthProvider>
+        )
       ) : (
         <CustomLayout>
           <Outlet />

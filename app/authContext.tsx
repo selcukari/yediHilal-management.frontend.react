@@ -6,7 +6,7 @@ import { setWithExpiry, getWithExpiry } from './utils/useLocalStorage';
 
 interface AuthContextType {
   currentUser: any;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string, loginType: string) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
   isLoggedIn: boolean;
@@ -50,11 +50,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string, loginType: string): Promise<boolean> => {
     setLoading(true);
     try {
-      const response = await api.get(`/${import.meta.env.VITE_APP_API_USER_CONTROLLER}/login?email=${email}&password=${password}`);
+      const response = await api.get(`/${import.meta.env.VITE_APP_API_USER_CONTROLLER}/${loginType}?email=${email}&password=${password}`);
       const getUser = response.data;
+      getUser.data["userType"] = loginType;
 
       if (getUser?.errors) {
         throw new Error('Kullanıcı bulunamadı veya şifre yanlış.');
@@ -78,7 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCurrentUser(null);
     localStorage.removeItem('currentUser');
 
-    navigate("login")
+    navigate("loginSelection")
   };
 
   const getCurrentToken = () => {

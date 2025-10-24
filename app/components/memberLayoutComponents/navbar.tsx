@@ -1,70 +1,17 @@
-import { useRef } from 'react';
 import { Group, Image, Title, Button, Avatar, Menu, Box, Burger, AppShell, Switch, useMantineColorScheme } from '@mantine/core';
-import { IconBell, IconLogout, IconUser, IconMoon, IconSun } from '@tabler/icons-react';
+import { IconBell, IconLogout, IconMoon, IconSun } from '@tabler/icons-react';
 import { useAuth } from '../../authContext';
 import { useNavigate } from "react-router";
-import { toast } from '../../utils/toastMessages';
-import UserEdit, { type UserEditDialogControllerRef } from '../../components/users/userEdit';
-import { useUserService } from '~/services/userService';
 
 interface NavbarProps {
   opened: boolean;
   toggle: () => void;
 }
 
-interface DutiesType {
-  ids: string;
-  names: string;
-  createDate: string;
-  authorizedPersonId: number;
-  authorizedPersonName: string;
-}
-
 export function Navbar({ opened, toggle }: NavbarProps) {
   const { isLoggedIn, logout, currentUser } = useAuth();
   const navigate = useNavigate();
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
-  
-  const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
-  const userEditRef = useRef<UserEditDialogControllerRef>(null);
-
-  const handleSaveSuccess = () => {
-    setTimeout(() => {
-      navigate("/")
-    }, 500);
-  };
-
-  const handleEdit = async () => {
-    if (currentUser?.id) {
-      const getUser = await service.user(currentUser.id as number);
-
-      if (getUser) {
-        const duties = (getUser.duties ? JSON.parse(getUser.duties) : []) as DutiesType[];
-
-        userEditRef.current?.openDialog({
-          id: getUser.id,
-          fullName: getUser.fullName,
-          identificationNumber: getUser.identificationNumber,
-          email: getUser.email,
-          countryCode: getUser.countryCode,
-          phone: getUser.phone,
-          dateOfBirth: getUser.dateOfBirth ? getUser.dateOfBirth.toString() : '',
-          isActive: getUser.isActive,
-          password: getUser.password,
-          moduleRoles: getUser.moduleRoles,
-          roleId: getUser.roleId.toString(),
-          countryId: getUser.countryId.toString(),
-          provinceId: getUser.provinceId?.toString(),
-          dutiesIds: duties && duties[duties.length - 1].ids as string,
-          duties: duties, 
-          deleteMessageTitle: getUser.deleteMessageTitle?.toString(),
-          updateDate: getUser.updateDate,
-        });
-      } else {
-        toast.info('Hiçbir veri yok!');
-      }
-    }
-  };
 
   return (
     <AppShell.Header>
@@ -102,9 +49,6 @@ export function Navbar({ opened, toggle }: NavbarProps) {
 
               <Menu.Dropdown>
                 <Menu.Label>Hesap</Menu.Label>
-                <Menu.Item leftSection={<IconUser size={14} />} onClick={handleEdit}>
-                  Profili Düzenle
-                </Menu.Item>
                 {/* Dark/Light Mode Switch */}
                 <Menu.Item
                   leftSection={colorScheme === 'dark' ? <IconMoon size={14} /> : <IconSun size={14} />}
@@ -134,7 +78,6 @@ export function Navbar({ opened, toggle }: NavbarProps) {
           )}
         </Group>
       </Group>
-      <UserEdit ref={userEditRef} onSaveSuccess={handleSaveSuccess} />
     </AppShell.Header>
   );
 }

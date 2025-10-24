@@ -17,16 +17,24 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
 
     if (!isLoggedIn) {
       // Sadece giriş yapmamış kullanıcıları login'e yönlendir
-      navigate("login");
+      if(["/userLogin", "/memberLogin"].includes(location.pathname)) {
+      navigate(location.pathname)
+
+        return;
+      }
+      navigate("loginSelection");
 
       return;
     }
 
-    if (location.pathname === '/login') {
+    if (location.pathname === '/loginSelection') {
       navigate("/")
 
       return;
     }
+      navigate("/")
+
+      return;
 
   }, [isLoggedIn]);
 
