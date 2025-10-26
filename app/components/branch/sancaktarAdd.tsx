@@ -22,6 +22,7 @@ type SancaktarDataGorevatama = {
   userDutyId: string;
   isActive: string;
   createDate: string;
+  finisDate: string;
 }
 
 interface SancaktarAddProps { 
@@ -75,6 +76,7 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
           userDutyName: (userDuty.name || ""),
           userDutyId: (userDuty.id || ""),
           createDate: new Date().toISOString(),
+          finisDate: '',
           isActive: "1"
         });
 

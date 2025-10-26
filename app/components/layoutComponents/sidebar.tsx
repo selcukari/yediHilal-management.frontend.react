@@ -102,7 +102,7 @@ const menuItems: MenuItem[] = [
   },
   {
     icon: IconExternalLink,
-    label: 'Dış Link Üye Ekle',
+    label: 'Kayıt/Form Oluştur',
     key: 'memberCreate',
     link: '/memberCreate',
   },

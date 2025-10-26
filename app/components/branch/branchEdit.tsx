@@ -36,6 +36,7 @@ type SancaktarDataGorevatama = {
   isActive: string;
   actions?: any
   createDate: string;
+  finisDate: string;
 }
 
 type FormValues = {
@@ -177,7 +178,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
   const openDialog = (value: FormValues) => {
     if (value) {
       fetchUsers();
-      form.setValues((value));
+      form.setValues(value);
 
       setSancaktarUserData(value.branchSancaktars ? JSON.parse(value.branchSancaktars) : []);
 
@@ -225,7 +226,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
     setSancaktarUserData(prev =>
       prev.map(item =>
         item.memberId == memberId
-          ? { ...item, isActive: "0" }
+          ? { ...item, isActive: "0", finisDate: new Date().toISOString() }
           : item                      
       )
     );
@@ -346,7 +347,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
           <Grid.Col span={4}>
            <DateInput
               label="Açılış Tarihi" placeholder="açılış tarihi" clearable minDate={subDays(new Date(), 30)} locale="tr" renderDay={DayRenderer}
-              value={form.values.openingDate} leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
+              value={form.values.openingDate || undefined} leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
               onChange={(value) => form.setFieldValue('openingDate', value)}
            />
           </Grid.Col>

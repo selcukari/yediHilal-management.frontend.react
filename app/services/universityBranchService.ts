@@ -30,6 +30,17 @@ export function useUniversityBranchService(controller: string) {
     }
   };
 
+  const getUniversityBranchesForRapor = async () => {
+
+    try {
+      const res = await api.get(`/${controller}/getUniversityBranchesForRapor`);
+
+      return res.data.data;
+    } catch (error: any) {
+      return error;
+    }
+  };
+
   const deleteUniversityBranch = async (id: number) => {
 
     try {
@@ -90,5 +101,5 @@ export function useUniversityBranchService(controller: string) {
     }
   };
 
-  return { getUniversityBranches, deleteUniversityBranch, addUniversityBranch, updateUniversityBranch };
+  return { getUniversityBranches, deleteUniversityBranch, getUniversityBranchesForRapor, addUniversityBranch, updateUniversityBranch };
 }

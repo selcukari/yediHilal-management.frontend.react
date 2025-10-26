@@ -76,6 +76,7 @@ export default function OfficerReport() {
     { field: 'userDutyName', header: 'Görevi' },
     { field: 'memberPhone', header: 'Telefon' },
     { field: 'createDate', header: 'Görev Tarihi' },
+    { field: 'finisDate', header: 'Bitiş Tarihi' },
 
     { field: 'branchName', header: 'Temsilcilik Adı' },
     { field: 'branchProvince', header: 'Temsilcilik İl' },
@@ -119,7 +120,7 @@ export default function OfficerReport() {
   
      try {
   
-      const getBranches = await serviceBranch.getBranches();
+      const getBranches = await serviceBranch.getBranchesForRapor();
       if (getBranches) {
         const resultData =getBranches.map((branch: BranchType) => ({
           ...branch,
@@ -181,7 +182,7 @@ export default function OfficerReport() {
   const filteredBranchReports = useMemo(() => {
     if (isEmpty(filterModel)) return sancaktarUserData;
     
-    return sancaktarUserData.filter(branchData => {
+    return sancaktarUserData?.filter(branchData => {
       const matchesSearch = filterModel.searchText ? (
         branchData.memberFullName.toLowerCase().includes(filterModel.searchText.toLowerCase())
         ) : true;
@@ -191,7 +192,7 @@ export default function OfficerReport() {
         : true;
 
       const matchesUserDuty = filterModel.userDutyIds && filterModel.userDutyIds.length > 0
-        ? filterModel.userDutyIds.includes(branchData.userDutyId.toString())
+        ? filterModel.userDutyIds.includes(branchData.userDutyId?.toString())
         : true;
       
       const matchesStatu = filterModel.statu ? (
@@ -224,6 +225,13 @@ export default function OfficerReport() {
           return (
             <Table.Td key={header.field}>
               {item["createDate"] ? formatDate(item["createDate"], dateFormatStrings.dateTimeFormatWithoutSecond): ""}
+            </Table.Td>
+          );
+        }
+        if (header.field === 'finisDate') {
+          return (
+            <Table.Td key={header.field}>
+              {item["finisDate"] ? formatDate(item["finisDate"], dateFormatStrings.dateTimeFormatWithoutSecond): ""}
             </Table.Td>
           );
         }
@@ -313,6 +321,7 @@ export default function OfficerReport() {
       branchHeadPhone: report["branchInfo"]["branchHeadPhone"] || "",
       memberStatu: report["memberStatu"] == "1" ? "Evet" : "Hayır",
       createDate: formatDate(report["createDate"], dateFormatStrings.dateTimeFormatWithoutSecond),
+      finisDate: formatDate(report["finisDate"], dateFormatStrings.dateTimeFormatWithoutSecond),
     }))
   }, [filteredBranchReports])
 

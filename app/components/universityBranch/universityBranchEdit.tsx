@@ -33,6 +33,7 @@ type SancaktarDataGorevatama = {
   isActive: string;
   actions?: any
   createDate: string;
+  finisDate: string;
 }
 
 type FormValues = {
@@ -205,7 +206,7 @@ const BranchEdit = forwardRef<UniversityBranchEditDialogControllerRef, Universit
     setSancaktarUserData(prev =>
       prev.map(item =>
         item.memberId == memberId
-          ? { ...item, isActive: "0" }
+          ? { ...item, isActive: "0", finisDate: new Date().toISOString() }
           : item                      
       )
     );
@@ -215,7 +216,7 @@ const BranchEdit = forwardRef<UniversityBranchEditDialogControllerRef, Universit
     { field: 'memberFullName', header: 'İsim' },
     { field: 'memberPhone', header: 'Telefon' }, 
     { field: 'userDutyName', header: 'Görev-Birim' },
-    { field: 'createDate', header: 'Tarih' },
+    { field: 'createDate', header: 'Kayıt Tarih' },
     { field: 'actions', header: 'İşlemler' },
   ]);
 
@@ -269,7 +270,7 @@ const BranchEdit = forwardRef<UniversityBranchEditDialogControllerRef, Universit
       onClose={() => {
         dialogClose();
       }}
-      title="Temsilcilik Güncelle"
+      title="Üniversite Temsilcilik Güncelle"
       centered
       size="700"
       overlayProps={{
@@ -304,7 +305,7 @@ const BranchEdit = forwardRef<UniversityBranchEditDialogControllerRef, Universit
             <Grid.Col span={6}>
               <TextInput
                 label="Email" placeholder="Email giriniz" type="email"
-                value={form.values.email}
+                value={form.values.email || ""}
                 {...form.getInputProps('email')}
               />
           </Grid.Col>

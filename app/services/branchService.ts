@@ -34,6 +34,17 @@ export function useBranchService(controller: string) {
     }
   };
 
+  const getBranchesForRapor = async () => {
+
+    try {
+      const res = await api.get(`/${controller}/getBranchesForRapor`);
+
+      return res.data.data;
+    } catch (error: any) {
+      return error;
+    }
+  };
+
   const deleteBranch = async (id: number) => {
 
     try {
@@ -104,5 +115,5 @@ export function useBranchService(controller: string) {
     }
   };
 
-  return { getBranches, deleteBranch, addBranch, updateBranch };
+  return { getBranches, deleteBranch, addBranch, updateBranch, getBranchesForRapor };
 }
