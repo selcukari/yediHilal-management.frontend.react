@@ -36,6 +36,7 @@ type FormValues = {
   updateDate?: string | null;
   createDate?: string | null;
   rentalPrice?: number;
+  leaseAgreementDate?: string | null;
   isRent: boolean;
   files?: any[];
 };
@@ -48,7 +49,7 @@ const BranchAdd = forwardRef<BranchAddDialogControllerRef, UserAddProps>(({onSav
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
   const [userData, setUserData] = useState<GetUserData[]>([]);
-  const [branchHeadDutyId, setBranchHeadDutyIdDutyId] = useState<string>("9");
+  const [branchHeadDutyId, setBranchHeadDutyIdDutyId] = useState<string>("19");
   
   const service = useBranchService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
@@ -63,6 +64,7 @@ const BranchAdd = forwardRef<BranchAddDialogControllerRef, UserAddProps>(({onSav
       address:"",
       phone: "",
       email:"",
+      leaseAgreementDate: "",
       socialMedias: "",
       openingDate: "",
       updateDate: "",
@@ -91,6 +93,7 @@ const BranchAdd = forwardRef<BranchAddDialogControllerRef, UserAddProps>(({onSav
       files: files.length > 0 ? files : undefined,
       rentalPrice: values.isRent ? values.rentalPrice : undefined,
       branchName: values.branchName.trim(),
+      leaseAgreementDate: values.isRent ? values.leaseAgreementDate : null,
       provinceId: values.provinceId as string,
       branchHeadId: values.branchHeadId as string,
     });
@@ -276,11 +279,19 @@ const BranchAdd = forwardRef<BranchAddDialogControllerRef, UserAddProps>(({onSav
               {...form.getInputProps('rentalPrice')}
             />
           </Grid.Col>
+          <Grid.Col span={4}>
+           <DateInput
+              label="Kira Sözleşme Tarihi" placeholder="tarih" clearable minDate={subDays(new Date(), 30)} locale="tr" renderDay={DayRenderer}
+              value={form.values.leaseAgreementDate || undefined} leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
+              disabled={!form.values.isRent} required={form.values.isRent}
+              onChange={(value) => form.setFieldValue('leaseAgreementDate', value)}
+           />
+          </Grid.Col>
           <Grid.Col span={6}>
             <FileUpload
               form={form}
-              required={false}
-              />
+              required={form.values.isRent}
+            />
           </Grid.Col>
           <Grid.Col span={6} offset={4}>
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">

@@ -102,6 +102,7 @@ export default function User() {
       duties: (item.duties && item.duties) as DutiesType[],
       dutiesIds: item.duties && item.duties[item.duties.length -1].ids as string,
       updateDate: item.updateDate,
+      dutyIds: item.dutyIds,
      });
   };
 

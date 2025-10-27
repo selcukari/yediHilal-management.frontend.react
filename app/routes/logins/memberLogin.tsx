@@ -4,17 +4,17 @@ import {
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate } from 'react-router';
-import { useAuth } from '../authContext';
+import { useAuth } from '../../authContext';
 import { toast } from '~/utils/toastMessages';
 
-export default function UserLogin() {
-  const { login, loading: authLoading, isLoggedIn } = useAuth();
+export default function MemberLogin() {
+  const { memberLogin, loading: authLoading, isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const [visible, { open, close }] = useDisclosure(false);
 
   const form = useForm({
     initialValues: {
-      email: 'yedihilaladmin@gmail.com',
+      email: 'testdeneme@gmail.com',
       password: '123456',
     },
     validate: {
@@ -25,10 +25,11 @@ export default function UserLogin() {
   const handleSubmit = async (values: typeof form.values) => {
     try {
       open()
-      const response = await login(values.email, values.password, "userLogin");
+      const response = await memberLogin(values.email, values.password);
 
       if (response == true) {
         close()
+
         setTimeout(() => {
           navigate("/");
           window.location.reload(); // Sayfayı yenile ile gorunmeyen menuler gelmemesi icin
@@ -61,7 +62,7 @@ export default function UserLogin() {
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <TextInput
             label="E-posta"
-            placeholder="ornek@site.com"
+            placeholder="ornek@email.com"
             required
             {...form.getInputProps('email')}
           />

@@ -40,6 +40,7 @@ type FormValues = {
   moduleRoles: string;
   roleId: string;
   dutiesIds?: string;
+  dutyIds?: string;
   deleteMessageTitle?: string;
 };
 
@@ -69,6 +70,7 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
       provinceId: '',
       password: '',
       dutiesIds: '',
+      dutyIds: '',
       isActive: true,
       deleteMessageTitle: '',
     },
@@ -121,7 +123,8 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
       provinceId: values.provinceId ? parseInt(values.provinceId) : undefined,
       countryId: values.countryId ? parseInt(values.countryId) : undefined,
       roleId: values.roleId ? parseInt(values.roleId) : undefined,
-      duties: JSON.stringify([newDuty])
+      duties: JSON.stringify([newDuty]),
+      dutyIds: values.dutiesIds ? values.dutiesIds.toString() : '',
     }
 
     const result = await service.addUser(newMemberValue);

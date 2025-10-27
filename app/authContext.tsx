@@ -6,7 +6,8 @@ import { setWithExpiry, getWithExpiry } from './utils/useLocalStorage';
 
 interface AuthContextType {
   currentUser: any;
-  login: (email: string, password: string, loginType: string) => Promise<boolean>;
+  login: (email: string, password: string, loginType: string, dutyId?: string) => Promise<boolean>;
+  memberLogin: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
   isLoggedIn: boolean;
@@ -50,12 +51,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   }, []);
 
-  const login = async (email: string, password: string, loginType: string): Promise<boolean> => {
+  const login = async (email: string, password: string, loginType: string, dutyId?: string): Promise<boolean> => {
     setLoading(true);
     try {
-      const response = await api.get(`/${import.meta.env.VITE_APP_API_USER_CONTROLLER}/${loginType}?email=${email}&password=${password}`);
+      const response = await api.get(`/${import.meta.env.VITE_APP_API_USER_CONTROLLER}/userLogin?email=${email}&password=${password}&dutyId=${dutyId || ''}`);
       const getUser = response.data;
       getUser.data["userType"] = loginType;
+
+      if (getUser?.errors) {
+        throw new Error('Kullanıcı bulunamadı veya şifre yanlış.');
+      }
+
+      setCurrentUser(getUser.data);
+      setWithExpiry('currentUser', JSON.stringify(getUser.data), 86400000 * 7); // a week
+
+      return true;
+    } catch (error: any) {
+      setCurrentUser(null);
+      localStorage.removeItem('currentUser');
+
+      return !!error.data;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const memberLogin = async (email: string, password: string): Promise<boolean> => {
+    setLoading(true);
+    try {
+      const response = await api.get(`/${import.meta.env.VITE_APP_API_USER_CONTROLLER}/memberLogin?email=${email}&password=${password}`);
+      const getUser = response.data;
+      getUser.data["userType"] = "memberLogin";
 
       if (getUser?.errors) {
         throw new Error('Kullanıcı bulunamadı veya şifre yanlış.');
@@ -90,6 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider value={{
       currentUser,
       login,
+      memberLogin,
       logout,
       loading,
       isLoggedIn: !!currentUser,
@@ -107,6 +134,7 @@ export function useAuth() {
     return {
       currentUser: null,
       login: async () => false,
+      memberLogin: async () => false,
       logout: () => {},
       loading: false,
       isLoggedIn: false,

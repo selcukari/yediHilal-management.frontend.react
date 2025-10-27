@@ -61,6 +61,7 @@ type FormValues = {
   updateDate?: string;
   duties?: DutiesType[];
   dutiesIds?: string;
+  dutyIds?: string;
   deleteMessageTitle?: string;
 };
 
@@ -93,6 +94,7 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
       moduleRoles: '',
       duties: [],
       dutiesIds: '',
+      dutyIds: '',
       deleteMessageTitle: '',
     },
     validate: {
@@ -199,6 +201,7 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
       countryId: values.countryId ? parseInt(values.countryId) : undefined,
       roleId: values.roleId ? parseInt(values.roleId) : undefined,
       duties: resultDutyData ? JSON.stringify(resultDutyData) : undefined,
+      dutyIds: values.dutiesIds ? values.dutiesIds.toString() : '',
     }
 
     const result = await service.updateUser(newUserValue);

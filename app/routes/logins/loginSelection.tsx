@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router";
-import { IconUser, IconUsers } from '@tabler/icons-react';
+import { IconUser, IconUsers, IconBuildings, IconSchool } from '@tabler/icons-react';
 import {
-  Container, Grid, TextInput, Text, Stack, Title, RingProgress,Badge,
-  Paper, Button, LoadingOverlay, Flex, Table, Group, ActionIcon,
+  Container, Text, Stack, Title,
+  Button, Group,
 } from '@mantine/core';
 
 export default function LoginSelection() {
@@ -39,6 +39,30 @@ export default function LoginSelection() {
             h={100}
           >
             Kullanıcı Girişi
+          </Button>
+
+          <Button
+            size="xxl"
+            leftSection={<IconBuildings size={24} />}
+            onClick={() => navigate('/branchLogin')} // Bu route'u oluşturmanız gerekecek
+            variant="filled"
+            color="blue"
+            w={200}
+            h={100}
+          >
+            Temsilcilik Girişi
+          </Button>
+
+          <Button
+            size="xxl"
+            leftSection={<IconSchool size={24} />}
+            onClick={() => navigate('/universityBranchLogin')} // Bu route'u oluşturmanız gerekecek
+            variant="outline"
+            color="gray"
+            w={200}
+            h={100}
+          >
+            Üniversite Girişi
           </Button>
         </Group>
       </Stack>

@@ -11,6 +11,7 @@ interface BranchDataParams {
   email?: string | null;
   socialMedias?: string | null;
   openingDate?: string | null;
+  leaseAgreementDate?: string | null;
   updateDate?: string | null;
   createDate?: string | null;
   branchSancaktars?: string | null;

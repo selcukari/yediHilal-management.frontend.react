@@ -49,6 +49,7 @@ type FormValues = {
   email?: string | null;
   socialMedias?: string | null;
   openingDate?: string | null;
+  leaseAgreementDate?: string | null;
   rentalPrice?: number;
   isRent: boolean;
   isActive: boolean;
@@ -71,7 +72,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
   const [opened, { open, close }] = useDisclosure(false);
   const [branchHeadUserData, setBranchHeadUserData] = useState<GetUserData[]>([]);
   const [sancaktarUserData, setSancaktarUserData] = useState<SancaktarDataGorevatama[]>([]);
-  const [branchHeadDutyId, setBranchHeadDutyIdDutyId] = useState<string>("9");
+  const [branchHeadDutyId, setBranchHeadDutyIdDutyId] = useState<string>("19");
   
   const service = useBranchService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
@@ -90,6 +91,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
       email:"",
       socialMedias: "",
       openingDate: "",
+      leaseAgreementDate: "",
       branchSancaktars: "",
       rentalPrice: 1000,
       isRent: true,
@@ -118,6 +120,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
       isRent: values.isRent,
       rentalPrice: values.isRent ? values.rentalPrice : undefined,
       branchHeadId: values.branchHeadId as string,
+      leaseAgreementDate: values.isRent ? values.leaseAgreementDate : null,
       branchSancaktars: sancaktarUserData ? JSON.stringify(sancaktarUserData) : ""
     });
 
@@ -374,11 +377,19 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
               {...form.getInputProps('rentalPrice')}
             />
           </Grid.Col>
+          <Grid.Col span={4}>
+           <DateInput
+              label="Kira Sözleşme Tarihi" placeholder="tarih" clearable minDate={subDays(new Date(), 30)} locale="tr" renderDay={DayRenderer}
+              value={form.values.leaseAgreementDate || undefined} leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
+              disabled={!form.values.isRent} required={form.values.isRent}
+              onChange={(value) => form.setFieldValue('leaseAgreementDate', value)}
+           />
+          </Grid.Col>
           <Grid.Col span={6}>
             <FileUpload
               form={form}
-              required={false} 
-              />
+              required={form.values.isRent}
+            />
           </Grid.Col>
           <Grid.Col span={4}>
             <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />} 

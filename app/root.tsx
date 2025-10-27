@@ -18,7 +18,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router";
 import { Notifications } from '@mantine/notifications';
 import { AuthProvider } from './authContext';
-import { Layout as AppLayout, MemberLayout } from './components';
+import { Layout as AppLayout, MemberLayout, BranchLayout, UniversityBranchLayout } from './components';
 import { CustomLayout } from './components';
 import ProtectedRoute from './protectedRoute'
 import type { Route } from "./+types/root";
@@ -89,26 +89,63 @@ export default function App() {
     setLocationPathname(!['/memberCreate', '/privacyPolicy'].includes(location.pathname));
   }, []);
 
+   // Layout seçimi için fonksiyon
+  const renderLayout = () => {
+    switch (currentUserType) {
+      case "userLogin":
+        return (
+          <AuthProvider>
+            <AppLayout>
+              <ProtectedRoute>
+                <Outlet />
+              </ProtectedRoute>
+            </AppLayout>
+          </AuthProvider>
+        );
+      case "memberLogin":
+        return (
+          <AuthProvider>
+            <MemberLayout>
+              <ProtectedRoute>
+                <Outlet />
+              </ProtectedRoute>
+            </MemberLayout>
+          </AuthProvider>
+        );
+      case "branchLogin":
+        return (
+          <AuthProvider>
+            <BranchLayout>
+              <ProtectedRoute>
+                <Outlet />
+              </ProtectedRoute>
+            </BranchLayout>
+          </AuthProvider>
+        );
+      case "universityBranchLogin":
+        return (
+          <AuthProvider>
+            <UniversityBranchLayout>
+              <ProtectedRoute>
+                <Outlet />
+              </ProtectedRoute>
+            </UniversityBranchLayout>
+          </AuthProvider>
+        );
+      default:
+        // Kullanıcı tipi belirlenemezse veya boşsa
+        return (
+          <CustomLayout>
+            <Outlet />
+          </CustomLayout>
+        );
+    }
+  };
+
   return (
     <MantineProvider theme={theme}>
       <Notifications position="top-right" />
-      {locationPathname ? ( currentUserType === "userLogin" ?
-        (<AuthProvider>
-          <AppLayout>
-            <ProtectedRoute>
-              <Outlet />
-            </ProtectedRoute>
-          </AppLayout>
-        </AuthProvider>) : (
-          <AuthProvider>
-          <MemberLayout>
-            <ProtectedRoute>
-              <Outlet />
-            </ProtectedRoute>
-          </MemberLayout>
-        </AuthProvider>
-        )
-      ) : (
+      {locationPathname ? renderLayout() : (
         <CustomLayout>
           <Outlet />
         </CustomLayout>

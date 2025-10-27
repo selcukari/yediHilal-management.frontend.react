@@ -13,7 +13,6 @@ import { useUserService } from '../../services/userService';
 import { useUniversityBranchService } from '../../services/universityBranchService';
 import { toast } from '../../utils/toastMessages';
 import { FileUpload } from '../fileInput';
-import { DayRenderer } from '..';
 
 export type UniversityBranchAddDialogControllerRef = {
   openDialog: () => void;
@@ -43,7 +42,7 @@ const UniversityBranchAdd = forwardRef<UniversityBranchAddDialogControllerRef, U
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
   const [userData, setUserData] = useState<GetUserData[]>([]);
-  const [branchHeadDutyId, setBranchHeadDutyIdDutyId] = useState<string>("9");
+  const [branchHeadDutyId, setBranchHeadDutyIdDutyId] = useState<string>("20");
   
   const service = useUniversityBranchService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);

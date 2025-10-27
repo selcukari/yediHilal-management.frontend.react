@@ -15,6 +15,7 @@ interface UserDataParams {
   updateDate?: string;
   duties?: string;
   deleteMessageTitle?: string;
+  dutyIds?: string;
 }
 
 type UserParams = {

@@ -1,5 +1,7 @@
 export { Layout } from './layoutComponents/layout';
 export { MemberLayout } from './memberLayoutComponents/layout';
+export { BranchLayout } from './branchLayoutComponents/layout';
+export { UniversityBranchLayout } from './universityBranchLayoutComponents/layout';
 export { Navbar } from './layoutComponents/navbar';
 export { Sidebar } from './layoutComponents/sidebar';
 export { Footer } from './layoutComponents/footer';

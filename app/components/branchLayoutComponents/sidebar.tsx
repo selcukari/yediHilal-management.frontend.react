@@ -3,9 +3,8 @@ import {
   NavLink, Flex, Text, Stack, Divider, Group, ScrollArea, AppShell,
 } from '@mantine/core';
 import {
-  IconUser, IconMail, IconLibrary, IconUsers, IconSettings, IconMessage, IconExternalLink, IconFileCheck, IconCar, IconCoin, IconBubbleText,
+  IconUsers, IconSettings, IconMessage, IconExternalLink, IconFileCheck, IconCar, IconCoin, IconBubbleText,
   IconChevronRight, IconClipboardList, IconPhoneCall, IconBuilding, IconCalendarTime, IconSettingsAutomation, IconChevronDown, IconBuildings,
-  IconReport, IconSchool,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
 import { useAuth } from '~/authContext';
@@ -26,11 +25,17 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   { icon: IconUsers, label: 'Üye Yönetimi', key: 'member', link: '/' },
-  { label: 'Finans Yönetimi', key: 'finance', link: '/financeManagements',
-    children: [
-      { icon: IconCoin, label: 'Finans', key: 'finance', link: '/finances' },
-      { icon: IconPhoneCall, label: 'Arama Takip', key: 'phoneCallTracking', link: '/phoneCallTrackings' },
-    ], 
+   {
+    icon: IconFileCheck,
+    label: 'Proje Yönetimi',
+    key: 'project',
+    link: '/projects',
+  },
+  {
+    icon: IconBuildings,
+    label: 'Temsilcilik Yönetimi',
+    key: 'branch',
+    link: '/branches',
   },
 ];
 

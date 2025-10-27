@@ -63,7 +63,7 @@ const BranchEdit = forwardRef<UniversityBranchEditDialogControllerRef, Universit
   const [opened, { open, close }] = useDisclosure(false);
   const [branchHeadUserData, setBranchHeadUserData] = useState<GetUserData[]>([]);
   const [sancaktarUserData, setSancaktarUserData] = useState<SancaktarDataGorevatama[]>([]);
-  const [branchHeadDutyId, setBranchHeadDutyIdDutyId] = useState<string>("9");
+  const [universityBranchHeadDutyId, setUniversityBranchHeadDutyIdDutyId] = useState<string>("20");
   
   const service = useUniversityBranchService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
@@ -183,7 +183,7 @@ const BranchEdit = forwardRef<UniversityBranchEditDialogControllerRef, Universit
           duties: u.duties ? last(JSON.parse(u.duties as string)) : { ids: "", names: "" }
         }));
 
-        setBranchHeadUserData(newUsers.filter(u => u.duties?.ids?.includes(branchHeadDutyId))?.map((i: any) => ({ id: i.id.toString(), fullName: i.fullName })));
+        setBranchHeadUserData(newUsers.filter(u => u.duties?.ids?.includes(universityBranchHeadDutyId))?.map((i: any) => ({ id: i.id.toString(), fullName: i.fullName })));
       } else {
         toast.info('Hiçbir veri yok!');
         setBranchHeadUserData([]);
