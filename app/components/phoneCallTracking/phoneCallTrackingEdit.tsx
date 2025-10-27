@@ -56,7 +56,7 @@ const PhoneCallTrackingEdit = forwardRef<PhoneCallTrackingEditDialogControllerRe
     { field: 'dateOfBirth', header: 'Doğum Yılı' },
     { field: 'countryName', header: 'Ülke' },
     { field: 'provinceName', header: 'İl' },
-    { field: 'phoneCallStatudescription', header: 'Arama Durum' },
+    { field: 'phoneCallStatudescription', header: 'Arama Notu' },
     { field: 'createdDate', header: 'İlk Kayıt' },
     { field: 'actions', header: 'Arama Durumu Gir' },
   ]);

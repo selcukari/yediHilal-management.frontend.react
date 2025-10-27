@@ -130,8 +130,8 @@ const openDialog = (value: FormValues) => {
               <Grid>
                 <Grid.Col span={6} offset={3}>
                   <TextInput
-                    label="Arama durumu"
-                    placeholder="durumu giriniz"
+                    label="Arama notu"
+                    placeholder="notu giriniz"
                     value={form.values.phoneCallStatudescription}
                     required
                     {...form.getInputProps('phoneCallStatudescription')}
