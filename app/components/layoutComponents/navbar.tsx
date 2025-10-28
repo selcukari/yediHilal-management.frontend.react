@@ -37,7 +37,6 @@ export function Navbar({ opened, toggle }: NavbarProps) {
   const handleEdit = async () => {
     if (currentUser?.id) {
       const getUser = await service.user(currentUser.id as number);
-
       if (getUser) {
         const duties = (getUser.duties ? JSON.parse(getUser.duties) : []) as DutiesType[];
 
@@ -52,8 +51,8 @@ export function Navbar({ opened, toggle }: NavbarProps) {
           isActive: getUser.isActive,
           password: getUser.password,
           moduleRoles: getUser.moduleRoles,
-          roleId: getUser.roleId.toString(),
-          countryId: getUser.countryId.toString(),
+          roleId: getUser.roleId?.toString(),
+          countryId: getUser.countryId?.toString(),
           provinceId: getUser.provinceId?.toString(),
           dutiesIds: duties && duties[duties.length - 1].ids as string,
           duties: duties, 

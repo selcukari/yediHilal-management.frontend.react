@@ -39,15 +39,15 @@ export function MeetingTypeSelect({ form, required = false, isDisabled = false }
 
   return (
     <Select
-      label="Toplantı Türü"
-      placeholder="toplantı türü seçiniz"
+      label="Toplantı Birim"
+      placeholder="toplantı Birim seçiniz"
       data={meetings}
       searchable
       clearable
       required={required}
       disabled={isDisabled}
       maxDropdownHeight={200}
-      nothingFoundMessage="toplantı türü bulunamadı..."
+      nothingFoundMessage="toplantı Birim bulunamadı..."
       {...form.getInputProps('meetingTypeId')}
     />
   );

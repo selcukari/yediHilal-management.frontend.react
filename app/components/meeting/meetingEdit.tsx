@@ -12,8 +12,6 @@ import { ProvinceSelect } from '../addOrEdit/provinceSelect';
 import { MeetingTypeSelect } from '../addOrEdit/meetingTypeSelect';
 import { RichTextEditorTiptap } from '../richTextEditorTiptap';
 import { useMeetingService } from '../../services/meetingService';
-import { PrioritySelect } from '../addOrEdit/prioritySelect';
-import { ResponsibleUserSelect } from '../addOrEdit/responsibleUserSelect';
 import { FileUpload } from '../fileInput';
 import { DayRenderer } from '../../components';
 
@@ -29,15 +27,14 @@ interface MeetingEditProps {
 type FormValues = {
   id: number;
   name: string;
-  responsibleId?: string | null;
+  responsibleFullName?: string | null;
   meetingTypeId?: string | null;
   provinceId?: string | null;
   address?: string | null;
   participantCount: number;
   duration?: number;
-  participants: string;
+  agendas: string;
   notes?: string;
-  priority: string;
   time: string | null;
   files?: any[]; // file
   fileUrls?: string; // kayıtlı fileurls
@@ -54,22 +51,20 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
     initialValues: {
       id: 0,
       name: '',
-      responsibleId: '',
+      responsibleFullName: '',
       meetingTypeId: "",
       provinceId: '',
       address: '',
       duration: 1,
-      participants: "",
+      agendas: "",
       participantCount: 5,
       notes: '',
-      priority: '',
       time: ''
     },
     validate: {
       name: (value) => (value.trim().length < 5 ? 'Toplantı başlık en az 5 karakter olmalı' : null),
-      responsibleId: (value) => (value ? null : 'Sorumlu kişi alanı zorunlu'),
-      priority: (value) => (value ? null : 'Öncelik alanı zorunlu'),
-      participants: (value) => (value.trim().length < 10 ? 'Katılıncı alanı boş olmaz' : null),
+      responsibleFullName: (value) => (value ? null : 'Sorumlu kişi alanı zorunlu'),
+      agendas: (value) => (value.trim().length < 10 ? 'Gündemler alanı boş olmaz' : null),
       time: (value) => (value ? null : 'Toplantı zamanı alanı zorunlu'),
     },
   });
@@ -105,7 +100,7 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
       ...values,
       name: values.name.trim(),
       files: files.length > 0 ? files : undefined,
-      responsibleId: values.responsibleId ? parseInt(values.responsibleId) : 1,
+      responsibleFullName: values.responsibleFullName ?? "",
       meetingTypeId: values.meetingTypeId ? parseInt(values.meetingTypeId) : 1,
       provinceId: values.provinceId ? parseInt(values.provinceId) : 1,
     });
@@ -197,9 +192,12 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
               />
             </Grid.Col>
             <Grid.Col span={6}>
-              <ResponsibleUserSelect
-                required={true}
-                form={form}
+              <TextInput
+                label="Sorumlu"
+                placeholder="sorumlu giriniz"
+                value={form.values.responsibleFullName}
+                required
+                {...form.getInputProps('responsibleFullName')}
               />
             </Grid.Col>
             <Grid.Col span={6}>
@@ -209,12 +207,6 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
                 label="İl" 
                 placeholder="İl Seçiniz" 
                 countryId={"1"}
-              />
-            </Grid.Col>
-            <Grid.Col span={6}>
-              <PrioritySelect
-                required={true}
-                form={form} 
               />
             </Grid.Col>
            <Grid.Col span={6}>
@@ -228,10 +220,10 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
           <Grid.Col span={6}>
             <Textarea
               mt="md"
-              label="Katılıncılar giriniz"
-              placeholder="katılıncılar..."
+              label="Gündemler giriniz"
+              placeholder="gündemler..."
               withAsterisk
-              {...form.getInputProps('participants')}
+              {...form.getInputProps('agendas')}
             />
           </Grid.Col>
           <Grid.Col span={6}>

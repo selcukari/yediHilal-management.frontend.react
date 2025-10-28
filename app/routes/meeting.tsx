@@ -10,7 +10,6 @@ import { toast } from '../utils/toastMessages';
 import { useMeetingService } from '../services/meetingService';
 import { formatDate } from '../utils/formatDate';
 import { dateFormatStrings } from '../utils/dateFormatStrings';
-import { priorityMockData } from '../utils/priorityMockData';
 import MeetingAdd, { type MeetingAddDialogControllerRef } from '../components/meeting/meetingAdd';
 import MeetingEdit, { type MeetingEditDialogControllerRef } from '../components/meeting/meetingEdit';
 import { randaomColor } from '../utils/randaomColor';
@@ -18,12 +17,11 @@ import { MenuActionButton , Province} from '../components'
 import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToExcel';
 import { type PdfTableColumn } from '../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../utils/repor/calculateColumnWidth';
-import { useAuth } from '~/authContext';
 import { stripHtml } from '../utils/stripHtml';
 interface MeetingData {
   id: number;
   name: string;
-  participants?: string;
+  agendas?: string;
   address?: string;
   participantCount?: number;
   meetingTypeId: number;
@@ -32,7 +30,6 @@ interface MeetingData {
   provinceName: string;
   duration?: number;
   notes?: string;
-  priority: string;
   isActive: boolean;
   responsibleId: number;
   responsibleFullName: string;
@@ -54,7 +51,6 @@ export default function Meeting() {
 
   const meetingAddRef = useRef<MeetingAddDialogControllerRef>(null);
   const meetingEditRef = useRef<MeetingEditDialogControllerRef>(null);
-  const { currentUser } = useAuth();
 
   const service = useMeetingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
@@ -62,11 +58,10 @@ export default function Meeting() {
     { field: 'id', header: 'Id' },
     { field: 'name', header: 'Toplantı Adı' },
     { field: 'provinceName', header: 'İl' },
-    { field: 'participants', header: 'Katılıncılar' },
+    { field: 'agendas', header: 'Gündemler' },
     { field: 'participantCount', header: 'Katılımcı Sayısı' },
-    { field: 'priority', header: 'Öncelik' },
     { field: 'responsibleFullName', header: 'Sorumlu' },
-    { field: 'meetingTypeName', header: 'Toplantı Türü' },
+    { field: 'meetingTypeName', header: 'Toplantı Birim' },
     { field: 'address', header: 'Adres' },
     { field: 'time', header: 'Toplantı Tarihi' },
     { field: 'duration', header: 'Toplantı Süresi(saat)' },
@@ -102,16 +97,14 @@ export default function Meeting() {
   const handleEdit = (value: MeetingData) => {
     meetingEditRef.current?.openDialog({
       ...value,
-      responsibleId: value.responsibleId.toString(),
       provinceId: value.provinceId?.toString(),
       meetingTypeId: value.meetingTypeId?.toString(),
       participantCount: value.participantCount ?? 1,
-      participants: value.participants ?? "",
+      agendas: value.agendas ?? "",
       time: value.time ?? "",
     });
   };
   const handleDelete = async (id: number) => {
-    console.log("handleDelete: id:", id);
     open();
 
     try {
@@ -158,21 +151,6 @@ export default function Meeting() {
     return "yellow";
   };
 
-   // Öncelik değerlerine göre renk döndüren fonksiyon
-  const getPriorityColor = (priorityValue: string, isFinish: boolean) => {
-    // Eğer iş tamamlandıysa her zaman gri döndür
-    if (isFinish) {
-      return 'gray';
-    }
-    switch(priorityValue) {
-      case 'urgent': return 'red';
-      case 'high': return 'orange';
-      case 'medium': return 'blue';
-      case 'low': return 'green';
-      default: return 'gray';
-    }
-  };
-
   const onProvinceChange = (provinceValues: string[] | null): void => {
     setFilterProvinceIds(provinceValues);
   };
@@ -196,21 +174,12 @@ export default function Meeting() {
   }, [meetingData, searchText, filterProvinceIds]);
 
   const rowItems = filteredMeetings.map((element) => {
-    const priorityInfo = priorityMockData.find(x => x.value === element.priority);
 
     return (<Table.Tr key={element.id}>
       <Table.Td>{element.id}</Table.Td>
       <Table.Td>{element.name}</Table.Td>
       <Table.Td>{element.provinceName}</Table.Td>
-      <Table.Td>{
-        <Badge 
-            color={getPriorityColor(element.priority, (differenceInDays(element.time ?? new Date(), new Date())<0))} 
-            variant="filled"
-          >
-          {priorityInfo?.label || element.priority}
-          </Badge>
-      }</Table.Td>
-      <Table.Td>{element.participants?.substring(0,30)}</Table.Td>
+      <Table.Td>{element.agendas?.substring(0,30)}</Table.Td>
       <Table.Td>{element.participantCount}</Table.Td>
       <Table.Td>{element.responsibleFullName}</Table.Td>
       <Table.Td>{element.meetingTypeName}</Table.Td>
@@ -223,7 +192,6 @@ export default function Meeting() {
           <ActionIcon 
             variant="light" 
             color="blue"
-            disabled={currentUser?.id as number == element.responsibleId ? false : true}
             onClick={() => handleEdit(element)}
           >
             <IconEdit size={16} />
@@ -231,7 +199,7 @@ export default function Meeting() {
           <ActionIcon 
             variant="light" 
             color="red"
-            disabled={currentUser?.id as number == element.responsibleId ? (differenceInDays(element.time ?? new Date(), new Date())<0 ? true : false) : true}
+            disabled={(differenceInDays(element.time ?? new Date(), new Date())<0 ? true : false)}
             onClick={() => handleDelete(element.id)}
           >
             <IconTrash size={16} />
@@ -275,10 +243,9 @@ export default function Meeting() {
   const raportProjectData = useMemo(() => {
     return filteredMeetings.map((project: MeetingData) => ({
       ...project,
-      participants: project.participants?.substring(0,30),
+      agendas: project.agendas?.substring(0,30),
       createDate: formatDate(project.createDate, dateFormatStrings.dateTimeFormatWithoutSecond),
       time: project.time ? formatDate(project.time, dateFormatStrings.dateTimeFormatWithoutSecond) : '-',
-      priority: priorityMockData.find(x => x.value === project.priority)?.label || project.priority
     }))
   }, [filteredMeetings])
 
@@ -384,8 +351,7 @@ export default function Meeting() {
                     <Table.Th>Id</Table.Th>
                     <Table.Th>Toplantı Adı</Table.Th>
                     <Table.Th>İl</Table.Th>
-                    <Table.Th>Öncelik</Table.Th>
-                    <Table.Th>Katılımcılar</Table.Th>
+                    <Table.Th>Gündemler</Table.Th>
                     <Table.Th>Katılımcı Sayısı</Table.Th>
                     <Table.Th>Sorumlu</Table.Th>
                     <Table.Th>Toplantı Türü</Table.Th>

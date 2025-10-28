@@ -5,14 +5,13 @@ type MeetingType = {
   id?: number;
   name: string;
   participantCount: number;
-  responsibleId: number;
+  responsibleFullName: string | null;
   meetingTypeId: number;
   provinceId: number;
-  participants: string;
+  agendas: string;
   time?: string | null;
   notes?: string | null;
   address?: string | null;
-  priority: string;
   isActive?: boolean;
   duration?: number;
   files?: any[]
@@ -51,14 +50,13 @@ export function useMeetingService(controller: string) {
         // Temel proje verilerini ekle
         formData.append('name', params.name);
         formData.append('participantCount', params.participantCount?.toString() || '0');
-        formData.append('responsibleId', params.responsibleId?.toString() || '');
+        formData.append('responsibleFullName', params.responsibleFullName?.toString() || '');
         formData.append('meetingTypeId', params.meetingTypeId?.toString() || '');
         formData.append('provinceId', params.provinceId?.toString() || "");
-        formData.append('participants', params.participants || '');
+        formData.append('agendas', params.agendas || '');
         formData.append('time', params.time || '');
         formData.append('notes', params.notes || '');
         formData.append('address', params.address || '');
-        formData.append('priority', params.priority || '');
         formData.append('duration', params.duration?.toString() || '0');
         // Dosyaları ekle
         (params.files || []).forEach((file: File) => {
@@ -80,14 +78,13 @@ export function useMeetingService(controller: string) {
       formData.append('id', params.id?.toString() || "");
       formData.append('name', params.name);
       formData.append('participantCount', params.participantCount?.toString() || '0');
-      formData.append('responsibleId', params.responsibleId?.toString() || '');
+      formData.append('responsibleFullName', params.responsibleFullName?.toString() || '');
       formData.append('meetingTypeId', params.meetingTypeId?.toString() || '');
       formData.append('provinceId', params.provinceId?.toString() || "");
-      formData.append('participants', params.participants || '');
+      formData.append('agendas', params.agendas || '');
       formData.append('time', params.time || '');
       formData.append('notes', params.notes || '');
       formData.append('address', params.address || '');
-      formData.append('priority', params.priority || '');
       formData.append('duration', params.duration?.toString() || '0');
       // Dosyaları ekle
       (params.files || []).forEach((file: File) => {
