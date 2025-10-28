@@ -25,27 +25,32 @@ interface PhoneCallStatuProps {
 type FormValues = {
 id: number;
 phoneCallStatudescription?: string;
+callStatu?: string;
 };
 
 const PhoneCallStatu = forwardRef<PhoneCallStatuDialogControllerRef, PhoneCallStatuProps>(({onSaveSuccess}, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
-  const [resultData, setResultData] = useState<any[]>([]);
-  const [selectedRows, setSelectedRows] = useState<number[]>([]);
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
 
   const confirmModalRef = useRef<ConfirmModalRef>(null);
+
+  const [callStatus, setCallStatus] = useState([
+    { value: 'unreachable', label: 'Ulaşılamadı' },
+    { value: 'informed', label: 'Bilgi Verildi' },
+    { value: 'notcalled', label: 'Aranmadı' },
+    { value: 'willcallagain', label: 'Tekrar Aranacak' },
+  ]);
 
   const form = useForm<FormValues>({
      initialValues: {
         id: 0,
         phoneCallStatudescription: '',
+        callStatu: '',
      },
      validate: {
         phoneCallStatudescription: (value) => (value && value.trim().length < 5 ? 'Arama durumu en az 5 karakter olmalı' : null),
      },
    });
-
-
 
 
   const handleSubmit = async (value: FormValues) => {
@@ -118,7 +123,7 @@ const openDialog = (value: FormValues) => {
         onClose={dialogClose}
         title="Arama Durumu"
         centered
-        size="xl"
+        size="l"
         overlayProps={{
           backgroundOpacity: 0.55,
           blur: 3,
@@ -128,15 +133,23 @@ const openDialog = (value: FormValues) => {
           <form onSubmit={form.onSubmit(handleSubmit)}>
             <Stack gap="md">
               <Grid>
-                <Grid.Col span={6} offset={3}>
-                  <TextInput
-                    label="Arama notu"
-                    placeholder="notu giriniz"
-                    value={form.values.phoneCallStatudescription}
-                    required
-                    {...form.getInputProps('phoneCallStatudescription')}
-                  />
+                
+              <Grid.Col span={6} offset={3}>
+                <Select
+                  label="Arama Durumu" placeholder="durumu Seçiniz"
+                  data={callStatus} required value={form.values.callStatu}
+                  searchable clearable maxDropdownHeight={200} nothingFoundMessage="durumu bulunamadı..."
+                  onChange={(value) => form.setFieldValue('callStatu', value ?? '')}
+                />
               </Grid.Col>
+              <Grid.Col span={6} offset={3}>
+                <TextInput
+                  label="Arama notu"
+                  placeholder="notu giriniz"
+                  value={form.values.phoneCallStatudescription}
+                  {...form.getInputProps('phoneCallStatudescription')}
+                />
+            </Grid.Col>
               <Grid.Col span={6} offset={4}>
                 <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
                   İptal

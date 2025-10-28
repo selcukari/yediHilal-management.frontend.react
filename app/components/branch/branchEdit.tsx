@@ -105,6 +105,11 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
 
         return /^[0-9]+$/.test(value) ? null : 'Sadece rakam girebilirsiniz';
       },
+      files: (value) => {
+        if (form.values.isRent && (!value || value.length === 0)) {
+          return 'Dosya yükleme alanı zorunlu';
+        }
+      },
     },
   });
 

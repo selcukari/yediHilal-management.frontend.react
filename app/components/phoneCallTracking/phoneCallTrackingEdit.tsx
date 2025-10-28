@@ -1,6 +1,6 @@
 import { forwardRef, useImperativeHandle, useState, useRef, useEffect } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { clone, omit } from 'ramda';
+import { clone } from 'ramda';
 import { Modal, TextInput, Button, ActionIcon, Group, Stack, Textarea, Title, Table, Paper, Grid, Flex, Switch, Select } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck, IconEdit } from '@tabler/icons-react';
@@ -10,6 +10,8 @@ import PhoneCallStatu, { type PhoneCallStatuDialogControllerRef } from './phoneC
 import { usePhoneCallTrackingService } from '../../services/phoneCallTrackingService';
 import { useUserService } from '../../services/userService';
 import { toast } from '../../utils/toastMessages';
+import { formatDate } from '../../utils/formatDate';
+import { dateFormatStrings } from '../../utils/dateFormatStrings';
 
 export type PhoneCallTrackingEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -49,14 +51,21 @@ const PhoneCallTrackingEdit = forwardRef<PhoneCallTrackingEditDialogControllerRe
     { field: 'fullName', header: 'Ad Soyad' },
     { field: 'typeNames', header: 'Üye Tipi' },
     { field: 'phoneWithCountryCode', header: 'Telefon' },
-    { field: 'email', header: 'Mail' },
     { field: 'referenceFullName', header: 'Referans İsmi' },
     { field: 'referencePhone', header: 'Referans Telefon' },
     { field: 'countryName', header: 'Ülke' },
     { field: 'provinceName', header: 'İl' },
     { field: 'phoneCallStatudescription', header: 'Arama Notu' },
-    { field: 'createdDate', header: 'İlk Kayıt' },
+    { field: 'callStatu', header: 'Arama Durumu' },
+    { field: 'createdDate', header: 'Güncelleme Tarih' },
     { field: 'actions', header: 'Arama Durumu Gir' },
+  ]);
+
+  const [callStatus, setCallStatus] = useState([
+    { value: 'unreachable', label: 'Ulaşılamadı' },
+    { value: 'informed', label: 'Bilgi Verildi' },
+    { value: 'notcalled', label: 'Aranmadı' },
+    { value: 'willcallagain', label: 'Tekrar Aranacak' },
   ]);
 
   const form = useForm<FormValues>({
@@ -178,15 +187,16 @@ const PhoneCallTrackingEdit = forwardRef<PhoneCallTrackingEditDialogControllerRe
     }
   }
   const handleEditPhoneCallStatu = (value: any) => {
-    phoneCallStatuRef.current?.openDialog({id: value.id, phoneCallStatudescription: value.phoneCallStatudescription})
+    phoneCallStatuRef.current?.openDialog({
+      id: value.id, phoneCallStatudescription: value.phoneCallStatudescription, callStatu: value.callStatu})
   }
 
   const phoneCallStatuSave = (value: any) => {
-
     setMembersData(prevData => 
     prevData.map(member => 
       member.id == value.id 
-        ? { ...member, phoneCallStatudescription: value.phoneCallStatudescription }
+        ? { ...member, phoneCallStatudescription: value.phoneCallStatudescription,
+          createdDate: formatDate(new Date().toISOString(), dateFormatStrings.dateTimeFormatWithoutSecond), callStatu: value.callStatu }
         : member
     )
   );
@@ -202,6 +212,13 @@ const PhoneCallTrackingEdit = forwardRef<PhoneCallTrackingEditDialogControllerRe
   const tableRows = membersData.map((member) => (
     <Table.Tr key={member.id}>
       {rowHeaders.map((header) => {
+        if (header.field === 'callStatu') {
+          return (
+            <Table.Td key={header.field}>
+              {callStatus.find(x => x.value == member[header.field])?.label || '-'}
+            </Table.Td>
+          );
+        }
         if (header.field === 'actions') {
             return (
               <Table.Td key={header.field}>
@@ -209,7 +226,7 @@ const PhoneCallTrackingEdit = forwardRef<PhoneCallTrackingEditDialogControllerRe
                   <ActionIcon 
                     variant="light" 
                     color="blue"
-                    onClick={() => handleEditPhoneCallStatu({id: member.id as number, phoneCallStatudescription: member.phoneCallStatudescription})}
+                    onClick={() => handleEditPhoneCallStatu({id: member.id as number, phoneCallStatudescription: member.phoneCallStatudescription, callStatu: member.callStatu})}
                   >
                     <IconEdit size={16} />
                   </ActionIcon>

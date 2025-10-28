@@ -21,13 +21,10 @@ interface MemberAddProps {
 
 type FormValues = {
   fullName: string;
-  email: string;
   countryCode: string;
   phone: string;
   referenceId: string;
   isActive: boolean;
-  isSms: boolean;
-  isMail: boolean;
   typeIds: string;
   countryId: string;
   provinceId: string;
@@ -47,9 +44,6 @@ const PhoneCallTrackingSend = forwardRef<PhoneCallTrackingSendDialogControllerRe
     { field: 'fullName', header: 'Ad Soyad' },
     { field: 'typeNames', header: 'Üye Tipi' },
     { field: 'phoneWithCountryCode', header: 'Telefon' },
-    { field: 'email', header: 'Mail' },
-    { field: 'isSms', header: 'Sms' },
-    { field: 'isMail', header: 'Mail' },
     { field: 'referenceFullName', header: 'Referans İsmi' },
     { field: 'referencePhone', header: 'Referans Telefon' },
     { field: 'countryName', header: 'Ülke' },
@@ -67,7 +61,9 @@ const PhoneCallTrackingSend = forwardRef<PhoneCallTrackingSendDialogControllerRe
       return;
     }
 
-    const selectedMemberData = resultData?.filter(i => valuesIds.includes(i.id))?.map(x => ({ ...x, phoneCallStatudescription: ""}));
+    const selectedMemberData = resultData?.filter(i => valuesIds.includes(i.id))?.map(x => ({
+      ...x, phoneCallStatudescription: "", createdDate: formatDate(new Date().toISOString(), dateFormatStrings.dateTimeFormatWithoutSecond), callStatu: ""
+    }));
     const result = await servicePhoneCall.updatePhoneCallTracking({
       id: parseInt(phoneCallId),
       members: JSON.stringify(selectedMemberData ?? []),

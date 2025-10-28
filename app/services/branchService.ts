@@ -71,6 +71,7 @@ export function useBranchService(controller: string) {
       formData.append('email', params?.email || '');
       formData.append('socialMedias', params.socialMedias || '');
       formData.append('openingDate', params.openingDate || '');
+      formData.append('leaseAgreementDate', params.leaseAgreementDate || '');
       formData.append('rentalPrice', params.rentalPrice?.toString() || '0');
       formData.append('isRent', params.isRent ? "1" : '');
 
@@ -100,6 +101,7 @@ export function useBranchService(controller: string) {
       formData.append('email', params?.email || '');
       formData.append('socialMedias', params.socialMedias || '');
       formData.append('openingDate', params.openingDate || '');
+      formData.append('leaseAgreementDate', params.leaseAgreementDate || '');
       formData.append('rentalPrice', params.rentalPrice?.toString() || '0');
       formData.append('branchSancaktars', params.branchSancaktars || '');
       formData.append('isRent', params.isRent ? "1" : '');
