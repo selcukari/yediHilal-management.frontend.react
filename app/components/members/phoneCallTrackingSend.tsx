@@ -1,21 +1,8 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { 
-  Modal, 
-  Select, 
-  Button, 
-  Stack, 
-  Flex, 
-  Group, 
-  Badge, 
-  Textarea,
-  Table,
-  Checkbox,
-  ScrollArea,
-  Text
+import {  Modal,  Select,  Button,  Stack,  Flex,  Group,  Badge,  Table, Checkbox, ScrollArea, Text
 } from '@mantine/core';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
-import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useMemberService } from '../../services/memberService';
 import { usePhoneCallTrackingService } from '../../services/phoneCallTrackingService';
@@ -34,11 +21,9 @@ interface MemberAddProps {
 
 type FormValues = {
   fullName: string;
-  identificationNumber: string;
   email: string;
   countryCode: string;
   phone: string;
-  dateOfBirth: string;
   referenceId: string;
   isActive: boolean;
   isSms: boolean;
@@ -65,10 +50,8 @@ const PhoneCallTrackingSend = forwardRef<PhoneCallTrackingSendDialogControllerRe
     { field: 'email', header: 'Mail' },
     { field: 'isSms', header: 'Sms' },
     { field: 'isMail', header: 'Mail' },
-    { field: 'identificationNumber', header: 'Kimlik' },
     { field: 'referenceFullName', header: 'Referans İsmi' },
     { field: 'referencePhone', header: 'Referans Telefon' },
-    { field: 'dateOfBirth', header: 'Doğum Yılı' },
     { field: 'countryName', header: 'Ülke' },
     { field: 'provinceName', header: 'İl' },
     { field: 'createdDate', header: 'İlk Kayıt' },
@@ -79,17 +62,16 @@ const PhoneCallTrackingSend = forwardRef<PhoneCallTrackingSendDialogControllerRe
 
   const handleSubmit = async (valuesIds: number[]) => {
     // Submit logic here
+    if (selectedRows.length === 0 || !phoneCallId) {
+      toast.info('Lütfen en az bir üye seçiniz veya arama takip');
+      return;
+    }
 
-      if (selectedRows.length === 0 || !phoneCallId) {
-        toast.info('Lütfen en az bir üye seçiniz veya arama takip');
-        return;
-      }
-
-      const selectedMemberData = resultData?.filter(i => valuesIds.includes(i.id))?.map(x => ({ ...x, phoneCallStatudescription: ""}));
-      const result = await servicePhoneCall.updatePhoneCallTracking({
-        id: parseInt(phoneCallId),
-        members: JSON.stringify(selectedMemberData ?? []),
-      });
+    const selectedMemberData = resultData?.filter(i => valuesIds.includes(i.id))?.map(x => ({ ...x, phoneCallStatudescription: ""}));
+    const result = await servicePhoneCall.updatePhoneCallTracking({
+      id: parseInt(phoneCallId),
+      members: JSON.stringify(selectedMemberData ?? []),
+    });
 
     if (result === true) {
 
