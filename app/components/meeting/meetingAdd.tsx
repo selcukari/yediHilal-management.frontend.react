@@ -1,6 +1,6 @@
 import { forwardRef, useImperativeHandle, useEffect, useState, useRef, useMemo } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, TextInput, Button, Stack, Text, Grid, Textarea } from '@mantine/core';
+import { Modal, TextInput, Button, Stack, Text, Grid, Textarea, Group, Stepper, Box } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DateTimePicker } from '@mantine/dates';
 import { IconCancel, IconCheck, IconCalendar } from '@tabler/icons-react';
@@ -8,7 +8,6 @@ import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { ProvinceSelect } from '../addOrEdit/provinceSelect';
 import { MeetingTypeSelect } from '../addOrEdit/meetingTypeSelect';
-import { ResponsibleUserSelect } from '../addOrEdit/responsibleUserSelect';
 import { useMeetingService } from '../../services/meetingService';
 import { toast } from '../../utils/toastMessages'; 
 import { RichTextEditorTiptap } from '../richTextEditorTiptap';
@@ -22,7 +21,7 @@ export type MeetingAddDialogControllerRef = {
 };
 
 interface UserAddProps {
-  onSaveSuccess?: () => void; // Yeni prop
+  onSaveSuccess?: () => void;
 }
 
 type FormValues = {
@@ -40,6 +39,7 @@ type FormValues = {
 };
 
 const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
+  const [activeStepper, setActiveStepper] = useState(0);
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -60,34 +60,110 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
       participantCount: 5,
       notes: '',
       files: [],
-      time: '',},
+      time: '',
+    },
     validate: {
       name: (value) => (value.trim().length < 5 ? 'Toplantı başlık en az 5 karakter olmalı' : null),
       responsibleFullName: (value) => (value ? null : 'Sorumlu kişi alanı zorunlu'),
-      agendas: (value) => (value.trim().length < 10 ? 'Gündemler alanı boş olmaz' : null),
+      agendas: (value) => (value.trim().length < 10 ? 'Gündemler alanı en az 10 karakter olmalı' : null),
       time: (value) => (value ? null : 'Toplantı zamanı alanı zorunlu'),
+      meetingTypeId: (value) => (value ? null : 'Toplantı türü seçmek zorunlu'),
+      provinceId: (value) => (value ? null : 'İl seçmek zorunlu'),
     },
   });
 
   useEffect(() => {
     if (form.isDirty()) {
       setIsDisabledSubmit(false);
-
       return;
     }
-
     setIsDisabledSubmit(true);
   }, [form.values]);
 
   const isUserAdmin = useMemo(() => {
     const result = currentUser?.userType === 'userLogin';
-  
     return result;
   }, [currentUser]);
 
+  // Step validation fonksiyonları
+  const validateStep1 = () => {
+    const fieldsToValidate = ['name', 'responsibleFullName', 'meetingTypeId', 'provinceId'];
+    let isValid = true;
+
+    fieldsToValidate.forEach(field => {
+      const validateFunc = form.validateField(field);
+      if (validateFunc.hasError) {
+        isValid = false;
+      }
+    });
+
+    return isValid;
+  };
+
+  const validateStep2 = () => {
+    const fieldsToValidate = ['agendas', 'time', 'duration'];
+    let isValid = true;
+
+    fieldsToValidate.forEach(field => {
+      const validateFunc = form.validateField(field);
+      if (validateFunc.hasError) {
+        isValid = false;
+      }
+    });
+
+    return isValid;
+  };
+
+  const validateStep3 = () => {
+    const fieldsToValidate = ['notes'];
+    let isValid = true;
+
+    fieldsToValidate.forEach(field => {
+      const validateFunc = form.validateField(field);
+      if (validateFunc.hasError) {
+        isValid = false;
+      }
+    });
+
+    return isValid;
+  };
+
+  const nextStep = () => {
+    let isValid = true;
+
+    // Aktif step'e göre validation yap
+    switch (activeStepper) {
+      case 0:
+        isValid = validateStep1();
+        break;
+      case 1:
+        isValid = validateStep2();
+        break;
+      case 2:
+        isValid = validateStep3();
+        break;
+      default:
+        isValid = true;
+    }
+
+    if (isValid) {
+      setActiveStepper((current) => (current < 2 ? current + 1 : current));
+    } else {
+      // Validation hatalarını göster
+      toast.warning('Lütfen tüm zorunlu alanları doğru şekilde doldurun.');
+    }
+  };
+
+  const prevStep = () => setActiveStepper((current) => (current > 0 ? current - 1 : current));
+
   const handleSubmit = async (values: FormValues) => {
+    // Son step için validation kontrolü
+    if (!validateStep3()) {
+      toast.warning('Lütfen alınan kararlar alanını doldurun.');
+      return;
+    }
+
     setIsDisabledSubmit(true);
-    // Dosya form değerlerinden al
     const files = form.values.files || [];
 
     const result = await service.addMeeting({
@@ -100,24 +176,21 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
     });
 
     if (result === true) {
-
       toast.success('İşlem başarılı!');
       
-      // onSaveSuccess event'ini tetikle
       if (onSaveSuccess) {
         onSaveSuccess();
       }
       
       close();
       form.reset();
+      setActiveStepper(0);
       setIsDisabledSubmit(false);
 
       return;
     }
     if (result?.data === false && result?.errors?.length > 0) {
-
       toast.warning(result.errors[0]);
-
     } else {
       toast.error('Bir hata oluştu!');
     }
@@ -128,6 +201,7 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
     confirmModalRef.current?.close();
     close();
     form.reset();
+    setActiveStepper(0);
   };
 
   const confirmDialogHandleCancel = () => {
@@ -136,18 +210,16 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
 
   const dialogClose = () => {
      if (!isEquals(form.getInitialValues(), form.getValues())) {
-
       confirmModalRef.current?.open();
     } else {
-      // Eğer form boşsa direkt kapat
       close();
       form.reset();
+      setActiveStepper(0);
     }
   }
 
   const openDialog = () => {
     open();
-
     if (!isUserAdmin) {
       form.setFieldValue('responsibleFullName', currentUser?.fullName as string);
     }
@@ -160,122 +232,184 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
 
   const errorTime = form.errors.time;
 
-  return (<>
-    <Modal
-      opened={opened}
-      onClose={() => {
-        dialogClose();
-      }}
-      title="Yeni Toplantı Ekle"
-      centered
-      size="700"
-      overlayProps={{
-        backgroundOpacity: 0.55,
-        blur: 3,
-      }}
-    >
-      <form onSubmit={form.onSubmit(handleSubmit)}>
-        <Stack gap="md">
-          <Grid>
-            <Grid.Col span={6}>
-              <TextInput
-                label="Toplantı Başlığı"
-                placeholder="başlık giriniz"
-                required
-                {...form.getInputProps('name')}
-              />
-            </Grid.Col>
-            <Grid.Col span={6}>
-              <MeetingTypeSelect
-                required={true}
-                form={form} 
-              />
-            </Grid.Col>
-            <Grid.Col span={6}>
-              <TextInput
-                label="Sorumlu"
-                placeholder="sorumlu giriniz"
-                required
-                {...form.getInputProps('responsibleFullName')}
-              />
-            </Grid.Col>
-            <Grid.Col span={6}>
-              <ProvinceSelect 
-                form={form}
-                required={true}
-                label="İl" 
-                placeholder="İl Seçiniz"  valueId={isUserAdmin ? null : currentUser?.provinceId?.toString()}
-                countryId={"1"} disabled={!isUserAdmin}
-              />
-            </Grid.Col>
-          <Grid.Col span={6}>
-            <TextInput
-              label="Katılımcı Sayısı"
-              placeholder="sayı giriniz"
-              type='number'
-              {...form.getInputProps('participantCount')}
-            />
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <Textarea
-              mt="md"
-              label="Gündemler giriniz"
-              placeholder="gündemler..."
-              withAsterisk minRows={5}
-              {...form.getInputProps('agendas')}
-            />
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <DateTimePicker dropdownType="modal" label="Toplantı Tarihi" placeholder="toplantı tarihi" required
-              error={errorTime} locale="tr" renderDay={DayRenderer}
-              clearable leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
-              minDate={new Date()}
-              onChange={(value) => form.setFieldValue('time', value)}
-            />
-          </Grid.Col>
-          <Grid.Col span={6}>
-           <Textarea
-             mt="md"
-             label="Adres giriniz"
-             placeholder="adres..."
-             withAsterisk
-             {...form.getInputProps('address')}
-           />
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <FileUpload
-              form={form}
-              required={false}
-            />
-          </Grid.Col>
-          <Grid.Col span={10}>
-            <Text>Alınan Kararlar <span style={{ color: 'red' }}>*</span></Text>
-            <RichTextEditorTiptap
-              form={form}
-              required={true}
-              emitVaue={"notes"}
-              {...form.getInputProps('notes')}
-            />
-          </Grid.Col>
-          <Grid.Col span={6} offset={4}>
-            <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
-              İptal
-            </Button>
-            <Button type="submit" variant="filled" size="xs" disabled={isDisabledSubmit}  leftSection={<IconCheck size={14} />} radius="xs">
-              Kaydet
-            </Button>
-          </Grid.Col>
-          </Grid>
-        </Stack>
-      </form>
-    </Modal>
-      {/* confirm Dialog */}
-    <ConfirmModal 
-      ref={confirmModalRef}
-      onConfirm={confirmDialogHandleConfirm}
-      onCancel={confirmDialogHandleCancel}
-    />
-  </>);
+  return (
+    <>
+      <Modal
+        opened={opened}
+        onClose={dialogClose}
+        title="Yeni Toplantı Ekle"
+        centered
+        size="700"
+        overlayProps={{
+          backgroundOpacity: 0.55,
+          blur: 3,
+        }}
+      >
+        <form>
+          <Stack gap="md">
+            <Stepper active={activeStepper}>
+              <Stepper.Step label="Temel Bilgiler" description="Toplantı temel bilgileri">
+                <Box mt="md">
+                  <Grid>
+                    <Grid.Col span={6}>
+                      <TextInput
+                        label="Toplantı Başlığı"
+                        placeholder="başlık giriniz"
+                        required
+                        withAsterisk
+                        {...form.getInputProps('name')}
+                      />
+                    </Grid.Col>
+                    <Grid.Col span={6}>
+                      <MeetingTypeSelect
+                        required={true}
+                        form={form} 
+                      />
+                    </Grid.Col>
+                    <Grid.Col span={6}>
+                      <TextInput
+                        label="Sorumlu"
+                        placeholder="sorumlu giriniz"
+                        required
+                        withAsterisk
+                        {...form.getInputProps('responsibleFullName')}
+                      />
+                    </Grid.Col>
+                    <Grid.Col span={6}>
+                      <ProvinceSelect 
+                        form={form}
+                        required={true}
+                        label="İl" 
+                        placeholder="İl Seçiniz"  
+                        valueId={isUserAdmin ? null : currentUser?.provinceId?.toString()}
+                        countryId={"1"} 
+                        disabled={!isUserAdmin}
+                      />
+                    </Grid.Col>
+                  </Grid>
+                </Box>
+              </Stepper.Step>
+
+              <Stepper.Step label="Detaylar" description="Toplantı detayları">
+                <Box mt="md">
+                  <Grid>
+                    <Grid.Col span={4}>
+                      <TextInput
+                        label="Katılımcı Sayısı"
+                        placeholder="sayı giriniz"
+                        type='number'
+                        {...form.getInputProps('participantCount')}
+                      />
+                    </Grid.Col>
+                    <Grid.Col span={4}>
+                      <TextInput
+                        label="Toplantı Süresi"
+                        placeholder="süre(saat)..."
+                        withAsterisk type='number'
+                        {...form.getInputProps('duration')}
+                      />
+                    </Grid.Col>
+                    <Grid.Col span={4}>
+                      <DateTimePicker 
+                        dropdownType="modal" 
+                        label="Toplantı Tarihi" 
+                        placeholder="toplantı tarihi" 
+                        required
+                        withAsterisk
+                        error={errorTime} 
+                        locale="tr" 
+                        renderDay={DayRenderer}
+                        clearable 
+                        leftSection={<IconCalendar size={18} stroke={1.5} />} 
+                        leftSectionPointerEvents="none"
+                        minDate={new Date()}
+                        {...form.getInputProps('time')}
+                      />
+                    </Grid.Col>
+                    <Grid.Col span={12}>
+                      <Textarea
+                        label="Gündemler giriniz"
+                        placeholder="gündemler..."
+                        required
+                        withAsterisk 
+                        minRows={5}
+                        {...form.getInputProps('agendas')}
+                      />
+                    </Grid.Col>
+                    <Grid.Col span={12}>
+                      <Textarea
+                        label="Adres giriniz"
+                        placeholder="adres..."
+                        minRows={3}
+                        {...form.getInputProps('address')}
+                      />
+                    </Grid.Col>
+                    <Grid.Col span={12}>
+                      <FileUpload
+                        form={form}
+                        required={false}
+                      />
+                    </Grid.Col>
+                  </Grid>
+                </Box>
+              </Stepper.Step>
+
+              <Stepper.Step label="Kararlar" description="Alınan kararlar">
+                <Box mt="md">
+                  <Grid>
+                    <Grid.Col span={12}>
+                      <Text fw={500} mb="xs">
+                        Alınan Kararlar <span style={{ color: 'red' }}>*</span>
+                      </Text>
+                      <RichTextEditorTiptap
+                        form={form}
+                        required={true}
+                        emitVaue={"notes"}
+                        {...form.getInputProps('notes')}
+                      />
+                      {form.errors.notes && (
+                        <Text size="sm" color="red" mt="xs">
+                          {form.errors.notes}
+                        </Text>
+                      )}
+                    </Grid.Col>
+                  </Grid>
+                </Box>
+              </Stepper.Step>
+            </Stepper>
+
+            {/* Footer Butonları */}
+            <Group justify="flex-end" mt="xl">
+              <Button 
+                variant="outline" 
+                onClick={prevStep} 
+                disabled={activeStepper === 0}
+                leftSection={<IconCancel size={14} />}
+                color="red"
+              >
+                Geri
+              </Button>
+              <Button 
+                variant="filled"
+                onClick={activeStepper === 2 ? () => handleSubmit(form.values) : nextStep}
+                leftSection={activeStepper === 2 ? <IconCheck size={14} /> : null}
+                disabled={isDisabledSubmit && activeStepper === 2}
+                loading={isDisabledSubmit}
+              >
+                {activeStepper === 2 ? "Kaydet" : "İlerle"}
+              </Button>
+            </Group>
+          </Stack>
+        </form>
+      </Modal>
+
+      <ConfirmModal 
+        ref={confirmModalRef}
+        onConfirm={confirmDialogHandleConfirm}
+        onCancel={confirmDialogHandleCancel}
+      />
+    </>
+  );
 });
 
 export default MeetingAdd;
