@@ -193,7 +193,7 @@ export default function Project() {
           <ActionIcon 
             variant="light" 
             color="red"
-            disabled={(currentUser?.id.toString()) as string == element.responsibleId.toString() ? (element.finisDate ? true : false) : true}
+            disabled={isUserAdmin ? ((currentUser?.id.toString()) as string == element.responsibleId.toString() ? (element.finisDate ? true : false) : true) : true}
             onClick={() => handleDelete(element.id)}
           >
             <IconTrash size={16} />

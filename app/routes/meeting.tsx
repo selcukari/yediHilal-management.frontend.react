@@ -211,7 +211,7 @@ export default function Meeting() {
           <ActionIcon 
             variant="light" 
             color="red"
-            disabled={isUserAdmin && (differenceInDays(element.time ?? new Date(), new Date())<0 ? true : false)}
+            disabled={isUserAdmin ? ((differenceInDays(element.time ?? new Date(), new Date())<0 ? true : false)) : true}
             onClick={() => handleDelete(element.id)}
           >
             <IconTrash size={16} />
