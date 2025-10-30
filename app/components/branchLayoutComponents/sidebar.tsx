@@ -32,6 +32,12 @@ const menuItems: MenuItem[] = [
     link: '/projects',
   },
   {
+    icon: IconCalendarTime,
+    label: 'Toplantı Yönetimi',
+    key: 'meeting',
+    link: '/meetings',
+  },
+  {
     icon: IconBuildings,
     label: 'Temsilcilik Yönetimi',
     key: 'branch',

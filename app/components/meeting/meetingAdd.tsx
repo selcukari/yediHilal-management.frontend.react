@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useEffect, useState, useRef } from 'react';
+import { forwardRef, useImperativeHandle, useEffect, useState, useRef, useMemo } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { Modal, TextInput, Button, Stack, Text, Grid, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
@@ -14,9 +14,10 @@ import { toast } from '../../utils/toastMessages';
 import { RichTextEditorTiptap } from '../richTextEditorTiptap';
 import { FileUpload } from '../fileInput';
 import { DayRenderer } from '../../components';
+import { useAuth } from '~/authContext';
 
 export type MeetingAddDialogControllerRef = {
-  open: () => void;
+  openDialog: () => void;
   close: () => void;
 };
 
@@ -43,6 +44,7 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
   const [opened, { open, close }] = useDisclosure(false);
 
   const service = useMeetingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+  const { currentUser } = useAuth();
 
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
@@ -76,6 +78,12 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
 
     setIsDisabledSubmit(true);
   }, [form.values]);
+
+  const isUserAdmin = useMemo(() => {
+    const result = currentUser?.userType === 'userLogin';
+  
+    return result;
+  }, [currentUser]);
 
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
@@ -137,8 +145,16 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
     }
   }
 
+  const openDialog = () => {
+    open();
+
+    if (!isUserAdmin) {
+      form.setFieldValue('responsibleFullName', currentUser?.fullName as string);
+    }
+  };
+
   useImperativeHandle(ref, () => ({
-    open,
+    openDialog,
     close,
   }));
 
@@ -188,8 +204,8 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
                 form={form}
                 required={true}
                 label="İl" 
-                placeholder="İl Seçiniz" 
-                countryId={"1"}
+                placeholder="İl Seçiniz"  valueId={isUserAdmin ? null : currentUser?.provinceId?.toString()}
+                countryId={"1"} disabled={!isUserAdmin}
               />
             </Grid.Col>
           <Grid.Col span={6}>

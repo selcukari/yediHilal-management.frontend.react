@@ -5,11 +5,10 @@ import {
 import {
   IconUsers, IconFileCheck,
   IconChevronRight, IconChevronDown,
-  IconSchool,
+  IconSchool, IconCalendarTime,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
 import { useAuth } from '~/authContext';
-import { toast } from '../../utils/toastMessages';
 
 interface SidebarProps {
   active: string;
@@ -31,6 +30,12 @@ const menuItems: MenuItem[] = [
     label: 'Proje Yönetimi',
     key: 'project',
     link: '/projects',
+  },
+  {
+    icon: IconCalendarTime,
+    label: 'Toplantı Yönetimi',
+    key: 'meeting',
+    link: '/meetings',
   },
   {
     icon: IconSchool,

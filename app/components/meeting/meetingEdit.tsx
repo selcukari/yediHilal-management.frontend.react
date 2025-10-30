@@ -1,6 +1,6 @@
-import { forwardRef, useImperativeHandle, useEffect, useState, useRef } from 'react';
+import { forwardRef, useImperativeHandle, useEffect, useState, useRef, useMemo } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { clone } from 'ramda';
+import { clone, is } from 'ramda';
 import { Modal, TextInput, Button, Text, Stack, Grid, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DateTimePicker } from '@mantine/dates';
@@ -14,6 +14,7 @@ import { RichTextEditorTiptap } from '../richTextEditorTiptap';
 import { useMeetingService } from '../../services/meetingService';
 import { FileUpload } from '../fileInput';
 import { DayRenderer } from '../../components';
+import { useAuth } from '~/authContext';
 
 export type MeetingEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -44,6 +45,7 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
   const [opened, { open, close }] = useDisclosure(false);
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const service = useMeetingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+  const { currentUser } = useAuth();
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
@@ -75,6 +77,10 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
     }
     setIsDisabledSubmit(true);
   }, [form.values]);
+
+  const isUserAdmin = useMemo(() => {
+     return currentUser?.userType === 'userLogin';
+    }, [currentUser]);
 
   const openDialog = (value: FormValues) => {
 
@@ -206,7 +212,7 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
                 required={true}
                 label="İl" 
                 placeholder="İl Seçiniz" 
-                countryId={"1"}
+                countryId={"1"} disabled={!isUserAdmin}
               />
             </Grid.Col>
            <Grid.Col span={6}>

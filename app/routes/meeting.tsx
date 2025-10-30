@@ -18,6 +18,8 @@ import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToEx
 import { type PdfTableColumn } from '../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../utils/repor/calculateColumnWidth';
 import { stripHtml } from '../utils/stripHtml';
+import { useAuth } from '~/authContext';
+
 interface MeetingData {
   id: number;
   name: string;
@@ -48,6 +50,7 @@ export default function Meeting() {
   const [searchText, setSearchText] = useState('');
   const [filterProvinceIds, setFilterProvinceIds] = useState<string[] | null>(null);
   const [selectedCountry, setSelectedCountry] = useState<string>("1");
+  const { currentUser } = useAuth();
 
   const meetingAddRef = useRef<MeetingAddDialogControllerRef>(null);
   const meetingEditRef = useRef<MeetingEditDialogControllerRef>(null);
@@ -73,6 +76,15 @@ export default function Meeting() {
       fetchProject();
     }, 1000);
   }, []);
+
+   const isUserAdmin = useMemo(() => {
+    const result = currentUser?.userType === 'userLogin';
+    if (!result) {
+      setFilterProvinceIds(currentUser?.provinceId ? [currentUser.provinceId.toString()] : null);
+    }
+
+    return result;
+  }, [currentUser]);
 
   const fetchProject = async () => {
     open();
@@ -199,7 +211,7 @@ export default function Meeting() {
           <ActionIcon 
             variant="light" 
             color="red"
-            disabled={(differenceInDays(element.time ?? new Date(), new Date())<0 ? true : false)}
+            disabled={isUserAdmin && (differenceInDays(element.time ?? new Date(), new Date())<0 ? true : false)}
             onClick={() => handleDelete(element.id)}
           >
             <IconTrash size={16} />
@@ -282,11 +294,11 @@ export default function Meeting() {
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
-            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />}  onClick={() => meetingAddRef.current?.open()}>Yeni Ekle</Button>
+            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />}  onClick={() => meetingAddRef.current?.openDialog()}>Yeni Ekle</Button>
             {/* Mobile için sadece icon buton */}
             <Button 
               variant="filled" 
-              onClick={() => meetingAddRef.current?.open()}
+              onClick={() => meetingAddRef.current?.openDialog()}
               hiddenFrom="xs"
               p="xs"
             >
@@ -313,7 +325,9 @@ export default function Meeting() {
                   />
                 </Grid.Col>
                 <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
-                  <Province onProvinceChange={onProvinceChange} countryId={selectedCountry}/>
+                  <Province onProvinceChange={onProvinceChange}
+                    countryId={selectedCountry} isDisabled={!isUserAdmin}
+                    valueId={!isUserAdmin ? currentUser?.provinceId.toString() : null}/>
                 </Grid.Col>
                 <Grid.Col span={{ base: 12, sm: 6, md: 2}}>
                   <Flex
