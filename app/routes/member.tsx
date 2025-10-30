@@ -37,6 +37,8 @@ interface Column {
 }
 
 export default function Member() {
+  const { isLoggedIn, currentUser } = useAuth();
+
   const [resultData, setResultData] = useState<any[]>([]);
   const [isDisabledDeleteAction, setDisabledDeleteAction]= useState(false);
   const [selectedCountry, setSelectedCountry] = useState<string | null | undefined>(null);
@@ -45,6 +47,7 @@ export default function Member() {
   const [selectedCountryName, setSelectedCountryName] = useState<string>('Türkiye'); // Yeni state
   const [selectedMemberTypeName, setSelectedMemberTypeName] = useState<string[]>([]);
   const [selectedProvinceNames, setSelectedProvinceNames] = useState<string[]>([]); // Yeni state
+  const [dutyMemberTypeId, setDutyMemberTypeId] = useState<string>('10');
   const [visible, { open, close }] = useDisclosure(false);
   
   const [rowHeaders, setRowHeaders] = useState([
@@ -72,9 +75,22 @@ export default function Member() {
   const phoneCallTrackingRef = useRef<PhoneCallTrackingSendDialogControllerRef>(null);
   const confirmModalMessageRef = useRef<ConfirmModalMessageRef>(null);
 
-  const { isLoggedIn } = useAuth();
-
   const service = useMemberService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
+
+  const isUserAdmin = useMemo(() => {
+    const result = currentUser?.userType === 'userLogin';
+
+    if (!result) {
+      setFilterModel((prev) => ({
+        ...prev,
+        typeIds: [dutyMemberTypeId],
+        countryId: currentUser?.countryId?.toString() || null,
+        provinceIds: currentUser?.provinceId ? [currentUser.provinceId.toString()] : null,
+      }));
+    }
+
+    return result;
+  }, [currentUser]);
 
   const renderBoolean = (value: boolean) => {
     return (
@@ -334,13 +350,15 @@ export default function Member() {
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
-            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />} onClick={() => memberAddRef.current?.open()}>Yeni Ekle</Button>
+            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />}
+              onClick={() => memberAddRef.current?.open()} disabled={!isUserAdmin}
+            >Yeni Ekle</Button>
             {/* Mobile için sadece icon buton */}
             <Button 
               variant="filled" 
               onClick={() => memberAddRef.current?.open()}
               hiddenFrom="xs"
-              p="xs"
+              p="xs" disabled={!isUserAdmin}
             >
               <IconPlus size={18} />
             </Button>
@@ -357,11 +375,13 @@ export default function Member() {
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
                 <Grid.Col span={{ base: 12, sm: 6, md: 3}}>
-                  <Country onCountryChange={onCountrySelected}/>
+                  <Country onCountryChange={onCountrySelected} isDisabled={!isUserAdmin}
+                    valueId={currentUser?.countryId?.toString() as string}/>
                 </Grid.Col>
 
                 <Grid.Col span={{ base: 12, sm: 6, md: 3}}>
-                  <Province onProvinceChange={onProvinceChange} countryId={selectedCountry}/>
+                  <Province onProvinceChange={onProvinceChange} countryId={selectedCountry} isDisabled={!isUserAdmin}
+                    valueId={isUserAdmin ? undefined : currentUser?.provinceId?.toString() as string}/>
                 </Grid.Col>
                 <Grid.Col span={{ base: 12, sm: 6, md: 3}}>
                   <ProgramType
@@ -392,7 +412,8 @@ export default function Member() {
                 </Grid.Col>
                 <Grid.Col span={{ base: 12, sm: 6, md: 3}}>
                   <MemberType
-                    onMemberTypeChange={onMemberTypeChange}
+                    onMemberTypeChange={onMemberTypeChange} isDisabled={!isUserAdmin}
+                    valueId={isUserAdmin ? undefined : [dutyMemberTypeId]}
                   ></MemberType>
                 </Grid.Col>
 

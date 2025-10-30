@@ -10,6 +10,7 @@ interface ProvinceSelectProps {
   required?: boolean;
   countryId?: string;
   disabled?: boolean;
+  valueId?: string | null;
 }
 
 export function ProvinceSelect({ 
@@ -17,17 +18,23 @@ export function ProvinceSelect({
   label = "İl", 
   placeholder = "İl Seçiniz", 
   required = false,
-  countryId,
+  countryId, valueId,
   disabled = false
 }: ProvinceSelectProps) {
 
   const [provinces, setProvinces] = useState<{ value: string; label: string }[]>([]);
-  
+
   const service = useProvinceService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
   
   useEffect(() => {
     fetchProvinceData(countryId);
   }, [countryId]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      form.setFieldValue('provinceId', valueId ?? form.values.provinceId);
+    }, 400);
+  }, []);
 
   const fetchProvinceData = async (countryId?: string) => {
     try {

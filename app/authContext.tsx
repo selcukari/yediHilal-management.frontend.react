@@ -49,7 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
     setLoading(false);
-  }, []);
+  }, [currentUser, location.pathname]);
 
   const login = async (email: string, password: string, loginType: string, dutyId?: string): Promise<boolean> => {
     setLoading(true);

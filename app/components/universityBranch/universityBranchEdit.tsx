@@ -1,9 +1,9 @@
-import { forwardRef, useImperativeHandle, useState, useRef, useEffect } from 'react';
+import { forwardRef, useImperativeHandle, useState, useRef, useEffect, useMemo } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { last, clone, omit } from 'ramda';
-import { Modal, TextInput, Button, Stack,ActionIcon, Group, Textarea, Title, Table, Paper, Grid, Flex, Switch, Select } from '@mantine/core';
+import { Modal, TextInput, Button, Stack,ActionIcon, Group, Textarea, Title, Table, Paper, Grid, Flex, Select } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { IconCancel, IconCheck, IconCalendar, IconTrash, IconPlus } from '@tabler/icons-react';
+import { IconCancel, IconCheck, IconTrash, IconPlus } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import { ProvinceSelect } from '../addOrEdit/provinceSelect';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
@@ -14,6 +14,7 @@ import { FileUpload } from '../fileInput';
 import SancaktarAdd, { type SancaktarAddDialogControllerRef } from './sancaktarAdd';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import { formatDate } from '../../utils/formatDate';
+import { useAuth } from '~/authContext';
 
 export type UniversityBranchEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -64,6 +65,7 @@ const BranchEdit = forwardRef<UniversityBranchEditDialogControllerRef, Universit
   const [branchHeadUserData, setBranchHeadUserData] = useState<GetUserData[]>([]);
   const [sancaktarUserData, setSancaktarUserData] = useState<SancaktarDataGorevatama[]>([]);
   const [universityBranchHeadDutyId, setUniversityBranchHeadDutyIdDutyId] = useState<string>("20");
+  const { currentUser } = useAuth();
   
   const service = useUniversityBranchService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
@@ -87,6 +89,10 @@ const BranchEdit = forwardRef<UniversityBranchEditDialogControllerRef, Universit
       universityName: (value) => (value.trim().length < 5 ? 'Temsilcilik Adı en az 5 karakter olmalı' : null),
     },
   });
+
+  const isUserAdmin = useMemo(() => {
+    return currentUser?.userType === 'userLogin';
+  }, [currentUser]);
 
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
@@ -298,7 +304,7 @@ const BranchEdit = forwardRef<UniversityBranchEditDialogControllerRef, Universit
               <Select
                 label="Üniversite Başkanı" placeholder="Üniversite başkan Seçiniz" data={branchHeadUserData.map(item => ({ value: item.id, label: item.fullName }))}
                 searchable clearable maxDropdownHeight={200} value={form.values.branchHeadId}
-                nothingFoundMessage="Üniversite başkan alan bulunamadı..." required
+                nothingFoundMessage="Üniversite başkan alan bulunamadı..." required disabled={!isUserAdmin}
                 onChange={(value) => form.setFieldValue('branchHeadId', value)}
               />
             </Grid.Col>

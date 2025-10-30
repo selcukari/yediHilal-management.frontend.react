@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState, useRef, useEffect } from 'react';
+import { forwardRef, useImperativeHandle, useState, useRef, useEffect, useMemo } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { last, clone, omit } from 'ramda';
 import { DateInput } from '@mantine/dates';
@@ -17,6 +17,7 @@ import { DayRenderer } from '../../components';
 import SancaktarAdd, { type SancaktarAddDialogControllerRef } from './sancaktarAdd';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import { formatDate } from '../../utils/formatDate';
+import { useAuth } from '~/authContext';
 
 export type BranchEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -73,6 +74,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
   const [branchHeadUserData, setBranchHeadUserData] = useState<GetUserData[]>([]);
   const [sancaktarUserData, setSancaktarUserData] = useState<SancaktarDataGorevatama[]>([]);
   const [branchHeadDutyId, setBranchHeadDutyIdDutyId] = useState<string>("19");
+  const { currentUser } = useAuth();
   
   const service = useBranchService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
@@ -112,6 +114,10 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
       },
     },
   });
+
+  const isUserAdmin = useMemo(() => {
+    return currentUser?.userType === 'userLogin';
+  }, [currentUser]);
 
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
@@ -326,7 +332,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
               <Select
                 label="Temsilcilik Başkanı" placeholder="Temsilcilik başkan Seçiniz" data={branchHeadUserData.map(item => ({ value: item.id, label: item.fullName }))}
                 searchable clearable maxDropdownHeight={200} value={form.values.branchHeadId}
-                nothingFoundMessage="Temsilcilik başkan alan bulunamadı..." required
+                nothingFoundMessage="Temsilcilik başkan alan bulunamadı..." required disabled={!isUserAdmin}
                 onChange={(value) => form.setFieldValue('branchHeadId', value)}
               />
             </Grid.Col>
@@ -350,6 +356,14 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
               withAsterisk minRows={5}
               value={form.values.socialMedias}
               {...form.getInputProps('socialMedias')}
+            />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <Textarea
+              mt="md" label="Adres" placeholder="adres..."
+              withAsterisk minRows={5}
+              value={form.values.socialMedias}
+              {...form.getInputProps('address')}
             />
           </Grid.Col>
           <Grid.Col span={4}>

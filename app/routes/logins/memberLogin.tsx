@@ -31,8 +31,7 @@ export default function MemberLogin() {
         close()
 
         setTimeout(() => {
-          navigate("/");
-          window.location.reload(); // Sayfayı yenile ile gorunmeyen menuler gelmemesi icin
+          navigate("/member-for-memberUser");
         }, 300);
       } else {
         close()

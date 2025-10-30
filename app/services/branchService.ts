@@ -24,10 +24,14 @@ export function useBranchService(controller: string) {
   const { getCurrentToken, logout } = useAuth();
   const api = createApi(getCurrentToken() ?? undefined, logout);
 
-  const getBranches = async () => {
+  const getBranches = async (headId?: number) => {
 
     try {
-      const res = await api.get(`/${controller}/getBranches`);
+      const res = await api.get(`/${controller}/getBranches`, {
+        params: {
+          headId: headId || null,
+        }
+      });
 
       return res.data.data;
     } catch (error: any) {

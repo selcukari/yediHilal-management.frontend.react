@@ -250,6 +250,14 @@ const BranchAdd = forwardRef<BranchAddDialogControllerRef, UserAddProps>(({onSav
               {...form.getInputProps('socialMedias')}
             />
           </Grid.Col>
+          <Grid.Col span={6}>
+            <Textarea
+              mt="md" label="Adres" placeholder="adres..."
+              withAsterisk minRows={5}
+              value={form.values.socialMedias}
+              {...form.getInputProps('address')}
+            />
+          </Grid.Col>
           <Grid.Col span={4}>
            <DateInput
              label="Açılış Tarihi" placeholder="açılış tarihi" clearable locale="tr" renderDay={DayRenderer}

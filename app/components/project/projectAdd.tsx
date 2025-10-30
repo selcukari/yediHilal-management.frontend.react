@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState, useRef } from 'react';
+import { forwardRef, useImperativeHandle, useState, useRef, useMemo, useEffect } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { Modal, TextInput, Button, Stack, Grid, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
@@ -14,9 +14,10 @@ import { toast } from '../../utils/toastMessages';
 import { RichTextEditorTiptap } from '../richTextEditorTiptap';
 import { FileUpload } from '../fileInput';
 import { DayRenderer } from '../../components';
+import { useAuth } from '~/authContext';
 
 export type ProjectAddDialogControllerRef = {
-  open: () => void;
+  openDialog: () => void;
   close: () => void;
 };
 
@@ -43,6 +44,7 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
   const service = useProjectService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const confirmModalRef = useRef<ConfirmModalRef>(null);
+  const { currentUser } = useAuth();
 
   const form = useForm<FormValues>({
     initialValues: {
@@ -62,6 +64,10 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
       priority: (value) => (value ? null : 'Öncelik alanı zorunlu'),
     },
   });
+
+  const isUserAdmin = useMemo(() => {
+    return currentUser?.userType === 'userLogin';
+  }, [currentUser]);
 
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
@@ -132,8 +138,15 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
     }
   }
 
+  const openDialog = () => {
+    open();
+    if (!isUserAdmin) {
+      form.setFieldValue('responsibleId', currentUser?.id?.toString() || '');
+    }
+  }
+
   useImperativeHandle(ref, () => ({
-    open,
+    openDialog,
     close,
   }));
 
@@ -182,7 +195,7 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
           <Grid.Col span={6}>
             <ResponsibleUserSelect
               required={true}
-              form={form}
+              form={form} isDisabled={!isUserAdmin}
             />
           </Grid.Col>
           <Grid.Col span={6}>

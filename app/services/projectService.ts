@@ -19,10 +19,14 @@ export function useProjectService(controller: string) {
   const { getCurrentToken, logout } = useAuth();
   const api = createApi(getCurrentToken() ?? undefined, logout);
 
-  const getProjects = async () => {
+  const getProjects = async (responsibleId?: number) => {
 
     try {
-      const res = await api.get(`/${controller}/getProjects`);
+      const res = await api.get(`/${controller}/getProjects`, {
+        params: {
+          responsibleId: responsibleId || null,
+        }
+      });
 
       return res.data.data;
     } catch (error: any) {

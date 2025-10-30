@@ -30,8 +30,8 @@ export default function UserLogin() {
       if (response == true) {
         close()
         setTimeout(() => {
-          navigate("/");
-          window.location.reload(); // Sayfayı yenile ile gorunmeyen menuler gelmemesi icin
+          navigate("/", { replace: true });
+          // window.location.reload(); // Sayfayı yenile ile gorunmeyen menuler gelmemesi icin
         }, 300);
       } else {
         close()

@@ -5,9 +5,11 @@ import { useMemberTypeService } from '../../services/memberTypeService';
 
 interface MemberTypeProps {
   onMemberTypeChange: (vals: string[] | null, names?: string[] | null) => void;
+  isDisabled?: boolean;
+  valueId?: string[] | null;
 }
 
-export function MemberType({ onMemberTypeChange }: MemberTypeProps) {
+export function MemberType({ onMemberTypeChange, isDisabled = false, valueId }: MemberTypeProps) {
   const [memberType, setMemberType] = useState<string[] | undefined>(undefined);
   const [memberTypes, setMemberTypes] = useState<{ value: string; label: string }[]>([]);
   
@@ -15,6 +17,7 @@ export function MemberType({ onMemberTypeChange }: MemberTypeProps) {
 
   useEffect(() => {
     fetchRoleData();
+    setMemberType(valueId ? valueId : undefined);
   }, []);
 
   const fetchRoleData = async () => {
@@ -52,6 +55,7 @@ export function MemberType({ onMemberTypeChange }: MemberTypeProps) {
       placeholder="Üye Tipi Seçiniz"
       data={memberTypes}
       value={memberType}
+      disabled={isDisabled}
       searchable
       clearable
       maxDropdownHeight={200}

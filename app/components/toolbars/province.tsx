@@ -7,11 +7,12 @@ interface ProvinceProps {
   isRequired?: boolean;
   isDisabled?: boolean;
   countryId?: string | null;
+  valueId?: string | null;
   onProvinceChange: (vals: string[], names?: string[]) => void;
 }
 
 export function Province({ 
- isRequired = false, countryId, isDisabled = false, onProvinceChange,
+ isRequired = false, countryId, isDisabled = false, onProvinceChange, valueId,
 }: ProvinceProps) {
   const [provinces, setProvinces] = useState<{ value: string; label: string }[]>([]);
   const [province, setProvince] = useState<string[] | undefined>(undefined);
@@ -21,7 +22,7 @@ export function Province({
   
   useEffect(() => {
     fetchProvinceData(countryId);
-    setProvince([]);
+    setProvince(valueId ? [valueId] : undefined);
   }, [countryId]);
 
   const fetchProvinceData = async (countryId?: string | null) => {

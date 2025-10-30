@@ -354,7 +354,7 @@ export default function Meeting() {
                     <Table.Th>Gündemler</Table.Th>
                     <Table.Th>Katılımcı Sayısı</Table.Th>
                     <Table.Th>Sorumlu</Table.Th>
-                    <Table.Th>Toplantı Türü</Table.Th>
+                    <Table.Th>Toplantı Birim</Table.Th>
                     <Table.Th>Alınan Kararlar</Table.Th>
                     <Table.Th>Toplantı Süresi(saat)</Table.Th>
                     <Table.Th>Toplantı Tarihi</Table.Th>

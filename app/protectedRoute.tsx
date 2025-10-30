@@ -17,26 +17,19 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
 
     if (!isLoggedIn) {
       // Sadece giriş yapmamış kullanıcıları login'e yönlendir
-      if(["/userLogin", "/memberLogin"].includes(location.pathname)) {
+      if(["/userLogin", "/memberLogin", "/branchLogin","/universityBranchLogin"].includes(location.pathname)) {
       navigate(location.pathname)
 
         return;
       }
-      navigate("loginSelection");
-
+      // Diğer tüm sayfalardan loginSelection'a yönlendir
+      navigate("/loginSelection", { replace: true });
       return;
     }
 
-    if (location.pathname === '/loginSelection') {
-      navigate("/")
+    return;
 
-      return;
-    }
-      navigate("/")
-
-      return;
-
-  }, [isLoggedIn]);
+  }, [isLoggedIn, location.pathname]);
 
   if (isLoggedIn) {
     return <>{children}</>;

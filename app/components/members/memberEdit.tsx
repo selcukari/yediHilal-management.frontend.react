@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState, useMemo, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { omit } from 'ramda';
 import { Modal, TextInput, Button, Stack, Grid, Text, Group, Switch, Textarea } from '@mantine/core';
@@ -12,6 +12,7 @@ import { ProvinceSelect } from '../addOrEdit/provinceSelect';
 import { useMemberService } from '../../services/memberService';
 import { toast } from '../../utils/toastMessages';
 import { MemberTypeSelect } from '../addOrEdit/memberTypeSelect';
+import { useAuth } from '~/authContext';
 
 export type MemberEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -49,6 +50,7 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
   const [isDisabledReference, setIsDisabledReference] = useState(false);
   const [isDisabledCountryCode, setIsDisabledCountryCode] = useState(false);
   const [isDisabledPhone, setIsDisabledPhone] = useState(false);
+  const { currentUser } = useAuth();
 
   const service = useMemberService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
   
@@ -124,7 +126,7 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
     if (value) {
       form.reset();
       // Önce initial values'ı set et
-      form.setValues((value));
+      form.setValues(value);
 
       form.setInitialValues((value));
       // Sonra form values'larını set et
@@ -148,7 +150,6 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
   }, [form.values.referenceId]);
 
   const handleSubmit = async (values: FormValues) => {
-    // Burada API çağrısı yapabilirsiniz
     const typeIdVoluntarily = "1";
     setIsDisabledSelect(true);
 
@@ -187,6 +188,10 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
     }
     setIsDisabledSelect(false);
   };
+
+  const isUserAdmin = useMemo(() => {
+    return currentUser?.userType === 'userLogin';
+  }, [currentUser]);
 
    // Ülke değiştiğinde ili sıfırla
   useEffect(() => {
@@ -262,14 +267,14 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
           <Grid.Col span={6}>
             <MemberTypeSelect
               form={form}
-              required={true}
+              required={true} disabled={!isUserAdmin}
               {...form.getInputProps('typeIds')}
             ></MemberTypeSelect>
           </Grid.Col>
 
           <Grid.Col span={6}>
             <CountrySelect
-              form={form}
+              form={form} disabled={!isUserAdmin}
             />
           </Grid.Col>
 
@@ -278,7 +283,7 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
               form={form} 
               label="İl" 
               placeholder="İl Seçiniz"
-              countryId={form.values.countryId}
+              countryId={form.values.countryId} disabled={!isUserAdmin}
             />
           </Grid.Col>
 

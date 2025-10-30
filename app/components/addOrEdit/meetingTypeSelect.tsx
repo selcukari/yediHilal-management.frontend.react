@@ -1,7 +1,7 @@
 import { Select } from '@mantine/core';
 import { useState, useEffect } from 'react';
 import type { UseFormReturnType } from '@mantine/form';
-import { useMeetingTypeService } from '../../services/meetingTypeService';
+import { useUserDutyService } from '../../services/userDutyService'; 
 
 interface MeetingTypeSelectProps {
   form: UseFormReturnType<any>;
@@ -12,7 +12,7 @@ interface MeetingTypeSelectProps {
 // gorevi
 export function MeetingTypeSelect({ form, required = false, isDisabled = false }: MeetingTypeSelectProps) {
   const [meetings, setMeetings] = useState<{ value: string; label: string }[]>([]);
-  const service =  useMeetingTypeService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+  const service =  useUserDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   
   useEffect(() => {
     fetchMeetingTypeData();
@@ -20,7 +20,7 @@ export function MeetingTypeSelect({ form, required = false, isDisabled = false }
 
   const fetchMeetingTypeData = async () => {
     try {
-      const response = await service.getMeetingTypes();
+      const response = await service.getUserDuties();
 
       if (response) {
         setMeetings(

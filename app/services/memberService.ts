@@ -81,7 +81,18 @@ export function useMemberService(controller: string) {
     }
   };
 
-  
+  const member = async (memberId: number) => {
+    try {
+      const res = await api.get(`/${controller}/getMember`,{
+        params: {memberId}
+      });
+
+      return res.data.data;
+    } catch (error: any) {
+      return error;
+    }
+  };
+
   const members = async (params: MemberParams) => {
     try {
       const newParams = {
@@ -117,5 +128,5 @@ export function useMemberService(controller: string) {
     }
   };
 
-  return { addMember, members, updateMember, deleteMember, membersInCache, addExternalMember };
+  return { addMember, members, updateMember, member, deleteMember, membersInCache, addExternalMember };
 }

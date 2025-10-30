@@ -32,8 +32,8 @@ export default function UserLogin() {
         close()
         setTimeout(() => {
           navigate("/");
-          window.location.reload(); // Sayfayı yenile ile gorunmeyen menuler gelmemesi icin
-        }, 300);
+          // window.location.reload(); // Sayfayı yenile ile gorunmeyen menuler gelmemesi icin
+        }, 200);
       } else {
         close()
         toast.error('Giriş başarısız. E-posta ve şifrenizi kontrol edin.');

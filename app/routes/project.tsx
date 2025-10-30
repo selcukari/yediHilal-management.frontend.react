@@ -67,11 +67,15 @@ export default function Project() {
       }, 1000);
   }, []);
 
+  const isUserAdmin = useMemo(() => {
+    return currentUser?.userType === 'userLogin';
+  }, [currentUser]);
+
   const fetchProject = async () => {
     open();
     try {
-
-      const getProjects = await service.getProjects();
+      const responsibleId = !isUserAdmin ? currentUser.id as number : undefined;
+      const getProjects = await service.getProjects(responsibleId);
       
       if (getProjects) {
         setProjectData(getProjects)
@@ -272,11 +276,11 @@ export default function Project() {
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
-            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />}  onClick={() => projectAddRef.current?.open()}>Yeni Ekle</Button>
+            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />}  onClick={() => projectAddRef.current?.openDialog()}>Yeni Ekle</Button>
                  {/* Mobile için sadece icon buton */}
                 <Button 
                   variant="filled" 
-                  onClick={() => projectAddRef.current?.open()}
+                  onClick={() => projectAddRef.current?.openDialog()}
                   hiddenFrom="xs"
                   p="xs"
                 >

@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
+import { forwardRef, useEffect, useMemo, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { Modal, TextInput, Button, Stack, Grid, Group, Switch, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
@@ -11,6 +11,7 @@ import { ReferansMemberSelect } from '../addOrEdit/referansMemberSelect';
 import { useMemberService } from '../../services/memberService';
 import { toast } from '../../utils/toastMessages';
 import { MemberTypeSelect } from '../addOrEdit/memberTypeSelect';
+import { useAuth } from '~/authContext';
 
 export type MemberAddDialogControllerRef = {
   open: () => void;
@@ -44,6 +45,9 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
   const [isDisabledReference, setIsDisabledReference] = useState(false);
   const [isDisabledCountryCode, setIsDisabledCountryCode] = useState(false);
   const [isDisabledPhone, setIsDisabledPhone] = useState(false);
+  const [dutyMemberTypeId, setDutyMemberTypeId] = useState<string>('10');
+  
+  const { currentUser } = useAuth();
 
   const service = useMemberService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
   
@@ -118,6 +122,16 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
     const phoneValue = form.values.phone;
     setIsDisabledReference(!!phoneValue?.trim()); // Eğer phone değeri varsa true, yoksa false
   }, [form.values.phone]);
+
+  const isUserAdmin = useMemo(() => {
+    const result = currentUser?.userType === 'userLogin';
+    if (!result) {
+      form.setFieldValue('provinceId', currentUser?.provinceId?.toString() as string);
+      form.setFieldValue('typeIds', dutyMemberTypeId as string);
+    }
+
+    return result;
+  }, [currentUser]);
 
   // reference alanını izle ve değişiklik olduğunda setIsDisabledCountryCode, setIsDisabledPhone'i güncelle
   useEffect(() => {
@@ -238,23 +252,23 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
           <Grid.Col span={6}>
             <MemberTypeSelect
               form={form}
-              required={true}
-              {...form.getInputProps('typeIds')}
+              required={true} disabled={!isUserAdmin}
+              {...form.getInputProps('typeIds')} valueId={isUserAdmin ? null : dutyMemberTypeId}
             ></MemberTypeSelect>
           </Grid.Col>
 
           <Grid.Col span={6}>
             <CountrySelect 
-              form={form} 
+              form={form} disabled={!isUserAdmin}
             />
           </Grid.Col>
 
           <Grid.Col span={6}>
             <ProvinceSelect 
-              form={form} 
-              label="İl" 
-              placeholder="İl Seçiniz" 
+              form={form} disabled={!isUserAdmin}
+              label="İl" placeholder="İl Seçiniz"
               countryId={form.values.countryId}
+              valueId={isUserAdmin ? null : currentUser?.provinceId?.toString()}
             />
           </Grid.Col>
 

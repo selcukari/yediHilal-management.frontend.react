@@ -6,13 +6,14 @@ import { useCountryService } from '../../services/countryService'
 interface CountryProps {
   isRequired?: boolean;
   isDisabled?: boolean;
+  valueId?: string | null;
   onCountryChange: (val: string | null, name?: string) => void;
 }
 
-export function Country({ isRequired = false, isDisabled = false,
+export function Country({ isRequired = false, isDisabled = false, valueId,
   onCountryChange,
  }: CountryProps) {
-  const [county, setCountry] = useState<string | null>("1");
+  const [county, setCountry] = useState<string | null>(null);
   const [countries, setCountries] = useState<{ value: string; label: string }[]>([]);
   const [error, setError] = useState<string | null>(isRequired ? 'Ülke alanı gereklidir.' : null);
   
@@ -20,6 +21,7 @@ export function Country({ isRequired = false, isDisabled = false,
 
   useEffect(() => {
     fetchCountryData();
+    setCountry(valueId ? valueId : "1");
   }, []);
 
   const fetchCountryData = async () => {

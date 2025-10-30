@@ -25,7 +25,7 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
-  { icon: IconUsers, label: 'Üye Yönetimi', key: 'member', link: '/' },
+  { icon: IconUsers, label: 'Üye Sayfası', key: 'memberForMemberUser', link: '/member-for-memberUser' },
   { label: 'Finans Yönetimi', key: 'finance', link: '/financeManagements',
     children: [
       { icon: IconCoin, label: 'Finans', key: 'finance', link: '/finances' },

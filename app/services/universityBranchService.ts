@@ -19,10 +19,14 @@ export function useUniversityBranchService(controller: string) {
   const { getCurrentToken, logout } = useAuth();
   const api = createApi(getCurrentToken() ?? undefined, logout);
 
-  const getUniversityBranches = async () => {
+  const getUniversityBranches = async (headId?: number) => {
 
     try {
-      const res = await api.get(`/${controller}/getUniversityBranches`);
+      const res = await api.get(`/${controller}/getUniversityBranches`, {
+        params: {
+          headId: headId || null,
+        }
+      });
 
       return res.data.data;
     } catch (error: any) {

@@ -15,6 +15,7 @@ import { MenuActionButton } from '../components'
 import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToExcel';
 import { type PdfTableColumn } from '../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../utils/repor/calculateColumnWidth';
+import { useAuth } from '~/authContext';
 
 interface Column {
   field: keyof UniversityBranchType;
@@ -40,6 +41,7 @@ export default function Duty() {
   const [resultData, setResultData] = useState<UniversityBranchType[]>([]);
   const [searchText, setSearchText] = useState('');
   const [visible, { open, close }] = useDisclosure(false);
+  const { currentUser } = useAuth();
   
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
     { field: 'id', header: 'Id' },
@@ -66,6 +68,10 @@ export default function Duty() {
       fetchUniversityBranch();
     }, 1000);
   }, []);
+
+  const isUserAdmin = useMemo(() => {
+    return currentUser?.userType === 'userLogin';
+  }, [currentUser]);
 
   const handleEdit = (item: UniversityBranchType) => {
     universityBranchEditRef.current?.openDialog({
@@ -128,7 +134,7 @@ export default function Duty() {
                 </ActionIcon>
                 <ActionIcon 
                   variant="light" 
-                  color="red"
+                  color="red" disabled={!isUserAdmin}
                   onClick={() => handleDelete(item.id)}
                 >
                   <IconTrash size={16} />
@@ -150,8 +156,8 @@ export default function Duty() {
      open();
 
      try {
-
-      const getUniversityBranches = await service.getUniversityBranches();
+      const headId = !isUserAdmin ? currentUser.id as number : undefined;
+      const getUniversityBranches = await service.getUniversityBranches(headId);
       if (getUniversityBranches) {
         setResultData(getUniversityBranches.map((UniversityBranch: UniversityBranchType) => ({
           ...UniversityBranch,
@@ -229,12 +235,13 @@ export default function Duty() {
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
-            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />} onClick={() => universityBranchAddRef.current?.openDialog()}>Yeni Ekle</Button>
+            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />} onClick={() => universityBranchAddRef.current?.openDialog()}
+              disabled={!isUserAdmin}>Yeni Ekle</Button>
             {/* Mobile için sadece icon buton */}
             <Button 
               variant="filled" 
               onClick={() => universityBranchAddRef.current?.openDialog()}
-              hiddenFrom="xs"
+              hiddenFrom="xs" disabled={!isUserAdmin}
               p="xs"
             >
               <IconPlus size={18} />

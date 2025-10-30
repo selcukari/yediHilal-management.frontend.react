@@ -10,6 +10,7 @@ import BranchEdit, { type BranchEditDialogControllerRef } from '../components/br
 import { useBranchService } from '../services/branchService';
 import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
+import { useAuth } from '~/authContext';
 import { dateFormatStrings } from '../utils/dateFormatStrings';
 import { MenuActionButton } from '../components'
 import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToExcel';
@@ -42,10 +43,11 @@ interface BranchType {
   actions?: any
 }
 
-export default function Duty() {
+export default function Branch() {
   const [resultData, setResultData] = useState<BranchType[]>([]);
   const [searchText, setSearchText] = useState('');
   const [visible, { open, close }] = useDisclosure(false);
+  const { currentUser } = useAuth();
   
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
     { field: 'id', header: 'Id' },
@@ -76,6 +78,10 @@ export default function Duty() {
       fetchBranch();
     }, 1000);
   }, []);
+
+  const isUserAdmin = useMemo(() => {
+    return currentUser?.userType === 'userLogin';
+  }, [currentUser]);
 
   const handleEdit = (item: BranchType) => {
     branchEditRef.current?.openDialog({
@@ -159,7 +165,7 @@ export default function Duty() {
                 </ActionIcon>
                 <ActionIcon 
                   variant="light" 
-                  color="red"
+                  color="red" disabled={!isUserAdmin}
                   onClick={() => handleDelete(item.id)}
                 >
                   <IconTrash size={16} />
@@ -181,8 +187,8 @@ export default function Duty() {
      open();
 
      try {
-
-      const getBranches = await service.getBranches();
+      const headId = !isUserAdmin ? currentUser.id as number : undefined;
+      const getBranches = await service.getBranches(headId);
       if (getBranches) {
         setResultData(getBranches.map((branch: BranchType) => ({
           ...branch,
@@ -263,13 +269,14 @@ export default function Duty() {
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
-            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />} onClick={() => branchAddRef.current?.openDialog()}>Yeni Ekle</Button>
+            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />}
+            onClick={() => branchAddRef.current?.openDialog()} disabled={!isUserAdmin}>Yeni Ekle</Button>
             {/* Mobile için sadece icon buton */}
             <Button 
               variant="filled" 
               onClick={() => branchAddRef.current?.openDialog()}
               hiddenFrom="xs"
-              p="xs"
+              p="xs" disabled={!isUserAdmin}
             >
               <IconPlus size={18} />
             </Button>
@@ -322,7 +329,7 @@ export default function Duty() {
           {/* Örnek Tablo */}
           <Paper shadow="xs" p="lg" withBorder>
             <Stack gap="md">
-              <Title order={4}>Son Şubeler({rowsTable?.length || 0})</Title>
+              <Title order={4}>Son Temsilcilik({rowsTable?.length || 0})</Title>
               <Table.ScrollContainer minWidth={400} maxHeight={700}>
                 <Table striped highlightOnHover withColumnBorders>
                   <Table.Thead>

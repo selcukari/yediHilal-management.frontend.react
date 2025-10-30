@@ -17,7 +17,7 @@ import {
 import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router";
 import { Notifications } from '@mantine/notifications';
-import { AuthProvider } from './authContext';
+import { AuthProvider, useAuth } from './authContext'; // useAuth'u da import et
 import { Layout as AppLayout, MemberLayout, BranchLayout, UniversityBranchLayout } from './components';
 import { CustomLayout } from './components';
 import ProtectedRoute from './protectedRoute'
@@ -67,70 +67,63 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function App() {
+function AppContent() {
   const location = useLocation();
   const [locationPathname, setLocationPathname] = useState<boolean>(true);
-  const [currentUserType, setCurrentUserType] = useState<string>("");
-
-  const [currentUser, setCurrentUser] = useState<any>(() => {
-    const storedUser = getWithExpiry("currentUser");
-    if (storedUser) {
-      try {
-        return JSON.parse(storedUser);
-      } catch {
-        localStorage.removeItem("currentUser");
-      }
-    }
-    return null;
-  });
+  const navigate = useNavigate();
+  const { currentUser, isLoggedIn } = useAuth(); // useAuth'u burada kullan
 
   useEffect(() => {
-    setCurrentUserType(currentUser?.userType || "");
     setLocationPathname(!['/memberCreate', '/privacyPolicy'].includes(location.pathname));
+
+    // Eğer kullanıcı giriş yapmamışsa ve ana sayfadaysa login selection'a yönlendir
+    if (!isLoggedIn) {
+      navigate('/loginSelection', { replace: true });
+    }
   }, []);
 
-   // Layout seçimi için fonksiyon
+  // Layout seçimi için fonksiyon
   const renderLayout = () => {
-    switch (currentUserType) {
+    if (!isLoggedIn) {
+      return (
+        <CustomLayout>
+          <Outlet />
+        </CustomLayout>
+      );
+    }
+
+    switch (currentUser?.userType) {
       case "userLogin":
         return (
-          <AuthProvider>
-            <AppLayout>
-              <ProtectedRoute>
-                <Outlet />
-              </ProtectedRoute>
-            </AppLayout>
-          </AuthProvider>
+          <AppLayout>
+            <ProtectedRoute>
+              <Outlet />
+            </ProtectedRoute>
+          </AppLayout>
         );
       case "memberLogin":
         return (
-          <AuthProvider>
-            <MemberLayout>
-              <ProtectedRoute>
-                <Outlet />
-              </ProtectedRoute>
-            </MemberLayout>
-          </AuthProvider>
+          <MemberLayout>
+            <ProtectedRoute>
+              <Outlet />
+            </ProtectedRoute>
+          </MemberLayout>
         );
       case "branchLogin":
         return (
-          <AuthProvider>
-            <BranchLayout>
-              <ProtectedRoute>
-                <Outlet />
-              </ProtectedRoute>
-            </BranchLayout>
-          </AuthProvider>
+          <BranchLayout>
+            <ProtectedRoute>
+              <Outlet />
+            </ProtectedRoute>
+          </BranchLayout>
         );
       case "universityBranchLogin":
         return (
-          <AuthProvider>
-            <UniversityBranchLayout>
-              <ProtectedRoute>
-                <Outlet />
-              </ProtectedRoute>
-            </UniversityBranchLayout>
-          </AuthProvider>
+          <UniversityBranchLayout>
+            <ProtectedRoute>
+              <Outlet />
+            </ProtectedRoute>
+          </UniversityBranchLayout>
         );
       default:
         // Kullanıcı tipi belirlenemezse veya boşsa
@@ -143,13 +136,23 @@ export default function App() {
   };
 
   return (
-    <MantineProvider theme={theme}>
+    <>
       <Notifications position="top-right" />
       {locationPathname ? renderLayout() : (
         <CustomLayout>
           <Outlet />
         </CustomLayout>
       )}
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <MantineProvider theme={theme}>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </MantineProvider>
   );
 }
