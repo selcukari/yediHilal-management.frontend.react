@@ -1,15 +1,18 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { pick, omit } from 'ramda';
+import { IconPlus } from '@tabler/icons-react';
 import {
-  Container, Paper, Textarea, Switch, Button, Title, Text,
+  Container, Paper, Textarea, Flex, Switch, Button, Title, Text, Select,
   LoadingOverlay } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { useAuth } from '../../authContext';
 import { toast } from '~/utils/toastMessages';
 import { useAutomaticSmsFieldService } from '~/services/automaticSmsFieldService';
+import { useReadyMessageService } from '~/services/readyMessageService';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import { formatDate } from '../../utils/formatDate';
+import ReadyMessageAdd, { type ReadyMessageAddDialogControllerRef } from '../../components/automaticSmsManagement/readyMessageAdd';
 
 type FormValues = {
   id: number;
@@ -18,11 +21,16 @@ type FormValues = {
   updateDate: string;
 }
 export default function AutomaticSmsManagement() {
+  const [readyMessage, setReadyMessage] = useState<{ value: string; label: string }[]>([]);
+  const [selectedReadyMessageId, setSelectedReadyMessageId] = useState<string>("");
   const { loading: authLoading, isLoggedIn } = useAuth();
   const [visible, { open, close }] = useDisclosure(false);
 
+  const serviceReadyMessage = useReadyMessageService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
   const service = useAutomaticSmsFieldService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
 
+  const readyMessageAdd = useRef<ReadyMessageAddDialogControllerRef>(null);
+  
   const form = useForm<FormValues>({
     initialValues: {
       id: 0,
@@ -35,9 +43,26 @@ export default function AutomaticSmsManagement() {
     },
   });
 
-  useEffect(() => {
-    fetchAutomaticSmsData();
-  }, []);
+  const fetchReadyMessage = async () => {
+    try {
+      const response = await serviceReadyMessage.getReadyMessages();
+
+      if (response) {
+        setReadyMessage(
+          response.map((c: any) => ({
+            value: String(c.id),
+            label: c.message,
+          }))
+        );
+      } else {
+        console.error('No fetchReadyMessage data found');
+      }
+    } catch (error: any) {
+      console.error('Error fetching fetchReadyMessage:', error.message);
+    }
+  }
+
+  
 
   const fetchAutomaticSmsData = async () => {
     try {
@@ -59,6 +84,11 @@ export default function AutomaticSmsManagement() {
       close();
     }
   };
+
+  useEffect(() => {
+    fetchAutomaticSmsData();
+    fetchReadyMessage();
+  }, []);
 
   const handleSubmit = async (values: typeof form.values) => {
     try {
@@ -82,6 +112,57 @@ export default function AutomaticSmsManagement() {
     }
   };
 
+  const selectedReadyMessage = (value: string | null) => {
+    if (value) {
+      const getReadyMessage = readyMessage.find(i => i.value == value)?.label || "";
+      setSelectedReadyMessageId(value);
+
+      form.setFieldValue('message', getReadyMessage as string);
+    }
+  }
+
+  const updateReadyMessage = async () => {
+    // Form validation kontrolü
+
+    if (form.validate()?.hasErrors) {
+    
+      toast.error('Lütfen formdaki hataları düzeltin');
+      return;
+    }
+
+    try {
+      open();
+      
+      // Hazır mesajı kaydetmek için gerekli veriyi hazırla
+      const messageData = {
+        message: form.values.message,
+        // Diğer gerekli alanları buraya ekleyin
+        id: parseInt(selectedReadyMessageId),
+        automaticSmsId: form.values.id
+      };
+
+      const result = await serviceReadyMessage.updateReadyMessage(messageData);
+      
+      if (result == true) {
+        toast.success('Hazır mesaj başarıyla kaydedildi!');
+        form.setInitialValues(form.values);
+        fetchReadyMessage();
+        close();
+        return;
+      } else {
+        toast.error('Hazır mesaj kaydedilirken bir hata oluştu!');
+        close();
+      }
+    } catch (error: any) {
+      close();
+      toast.error('Hazır mesaj kaydedilirken bir hata oluştu!');
+    }
+  }
+
+  const handleSaveSuccessForReadyMessage = () => {
+    fetchReadyMessage();
+  }
+
   return (
     <Container size={420} my={40}>
       <LoadingOverlay
@@ -94,6 +175,12 @@ export default function AutomaticSmsManagement() {
 
       <Paper withBorder shadow="md" p={30} radius="md">
         <Text c="dimmed">Son Güncelle: {formatDate(form.values.updateDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Text>
+        <Select
+          label="Hazır Mesaj" placeholder="mesaj seçiniz"
+          data={readyMessage}
+          searchable clearable maxDropdownHeight={200} nothingFoundMessage="mesaj bulunamadı..."
+          required onChange={(value) => selectedReadyMessage(value)}
+        />
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Textarea mt="md" withAsterisk mb={4}
             label="Mesaj"
@@ -107,6 +194,28 @@ export default function AutomaticSmsManagement() {
             checked={form.values.isActive}
             {...form.getInputProps('isActive')}
           />
+          <Flex
+            mih={50}
+            gap="md"
+            justify="center"
+            align="flex-end"
+            direction="row"
+          wrap="wrap">
+          <Button 
+            mt="xl" onClick={updateReadyMessage}
+            loading={authLoading}
+            disabled={!form.isDirty()}
+          >
+            Hazır Message Kaydet
+          </Button>
+          <Button 
+            variant="filled" 
+            p="xs" onClick={() => readyMessageAdd.current?.open()}
+            loading={authLoading}
+          >
+            <IconPlus size={18} />
+          </Button>
+          </Flex>
 
           <Button 
             fullWidth 
@@ -119,6 +228,7 @@ export default function AutomaticSmsManagement() {
           </Button>
         </form>
       </Paper>
+      <ReadyMessageAdd  ref={readyMessageAdd} onSaveSuccess={handleSaveSuccessForReadyMessage}/>
     </Container>
   );
 }
