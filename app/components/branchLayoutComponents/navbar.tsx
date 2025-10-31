@@ -27,7 +27,7 @@ export function Navbar({ opened, toggle }: NavbarProps) {
         {/* Orta: Başlık - sadece desktop'ta */}
         <Box visibleFrom="sm" style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
           <Title order={3} c="blue">
-            YediHilal Yönetim
+            YediHilal Yönetim/Temsilcilik
           </Title>
         </Box>
 
