@@ -1,9 +1,11 @@
 import { useEffect, useState, useRef } from 'react';
 import { pick, omit } from 'ramda';
-import { IconPlus } from '@tabler/icons-react';
+import { IconPlus  } from '@tabler/icons-react';
+import { TimePicker } from '@mantine/dates';
 import {
   Container, Paper, Textarea, Flex, Switch, Button, Title, Text, Select,
-  LoadingOverlay } from '@mantine/core';
+  LoadingOverlay, TextInput,
+} from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { useAuth } from '../../authContext';
@@ -17,13 +19,15 @@ import ReadyMessageAdd, { type ReadyMessageAddDialogControllerRef } from '../../
 type FormValues = {
   id: number;
   message: string;
+  day: number;
+  hour: string;
   isActive: boolean;
   updateDate: string;
 }
 export default function AutomaticSmsManagement() {
   const [readyMessage, setReadyMessage] = useState<{ value: string; label: string }[]>([]);
   const [selectedReadyMessageId, setSelectedReadyMessageId] = useState<string>("");
-  const { loading: authLoading, isLoggedIn } = useAuth();
+  const { loading: authLoading } = useAuth();
   const [visible, { open, close }] = useDisclosure(false);
 
   const serviceReadyMessage = useReadyMessageService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
@@ -35,11 +39,14 @@ export default function AutomaticSmsManagement() {
     initialValues: {
       id: 0,
       message: '',
+      day: 9,
+      hour: "",
       isActive: true,
       updateDate: '',
     },
     validate: {
       message: (value) => (value.trim().length < 10 ? 'Mesaj en az 10 karakter olmalı' : null),
+      hour: (value) => (value.trim() ? null : 'Saat alanı zorunlu'),
     },
   });
 
@@ -70,9 +77,9 @@ export default function AutomaticSmsManagement() {
       const response = await service.getAutomaticSmsFields();
 
       if (response) {
-        form.setValues((pick(['id', 'message', 'isActive', 'updateDate'], response) as FormValues));
+        form.setValues((pick(['id', 'message', 'isActive', 'updateDate', 'day', "hour"], response) as FormValues));
 
-        form.setInitialValues(pick(['id', 'message', 'isActive', 'updateDate'],response));
+        form.setInitialValues(pick(['id', 'message', 'isActive', 'updateDate', 'day', "hour"],response));
 
         close();
       } else {
@@ -118,6 +125,8 @@ export default function AutomaticSmsManagement() {
       setSelectedReadyMessageId(value);
 
       form.setFieldValue('message', getReadyMessage as string);
+    } else {
+      setSelectedReadyMessageId("");
     }
   }
 
@@ -130,6 +139,12 @@ export default function AutomaticSmsManagement() {
       return;
     }
 
+    if (!selectedReadyMessageId) {
+    
+      toast.error('Lütfen hazır mesaj seçiniz!');
+      return;
+    }
+
     try {
       open();
       
@@ -138,7 +153,6 @@ export default function AutomaticSmsManagement() {
         message: form.values.message,
         // Diğer gerekli alanları buraya ekleyin
         id: parseInt(selectedReadyMessageId),
-        automaticSmsId: form.values.id
       };
 
       const result = await serviceReadyMessage.updateReadyMessage(messageData);
@@ -163,8 +177,10 @@ export default function AutomaticSmsManagement() {
     fetchReadyMessage();
   }
 
+  const error = form.errors.hour;
+
   return (
-    <Container size={420} my={40}>
+    <Container size={550} my={40}>
       <LoadingOverlay
         visible={visible}
         zIndex={1000}
@@ -188,7 +204,29 @@ export default function AutomaticSmsManagement() {
             required autosize minRows={10} maxRows={15}
             {...form.getInputProps('message')}
           />
-
+          <Flex
+            mih={50}
+            gap="md"
+            justify="center"
+            align="flex-end"
+            direction="row"
+            wrap="wrap">
+          <TextInput
+            label="Ayın Kaçında"
+            placeholder="kaçıncı günü"
+            {...form.getInputProps('day')}
+            type="number" required
+            min={1} max={27}
+          />
+          <TimePicker
+            label="Saat" error={error}
+            withDropdown
+            required
+            value={form.values.hour}
+            onChange={(val) => form.setFieldValue('hour', val)}
+            presets={['09:00', '10:30', '12:00', '13:00', '14:30', '15:00']}
+          />
+          </Flex>
           <Switch 
             label="Aktiflik Durumu" 
             checked={form.values.isActive}
@@ -200,23 +238,20 @@ export default function AutomaticSmsManagement() {
             justify="center"
             align="flex-end"
             direction="row"
-          wrap="wrap">
+            wrap="wrap">
           <Button 
             mt="xl" onClick={updateReadyMessage}
             loading={authLoading}
-            disabled={!form.isDirty()}
-          >
+            disabled={!form.isDirty()}>
             Hazır Message Kaydet
           </Button>
           <Button 
             variant="filled" 
             p="xs" onClick={() => readyMessageAdd.current?.open()}
-            loading={authLoading}
-          >
+            loading={authLoading}>
             <IconPlus size={18} />
           </Button>
           </Flex>
-
           <Button 
             fullWidth 
             mt="xl" 

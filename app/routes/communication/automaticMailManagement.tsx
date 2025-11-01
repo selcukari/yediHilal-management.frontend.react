@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { pick, omit } from 'ramda';
 import { IconPlus } from '@tabler/icons-react';
+import { TimePicker } from '@mantine/dates';
 import {
   Container, Paper, TextInput, Switch, Button, Title, Text, Flex, Select,
   LoadingOverlay } from '@mantine/core';
@@ -19,6 +20,8 @@ type FormValues = {
   id: number;
   subject: string;
   body: string;
+  day: number;
+  hour: string;
   isActive: boolean;
   updateDate: string;
   createDate?: string;
@@ -40,6 +43,8 @@ export default function AutomaticMailManagement() {
       id: 0,
       subject: '',
       body: '',
+      day: 9,
+      hour: "",
       isActive: true,
       updateDate: '',
       createDate: ''
@@ -50,7 +55,8 @@ export default function AutomaticMailManagement() {
         const textContent = value.replace(/<[^>]*>/g, '').trim();
 
         return textContent.length < 10 ? 'Adres en az 10 karakter olmalı' : null;
-      }
+      },
+      hour: (value) => (value.trim() ? null : 'Saat alanı zorunlu'),
     },
   });
 
@@ -80,9 +86,9 @@ export default function AutomaticMailManagement() {
       const response = await service.getAutomaticMailFields();
 
       if (response) {
-        form.setValues((pick(['id', 'subject', 'isActive', 'updateDate', 'body'], response) as FormValues));
+        form.setValues((pick(['id', 'subject', 'isActive', 'updateDate', 'body', 'day', "hour"], response) as FormValues));
        
-        form.setInitialValues(pick(['id', 'subject', 'isActive', 'updateDate', 'body'],response));
+        form.setInitialValues(pick(['id', 'subject', 'isActive', 'updateDate', 'body', 'day', "hour"],response));
        
         close();
       } else {
@@ -108,6 +114,8 @@ export default function AutomaticMailManagement() {
 
       form.setFieldValue('subject', getReadyMessage?.label || "");
       form.setFieldValue('body', getReadyMessage?.body || "");
+    } else {
+      setSelectedReadyMessageId("");
     }
   }
 
@@ -117,6 +125,12 @@ export default function AutomaticMailManagement() {
       if (form.validate()?.hasErrors) {
       
         toast.error('Lütfen formdaki hataları düzeltin');
+        return;
+      }
+
+      if (!selectedReadyMessageId) {
+    
+        toast.error('Lütfen hazır mesaj seçiniz!');
         return;
       }
   
@@ -130,7 +144,6 @@ export default function AutomaticMailManagement() {
           body: form.values.body,
           // Diğer gerekli alanları buraya ekleyin
           id: parseInt(selectedReadyMessageId),
-          automaticMailId: form.values.id
         };
   
         const result = await serviceReadyMessage.updateReadyMessageMail(messageData);
@@ -179,6 +192,8 @@ export default function AutomaticMailManagement() {
     fetchReadyMessage();
   }
 
+  const error = form.errors.hour;
+
   return (
     <Container size={620} my={40}>
       <LoadingOverlay
@@ -211,8 +226,30 @@ export default function AutomaticMailManagement() {
               required={true}
               value={form.values.body}
               {...form.getInputProps('body')}
-            />
-
+          />
+          <Flex
+            mih={50}
+            gap="md"
+            justify="center"
+            align="flex-end"
+            direction="row"
+            wrap="wrap">
+          <TextInput
+            label="Ayın Kaçında"
+            placeholder="kaçıncı günü"
+            {...form.getInputProps('day')}
+            type="number" required
+            min={1} max={27}
+          />
+          <TimePicker
+            label="Saat" error={error}
+            withDropdown
+            required
+            value={form.values.hour}
+            onChange={(val) => form.setFieldValue('hour', val)}
+            presets={['09:00', '10:30', '12:00', '13:00', '14:30', '15:00']}
+          />
+          </Flex>
           <Switch 
             label="Aktiflik Durumu" mt={4}
             checked={form.values.isActive}
@@ -228,19 +265,16 @@ export default function AutomaticMailManagement() {
             <Button 
             mt="xl" onClick={updateReadyMessage}
             loading={authLoading}
-            disabled={!form.isDirty()}
-          >
+            disabled={!form.isDirty()}>
             Hazır Message Kaydet
           </Button>
           <Button 
             variant="filled" 
             p="xs" onClick={() => readyMessageMailAdd.current?.open()}
-            loading={authLoading}
-          >
+            loading={authLoading}>
             <IconPlus size={18} />
           </Button>
-
-            </Flex>
+          </Flex>
           <Button 
             fullWidth 
             mt="xl" 
