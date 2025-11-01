@@ -351,14 +351,14 @@ export default function Member() {
               </Text>
             </div>
             <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />}
-              onClick={() => memberAddRef.current?.open()} disabled={!isUserAdmin}
+              onClick={() => memberAddRef.current?.open()}
             >Yeni Ekle</Button>
             {/* Mobile için sadece icon buton */}
             <Button 
               variant="filled" 
               onClick={() => memberAddRef.current?.open()}
               hiddenFrom="xs"
-              p="xs" disabled={!isUserAdmin}
+              p="xs"
             >
               <IconPlus size={18} />
             </Button>
