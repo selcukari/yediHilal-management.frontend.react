@@ -43,6 +43,12 @@ const menuItems: MenuItem[] = [
     key: 'branch',
     link: '/branches',
   },
+  { label: 'Finans Yönetimi', key: 'finance', link: '/financeManagements',
+    children: [
+      { icon: IconCoin, label: 'Finans', key: 'finance', link: '/finances' },
+      { icon: IconPhoneCall, label: 'Arama Takip', key: 'phoneCallTracking', link: '/phoneCallTrackings' },
+    ], 
+  },
 ];
 
 // Recursive function to find all menu items including nested children

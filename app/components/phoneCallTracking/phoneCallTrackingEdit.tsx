@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState, useRef, useEffect } from 'react';
+import { forwardRef, useImperativeHandle, useState, useRef, useEffect, useMemo } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { clone } from 'ramda';
 import { Modal, TextInput, Button, ActionIcon, Group, Stack, Textarea, Title, Table, Paper, Grid, Flex, Switch, Select } from '@mantine/core';
@@ -12,6 +12,7 @@ import { useUserService } from '../../services/userService';
 import { toast } from '../../utils/toastMessages';
 import { formatDate } from '../../utils/formatDate';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
+import { useAuth } from '~/authContext';
 
 export type PhoneCallTrackingEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -40,6 +41,8 @@ const PhoneCallTrackingEdit = forwardRef<PhoneCallTrackingEditDialogControllerRe
   const [membersData, setMembersData] = useState<any[]>([]);
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
+
+  const { currentUser } = useAuth();
   
   const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const service = usePhoneCallTrackingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
@@ -67,6 +70,10 @@ const PhoneCallTrackingEdit = forwardRef<PhoneCallTrackingEditDialogControllerRe
     { value: 'notcalled', label: 'Aranmadı' },
     { value: 'willcallagain', label: 'Tekrar Aranacak' },
   ]);
+
+  const isUserAdmin = useMemo(() => {
+    return currentUser?.userType === 'userLogin';
+  }, [currentUser]);
 
   const form = useForm<FormValues>({
     initialValues: {
@@ -281,7 +288,7 @@ const PhoneCallTrackingEdit = forwardRef<PhoneCallTrackingEditDialogControllerRe
             <Grid.Col span={4}>
               <Select
                 label="Sorumlu" placeholder="sorumlu Seçiniz"
-                data={userData.map(item => ({ value: item.id, label: item.fullName }))} disabled={isDisabledSubmit}
+                data={userData.map(item => ({ value: item.id, label: item.fullName }))} disabled={!isUserAdmin}
                 searchable clearable maxDropdownHeight={200} nothingFoundMessage="sorumlu kişi bulunamadı..."
                 required value={form.values.responsibleId} onChange={(value) => form.setFieldValue('responsibleId', value)}
               />

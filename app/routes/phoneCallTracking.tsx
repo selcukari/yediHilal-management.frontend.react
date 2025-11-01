@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { IconSearch, IconEdit, IconTrash, IconPlus } from '@tabler/icons-react';
 import {
-  Container, Grid, TextInput, Badge, ActionIcon, Stack, Group, Title, Text, Paper, Table, LoadingOverlay, Button,
+  Container, Grid, TextInput, ActionIcon, Stack, Group, Title, Text, Paper, Table, LoadingOverlay, Button,
 } from '@mantine/core';
 import { omit } from 'ramda';
 import { useDisclosure } from '@mantine/hooks';
@@ -11,7 +11,7 @@ import { usePhoneCallTrackingService } from '../services/phoneCallTrackingServic
 import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
 import { dateFormatStrings } from '../utils/dateFormatStrings';
-
+import { useAuth } from '~/authContext';
 interface Column {
   field: keyof PhoneCallTrackingType;
   header: string;
@@ -34,6 +34,7 @@ export default function DocumentTracking() {
   const [resultData, setResultData] = useState<PhoneCallTrackingType[]>([]);
   const [searchText, setSearchText] = useState('');
   const [visible, { open, close }] = useDisclosure(false);
+  const { currentUser } = useAuth();
   
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
     { field: 'id', header: 'Id' },
@@ -48,6 +49,10 @@ export default function DocumentTracking() {
   const phoneCallTrackingEditRef = useRef<PhoneCallTrackingEditDialogControllerRef>(null);
 
   const service = usePhoneCallTrackingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+
+  const isUserAdmin = useMemo(() => {
+    return currentUser?.userType === 'userLogin';
+  }, [currentUser]);
 
   // Filtrelenmiş veriler
   const filteredPhoneCalls = useMemo(() => {
@@ -143,8 +148,9 @@ export default function DocumentTracking() {
      open();
 
      try {
+      const responsibleId = !isUserAdmin ? currentUser.id as number : undefined;
 
-      const getphoneCallTrackings = await service.getPhoneCallTrackings();
+      const getphoneCallTrackings = await service.getPhoneCallTrackings(responsibleId);
       if (getphoneCallTrackings) {
         setResultData(getphoneCallTrackings.map((phoneCallTracking: PhoneCallTrackingType) => ({
           ...phoneCallTracking,

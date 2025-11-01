@@ -14,10 +14,14 @@ export function usePhoneCallTrackingService(controller: string) {
   const { getCurrentToken, logout } = useAuth();
   const api = createApi(getCurrentToken() ?? undefined, logout);
 
-  const getPhoneCallTrackings = async () => {
+  const getPhoneCallTrackings = async (responsibleId?: number) => {
 
     try {
-      const res = await api.get(`/${controller}/getPhoneCallTrackings`);
+      const res = await api.get(`/${controller}/getPhoneCallTrackings`, {
+        params: {
+          responsibleId: responsibleId || null,
+        }
+      });
 
       return res.data.data;
     } catch (error: any) {

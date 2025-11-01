@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
+import { forwardRef, useEffect, useMemo, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import {  Modal,  Select,  Button,  Stack,  Flex,  Group,  Badge,  Table, Checkbox, ScrollArea, Text
 } from '@mantine/core';
@@ -9,6 +9,7 @@ import { usePhoneCallTrackingService } from '../../services/phoneCallTrackingSer
 import { toast } from '../../utils/toastMessages';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import { formatDate } from '../../utils/formatDate';
+import { useAuth } from '~/authContext';
 
 export type PhoneCallTrackingSendDialogControllerRef = {
   open: () => void;
@@ -39,6 +40,8 @@ const PhoneCallTrackingSend = forwardRef<PhoneCallTrackingSendDialogControllerRe
   const [phoneCallId, setPhoneCallId] = useState<string>("");
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
+  const { currentUser } = useAuth();
+
   const [rowHeaders, setRowHeaders] = useState([
     { field: 'id', header: 'Id' },
     { field: 'fullName', header: 'Ad Soyad' },
@@ -53,6 +56,10 @@ const PhoneCallTrackingSend = forwardRef<PhoneCallTrackingSendDialogControllerRe
 
   const service = useMemberService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
   const servicePhoneCall = usePhoneCallTrackingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+
+  const isUserAdmin = useMemo(() => {
+    return currentUser?.userType === 'userLogin';
+  }, [currentUser]);
 
   const handleSubmit = async (valuesIds: number[]) => {
     // Submit logic here
@@ -143,8 +150,9 @@ const PhoneCallTrackingSend = forwardRef<PhoneCallTrackingSendDialogControllerRe
      open();
 
      try {
+      const responsibleId = !isUserAdmin ? currentUser.id as number : undefined;
 
-      const getphoneCallTrackings = await servicePhoneCall.getPhoneCallTrackings();
+      const getphoneCallTrackings = await servicePhoneCall.getPhoneCallTrackings(responsibleId);
       if (getphoneCallTrackings) {
         setResultDataPhoneCall(getphoneCallTrackings);
        

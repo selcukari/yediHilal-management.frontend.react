@@ -1,6 +1,6 @@
-import { forwardRef, useImperativeHandle, useEffect, useState, useRef } from 'react';
+import { forwardRef, useImperativeHandle, useEffect, useState, useRef, useMemo } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, TextInput, Button, Stack, Textarea, Grid, Flex, Switch, Select } from '@mantine/core';
+import { Modal, TextInput, Button, Stack, Textarea, Grid, Flex, Select } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
@@ -8,6 +8,7 @@ import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { usePhoneCallTrackingService } from '../../services/phoneCallTrackingService';
 import { useUserService } from '../../services/userService';
 import { toast } from '../../utils/toastMessages';
+import { useAuth } from '~/authContext';
 
 export type PhoneCallTrackingAddDialogControllerRef = {
   open: () => void;
@@ -32,6 +33,7 @@ const PhoneCallTrackingAdd = forwardRef<PhoneCallTrackingAddDialogControllerRef,
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [userData, setUserData] = useState<GetUserData[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
+  const { currentUser } = useAuth();
   
   const service = usePhoneCallTrackingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
@@ -49,6 +51,10 @@ const PhoneCallTrackingAdd = forwardRef<PhoneCallTrackingAddDialogControllerRef,
       responsibleId: (value) => (value ? null : 'Sorumlu kişi alanı zorunlu'),
     },
   });
+
+  const isUserAdmin = useMemo(() => {
+    return currentUser?.userType === 'userLogin';
+  }, [currentUser]);
 
   const fetchUsers = async () => {
     try {
@@ -178,8 +184,9 @@ const PhoneCallTrackingAdd = forwardRef<PhoneCallTrackingAddDialogControllerRef,
               <Select
                 label="Sorumlu" placeholder="sorumlu Seçiniz"
                 data={userData.map(item => ({ value: item.id, label: item.fullName }))}
+                value={isUserAdmin ? null : currentUser.id?.toString()}
                 searchable clearable maxDropdownHeight={200} nothingFoundMessage="sorumlu kişi bulunamadı..."
-                required onChange={(value) => form.setFieldValue('responsibleId', value)}
+                required onChange={(value) => form.setFieldValue('responsibleId', value)} disabled={!isUserAdmin}
               />
             </Grid.Col>
           <Grid.Col span={10}>

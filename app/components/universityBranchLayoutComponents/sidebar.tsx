@@ -3,9 +3,9 @@ import {
   NavLink, Flex, Text, Stack, Divider, Group, ScrollArea, AppShell,
 } from '@mantine/core';
 import {
-  IconUsers, IconFileCheck,
+  IconUsers, IconFileCheck, IconCoin,
   IconChevronRight, IconChevronDown,
-  IconSchool, IconCalendarTime,
+  IconSchool, IconCalendarTime, IconPhoneCall,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
 import { useAuth } from '~/authContext';
@@ -42,6 +42,12 @@ const menuItems: MenuItem[] = [
     label: 'Üniversite Yönetimi',
     key: 'universityBranch',
     link: '/university-branches',
+  },
+  { label: 'Finans Yönetimi', key: 'finance', link: '/financeManagements',
+    children: [
+      { icon: IconCoin, label: 'Finans', key: 'finance', link: '/finances' },
+      { icon: IconPhoneCall, label: 'Arama Takip', key: 'phoneCallTracking', link: '/phoneCallTrackings' },
+    ], 
   },
 ];
 
