@@ -7,6 +7,7 @@ import { useForm } from '@mantine/form';
 import { subDays } from 'date-fns';
 import { IconCancel, IconCheck, IconCalendar, IconTrash, IconPlus } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
+import { DistrictceSelect } from '../addOrEdit/districtSelect';
 import { ProvinceSelect } from '../addOrEdit/provinceSelect';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useUserService } from '../../services/userService';
@@ -43,6 +44,7 @@ type SancaktarDataGorevatama = {
 type FormValues = {
   id: number;
   branchName: string;
+  districtId: string | null;
   provinceId: string | null;
   branchHeadId: string | null;
   address?: string | null;
@@ -87,6 +89,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
       id: 0,
       branchName: '',
       provinceId: "",
+      districtId: "",
       branchHeadId: "",
       address:"",
       phone: "",
@@ -125,7 +128,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
     const files = form.values.files || [];
     
     const result = await service.updateBranch({
-      ...omit(['isActive', 'provinceId'], values),
+      ...omit(['isActive', 'provinceId', 'districtId'], values),
       files: files.length > 0 ? files : undefined,
       branchName: values.branchName.trim(),
       isRent: values.isRent,
@@ -323,12 +326,6 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
               />
             </Grid.Col>
             <Grid.Col span={6}>
-              <ProvinceSelect 
-                form={form} required={true} label="İl" placeholder="İl Seçiniz" 
-                countryId={"1"} disabled={true}
-              />
-            </Grid.Col>
-            <Grid.Col span={6}>
               <Select
                 label="Temsilcilik Başkanı" placeholder="Temsilcilik başkan Seçiniz" data={branchHeadUserData.map(item => ({ value: item.id, label: item.fullName }))}
                 searchable clearable maxDropdownHeight={200} value={form.values.branchHeadId}
@@ -336,6 +333,20 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
                 onChange={(value) => form.setFieldValue('branchHeadId', value)}
               />
             </Grid.Col>
+            <Grid.Col span={6}>
+              <ProvinceSelect 
+                form={form} required={true} label="İl" placeholder="İl Seçiniz" 
+                countryId={"1"} disabled={true}
+              />
+            </Grid.Col>
+            <Grid.Col span={6}>
+            <DistrictceSelect 
+              form={form}
+              // required={true}
+              disabled={true}
+              provinceId={form.values.provinceId ?? undefined}
+            />
+          </Grid.Col>
             <Grid.Col span={4}>
               <TextInput
                 label="Telefon" placeholder="505 555 5555"

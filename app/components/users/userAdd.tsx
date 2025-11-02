@@ -7,6 +7,7 @@ import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { CountrySelect } from '../addOrEdit/countrySelect';
 import { ProvinceSelect } from '../addOrEdit/provinceSelect';
+import { DistrictceSelect } from '../addOrEdit/districtSelect';
 import { RoleSelect } from '../addOrEdit/roleSelect';
 import { useUserService } from '../../services/userService';
 import { toast } from '../../utils/toastMessages';
@@ -36,6 +37,7 @@ type FormValues = {
   isActive: boolean;
   countryId: string;
   provinceId: string;
+  districtId: string;
   password: string;
   moduleRoles: string;
   roleId: string;
@@ -68,6 +70,7 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
       roleId: '3',
       moduleRoles: '',
       provinceId: '',
+      districtId: '',
       password: '',
       dutiesIds: '',
       dutyIds: '',
@@ -121,6 +124,7 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
       fullName: values.fullName.trim(),
       deleteMessageTitle: (values.isActive ? undefined : (values.deleteMessageTitle ? values.deleteMessageTitle.trim() : undefined )),
       provinceId: values.provinceId ? parseInt(values.provinceId) : undefined,
+      districtId: values.districtId ? parseInt(values.districtId) : undefined,
       countryId: values.countryId ? parseInt(values.countryId) : undefined,
       roleId: values.roleId ? parseInt(values.roleId) : undefined,
       duties: JSON.stringify([newDuty]),
@@ -275,23 +279,36 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
             />
           </Grid.Col>
 
-          <Grid.Col span={6}>
+          <Grid.Col span={4}>
             <CountrySelect 
               form={form}
               disabled={true}
             />
           </Grid.Col>
 
-          <Grid.Col span={6}>
+          <Grid.Col span={4}>
             <ProvinceSelect 
               form={form}
               required={true}
-              label="İl" 
-              placeholder="İl Seçiniz" 
               countryId={form.values.countryId}
             />
           </Grid.Col>
-
+          <Grid.Col span={4}>
+            <DistrictceSelect 
+              form={form}
+              required={true}
+              provinceId={form.values.provinceId}
+            />
+          </Grid.Col>
+          <Grid.Col span={2}>
+            <TextInput
+              label="Ülke Kodu"
+              placeholder="Ülke kodu giriniz"
+              value={form.values.countryCode}
+              required type='number'
+              {...form.getInputProps('countryCode')}
+            />
+          </Grid.Col>
           <Grid.Col span={4}>
             <TextInput
               label="Telefon"

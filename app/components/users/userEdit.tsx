@@ -8,6 +8,7 @@ import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { CountrySelect } from '../addOrEdit/countrySelect';
 import { ProvinceSelect } from '../addOrEdit/provinceSelect';
+import { DistrictceSelect } from '../addOrEdit/districtSelect';
 import { useUserService } from '../../services/userService';
 import { RoleSelect } from '../addOrEdit/roleSelect';
 import { toast } from '../../utils/toastMessages';
@@ -56,6 +57,7 @@ type FormValues = {
   roleId: string;
   moduleRoles: string;
   provinceId: string;
+  districtId?: string;
   createdDate?: string;
   password: string;
   updateDate?: string;
@@ -87,6 +89,7 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
       countryId: '1',
       roleId: '3',
       provinceId: '',
+      districtId: '',
       isActive: true,
       createdDate: "",
       updateDate: "",
@@ -198,6 +201,7 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
       deleteMessageTitle: (values.isActive ? undefined : (values.deleteMessageTitle ? values.deleteMessageTitle.trim() : undefined )),
       fullName: values.fullName.trim(),
       provinceId: values.provinceId ? parseInt(values.provinceId) : undefined,
+      districtId: values.districtId ? parseInt(values.districtId) : undefined,
       countryId: values.countryId ? parseInt(values.countryId) : undefined,
       roleId: values.roleId ? parseInt(values.roleId) : undefined,
       duties: resultDutyData ? JSON.stringify(resultDutyData) : undefined,
@@ -334,14 +338,14 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
             />
           </Grid.Col>
 
-          <Grid.Col span={6}>
+          <Grid.Col span={4}>
             <CountrySelect
               form={form}
               disabled={true}
             />
           </Grid.Col>
 
-          <Grid.Col span={6}>
+          <Grid.Col span={4}>
             <ProvinceSelect 
               form={form}
               required={true}
@@ -350,7 +354,13 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
               countryId={form.values.countryId}
             />
           </Grid.Col>
-
+          <Grid.Col span={4}>
+            <DistrictceSelect 
+              form={form}
+              required={true}
+              provinceId={form.values.provinceId}
+            />
+          </Grid.Col>
           <Grid.Col span={2}>
             <TextInput
               label="Ülke Kodu"

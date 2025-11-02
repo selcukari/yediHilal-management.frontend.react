@@ -27,6 +27,8 @@ interface BranchType {
   branchName: string;
   provinceId: number;
   provinceName: string;
+  districtId: number;
+  districtName: string;
   branchHeadId: number;
   branchHeadFullName?: string | null;
   branchHeadPhone?: string | null;
@@ -54,6 +56,7 @@ export default function Branch() {
     { field: 'branchName', header: 'Şube Adı' },
     { field: 'branchHeadFullName', header: 'Başkan Adı/Telefon' },
     { field: 'provinceName', header: 'İl' },
+    { field: 'districtName', header: 'İlçe' },
     { field: 'phone', header: 'Telefon' },
     { field: 'email', header: 'Mail' },
     { field: 'openingDate', header: 'Acılış Tarih' },
@@ -85,9 +88,10 @@ export default function Branch() {
 
   const handleEdit = (item: BranchType) => {
     branchEditRef.current?.openDialog({
-      ...omit(['actions', 'createDate', 'branchHeadPhone', 'updateDate', 'provinceName', 'branchHeadFullName'], item),
+      ...omit(['actions', 'createDate', 'branchHeadPhone', 'updateDate', 'provinceName', 'branchHeadFullName', 'districtName'], item),
       branchHeadId: item.branchHeadId ? item.branchHeadId.toString() : null,
       provinceId: item.provinceId?.toString(),
+      districtId: item.districtId?.toString(),
     });
   };
 

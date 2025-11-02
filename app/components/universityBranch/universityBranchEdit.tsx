@@ -5,6 +5,7 @@ import { Modal, TextInput, Button, Stack,ActionIcon, Group, Textarea, Title, Tab
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck, IconTrash, IconPlus } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
+import { DistrictceSelect } from '../addOrEdit/districtSelect';
 import { ProvinceSelect } from '../addOrEdit/provinceSelect';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useUserService } from '../../services/userService';
@@ -41,6 +42,7 @@ type FormValues = {
   id: number;
   universityName: string;
   provinceId: string | null;
+  districtId: string | null;
   branchHeadId: string | null;
   email?: string | null;
   socialMedias?: string | null;
@@ -78,6 +80,7 @@ const BranchEdit = forwardRef<UniversityBranchEditDialogControllerRef, Universit
       id: 0,
       universityName: '',
       provinceId: "",
+      districtId: "",
       branchHeadId: "",
       email:"",
       socialMedias: "",
@@ -100,7 +103,7 @@ const BranchEdit = forwardRef<UniversityBranchEditDialogControllerRef, Universit
     const files = form.values.files || [];
     
     const result = await service.updateUniversityBranch({
-      ...omit(['isActive', 'provinceId'], values),
+      ...omit(['isActive', 'provinceId', 'districtId'], values),
       files: files.length > 0 ? files : undefined,
       universityName: values.universityName.trim(),
       branchHeadId: values.branchHeadId as string,
@@ -295,12 +298,6 @@ const BranchEdit = forwardRef<UniversityBranchEditDialogControllerRef, Universit
               />
             </Grid.Col>
             <Grid.Col span={6}>
-              <ProvinceSelect 
-                form={form} required={true} label="İl" placeholder="İl Seçiniz" 
-                countryId={"1"} disabled={true}
-              />
-            </Grid.Col>
-            <Grid.Col span={6}>
               <Select
                 label="Üniversite Başkanı" placeholder="Üniversite başkan Seçiniz" data={branchHeadUserData.map(item => ({ value: item.id, label: item.fullName }))}
                 searchable clearable maxDropdownHeight={200} value={form.values.branchHeadId}
@@ -308,6 +305,20 @@ const BranchEdit = forwardRef<UniversityBranchEditDialogControllerRef, Universit
                 onChange={(value) => form.setFieldValue('branchHeadId', value)}
               />
             </Grid.Col>
+            <Grid.Col span={6}>
+              <ProvinceSelect 
+                form={form} required={true} label="İl" placeholder="İl Seçiniz" 
+                countryId={"1"} disabled={true}
+              />
+            </Grid.Col>
+            <Grid.Col span={6}>
+            <DistrictceSelect 
+              form={form}
+              // required={true}
+              disabled={true}
+              provinceId={form.values.provinceId ?? undefined}
+            />
+          </Grid.Col>
             <Grid.Col span={6}>
               <TextInput
                 label="Email" placeholder="Email giriniz" type="email"

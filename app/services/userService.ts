@@ -7,6 +7,7 @@ interface UserDataParams {
   isActive: boolean;
   countryId?: number;
   provinceId?: number;
+  districtId?: number;
   identificationNumber?: string;
   telephone?: string;
   email?: string;

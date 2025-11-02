@@ -8,6 +8,7 @@ import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck, IconCalendar } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import { ProvinceSelect } from '../addOrEdit/provinceSelect';
+import { DistrictceSelect } from '../addOrEdit/districtSelect';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useUserService } from '../../services/userService';
 import { useBranchService } from '../../services/branchService';
@@ -27,6 +28,7 @@ interface UserAddProps {
 type FormValues = {
   branchName: string;
   provinceId: string;
+  districtId: string;
   branchHeadId: string | null;
   address?: string | null;
   phone?: string | null;
@@ -60,6 +62,7 @@ const BranchAdd = forwardRef<BranchAddDialogControllerRef, UserAddProps>(({onSav
     initialValues: {
       branchName: '',
       provinceId: "",
+      districtId: '',
       branchHeadId: "",
       address:"",
       phone: "",
@@ -95,6 +98,7 @@ const BranchAdd = forwardRef<BranchAddDialogControllerRef, UserAddProps>(({onSav
       branchName: values.branchName.trim(),
       leaseAgreementDate: values.isRent ? values.leaseAgreementDate : null,
       provinceId: values.provinceId as string,
+      districtId: values.districtId as string,
       branchHeadId: values.branchHeadId as string,
     });
 
@@ -212,6 +216,14 @@ const BranchAdd = forwardRef<BranchAddDialogControllerRef, UserAddProps>(({onSav
               />
             </Grid.Col>
             <Grid.Col span={6}>
+              <Select
+                label="Temsilcilik Başkanı" placeholder="temsilcilik başkan Seçiniz"
+                data={userData.map(item => ({ value: item.id, label: item.fullName }))}
+                searchable clearable maxDropdownHeight={200} nothingFoundMessage="Temsilcilik başkan alan bulunamadı..."
+                required onChange={(value) => form.setFieldValue('branchHeadId', value)}
+              />
+            </Grid.Col>
+            <Grid.Col span={6}>
               <ProvinceSelect 
                 form={form}
                 required={true}
@@ -221,11 +233,10 @@ const BranchAdd = forwardRef<BranchAddDialogControllerRef, UserAddProps>(({onSav
               />
             </Grid.Col>
             <Grid.Col span={6}>
-              <Select
-                label="Temsilcilik Başkanı" placeholder="temsilcilik başkan Seçiniz"
-                data={userData.map(item => ({ value: item.id, label: item.fullName }))}
-                searchable clearable maxDropdownHeight={200} nothingFoundMessage="Temsilcilik başkan alan bulunamadı..."
-                required onChange={(value) => form.setFieldValue('branchHeadId', value)}
+              <DistrictceSelect 
+                form={form}
+                required={true}
+                provinceId={form.values.provinceId}
               />
             </Grid.Col>
             <Grid.Col span={4}>

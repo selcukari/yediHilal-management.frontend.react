@@ -5,6 +5,7 @@ interface BranchDataParams {
   id?: number;
   branchName: string;
   provinceId?: string;
+  districtId?: string;
   branchHeadId?: string;
   address?: string | null;
   phone?: string | null;
@@ -70,6 +71,7 @@ export function useBranchService(controller: string) {
       formData.append('branchName', params.branchName);
       formData.append('branchHeadId', params.branchHeadId || '');
       formData.append('provinceId', params.provinceId || '');
+      formData.append('districtId', params.districtId || '');
       formData.append('address', params.address || '');
       formData.append('phone', params.phone || "");
       formData.append('email', params?.email || '');

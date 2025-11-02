@@ -1,12 +1,11 @@
 import { forwardRef, useImperativeHandle, useEffect, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { last } from 'ramda';
-import { subDays } from 'date-fns';
-import { DateInput } from '@mantine/dates';
 import { Modal, TextInput, Button, Stack, Textarea, Grid, Flex, Switch, Select } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { IconCancel, IconCheck, IconCalendar } from '@tabler/icons-react';
+import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
+import { DistrictceSelect } from '../addOrEdit/districtSelect';
 import { ProvinceSelect } from '../addOrEdit/provinceSelect';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useUserService } from '../../services/userService';
@@ -26,6 +25,7 @@ interface UniversityBranchAddProps {
 type FormValues = {
   universityName: string;
   provinceId: string;
+  districtId: string;
   branchHeadId: string | null;
   socialMedias?: string | null;
   email?: string | null;
@@ -55,6 +55,7 @@ const UniversityBranchAdd = forwardRef<UniversityBranchAddDialogControllerRef, U
       provinceId: "",
       branchHeadId: "",
       email:"",
+      districtId: "",
       socialMedias: "",
       updateDate: "",
       createDate: "",
@@ -75,6 +76,7 @@ const UniversityBranchAdd = forwardRef<UniversityBranchAddDialogControllerRef, U
       files: files.length > 0 ? files : undefined,
       universityName: values.universityName.trim(),
       provinceId: values.provinceId as string,
+      districtId: values.districtId as string,
       branchHeadId: values.branchHeadId as string,
     });
 
@@ -192,6 +194,14 @@ const UniversityBranchAdd = forwardRef<UniversityBranchAddDialogControllerRef, U
               />
             </Grid.Col>
             <Grid.Col span={6}>
+              <Select
+                label="Üniversite Başkanı" placeholder="Üniversite başkan Seçiniz"
+                data={userData.map(item => ({ value: item.id, label: item.fullName }))}
+                searchable clearable maxDropdownHeight={200} nothingFoundMessage="Temsilcilik başkan alan bulunamadı..."
+                required onChange={(value) => form.setFieldValue('branchHeadId', value)}
+              />
+            </Grid.Col>
+            <Grid.Col span={6}>
               <ProvinceSelect 
                 form={form}
                 required={true}
@@ -201,11 +211,10 @@ const UniversityBranchAdd = forwardRef<UniversityBranchAddDialogControllerRef, U
               />
             </Grid.Col>
             <Grid.Col span={6}>
-              <Select
-                label="Üniversite Başkanı" placeholder="Üniversite başkan Seçiniz"
-                data={userData.map(item => ({ value: item.id, label: item.fullName }))}
-                searchable clearable maxDropdownHeight={200} nothingFoundMessage="Temsilcilik başkan alan bulunamadı..."
-                required onChange={(value) => form.setFieldValue('branchHeadId', value)}
+              <DistrictceSelect 
+                form={form}
+                required={true}
+                provinceId={form.values.provinceId}
               />
             </Grid.Col>
             <Grid.Col span={6}>

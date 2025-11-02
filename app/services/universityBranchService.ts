@@ -5,6 +5,7 @@ interface UniversityBranchDataParams {
   id?: number;
   universityName: string;
   provinceId?: string;
+  districtId?: string;
   branchHeadId?: string;
   socialMedias?: string | null;
   email?: string | null;
@@ -65,6 +66,7 @@ export function useUniversityBranchService(controller: string) {
       formData.append('universityName', params.universityName);
       formData.append('branchHeadId', params.branchHeadId || '');
       formData.append('provinceId', params.provinceId || '');
+      formData.append('districtId', params.districtId || '');
       formData.append('socialMedias', params.socialMedias || '');
       formData.append('email', params.email || '');
 
