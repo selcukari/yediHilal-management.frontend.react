@@ -26,6 +26,8 @@ interface UniversityBranchType {
   id: number;
   universityName: string;
   provinceId: number;
+  districtId: number;
+  districtName: string;
   provinceName: string;
   branchHeadId: number;
   branchHeadFullName?: string | null;
@@ -48,6 +50,7 @@ export default function Duty() {
     { field: 'universityName', header: 'Üniversite Adı' },
     { field: 'branchHeadFullName', header: 'Başkan Adı/Telefon' },
     { field: 'provinceName', header: 'İl' },
+    { field: 'districtName', header: 'İlçe' },
     { field: 'createDate', header: 'İlk Tarih' },
     { field: 'actions', header: 'İşlemler' },
   ]);
@@ -75,9 +78,10 @@ export default function Duty() {
 
   const handleEdit = (item: UniversityBranchType) => {
     universityBranchEditRef.current?.openDialog({
-      ...omit(['actions', 'createDate', 'branchHeadPhone', 'updateDate', 'provinceName', 'branchHeadFullName'], item),
+      ...omit(['actions', 'createDate', 'branchHeadPhone', 'updateDate', 'provinceName', 'branchHeadFullName', 'districtName'], item),
       branchHeadId: item.branchHeadId ? item.branchHeadId.toString() : null,
       provinceId: item.provinceId?.toString(),
+      districtId: item.districtId?.toString(),
     });
   };
 
