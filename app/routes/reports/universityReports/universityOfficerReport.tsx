@@ -33,6 +33,8 @@ interface UniversityBranchType {
   universityName: string;
   provinceId: number;
   provinceName: string;
+  districtName: string;
+  districtId: number;
   branchHeadId: number;
   universityBranchHeadFullName?: string | null;
   universityBranchHeadPhone?: string | null;
@@ -75,6 +77,7 @@ export default function OfficerReport() {
 
     { field: 'universityName', header: 'Üniversite Adı' },
     { field: 'universityBranchProvince', header: 'Üniversite İl' },
+    { field: 'universityDistrictName', header: 'Temsilcilik İlçe' },
     { field: 'universityBranchHeadFullName', header: 'Üniversite Başkanı' },
     { field: 'universityBranchHeadPhone', header: 'Üniversite Baş. Numarası' },
   ]);
@@ -141,6 +144,7 @@ export default function OfficerReport() {
                 universityName: branch.universityName,
                 provinceName: branch.provinceName,
                 provinceId: branch.provinceId,
+                districtName: branch.districtName,
                 email: branch.email,
                 // sube başkan info
                 universityBranchHeadFullName: branch.branchHeadFullName,
@@ -241,6 +245,13 @@ export default function OfficerReport() {
             </Table.Td>
           );
         }
+        if (header.field === 'universityDistrictName') {
+          return (
+            <Table.Td key={header.field}>
+              {item["branchInfo"]["districtName"] || ""}
+            </Table.Td>
+          );
+        }
         if (header.field === 'universityBranchHeadFullName') {
           return (
             <Table.Td key={header.field}>
@@ -309,6 +320,7 @@ export default function OfficerReport() {
       ...report,
       universityName: report["branchInfo"]["universityName"] || "",
       universityBranchProvince: report["branchInfo"]["provinceName"] || "",
+      universityDistrictName: report["branchInfo"]["districtName"] || "",
       universityBranchHeadFullName: report["branchInfo"]["universityBranchHeadFullName"] || "",
       universityBranchHeadPhone: report["branchInfo"]["universityBranchHeadPhone"] || "",
       memberStatu: report["memberStatu"] == "1" ? "Evet" : "Hayır",

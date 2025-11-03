@@ -32,7 +32,9 @@ interface BranchType {
   id: number;
   branchName: string;
   provinceId: number;
+  districtId: number;
   provinceName: string;
+  districtName: string;
   branchHeadId: number;
   branchHeadFullName?: string | null;
   branchHeadPhone?: string | null;
@@ -80,6 +82,7 @@ export default function OfficerReport() {
 
     { field: 'branchName', header: 'Temsilcilik Adı' },
     { field: 'branchProvince', header: 'Temsilcilik İl' },
+    { field: 'branchDistrictName', header: 'Temsilcilik İlçe' },
     { field: 'branchHeadFullName', header: 'Temsilcilik Başkanı' },
     { field: 'branchHeadPhone', header: 'Temsilcilik Baş. Numarası' },
   ]);
@@ -152,6 +155,7 @@ export default function OfficerReport() {
                 id: branch.id,
                 branchName: branch.branchName,
                 provinceName: branch.provinceName,
+                districtName: branch.districtName,
                 provinceId: branch.provinceId,
                 address: branch.address,
                 phone: branch.phone,
@@ -249,6 +253,13 @@ export default function OfficerReport() {
             </Table.Td>
           );
         }
+        if (header.field === 'branchDistrictName') {
+          return (
+            <Table.Td key={header.field}>
+              {item["branchInfo"]["districtName"] || ""}
+            </Table.Td>
+          );
+        }
         if (header.field === 'branchHeadFullName') {
           return (
             <Table.Td key={header.field}>
@@ -308,7 +319,7 @@ export default function OfficerReport() {
   }, [rowHeaders]);
 
   const reportTitle = (): string => {
-    return "Temsilcilik Rapor";
+    return "Temsilcilik Görevli Rapor";
   };
 
    // raportdata
@@ -317,6 +328,7 @@ export default function OfficerReport() {
       ...report,
       branchName: report["branchInfo"]["branchName"] || "",
       branchProvince: report["branchInfo"]["provinceName"] || "",
+      branchDistrictName: report["branchInfo"]["districtName"] || "",
       branchHeadFullName: report["branchInfo"]["branchHeadFullName"] || "",
       branchHeadPhone: report["branchInfo"]["branchHeadPhone"] || "",
       memberStatu: report["memberStatu"] == "1" ? "Evet" : "Hayır",
