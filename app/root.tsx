@@ -17,7 +17,7 @@ import {
 import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router";
 import { Notifications } from '@mantine/notifications';
-import { AuthProvider, useAuth } from './authContext'; // useAuth'u da import et
+import { AuthProvider, useAuth } from './authContext';
 import { Layout as AppLayout, MemberLayout, BranchLayout, UniversityBranchLayout } from './components';
 import { CustomLayout } from './components';
 import ProtectedRoute from './protectedRoute'
@@ -71,7 +71,7 @@ function AppContent() {
   const location = useLocation();
   const [locationPathname, setLocationPathname] = useState<boolean>(true);
   const navigate = useNavigate();
-  const { currentUser, isLoggedIn } = useAuth(); // useAuth'u burada kullan
+  const { currentUser, isLoggedIn } = useAuth();
 
   useEffect(() => {
     setLocationPathname(!['/memberCreate', '/privacyPolicy'].includes(location.pathname));
@@ -126,7 +126,6 @@ function AppContent() {
           </UniversityBranchLayout>
         );
       default:
-        // Kullanıcı tipi belirlenemezse veya boşsa
         return (
           <CustomLayout>
             <Outlet />
@@ -157,12 +156,13 @@ export default function App() {
   );
 }
 
+// Basit ErrorBoundary - Router hook'ları kullanmadan
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  const navigate = useNavigate();
   let title = "Oops!";
   let message = "An unexpected error occurred.";
   let status = 500;
   let stack: string | undefined;
+  const { currentUser } = useAuth();
 
   if (isRouteErrorResponse(error)) {
     status = error.status;
@@ -177,71 +177,117 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   const is404 = status === 404;
+    // Layout seçimi için fonksiyon
+  const goToHomeDefault = () => {
+    let user = null;
+    const storedUser = getWithExpiry('currentUser');
+    if (storedUser) {
+      user =  JSON.parse(storedUser);
+    }
+
+    switch (user?.userType) {
+      case "memberLogin":
+        window.location.href = '/member-for-memberUser';
+        return;
+      default:
+        window.location.href = '/';
+        return;
+    }
+  };
+
+  // Ana sayfaya dön butonu için basit JavaScript kullanımı
+  const goToHome = () => {
+    window.location.href = '/';
+  };
 
   return (
-    <AppLayout>
-      <Container size="md" py={80}>
-        <Stack align="center" gap="xl">
-          {/* 404 için özel ikon ve renk */}
-          {is404 ? (
-            <Alert 
-              color="red" 
-              title={title}
-              icon={<IconAlertCircle size={24} />}
-              w="100%"
-              variant="filled"
-            >
-              <Text c="white" size="lg" fw={500}>
-                {message}
-              </Text>
-            </Alert>
-          ) : (
-            <Alert 
-              color="orange" 
-              title={title}
-              icon={<IconAlertCircle size={24} />}
-              w="100%"
-            >
-              <Text size="lg" fw={500}>
-                {message}
-              </Text>
-            </Alert>
-          )}
+    <html lang="en" {...mantineHtmlProps}>
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <ColorSchemeScript />
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <MantineProvider theme={theme}>
+          <div className="error-boundary">
+            <Container size="md" py={80}>
+              <Stack align="center" gap="xl">
+                {/* 404 için özel ikon ve renk */}
+                {is404 ? (
+                  <Alert 
+                    color="red" 
+                    title={title}
+                    icon={<IconAlertCircle size={24} />}
+                    w="100%"
+                    variant="filled"
+                  >
+                    <Text c="white" size="lg" fw={500}>
+                      {message}
+                    </Text>
+                  </Alert>
+                ) : (
+                  <Alert 
+                    color="orange" 
+                    title={title}
+                    icon={<IconAlertCircle size={24} />}
+                    w="100%"
+                  >
+                    <Text size="lg" fw={500}>
+                      {message}
+                    </Text>
+                  </Alert>
+                )}
 
-          {/* Görsel - 404 için özel */}
-          {is404 && (
-            <div style={{ textAlign: 'center' }}>
-              <Title 
-                c="red" 
-                size={120} 
-                style={{ 
-                  fontWeight: 900,
-                  opacity: 0.7,
-                  lineHeight: 1 
-                }}
-              >
-                404
-              </Title>
-              <Text size="xl" c="dimmed" fw={500}>
-                Sayfa Bulunamadı
-              </Text>
-            </div>
-          )}
+                {/* Görsel - 404 için özel */}
+                {is404 && (
+                  <div style={{ textAlign: 'center' }}>
+                    <Title 
+                      c="red" 
+                      size={120} 
+                      style={{ 
+                        fontWeight: 900,
+                        opacity: 0.7,
+                        lineHeight: 1 
+                      }}
+                    >
+                      404
+                    </Title>
+                    <Text size="xl" c="dimmed" fw={500}>
+                      Sayfa Bulunamadı
+                    </Text>
+                  </div>
+                )}
 
-          {/* Aksiyon butonları */}
-          <Group>
-            <Button
-              size="lg"
-              leftSection={<IconHome size={18} />}
-              onClick={() => navigate('/')}
-              variant={is404 ? "filled" : "light"}
-              color={is404 ? "red" : "blue"}
-            >
-              Ana Sayfaya Dön
-            </Button>
-          </Group>
-        </Stack>
-      </Container>
-    </AppLayout>
+                {/* Aksiyon butonları */}
+                <Group>
+                  <Button
+                    size="lg"
+                    leftSection={<IconHome size={18} />}
+                    onClick={goToHomeDefault}
+                    variant={is404 ? "filled" : "light"}
+                    color={is404 ? "red" : "blue"}
+                  >
+                    Ana Sayfaya Dön
+                  </Button>
+                </Group>
+
+                {/* Geliştirme ortamında stack trace göster */}
+                {import.meta.env.VITE_APP_IS_DEV && stack && (
+                  <details style={{ width: '100%' }}>
+                    <summary>Hata Detayları</summary>
+                    <Code block style={{ whiteSpace: 'pre-wrap', marginTop: '1rem' }}>
+                      {stack}
+                    </Code>
+                  </details>
+                )}
+              </Stack>
+            </Container>
+          </div>
+        </MantineProvider>
+        <Scripts />
+      </body>
+    </html>
   );
 }
