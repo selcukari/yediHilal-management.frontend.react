@@ -8,6 +8,7 @@ type MeetingType = {
   responsibleFullName: string | null;
   meetingTypeId: number;
   provinceId: number;
+  districtId: number;
   agendas: string;
   time?: string | null;
   notes?: string | null;
@@ -53,6 +54,7 @@ export function useMeetingService(controller: string) {
         formData.append('responsibleFullName', params.responsibleFullName?.toString() || '');
         formData.append('meetingTypeId', params.meetingTypeId?.toString() || '');
         formData.append('provinceId', params.provinceId?.toString() || "");
+        formData.append('districtId', params.districtId?.toString() || "");
         formData.append('agendas', params.agendas || '');
         formData.append('time', params.time || '');
         formData.append('notes', params.notes || '');
@@ -81,6 +83,7 @@ export function useMeetingService(controller: string) {
       formData.append('responsibleFullName', params.responsibleFullName?.toString() || '');
       formData.append('meetingTypeId', params.meetingTypeId?.toString() || '');
       formData.append('provinceId', params.provinceId?.toString() || "");
+      formData.append('districtId', params.districtId?.toString() || "");
       formData.append('agendas', params.agendas || '');
       formData.append('time', params.time || '');
       formData.append('notes', params.notes || '');

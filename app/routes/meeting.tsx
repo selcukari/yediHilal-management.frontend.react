@@ -30,6 +30,8 @@ interface MeetingData {
   meetingTypeName: string;
   provinceId: number;
   provinceName: string;
+  districtId?: number;
+  districtName?: string;
   duration?: number;
   notes?: string;
   isActive: boolean;
@@ -61,6 +63,7 @@ export default function Meeting() {
     { field: 'id', header: 'Id' },
     { field: 'name', header: 'Toplantı Adı' },
     { field: 'provinceName', header: 'İl' },
+    { field: 'districtName', header: 'İlçe' },
     { field: 'agendas', header: 'Gündemler' },
     { field: 'participantCount', header: 'Katılımcı Sayısı' },
     { field: 'responsibleFullName', header: 'Sorumlu' },
@@ -110,6 +113,7 @@ export default function Meeting() {
     meetingEditRef.current?.openDialog({
       ...value,
       provinceId: value.provinceId?.toString(),
+      districtId: value.districtId?.toString(),
       meetingTypeId: value.meetingTypeId?.toString(),
       participantCount: value.participantCount ?? 1,
       agendas: value.agendas ?? "",
@@ -191,11 +195,12 @@ export default function Meeting() {
       <Table.Td>{element.id}</Table.Td>
       <Table.Td>{element.name}</Table.Td>
       <Table.Td>{element.provinceName}</Table.Td>
+      <Table.Td>{element.districtName}</Table.Td>
       <Table.Td>{element.agendas?.substring(0,30)}</Table.Td>
       <Table.Td>{element.participantCount}</Table.Td>
       <Table.Td>{element.responsibleFullName}</Table.Td>
       <Table.Td>{element.meetingTypeName}</Table.Td>
-      <Table.Td>{stripHtml(element.notes)?.substring(0,20)}</Table.Td>
+      <Table.Td>{stripHtml(element.address)?.substring(0,20)}</Table.Td>
       <Table.Td>{element.duration}</Table.Td>
       <Table.Td>{formatDate(element.time, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
       <Table.Td>{formatDate(element.createDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
@@ -256,6 +261,7 @@ export default function Meeting() {
     return filteredMeetings.map((project: MeetingData) => ({
       ...project,
       agendas: project.agendas?.substring(0,30),
+      address: project.address?.substring(0,30),
       createDate: formatDate(project.createDate, dateFormatStrings.dateTimeFormatWithoutSecond),
       time: project.time ? formatDate(project.time, dateFormatStrings.dateTimeFormatWithoutSecond) : '-',
     }))
@@ -365,11 +371,12 @@ export default function Meeting() {
                     <Table.Th>Id</Table.Th>
                     <Table.Th>Toplantı Adı</Table.Th>
                     <Table.Th>İl</Table.Th>
+                    <Table.Th>İlçe</Table.Th>
                     <Table.Th>Gündemler</Table.Th>
                     <Table.Th>Katılımcı Sayısı</Table.Th>
                     <Table.Th>Sorumlu</Table.Th>
                     <Table.Th>Toplantı Birim</Table.Th>
-                    <Table.Th>Alınan Kararlar</Table.Th>
+                    <Table.Th>Adres</Table.Th>
                     <Table.Th>Toplantı Süresi(saat)</Table.Th>
                     <Table.Th>Toplantı Tarihi</Table.Th>
                     <Table.Th>İlk Kayıt Tarihi</Table.Th>

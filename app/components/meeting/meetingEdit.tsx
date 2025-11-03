@@ -1,6 +1,6 @@
 import { forwardRef, useImperativeHandle, useEffect, useState, useRef, useMemo } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { clone, is } from 'ramda';
+import { clone } from 'ramda';
 import { Modal, TextInput, Button, Text, Stack, Grid, Textarea, Stepper, Box, Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DateTimePicker } from '@mantine/dates';
@@ -8,6 +8,7 @@ import { IconCancel, IconCheck, IconCalendar } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { toast } from '../../utils/toastMessages';
+import { DistrictceSelect } from '../addOrEdit/districtSelect';
 import { ProvinceSelect } from '../addOrEdit/provinceSelect';
 import { MeetingTypeSelect } from '../addOrEdit/meetingTypeSelect';
 import { RichTextEditorTiptap } from '../richTextEditorTiptap';
@@ -31,6 +32,7 @@ type FormValues = {
   responsibleFullName?: string | null;
   meetingTypeId?: string | null;
   provinceId?: string | null;
+  districtId?: string | null;
   address?: string | null;
   participantCount: number;
   duration?: number;
@@ -57,6 +59,7 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
       responsibleFullName: '',
       meetingTypeId: "",
       provinceId: '',
+      districtId: '',
       address: '',
       duration: 1,
       agendas: "",
@@ -70,6 +73,7 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
       time: (value) => (value ? null : 'Toplantı zamanı alanı zorunlu'),
       provinceId: (value) => (value ? null : 'İl seçmek zorunlu'),
       agendas: (value) => (value.trim().length < 10 ? 'Gündemler alanı en az 10 karakter olmalı' : null),
+      districtId: (value) => (value ? null : 'İlçe seçmek zorunlu'),
     },
   });
   useEffect(() => {
@@ -86,7 +90,8 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
 
   // Step validation fonksiyonları
   const validateStep1 = () => {
-    const fieldsToValidate = ['name', 'responsibleFullName', 'meetingTypeId', 'provinceId'];
+    const fieldsToValidate = ['name', 'responsibleFullName',
+      'districtId', 'meetingTypeId', 'provinceId'];
     let isValid = true;
 
     fieldsToValidate.forEach(field => {
@@ -187,6 +192,7 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
       responsibleFullName: values.responsibleFullName ?? "",
       meetingTypeId: values.meetingTypeId ? parseInt(values.meetingTypeId) : 1,
       provinceId: values.provinceId ? parseInt(values.provinceId) : 1,
+      districtId: values.districtId ? parseInt(values.districtId) : 1,
     });
 
     if (result == true) {
@@ -279,7 +285,7 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
                 form={form} 
               />
             </Grid.Col>
-            <Grid.Col span={6}>
+            <Grid.Col span={4}>
               <TextInput
                 label="Sorumlu"
                 placeholder="sorumlu giriniz"
@@ -288,13 +294,20 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
                 {...form.getInputProps('responsibleFullName')}
               />
             </Grid.Col>
-            <Grid.Col span={6}>
+            <Grid.Col span={4}>
               <ProvinceSelect 
                 form={form}
                 required={true}
                 label="İl" 
                 placeholder="İl Seçiniz" 
                 countryId={"1"} disabled={!isUserAdmin}
+              />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <DistrictceSelect 
+                form={form}
+                required={true}
+                provinceId={form.values.provinceId ?? undefined}
               />
             </Grid.Col>
             </Grid>

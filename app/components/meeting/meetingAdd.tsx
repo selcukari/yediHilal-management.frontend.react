@@ -6,6 +6,7 @@ import { DateTimePicker } from '@mantine/dates';
 import { IconCancel, IconCheck, IconCalendar } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
+import { DistrictceSelect } from '../addOrEdit/districtSelect';
 import { ProvinceSelect } from '../addOrEdit/provinceSelect';
 import { MeetingTypeSelect } from '../addOrEdit/meetingTypeSelect';
 import { useMeetingService } from '../../services/meetingService';
@@ -29,6 +30,7 @@ type FormValues = {
   responsibleFullName?: string | null;
   meetingTypeId?: string | null;
   provinceId?: string | null;
+  districtId?: string | null;
   address?: string | null;
   participantCount: number;
   duration?: number;
@@ -54,6 +56,7 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
       responsibleFullName: '',
       meetingTypeId: "",
       provinceId: '',
+      districtId: '',
       address: '',
       duration: 1,
       agendas: "",
@@ -69,6 +72,7 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
       time: (value) => (value ? null : 'Toplantı zamanı alanı zorunlu'),
       meetingTypeId: (value) => (value ? null : 'Toplantı türü seçmek zorunlu'),
       provinceId: (value) => (value ? null : 'İl seçmek zorunlu'),
+      districtId: (value) => (value ? null : 'İlçe seçmek zorunlu'),
     },
   });
 
@@ -87,7 +91,8 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
 
   // Step validation fonksiyonları
   const validateStep1 = () => {
-    const fieldsToValidate = ['name', 'responsibleFullName', 'meetingTypeId', 'provinceId'];
+    const fieldsToValidate = ['name', 'responsibleFullName', 'meetingTypeId',
+      'provinceId', 'districtId'];
     let isValid = true;
 
     fieldsToValidate.forEach(field => {
@@ -173,6 +178,7 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
       files: files.length > 0 ? files : undefined,
       meetingTypeId: values.meetingTypeId ? parseInt(values.meetingTypeId) : 1,
       provinceId: values.provinceId ? parseInt(values.provinceId) : 1,
+      districtId: values.districtId ? parseInt(values.districtId) : 1,
     });
 
     if (result === true) {
@@ -266,7 +272,7 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
                         form={form} 
                       />
                     </Grid.Col>
-                    <Grid.Col span={6}>
+                    <Grid.Col span={4}>
                       <TextInput
                         label="Sorumlu"
                         placeholder="sorumlu giriniz"
@@ -275,7 +281,7 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
                         {...form.getInputProps('responsibleFullName')}
                       />
                     </Grid.Col>
-                    <Grid.Col span={6}>
+                    <Grid.Col span={4}>
                       <ProvinceSelect 
                         form={form}
                         required={true}
@@ -286,6 +292,13 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
                         disabled={!isUserAdmin}
                       />
                     </Grid.Col>
+                    <Grid.Col span={4}>
+                      <DistrictceSelect 
+                        form={form}
+                        required={true}
+                        provinceId={form.values.provinceId ?? undefined}
+                      />
+                  </Grid.Col>
                   </Grid>
                 </Box>
               </Stepper.Step>
