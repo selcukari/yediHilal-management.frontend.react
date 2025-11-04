@@ -267,7 +267,7 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
           <Grid.Col span={6}>
             <MemberTypeSelect
               form={form}
-              required={true} disabled={!isUserAdmin}
+              required={true}
               {...form.getInputProps('typeIds')}
             ></MemberTypeSelect>
           </Grid.Col>

@@ -252,7 +252,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
           <Grid.Col span={6}>
             <MemberTypeSelect
               form={form}
-              required={true} disabled={!isUserAdmin}
+              required={true}
               {...form.getInputProps('typeIds')} valueId={isUserAdmin ? null : dutyMemberTypeId}
             ></MemberTypeSelect>
           </Grid.Col>
