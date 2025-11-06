@@ -3,12 +3,11 @@ import {
   NavLink, Flex, Text, Stack, Divider, Group, ScrollArea, AppShell,
 } from '@mantine/core';
 import {
-  IconUsers, IconSettings, IconMessage, IconExternalLink, IconFileCheck, IconCar, IconCoin, IconBubbleText,
-  IconChevronRight, IconClipboardList, IconPhoneCall, IconBuilding, IconCalendarTime, IconSettingsAutomation, IconChevronDown, IconBuildings,
+  IconUsers, IconUser, IconFileCheck, IconCoin,
+  IconChevronRight, IconPhoneCall, IconCalendarTime, IconChevronDown, IconBuildings,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
 import { useAuth } from '~/authContext';
-import { toast } from '../../utils/toastMessages';
 
 interface SidebarProps {
   active: string;
@@ -49,6 +48,7 @@ const menuItems: MenuItem[] = [
       { icon: IconPhoneCall, label: 'Arama Takip', key: 'phoneCallTracking', link: '/phoneCallTrackings' },
     ], 
   },
+  { icon: IconUser, label: 'Kullanıcı Yönetimi', key: 'user', link: '/users' },
 ];
 
 // Recursive function to find all menu items including nested children

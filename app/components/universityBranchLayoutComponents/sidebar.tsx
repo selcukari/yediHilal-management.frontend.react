@@ -4,7 +4,7 @@ import {
 } from '@mantine/core';
 import {
   IconUsers, IconFileCheck, IconCoin,
-  IconChevronRight, IconChevronDown,
+  IconChevronRight, IconChevronDown, IconUser,
   IconSchool, IconCalendarTime, IconPhoneCall,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
@@ -49,6 +49,7 @@ const menuItems: MenuItem[] = [
       { icon: IconPhoneCall, label: 'Arama Takip', key: 'phoneCallTracking', link: '/phoneCallTrackings' },
     ], 
   },
+  { icon: IconUser, label: 'Kullanıcı Yönetimi', key: 'user', link: '/users' },
 ];
 
 // Recursive function to find all menu items including nested children

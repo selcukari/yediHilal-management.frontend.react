@@ -80,7 +80,7 @@ export default function Meeting() {
     }, 1000);
   }, []);
 
-   const isUserAdmin = useMemo(() => {
+  const isUserAdmin = useMemo(() => {
     const result = currentUser?.userType === 'userLogin';
     if (!result) {
       setFilterProvinceIds(currentUser?.provinceId ? [currentUser.provinceId.toString()] : null);

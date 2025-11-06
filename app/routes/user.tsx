@@ -41,7 +41,6 @@ interface DutiesType {
 
 export default function User() {
   const [resultData, setResultData] = useState<any[]>([]);
-  const [isDisabledDeleteAction, setDisabledDeleteAction]= useState(false);
   const [selectedCountry, setSelectedCountry] = useState<string | null | undefined>(null);
   const [filterModel, setFilterModel] = useState<filterModels>({ isActive: true, countryId: '1' });
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null); // Silinecek öğenin ID'sini tut
@@ -71,17 +70,22 @@ export default function User() {
   const userEditRef = useRef<UserEditDialogControllerRef>(null);
   const confirmModalMessageRef = useRef<ConfirmModalMessageRef>(null);
 
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, currentUser } = useAuth();
 
   const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      setTimeout(() => {
-        fetchUsers();
-      }, 1500);
+  const isUserAdmin = useMemo(() => {
+    const result = currentUser?.userType === 'userLogin';
+    if (!result) {
+      setFilterModel((prev) => ({
+        ...prev,
+        searchText: currentUser?.fullName || undefined,
+        provinceIds: currentUser?.provinceId ? [currentUser.provinceId.toString()] : null
+      }));
     }
-  }, []);
+
+    return result;
+  }, [currentUser]);
 
   const handleEdit = (item: any) => {
      userEditRef.current?.openDialog({
@@ -138,7 +142,7 @@ export default function User() {
                 <ActionIcon 
                   variant="light" 
                   color="red"
-                  disabled={isDisabledDeleteAction}
+                  disabled={!isUserAdmin}
                   onClick={() => handleDelete(item.id)}
                 >
                   <IconTrash size={16} />
@@ -213,13 +217,20 @@ export default function User() {
         setResultData([]);
       }
         close();
-        setDisabledDeleteAction(!filterModel.isActive);
     } catch (error: any) {
 
       toast.error(`Kullanıcılar yüklenirken hata: ${error.message}`);
       close();
     }
   };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      setTimeout(() => {
+        fetchUsers();
+      }, 500);
+    }
+  }, []);
 
   const handleSaveSuccess = () => {
 
@@ -319,19 +330,20 @@ export default function User() {
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
-            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />} onClick={() => userAddRef.current?.openDialog()}>Yeni Ekle</Button>
+            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />} disabled={!isUserAdmin} onClick={() => userAddRef.current?.openDialog()}>Yeni Ekle</Button>
             {/* Mobile için sadece icon buton */}
             <Button 
               variant="filled" 
               onClick={() => userAddRef.current?.openDialog()}
               hiddenFrom="xs"
-              p="xs"
+              p="xs" disabled={!isUserAdmin}
             >
               <IconPlus size={18} />
             </Button>
           </Group>
 
           {/* İçerik Kartları */}
+          {isUserAdmin && 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
@@ -411,6 +423,7 @@ export default function User() {
               </Grid>
             </Paper>
           </div>
+        }
 
           {/* Örnek Tablo */}
           <Paper shadow="xs" p="lg" withBorder>
