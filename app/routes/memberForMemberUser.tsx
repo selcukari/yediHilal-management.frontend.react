@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { omit } from 'ramda';
-import { TextInput, Button, Stack, Grid, Text, Group, Switch, Textarea, Container, Title, Paper } from '@mantine/core';
+import { TextInput, Button, Stack, Grid, Text, PasswordInput, Group, Switch, Textarea, Container, Title, Paper } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCheck } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
@@ -19,6 +19,7 @@ type FormValues = {
   fullName: string;
   identificationNumber: string;
   email: string;
+  password: string;
   countryCode: string;
   phone: string;
   dateOfBirth: string;
@@ -53,6 +54,7 @@ const MemberEditPage = () => {
       fullName: '',
       identificationNumber: '',
       email: '',
+      password: '',
       countryCode: '90',
       phone: '',
       dateOfBirth: '',
@@ -310,6 +312,14 @@ const MemberEditPage = () => {
                   {...form.getInputProps('email')}
                 />
               </Grid.Col>
+              <Grid.Col span={6}>
+                <PasswordInput
+                  label="Şifre"
+                  placeholder="Şifre giriniz"
+                  value={form.values.password}
+                  {...form.getInputProps('password')}
+                />
+              </Grid.Col>
 
               <Grid.Col span={6}>
                 <fieldset style={{ border: '1px solid #e9ecef', borderRadius: '8px', padding: '16px' }}>
@@ -317,7 +327,7 @@ const MemberEditPage = () => {
                   <Group gap="lg">
                     <Switch 
                       label="Üye Durumu" 
-                      checked={form.values.isActive}
+                      checked={form.values.isActive} disabled={true}
                       onChange={(event) => form.setFieldValue('isActive', event.currentTarget.checked)}
                     />
                     <Switch 

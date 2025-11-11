@@ -106,6 +106,7 @@ export default function Member() {
       fullName: item.fullName,
       identificationNumber: item.identificationNumber,
       email: item.email,
+      password: item.password,
       countryCode: item.countryCode,
       phone: item.phone,
       dateOfBirth: item.dateOfBirth ? item.dateOfBirth.toString() : '',

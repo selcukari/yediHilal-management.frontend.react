@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, useMemo, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { omit } from 'ramda';
-import { Modal, TextInput, Button, Stack, Grid, Text, Group, Switch, Textarea } from '@mantine/core';
+import { Modal, TextInput, Button, Stack, Grid, PasswordInput, Text, Group, Switch, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
@@ -28,6 +28,7 @@ type FormValues = {
   fullName: string;
   identificationNumber: string;
   email: string;
+  password?: string;
   countryCode: string;
   phone: string;
   dateOfBirth: string;
@@ -64,6 +65,7 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
       email: '',
       countryCode: '90',
       phone: '',
+      password: '',
       dateOfBirth: '',
       referenceId: '',
       typeIds: '1',
@@ -324,6 +326,15 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
               placeholder="Email giriniz"
               value={form.values.email}
               {...form.getInputProps('email')}
+            />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <PasswordInput
+              label="Şifre"
+              placeholder="Şifreniz"
+              required
+              mt="md"
+              {...form.getInputProps('password')}
             />
           </Grid.Col>
 
