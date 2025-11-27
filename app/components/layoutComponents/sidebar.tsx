@@ -75,7 +75,7 @@ const menuItems: MenuItem[] = [
         children: [{ label: 'Emanet Araçlar', key: 'vehicleDeposits', link: '/vehicleDeposits' }, { label: 'Araçlar', key: 'vehicles', link: '/vehicles' }, ],
       },
       { icon: IconClipboardList, label: 'Stok Yönetimi', key: 'stock', link: '/stocks',
-        children: [ { label: 'Emanetler', key: 'stockDeposit', link: '/stockDeposits' },   { label: 'Giderler', key: 'stockExpense', link: '/stockExpenses' },   { label: 'Depo', key: 'stock-depo', link: '/stocks' },],
+        children: [ { label: 'Emanetler', key: 'stockDeposit', link: '/stockDeposits' },   { label: 'Sarf', key: 'stockExpense', link: '/stockExpenses' },   { label: 'Depo', key: 'stock-depo', link: '/stocks' },],
       },
     ]
   },

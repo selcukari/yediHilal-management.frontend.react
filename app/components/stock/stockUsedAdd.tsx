@@ -290,7 +290,7 @@ const StockUsedAdd = forwardRef<StockUsedAddDialogControllerRef, StockUsedAddPro
             <Grid.Col span={10} offset={1}>
               <Textarea
                 mt="md"
-                label="Note"
+                label="Açıklama"
                 placeholder="messaj..."
                 withAsterisk
                 {...form.getInputProps('note')}

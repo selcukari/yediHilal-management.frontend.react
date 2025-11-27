@@ -327,7 +327,7 @@ const StockUsedExpenseEdit = forwardRef<StockUsedExpenseEditDialogControllerRef,
              </Grid.Col>
              <Grid.Col span={10} offset={1}>
               <Textarea
-                mt="md" label="Note" placeholder="messaj..."
+                mt="md" label="Açıklama" placeholder="messaj..."
                 withAsterisk value={form.values.note}
                 {...form.getInputProps('note')}
               />

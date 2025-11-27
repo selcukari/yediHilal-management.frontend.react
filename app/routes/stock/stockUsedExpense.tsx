@@ -67,8 +67,8 @@ export default function StockUsedExpense() {
     { field: 'title', header: 'Başlık' },
     { field: 'projectName', header: 'Proje Adı' },
     { field: 'address', header: 'Adres' },
-    { field: 'note', header: 'Note' },
-    { field: 'items', header: 'Giderler' },
+    { field: 'note', header: 'Açıklama' },
+    { field: 'items', header: 'Sarf' },
     { field: 'buyerInformations', header: 'Alıcı Bilgileri' },
     { field: 'isDelivery', header: 'Bitiş Durum' },
     { field: 'createDate', header: 'Kayıt Tarih' },
@@ -133,7 +133,7 @@ export default function StockUsedExpense() {
       stockUsedExpenseEditRef.current?.openDialog("Gider Düzenle", item, stockDataItems || []);
     }
     const handleAddItem = () => {
-      stockUsedAddRef.current?.openDialog("Gider Ekle", "expense", stockDataItems || [])
+      stockUsedAddRef.current?.openDialog("Sarf Ekle", "expense", stockDataItems || [])
     }
 
   const rowsTable = filteredStockUseds.map((item) => (
@@ -303,12 +303,12 @@ export default function StockUsedExpense() {
           {/* Sayfa Başlığı */}
           <Group justify="space-between" align="center">
             <div>
-              <Title order={2}>Stok Gider Sayfası</Title>
+              <Title order={2}>Stok Sarf Sayfası</Title>
               <Text size="sm" c="dimmed">
                 Toolbar Filtreleme Alanı
               </Text>
             </div>
-            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />}  onClick={handleAddItem}>Yeni Gider Ekle</Button>
+            <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />}  onClick={handleAddItem}>Yeni Sarf Ekle</Button>
             {/* Mobile için sadece icon buton */}
             <Button 
               variant="filled" 
@@ -368,7 +368,7 @@ export default function StockUsedExpense() {
           {/* Örnek Tablo */}
           <Paper shadow="xs" p="lg" withBorder>
             <Stack gap="md">
-              <Title order={4}>Son Stok Giderler({rowsTable?.length || 0})</Title>
+              <Title order={4}>Son Stok Sarf({rowsTable?.length || 0})</Title>
               <Table.ScrollContainer minWidth={400} maxHeight={700}>
                 <Table striped highlightOnHover withColumnBorders>
                   <Table.Thead>

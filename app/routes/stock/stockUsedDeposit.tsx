@@ -70,7 +70,7 @@ export default function StockUsedDeposit() {
     { field: 'projectName', header: 'Proje Adı' },
     { field: 'address', header: 'Adres' },
     { field: 'note', header: 'Note' },
-    { field: 'items', header: 'Giderler' },
+    { field: 'items', header: 'Sarf' },
     { field: 'buyerInformations', header: 'Alıcı Bilgileri' },
     { field: 'isDelivery', header: 'Bitiş Durum' },
     { field: 'createDate', header: 'Kayıt Tarih' },
