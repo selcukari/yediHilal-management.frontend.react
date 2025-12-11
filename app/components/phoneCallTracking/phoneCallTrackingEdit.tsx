@@ -1,7 +1,7 @@
 import { forwardRef, useImperativeHandle, useState, useRef, useEffect, useMemo } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { clone } from 'ramda';
-import { Modal, TextInput, Button, ActionIcon, Group, Stack, Textarea, Title, Table, Paper, Grid, Flex, Switch, Select } from '@mantine/core';
+import { Modal, TextInput, Button, ActionIcon, Group, Tooltip, Stack, Textarea, Title, Table, Paper, Grid, Flex, Switch, Select } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck, IconEdit } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
@@ -230,6 +230,7 @@ const PhoneCallTrackingEdit = forwardRef<PhoneCallTrackingEditDialogControllerRe
             return (
               <Table.Td key={header.field}>
                 <Group gap="xs">
+                  <Tooltip label="Güncelle">
                   <ActionIcon 
                     variant="light" 
                     color="blue"
@@ -237,6 +238,7 @@ const PhoneCallTrackingEdit = forwardRef<PhoneCallTrackingEditDialogControllerRe
                   >
                     <IconEdit size={16} />
                   </ActionIcon>
+                  </Tooltip>
                 </Group>
               </Table.Td>
             );

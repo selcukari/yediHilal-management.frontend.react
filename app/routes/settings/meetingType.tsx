@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { IconSearch, IconEdit, IconTrash, IconPlus } from '@tabler/icons-react';
 import {
-  Container, Grid, TextInput, ActionIcon, Stack, Group, Title, Text, Paper, Table, LoadingOverlay, Button,
+  Container, Grid, TextInput, Tooltip, ActionIcon, Stack, Group, Title, Text, Paper, Table, LoadingOverlay, Button,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import MeetingTypeAdd, { type MeetingTypeAddDialogControllerRef } from '../../components/meetingType/meetingTypAdd';
@@ -116,6 +116,7 @@ export default function MeetingType() {
           return (
             <Table.Td key={header.field}>
               <Group gap="xs">
+                <Tooltip label="Güncelle">
                 <ActionIcon 
                   variant="light" 
                   color="blue"
@@ -123,6 +124,8 @@ export default function MeetingType() {
                 >
                   <IconEdit size={16} />
                 </ActionIcon>
+                </Tooltip>
+                <Tooltip label="Sil">
                 <ActionIcon 
                   variant="light" 
                   color="red"
@@ -130,6 +133,7 @@ export default function MeetingType() {
                 >
                   <IconTrash size={16} />
                 </ActionIcon>
+                </Tooltip>
               </Group>
             </Table.Td>
           );

@@ -1,7 +1,7 @@
 import { forwardRef, useImperativeHandle, useState, useRef, useEffect, useMemo } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { last, clone, omit } from 'ramda';
-import { Modal, TextInput, Button, Stack,ActionIcon, Group, Textarea, Title, Table, Paper, Grid, Flex, Select } from '@mantine/core';
+import { Modal, TextInput, Button, Stack,ActionIcon, Tooltip, Group, Textarea, Title, Table, Paper, Grid, Flex, Select } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck, IconTrash, IconPlus } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
@@ -251,6 +251,7 @@ const BranchEdit = forwardRef<UniversityBranchEditDialogControllerRef, Universit
             return (
               <Table.Td key={header.field}>
                 <Group gap="xs">
+                  <Tooltip label="Güncelle">
                   <ActionIcon 
                     variant="light" 
                     color="red"
@@ -258,6 +259,7 @@ const BranchEdit = forwardRef<UniversityBranchEditDialogControllerRef, Universit
                   >
                     <IconTrash size={16} />
                   </ActionIcon>
+                  </Tooltip>
                 </Group>
               </Table.Td>
             );

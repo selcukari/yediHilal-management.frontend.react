@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import {
-  Container, Grid, TextInput, Text, Stack, Title, RingProgress,
+  Container, Grid, TextInput, Text, Stack, Title, RingProgress, Tooltip,
   Paper, Button, LoadingOverlay, Flex, Table, Group, ActionIcon,
 } from '@mantine/core';
 import { differenceInDays } from 'date-fns';
@@ -14,6 +14,7 @@ import MeetingAdd, { type MeetingAddDialogControllerRef } from '../components/me
 import MeetingEdit, { type MeetingEditDialogControllerRef } from '../components/meeting/meetingEdit';
 import { randaomColor } from '../utils/randaomColor';
 import { MenuActionButton , Province} from '../components'
+import { handleDownloadPdf } from '../utils/repor/generateMeetingPdf';
 import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToExcel';
 import { type PdfTableColumn } from '../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../utils/repor/calculateColumnWidth';
@@ -165,7 +166,8 @@ export default function Meeting() {
 
   const handleDowlandPdf = (meeting: MeetingData) => {
     // PDF indirme işlemleri
-    toast.info('PDF indirme işlemi yakında eklenecektir.');
+    handleDownloadPdf(meeting);
+    toast.success('PDF başarıyla oluşturuldu!');
   }
 
   const onProvinceChange = (provinceValues: string[] | null): void => {
@@ -205,6 +207,7 @@ export default function Meeting() {
       <Table.Td>{formatDate(element.createDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
       <Table.Td>
         <Group gap="xs">
+          <Tooltip label="Güncelle">
           <ActionIcon 
             variant="light" 
             color="blue"
@@ -212,6 +215,8 @@ export default function Meeting() {
           >
             <IconEdit size={16} />
           </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Sil">
           <ActionIcon 
             variant="light" 
             color="red"
@@ -220,6 +225,8 @@ export default function Meeting() {
           >
             <IconTrash size={16} />
           </ActionIcon>
+          </Tooltip>
+          <Tooltip label="PDF İndir">
           <ActionIcon 
             variant="light" 
             color="green"
@@ -227,6 +234,7 @@ export default function Meeting() {
           >
             <IconFileTypePdf size={16} />
           </ActionIcon>
+          </Tooltip>
         </Group>
       </Table.Td>
     </Table.Tr>)

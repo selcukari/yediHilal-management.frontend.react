@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { IconSearch, IconFilter, IconEdit, IconTrash, IconPlus, IconCalendar, IconPhoneCall } from '@tabler/icons-react';
 import {
   Container, Grid, TextInput, Switch, Stack, Group, Title, Text, Button, Paper, Table, Badge,
-  ActionIcon, LoadingOverlay, Flex,
+  ActionIcon, LoadingOverlay, Flex, Tooltip,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
@@ -136,6 +136,7 @@ export default function Member() {
           return (
             <Table.Td key={header.field}>
               <Group gap="xs">
+                <Tooltip label="Güncelle">
                 <ActionIcon 
                   variant="light" 
                   color="blue"
@@ -143,6 +144,8 @@ export default function Member() {
                 >
                   <IconEdit size={16} />
                 </ActionIcon>
+                </Tooltip>
+                <Tooltip label="Sil">
                 <ActionIcon 
                   variant="light" 
                   color="red"
@@ -151,6 +154,7 @@ export default function Member() {
                 >
                   <IconTrash size={16} />
                 </ActionIcon>
+                </Tooltip>
               </Group>
             </Table.Td>
           );

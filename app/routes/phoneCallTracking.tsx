@@ -1,9 +1,8 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { IconSearch, IconEdit, IconTrash, IconPlus } from '@tabler/icons-react';
 import {
-  Container, Grid, TextInput, ActionIcon, Stack, Group, Title, Text, Paper, Table, LoadingOverlay, Button,
+  Container, Grid, TextInput, Tooltip, ActionIcon, Stack, Group, Title, Text, Paper, Table, LoadingOverlay, Button,
 } from '@mantine/core';
-import { omit } from 'ramda';
 import { useDisclosure } from '@mantine/hooks';
 import PhoneCallTrackingAdd, { type PhoneCallTrackingAddDialogControllerRef } from '../components/phoneCallTracking/phoneCallTrackingAdd';
 import PhoneCallTrackingEdit, { type PhoneCallTrackingEditDialogControllerRef } from '../components/phoneCallTracking/phoneCallTrackingEdit';
@@ -119,18 +118,22 @@ export default function DocumentTracking() {
           return (
             <Table.Td key={header.field}>
               <Group gap="xs">
+                <Tooltip label="Güncelle">
                 <ActionIcon 
                   variant="light" color="blue"
                   onClick={() => handleEdit(item)}
                 >
                   <IconEdit size={16} />
                 </ActionIcon>
+                </Tooltip>
+                <Tooltip label="Sil">
                 <ActionIcon 
                   variant="light" color="red"
                   onClick={() => handleDelete(item.id)}
                 >
                   <IconTrash size={16} />
                 </ActionIcon>
+                </Tooltip>
               </Group>
             </Table.Td>
           );

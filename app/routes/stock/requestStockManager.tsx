@@ -1,6 +1,6 @@
 import { useState, useEffect, Fragment, useRef, useMemo } from 'react';
 import {
-  Container, Grid, Table, Text, Stack, Title, Button, Select,
+  Container, Grid, Table, Text, Stack, Tooltip, Title, Button, Select,
   Paper, TextInput, LoadingOverlay, Flex, Group, ActionIcon,
 } from '@mantine/core';
 import { MenuActionButton } from '../../components'
@@ -278,6 +278,7 @@ export default function RequestStock() {
           return (
             <Table.Td key={header.field}>
               <Group gap="xs">
+                <Tooltip label="Onayla">
                 <ActionIcon 
                   variant="light" 
                   color="green"
@@ -285,6 +286,7 @@ export default function RequestStock() {
                 >
                   <IconCheck size={16} />
                 </ActionIcon>
+                </Tooltip>
               </Group>
             </Table.Td>
           );

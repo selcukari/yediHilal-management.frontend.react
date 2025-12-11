@@ -1,6 +1,6 @@
-import { useState, useEffect, Fragment, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import {
-  Container, Grid, Table, Text, Stack, Title, Button, Badge,
+  Container, Grid, Table, Text, Stack, Tooltip, Title, Button, Badge,
   Paper, TextInput, LoadingOverlay, Flex, Group, ActionIcon,
 } from '@mantine/core';
 import { MenuActionButton } from '../../components'
@@ -231,6 +231,7 @@ export default function RequestStock() {
           return (
             <Table.Td key={header.field}>
               <Group gap="xs">
+                <Tooltip label="Güncelle">
                 <ActionIcon 
                   variant="light" 
                   color="blue"
@@ -239,6 +240,8 @@ export default function RequestStock() {
                 >
                   <IconEdit size={16} />
                 </ActionIcon>
+                </Tooltip>
+                <Tooltip label="Sil">
                 <ActionIcon 
                   variant="light" 
                   color="red"
@@ -247,6 +250,7 @@ export default function RequestStock() {
                 >
                   <IconTrash size={16} />
                 </ActionIcon>
+                </Tooltip>
               </Group>
             </Table.Td>
           );

@@ -2,7 +2,8 @@ import { forwardRef, useImperativeHandle, useState, useRef, useEffect, useMemo }
 import { useDisclosure } from '@mantine/hooks';
 import { last, clone, omit } from 'ramda';
 import { DateInput } from '@mantine/dates';
-import { Modal, TextInput, Button, Stack,ActionIcon, Group, Textarea, Title, Table, Paper, Grid, Flex, Switch, Select } from '@mantine/core';
+import { Modal, TextInput, Button, Stack,ActionIcon, Group, Textarea, Title, Table, Paper, Grid, Flex,
+  Tooltip, Switch, Select } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { subDays } from 'date-fns';
 import { IconCancel, IconCheck, IconCalendar, IconTrash, IconPlus } from '@tabler/icons-react';
@@ -279,6 +280,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
             return (
               <Table.Td key={header.field}>
                 <Group gap="xs">
+                  <Tooltip label="Sil">
                   <ActionIcon 
                     variant="light" 
                     color="red"
@@ -286,6 +288,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
                   >
                     <IconTrash size={16} />
                   </ActionIcon>
+                  </Tooltip>
                 </Group>
               </Table.Td>
             );

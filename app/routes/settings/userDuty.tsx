@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { IconSearch, IconEdit, IconTrash, IconPlus } from '@tabler/icons-react';
 import {
   Container, Grid, TextInput, ActionIcon, Stack, Group, Title, Text, Paper, Table, LoadingOverlay, Button,
+  Tooltip,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import UserDutyAdd, { type UserDutyAddDialogControllerRef } from '../../components/userDuty/userDutyAdd';
@@ -116,6 +117,7 @@ export default function UserDuty() {
           return (
             <Table.Td key={header.field}>
               <Group gap="xs">
+                <Tooltip label="Güncelle">
                 <ActionIcon 
                   variant="light" 
                   color="blue"
@@ -123,6 +125,8 @@ export default function UserDuty() {
                 >
                   <IconEdit size={16} />
                 </ActionIcon>
+                </Tooltip>
+                <Tooltip label="Sil">
                 <ActionIcon 
                   variant="light" 
                   color="red"
@@ -130,6 +134,7 @@ export default function UserDuty() {
                 >
                   <IconTrash size={16} />
                 </ActionIcon>
+                </Tooltip>
               </Group>
             </Table.Td>
           );

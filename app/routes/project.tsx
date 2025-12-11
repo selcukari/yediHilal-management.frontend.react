@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Container, Grid, TextInput, Text, Stack, Title, RingProgress,Badge,
-  Paper, Button, LoadingOverlay, Flex, Table, Group, ActionIcon,
+  Paper, Button, Tooltip, LoadingOverlay, Flex, Table, Group, ActionIcon,
 } from '@mantine/core';
 import { IconSearch, IconPlus, IconTrash, IconEdit } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
@@ -182,6 +182,7 @@ export default function Project() {
       <Table.Td>{formatDate(element.finisDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
       <Table.Td>
         <Group gap="xs">
+          <Tooltip label="Güncelle">
           <ActionIcon 
             variant="light" 
             color="blue"
@@ -190,6 +191,8 @@ export default function Project() {
           >
             <IconEdit size={16} />
           </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Sil">
           <ActionIcon 
             variant="light" 
             color="red"
@@ -198,6 +201,7 @@ export default function Project() {
           >
             <IconTrash size={16} />
           </ActionIcon>
+          </Tooltip>
         </Group>
       </Table.Td>
     </Table.Tr>)

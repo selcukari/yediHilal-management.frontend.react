@@ -1,7 +1,6 @@
-import { useState, useEffect, Fragment, useRef, useMemo } from 'react';
-import { pick } from 'ramda';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import {
-  Container, Grid, Table, Text, Stack, Title, RingProgress, Badge, Button,
+  Container, Grid, Tooltip, Table, Text, Stack, Title, RingProgress, Badge, Button,
   Paper, TextInput, LoadingOverlay, Flex, Group, ActionIcon,
 } from '@mantine/core';
 import { differenceInDays } from 'date-fns';
@@ -240,6 +239,7 @@ export default function Stock() {
           return (
             <Table.Td key={header.field}>
               <Group gap="xs">
+                <Tooltip label="Güncelle">
                 <ActionIcon 
                   variant="light" 
                   color="blue"
@@ -247,6 +247,8 @@ export default function Stock() {
                 >
                   <IconEdit size={16} />
                 </ActionIcon>
+                </Tooltip>
+                <Tooltip label="Sil">
                 <ActionIcon 
                   variant="light" 
                   color="red"
@@ -255,6 +257,7 @@ export default function Stock() {
                 >
                   <IconTrash size={16} />
                 </ActionIcon>
+                </Tooltip>
               </Group>
             </Table.Td>
           );

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { IconSearch, IconEdit, IconTrash, IconPlus } from '@tabler/icons-react';
 import {
-  Container, Grid, TextInput, Badge, Flex, ActionIcon, Stack, Group, Title, Text, Paper, Table, LoadingOverlay, Button,
+  Container, Grid, TextInput, Tooltip, Badge, Flex, ActionIcon, Stack, Group, Title, Text, Paper, Table, LoadingOverlay, Button,
 } from '@mantine/core';
 import { omit } from 'ramda';
 import { useDisclosure } from '@mantine/hooks';
@@ -160,6 +160,7 @@ export default function Branch() {
           return (
             <Table.Td key={header.field}>
               <Group gap="xs">
+                <Tooltip label="Güncelle">
                 <ActionIcon 
                   variant="light" 
                   color="blue"
@@ -167,6 +168,8 @@ export default function Branch() {
                 >
                   <IconEdit size={16} />
                 </ActionIcon>
+                </Tooltip>
+                <Tooltip label="Sil">
                 <ActionIcon 
                   variant="light" 
                   color="red" disabled={!isUserAdmin}
@@ -174,6 +177,7 @@ export default function Branch() {
                 >
                   <IconTrash size={16} />
                 </ActionIcon>
+                </Tooltip>
               </Group>
             </Table.Td>
           );

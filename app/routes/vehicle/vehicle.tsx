@@ -3,7 +3,7 @@ import { differenceInDays } from 'date-fns';
 import { omit } from 'ramda';
 import {
   Container, Grid, TextInput, Text, Stack, Title, RingProgress, ActionIcon,
-  Paper, Button, LoadingOverlay, Flex, Table, Group, Select,
+  Paper, Button, LoadingOverlay, Tooltip, Flex, Table, Group, Select,
 } from '@mantine/core';
 import { IconSearch, IconPlus, IconEdit, IconTrash } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
@@ -258,6 +258,7 @@ export default function Vehicle() {
       </Table.Td>
       <Table.Td>
         <Group gap="xs">
+          <Tooltip label="Güncelle">
           <ActionIcon 
             variant="light" 
             color="blue"
@@ -266,6 +267,8 @@ export default function Vehicle() {
           >
             <IconEdit size={16} />
           </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Sil">
           <ActionIcon 
             variant="light" 
             color="red"
@@ -274,6 +277,7 @@ export default function Vehicle() {
           >
             <IconTrash size={16} />
           </ActionIcon>
+         </Tooltip>
         </Group>
       </Table.Td>
     </Table.Tr>

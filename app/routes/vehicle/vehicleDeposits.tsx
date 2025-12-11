@@ -3,7 +3,7 @@ import { differenceInDays } from 'date-fns';
 import { omit } from 'ramda';
 import {
   Container, Grid, TextInput, Text, Stack, Title, ActionIcon, Flex, Table, Group,
-  Paper, Button, LoadingOverlay,
+  Paper, Button, LoadingOverlay, Tooltip,
 } from '@mantine/core';
 import { IconSearch, IconPlus, IconEdit, IconTrash } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
@@ -199,6 +199,7 @@ export default function VehicleDeposit() {
       </Table.Td>
       <Table.Td>
         <Group gap="xs">
+          <Tooltip label="Güncelle">
           <ActionIcon 
             variant="light" color="blue"
             disabled={vehicleDeposit.returnDate ? true : false}
@@ -206,6 +207,8 @@ export default function VehicleDeposit() {
           >
             <IconEdit size={16} />
           </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Sil">
           <ActionIcon 
             variant="light" color="red"
             disabled={vehicleDeposit.returnDate ? true : false}
@@ -213,6 +216,7 @@ export default function VehicleDeposit() {
           >
             <IconTrash size={16} />
           </ActionIcon>
+          </Tooltip>
         </Group>
       </Table.Td>
     </Table.Tr>
