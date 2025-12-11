@@ -38,10 +38,12 @@ type FormValues = {
   insuranceDate?: string | null;
   // muane tarihi
   inspectionDate?: string | null;
+  kaskoDate?: string | null;
   year: string | null;
   userId: number;
   fuelLevel: string | null;
   note: string | null;
+  place: string | null;
 };
 export type VehicleAddDialogControllerRef = {
   openDialog: (values: GetVehicleData[]) => void;
@@ -72,7 +74,9 @@ const VehicleAdd = forwardRef<VehicleAddDialogControllerRef, VehicleAddProps>(({
       inspectionDate: '',
       year: `${new Date().getFullYear()}`,
       note: '',
-      fuelLevel: ''
+      fuelLevel: '',
+      kaskoDate: '',
+      place: '',
     },
     validate: {
       plate: (value) => {
@@ -227,6 +231,13 @@ const VehicleAdd = forwardRef<VehicleAddDialogControllerRef, VehicleAddProps>(({
               {...form.getInputProps('year')}
             />
           </Grid.Col>
+          <Grid.Col span={4}>
+            <TextInput
+              label="Konum Yeri"
+              placeholder="yeri giriniz" required
+              {...form.getInputProps('place')}
+            />
+          </Grid.Col>
           <Grid.Col span={2}>
             <TextInput
               label="Renk"
@@ -290,6 +301,12 @@ const VehicleAdd = forwardRef<VehicleAddDialogControllerRef, VehicleAddProps>(({
             <DateTimePicker dropdownType="modal" label="Muane Tarihi" placeholder="muane tarihi" clearable renderDay={DayRenderer}
               minDate={new Date()} leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
               onChange={(value) => form.setFieldValue('inspectionDate', value)} locale="tr"
+            />
+           </Grid.Col>
+           <Grid.Col span={6}>
+            <DateTimePicker dropdownType="modal" label="Kasko Tarihi" placeholder="kasko tarihi" clearable renderDay={DayRenderer}
+              minDate={new Date()} leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
+              onChange={(value) => form.setFieldValue('kaskoDate', value)} locale="tr"
             />
            </Grid.Col>
           <Grid.Col span={6}>

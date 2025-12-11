@@ -1,25 +1,21 @@
 import { forwardRef, useImperativeHandle, useState, useEffect, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { clone, omit } from 'ramda';
-import { Modal, TextInput, Button, Stack, Select, Grid, Textarea } from '@mantine/core';
+import { Modal, TextInput, Button, Stack, Grid, Select, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { DateTimePicker } from '@mantine/dates';
-import { IconCancel, IconCheck, IconCalendar } from '@tabler/icons-react';
+import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { toast } from '../../utils/toastMessages';
 import { useWarehouseService } from '../../services/warehouseService';
-import { useStockService } from '../../services/stockService';
-import stripSpecialCharacters from '../../utils/stripSpecialCharacters';
 import { useAuth } from '~/authContext';
-import { DayRenderer } from '../../components';
 
-export type StockEditDialogControllerRef = {
+export type ShelveEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
   close: () => void;
 };
 
-interface UserEditProps {
+interface ShelveEditProps {
   onSaveSuccess?: () => void; // Yeni prop
 }
 
@@ -27,35 +23,20 @@ type FormValues = {
   id: number;
   updateUserId: number;
   updateUserFullName: string;
-  expirationDate?: string | null;
   name: string;
-  nameKey: string;
-  isActive: boolean;
-  unitPrice?: string;
-  totalPrice?: number;
-  count?: string;
-  shelveId: string | null;
-  place: string;
-  warehouseId: string | null;
   description?: string;
-  fromWhere?: string;
+  warehouseId: string | null;
+  rowsMax: number;
+  columnsMax: number;
   actions?: string;
 };
 
-type GetStockData = {
-  id: number;
-  name: string;
-  nameKey: string;
-}
-
-const StockEdit = forwardRef<StockEditDialogControllerRef, UserEditProps>(({onSaveSuccess}, ref) => {
+const WarehouseEdit = forwardRef<ShelveEditDialogControllerRef, ShelveEditProps>(({onSaveSuccess}, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
-  const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
-  const [shelves, setShelves] = useState<{ value: string; label: string }[]>([]);
   const [warehouses, setWarehouses] = useState<{ value: string; label: string }[]>([]);
 
-  const service = useStockService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
-  const serviceWarehouse = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
+  const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
+  const service = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
   const { currentUser } = useAuth();
@@ -65,18 +46,11 @@ const StockEdit = forwardRef<StockEditDialogControllerRef, UserEditProps>(({onSa
       id: 0,
       updateUserId: 0,
       updateUserFullName: '',
-      expirationDate: '',
       name: '',
-      nameKey: '',
-      isActive: true,
-      unitPrice: "1",
-      shelveId: null,
-      place: '',
-      warehouseId: null,
-      totalPrice: 1,
-      count: "1",
       description: '',
-      fromWhere: 'Bim Market',
+      warehouseId: "",
+      rowsMax: 0,
+      columnsMax: 0,
     },
     validate: {
        name: (value) => {
@@ -84,66 +58,46 @@ const StockEdit = forwardRef<StockEditDialogControllerRef, UserEditProps>(({onSa
           return "Ürün Adı en az 5 karakter olmalı";
         }
 
-
         return null;
       },
-      unitPrice: (value) => {
-        return (value && parseInt(value) > 0) ? null: "Birim fiyatı en az 1 olmalıdır"
-      },
-      count: (value) => {
-
-        return (value && parseInt(value) > 0) ? null : "Toplam sayı en az 1 olmalıdır"
+      warehouseId: (value) => {
+        if(!value) {
+          return "Lütfen bir depo seçiniz";
+        }
+        return null;
       },
     },
   });
 
-  
   useEffect(() => {
     fetchWarehouseData();
-    fetchShelves();
   }, []);
-  
+
   const fetchWarehouseData = async () => {
     try {
-      const response = await serviceWarehouse.getWarehouses();
-        if (response) {
-         setWarehouses(
-           response.map((c: any) => ({
-             value: String(c.id),
-             label: c.name,
-           }))
-         );
-       } else {
-         console.error('No setWarehouses data found');
-        }
-     } catch (error: any) {
+      const response = await service.getWarehouses();
+
+      if (response) {
+        setWarehouses(
+          response.map((c: any) => ({
+            value: String(c.id),
+            label: c.name,
+          }))
+        );
+      } else {
+        console.error('No setWarehouses data found');
+      }
+    } catch (error: any) {
       console.error('Error fetching countries:', error.message);
-     }
-   };
-   const fetchShelves = async () => {
-    try {
-      const response = await serviceWarehouse.getShelves();
-        if (response) {
-         setShelves(
-           response.map((c: any) => ({
-             value: String(c.id),
-             label: c.name,
-           }))
-         );
-       } else {
-         console.error('No fetchShelves data found');
-        }
-     } catch (error: any) {
-      console.error('Error fetching countries:', error.message);
-     }
-   };
-  
+    }
+  };
 
 
   const openDialog = (value: FormValues) => {
 
     if (value) {
       form.reset();
+
       // Önce initial values'ı set et
       form.setValues(value);
 
@@ -166,17 +120,13 @@ const StockEdit = forwardRef<StockEditDialogControllerRef, UserEditProps>(({onSa
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
 
-    const newStockValue = {
+    const newShelveValue = {
       ...(omit(['updateUserFullName'], values)),
-      totalPrice: (parseInt(values.unitPrice || "1")) * (parseInt(values.count || "1")),
-      unitPrice: parseInt(values.unitPrice || "1"),
-      count: parseInt(values.count || "1"),
       updateUserId: currentUser?.id as number,
-      shelveId: values.shelveId ? parseInt(values.shelveId, 10) : undefined,
       warehouseId: values.warehouseId ? parseInt(values.warehouseId, 10) : undefined,
     }
 
-    const result = await service.updateStock(newStockValue);
+    const result = await service.updateShelve(newShelveValue);
 
     if (result == true) {
 
@@ -237,7 +187,7 @@ const StockEdit = forwardRef<StockEditDialogControllerRef, UserEditProps>(({onSa
       onClose={() => {
         dialogClose();
       }}
-      title="Stok Düzenle"
+      title="Raf Düzenle"
       centered
       size="700"
       overlayProps={{
@@ -250,8 +200,8 @@ const StockEdit = forwardRef<StockEditDialogControllerRef, UserEditProps>(({onSa
           <Grid>
             <Grid.Col span={6}>
               <TextInput
-                label="Ürün Adı"
-                placeholder="Ürün adı giriniz"
+                label="Raf Adı"
+                placeholder="Raf adı giriniz"
                 value={form.values.name}
                 required
                 {...form.getInputProps('name')}
@@ -264,69 +214,25 @@ const StockEdit = forwardRef<StockEditDialogControllerRef, UserEditProps>(({onSa
               nothingFoundMessage="depo bulunamadı..." required
               onChange={(value) => form.setFieldValue('warehouseId', value)}
             />
-            </Grid.Col>
-            <Grid.Col span={6}>
-              <Select
-                label="Raf" placeholder="Raf seçiniz" data={shelves}
-                searchable maxDropdownHeight={200} value={form.values.shelveId}
-                nothingFoundMessage="raf bulunamadı..." required
-                onChange={(value) => form.setFieldValue('shelveId', value)}
-              />
-            </Grid.Col>
-            <Grid.Col span={6}>
-              <TextInput
-                label="Ürün yeri"
-                placeholder="(10) yeri..."
-                value={form.values.place}
-                required 
-                {...form.getInputProps('place')}
-              />
-            </Grid.Col>
-            <Grid.Col span={6}></Grid.Col>
+          </Grid.Col>
           <Grid.Col span={6}>
             <TextInput
-              label="Birim fiyatı"
-              placeholder="fiyat giriniz(₺)"
-              type='number'
-              min={1}
-              value={form.values.unitPrice}
-              {...form.getInputProps('unitPrice')}
+              label="Raf max Satır Sayısı"
+              value={form.values.rowsMax}
+              placeholder="satır giriniz"
+              required min={1} type='number'
+              {...form.getInputProps('rowsMax')}
             />
           </Grid.Col>
           <Grid.Col span={6}>
             <TextInput
-              label="Ürün sayısı"
-              placeholder="item sayısı giriniz"
-              type='number'
-              min={1}
-              value={form.values.count}
-              {...form.getInputProps('count')}
+              label="Raf max Sütun Sayısı"
+              value={form.values.columnsMax}
+              placeholder="sütun giriniz"
+              required type='number' min={1}
+              {...form.getInputProps('columnsMax')}
             />
           </Grid.Col>
-          <Grid.Col span={6}>
-            <TextInput
-              label="Toplam Fiyat"
-              type='number'
-              disabled
-              min={1}
-              value={(parseInt(form.values.unitPrice ?? "1")) * (parseInt(form.values.count ?? "1"))}
-            />
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <TextInput
-              label="Nereden alındı"
-              placeholder="yer giriniz"
-              value={form.values.fromWhere}
-              {...form.getInputProps('fromWhere')}
-            />
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <DateTimePicker dropdownType="modal" label="Son Kullanma Tarihi" placeholder="son tarihi" required clearable value={form.values.expirationDate}
-              minDate={new Date()} leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
-              onChange={(value) => form.setFieldValue('expirationDate', value)} locale="tr" renderDay={DayRenderer}
-            />
-           </Grid.Col>
-
           <Grid.Col span={6}>
             <Textarea
               mt="md"
@@ -359,4 +265,4 @@ const StockEdit = forwardRef<StockEditDialogControllerRef, UserEditProps>(({onSa
   </>);
 });
 
-export default StockEdit;
+export default WarehouseEdit;

@@ -4,3 +4,9 @@ export const priorityMockData = [
    { value: 'low', label: 'Düşük' },
    { value: 'medium', label: 'Orta' },
 ];
+
+export const statuMockData = [
+   { value: 'pending', label: 'Bekliyor' },
+   { value: 'canceled', label: 'İptal' },
+   { value: 'approved', label: 'Onaylandı' },
+];

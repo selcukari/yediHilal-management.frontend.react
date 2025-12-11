@@ -4,13 +4,21 @@ interface StockDataParams {
   updateUserId: number;
   expirationDate?: string | null;
   name: string;
-  nameKey: string;
   isActive: boolean;
   unitPrice: number;
   totalPrice?: number;
   count?: number;
   description?: string;
   fromWhere?: string;
+}
+
+interface StockRequestDataParams {
+  requestStocks: {
+    productId: number;
+    updateUserId: number;
+    count: number;
+    description?: string;
+  }[];
 }
 
 interface StockUsedExpenseParams {
@@ -50,6 +58,18 @@ export function useStockService(controller: string) {
       return error;
     }
   };
+
+  const createStockRequest = async (params: StockRequestDataParams) => {
+
+    try {
+      const res = await api.post(`/${controller}/addRequestStocks`, params);
+
+      return res.data.data;
+    } catch (error: any) {
+
+      return error;
+    }
+  };
   const addStock = async (params: StockDataParams) => {
 
     try {
@@ -84,54 +104,6 @@ export function useStockService(controller: string) {
     }
   };
 
-  const getStockUsed = async (type: string) => {
-
-    try {
-      const res = await api.get(`/${controller}/getStockUseds`, {
-        params: {
-          type,
-        }
-      });
-
-      return res.data.data;
-    } catch (error: any) {
-      return error;
-    }
-  };
-
-  const addStockUsed = async (params: StockUsedExpenseParams) => {
-
-    try {
-      const res = await api.post(`/${controller}/addStockUsed`, params);
-
-      return res.data.data;
-    } catch (error: any) {
-
-      return error;
-    }
-  };
-  const updateStockUsedExpense = async (params: UpdateStockUsedExpenseParams) => {
-
-    try {
-      const res = await api.put(`/${controller}/updateStockUsed`, params);
-
-      return res.data.data;
-    } catch (error: any) {
-
-      return error;
-    }
-  };
-
-    const deleteStockUsed = async (stockId: number) => {
-
-    try {
-      const res = await api.put(`/${controller}/deleteStockUsed?id=${stockId}`, null);
-
-      return res.data.data;
-    } catch (error: any) {
-      return error;
-    }
-  };
-
-  return { getStocks, addStock, deleteStock, updateStock, addStockUsed, getStockUsed, updateStockUsedExpense, deleteStockUsed };
+  return { getStocks, addStock, deleteStock, updateStock,
+    createStockRequest };
 }

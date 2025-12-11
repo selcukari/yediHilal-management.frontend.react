@@ -3,7 +3,7 @@ import {
   NavLink, Flex, Text, Stack, Divider, Group, ScrollArea, AppShell,
 } from '@mantine/core';
 import {
-  IconUsers, IconUser, IconFileCheck, IconCoin,
+  IconUsers, IconUser, IconFileCheck, IconCoin, IconClipboardList,
   IconChevronRight, IconPhoneCall, IconCalendarTime, IconChevronDown, IconBuildings,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
@@ -42,6 +42,11 @@ const menuItems: MenuItem[] = [
     key: 'branch',
     link: '/branches',
   },
+  { icon: IconClipboardList, label: 'Stok Yönetimi', key: 'stock', link: '/requestStocks',
+     children: [
+      { label: 'Ürün Taleblerim', key: 'requestStock', link: '/requestStocks' }, 
+     ],
+   },
   { label: 'Finans Yönetimi', key: 'finance', link: '/financeManagements',
     children: [
       { icon: IconCoin, label: 'Finans', key: 'finance', link: '/finances' },

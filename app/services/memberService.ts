@@ -16,7 +16,7 @@ interface UserDataParams {
   email?: string;
   referenceId?: number;
   dateOfBirth?: string;
-  createdDate?: string;
+  createdDate?: string | null;
   updateDate?: string;
   deleteMessageTitle?: string;
 }

@@ -3,8 +3,9 @@ import { useDisclosure } from '@mantine/hooks';
 import { omit } from 'ramda';
 import { Modal, TextInput, Button, Stack, Grid, PasswordInput, Text, Group, Switch, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { IconCancel, IconCheck } from '@tabler/icons-react';
+import { IconCancel, IconCheck, IconCalendar } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
+import { DateTimePicker } from '@mantine/dates';
 import { ReferansMemberSelect } from '../addOrEdit/referansMemberSelect';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { CountrySelect } from '../addOrEdit/countrySelect';
@@ -13,6 +14,7 @@ import { useMemberService } from '../../services/memberService';
 import { toast } from '../../utils/toastMessages';
 import { MemberTypeSelect } from '../addOrEdit/memberTypeSelect';
 import { useAuth } from '~/authContext';
+import { DayRenderer } from '../../components';
 
 export type MemberEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -40,7 +42,7 @@ type FormValues = {
   isMail: boolean;
   countryId: string;
   provinceId: string;
-  createdDate?: string;
+  createdDate?: string | null;
   updateDate?: string;
   deleteMessageTitle?: string;
 };
@@ -156,10 +158,11 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
     setIsDisabledSelect(true);
 
     const newMemberValue = {
-      ...omit(['createdDate', 'updateDate'], values),
+      ...omit(['updateDate'], values),
       fullName: values.fullName.trim(),
       deleteMessageTitle: (values.isActive ? undefined : (values.deleteMessageTitle ? values.deleteMessageTitle.trim() : undefined )),
       typeIds: values.typeIds ? values.typeIds : typeIdVoluntarily,
+      createdDate: values.createdDate ? new Date(values.createdDate).toISOString() : null,
       provinceId: values.provinceId ? parseInt(values.provinceId) : undefined,
       countryId: values.countryId ? parseInt(values.countryId) : undefined,
       referenceId: values.referenceId ? parseInt(values.referenceId) : undefined,
@@ -332,7 +335,6 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
             <PasswordInput
               label="Şifre"
               placeholder="Şifreniz"
-              required
               mt="md"
               {...form.getInputProps('password')}
             />
@@ -371,6 +373,12 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
               {...form.getInputProps('deleteMessageTitle')}
             />
           </Grid.Col>
+          <Grid.Col span={6}>
+            <DateTimePicker dropdownType="modal" label="İlk Kayıt Tarihi" placeholder="kayıt tarihi" clearable
+              value={form.values.createdDate} leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
+              onChange={(value) => form.setFieldValue('createdDate', value)} locale="tr" renderDay={DayRenderer}
+            />
+           </Grid.Col>
           {form.values.sancaktarGorev && <Grid.Col span={6}>
             <Text>Şube/Teşkilat Görevi: {form.values.sancaktarGorev}</Text>
           </Grid.Col> }

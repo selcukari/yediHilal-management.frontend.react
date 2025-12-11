@@ -4,7 +4,7 @@ import {
   Paper, Button, LoadingOverlay, Flex, Table, Group, ActionIcon,
 } from '@mantine/core';
 import { differenceInDays } from 'date-fns';
-import { IconSearch, IconPlus, IconTrash, IconEdit } from '@tabler/icons-react';
+import { IconSearch, IconPlus, IconTrash, IconEdit, IconFileTypePdf } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { toast } from '../utils/toastMessages';
 import { useMeetingService } from '../services/meetingService';
@@ -17,14 +17,13 @@ import { MenuActionButton , Province} from '../components'
 import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToExcel';
 import { type PdfTableColumn } from '../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../utils/repor/calculateColumnWidth';
-import { stripHtml } from '../utils/stripHtml';
 import { useAuth } from '~/authContext';
 
 interface MeetingData {
   id: number;
   name: string;
   agendas?: string;
-  address?: string;
+  participants?: string;
   participantCount?: number;
   meetingTypeId: number;
   meetingTypeName: string;
@@ -32,7 +31,6 @@ interface MeetingData {
   provinceName: string;
   districtId?: number;
   districtName?: string;
-  duration?: number;
   notes?: string;
   isActive: boolean;
   responsibleId: number;
@@ -68,9 +66,7 @@ export default function Meeting() {
     { field: 'participantCount', header: 'Katılımcı Sayısı' },
     { field: 'responsibleFullName', header: 'Sorumlu' },
     { field: 'meetingTypeName', header: 'Toplantı Birim' },
-    { field: 'address', header: 'Adres' },
     { field: 'time', header: 'Toplantı Tarihi' },
-    { field: 'duration', header: 'Toplantı Süresi(saat)' },
     { field: 'createDate', header: 'İlk Kayıt T.' },
   ]);
 
@@ -167,6 +163,11 @@ export default function Meeting() {
     return "yellow";
   };
 
+  const handleDowlandPdf = (meeting: MeetingData) => {
+    // PDF indirme işlemleri
+    toast.info('PDF indirme işlemi yakında eklenecektir.');
+  }
+
   const onProvinceChange = (provinceValues: string[] | null): void => {
     setFilterProvinceIds(provinceValues);
   };
@@ -200,9 +201,7 @@ export default function Meeting() {
       <Table.Td>{element.participantCount}</Table.Td>
       <Table.Td>{element.responsibleFullName}</Table.Td>
       <Table.Td>{element.meetingTypeName}</Table.Td>
-      <Table.Td>{stripHtml(element.address)?.substring(0,20)}</Table.Td>
-      <Table.Td>{element.duration}</Table.Td>
-      <Table.Td>{formatDate(element.time, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
+      <Table.Td style={{ color: diffDateTimeForColor(element.time) }}>{formatDate(element.time, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
       <Table.Td>{formatDate(element.createDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Table.Td>
       <Table.Td>
         <Group gap="xs">
@@ -220,6 +219,13 @@ export default function Meeting() {
             onClick={() => handleDelete(element.id)}
           >
             <IconTrash size={16} />
+          </ActionIcon>
+          <ActionIcon 
+            variant="light" 
+            color="green"
+            onClick={() => handleDowlandPdf(element)}
+          >
+            <IconFileTypePdf size={16} />
           </ActionIcon>
         </Group>
       </Table.Td>
@@ -261,7 +267,6 @@ export default function Meeting() {
     return filteredMeetings.map((project: MeetingData) => ({
       ...project,
       agendas: project.agendas?.substring(0,30),
-      address: project.address?.substring(0,30),
       createDate: formatDate(project.createDate, dateFormatStrings.dateTimeFormatWithoutSecond),
       time: project.time ? formatDate(project.time, dateFormatStrings.dateTimeFormatWithoutSecond) : '-',
     }))
@@ -376,8 +381,6 @@ export default function Meeting() {
                     <Table.Th>Katılımcı Sayısı</Table.Th>
                     <Table.Th>Sorumlu</Table.Th>
                     <Table.Th>Toplantı Birim</Table.Th>
-                    <Table.Th>Adres</Table.Th>
-                    <Table.Th>Toplantı Süresi(saat)</Table.Th>
                     <Table.Th>Toplantı Tarihi</Table.Th>
                     <Table.Th>İlk Kayıt Tarihi</Table.Th>
                   </Table.Tr>

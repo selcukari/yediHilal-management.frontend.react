@@ -17,7 +17,6 @@ import { MenuActionButton } from '../../components'
 import { type ColumnDefinition, type ValueData } from '../../utils/repor/exportToExcel';
 import { type PdfTableColumn } from '../../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../../utils/repor/calculateColumnWidth';
-import { mockDataFuelLevel } from '../../utils/vehicleMockData';
 interface Column {
   field: keyof VehicleData;
   header: string;
@@ -26,9 +25,6 @@ interface VehicleData {
   id: number;
   givenToId: number;
   givenById: number;
-  mileageStart: number;
-  mileageEnd: number;
-  fuelLevelStart?: string;
   vehicleId: number;
   vehiclePlate: string;
   createDate: string;
@@ -39,7 +35,6 @@ interface VehicleData {
   givenToPhone: string;
   givenByFullName: string;
   givenByPhone: string;
-  fuelLevelEnd?: string;
   actions?: string;
 }
 
@@ -57,10 +52,6 @@ export default function VehicleDeposit() {
     { field: 'id', header: 'Id' },
     { field: 'vehiclePlate', header: 'Araç Plaka' },
     { field: 'note', header: 'Not' },
-    { field: 'mileageStart', header: 'Kilometre Başlangıç' },
-    { field: 'mileageEnd', header: 'Kilometre Bitiş' },
-    { field: 'fuelLevelStart', header: 'Yakıt Başlangıç' },
-    { field: 'fuelLevelEnd', header: 'Yakıt Bitiş' },
     { field: 'givenToFullName', header: 'Araç Teslim Eden' },
     { field: 'givenByFullName', header: 'Araç Kullanan' },
     { field: 'createDate', header: 'İlk Kayıt' },
@@ -103,16 +94,11 @@ export default function VehicleDeposit() {
   };
 
   const handleEdit = (item: VehicleData) => {
-   console.log("handleEdit: item:", item);
     vehicleDepositEdit.current?.openDialog({
-      ...omit(['createDate', 'isActive', 'givenByFullName', 'givenToFullName', 'givenToPhone', 'givenByPhone'], item),
+      ...omit(['isActive', 'givenByFullName', 'givenToFullName', 'givenToPhone', 'givenByPhone'], item),
       note: item.note ? item.note : "",
       givenById: item.givenById ? item.givenById.toString() : "",
       vehicleId: item.vehicleId ? item.vehicleId.toString() : null,
-      mileageStart: item.mileageStart ? item.mileageStart?.toString() : null,
-      mileageEnd: item.mileageEnd ? item.mileageEnd?.toString() : null,
-      fuelLevelStart: item.fuelLevelStart ? item.fuelLevelStart?.toString() : "1/2",
-      fuelLevelEnd: item.fuelLevelEnd ? item.fuelLevelEnd?.toString() : null,
     });
   }
   const handleDelete = async (id: number) => {
@@ -192,8 +178,6 @@ export default function VehicleDeposit() {
   const raportVehicleData = useMemo(() => {
     return filteredVehicleDeposits.map((vehicleDeposit: VehicleData) => ({
       ...vehicleDeposit,
-      fuelLevelStart: mockDataFuelLevel.find(fuel => fuel.id == vehicleDeposit.fuelLevelStart)?.name,
-      fuelLevelEnd: mockDataFuelLevel.find(fuel => fuel.id == vehicleDeposit.fuelLevelEnd)?.name,
       givenByFullName: `${vehicleDeposit.givenByFullName}(${vehicleDeposit.givenByPhone})`,
       createDate: formatDate(vehicleDeposit.createDate, dateFormatStrings.dateTimeFormatWithoutSecond),
       returnDate: formatDate(vehicleDeposit.returnDate, dateFormatStrings.dateTimeFormatWithoutSecond),
@@ -205,10 +189,6 @@ export default function VehicleDeposit() {
       <Table.Td>{vehicleDeposit.id}</Table.Td>
       <Table.Td>{vehicleDeposit.vehiclePlate}</Table.Td>
       <Table.Td>{vehicleDeposit.note}</Table.Td>
-      <Table.Td>{vehicleDeposit.mileageStart}</Table.Td>
-      <Table.Td>{vehicleDeposit.mileageEnd}</Table.Td>
-      <Table.Td>{mockDataFuelLevel.find(fuel => fuel.id == vehicleDeposit.fuelLevelStart)?.name}</Table.Td>
-      <Table.Td>{mockDataFuelLevel.find(fuel => fuel.id == vehicleDeposit.fuelLevelEnd)?.name}</Table.Td>
       <Table.Td>{`${vehicleDeposit.givenToFullName}(${vehicleDeposit.givenToPhone})`}</Table.Td>
       <Table.Td>{`${vehicleDeposit.givenByFullName}(${vehicleDeposit.givenByPhone})`}</Table.Td>
       <Table.Td style={{ color: diffDateTimeForColor(vehicleDeposit.createDate) }}>
@@ -321,13 +301,9 @@ export default function VehicleDeposit() {
                     <Table.Th>Id</Table.Th>
                     <Table.Th>Araç Plaka</Table.Th>
                     <Table.Th>Note</Table.Th>
-                    <Table.Th>Kilometre Başlangıç</Table.Th>
-                    <Table.Th>Kilometre Bitiş</Table.Th>
-                    <Table.Th>Yakıt Başlangıç</Table.Th>
-                    <Table.Th>Yakıt Bitiş</Table.Th>
                     <Table.Th>Araç Teslim Eden</Table.Th>
                     <Table.Th>Araç Kullanan</Table.Th>
-                    <Table.Th>İlk Kayıt</Table.Th>
+                    <Table.Th>Alınan Tarih</Table.Th>
                     <Table.Th>Teslim Tarih</Table.Th>
                     <Table.Th>İşlemler</Table.Th>
                   </Table.Tr>

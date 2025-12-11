@@ -18,6 +18,8 @@ type VehicleParams = {
   insuranceDate?: string | null;
   // muane tarihi
   inspectionDate?: string | null;
+  kaskoDate?: string | null;
+  place?: string | null;
   year: number | null;
   userId: number;
   fuelLevel: string | null;
@@ -28,10 +30,6 @@ type VehicleDepositParams = {
   givenToId: number;
   givenById: number;
   // kilometresi
-  mileageStart?: number;
-  mileageEnd?: number;
-  fuelLevelStart: string;
-  fuelLevelEnd: string | null;
   // teslim tarihi
   returnDate?: string | null;
   note?: string | null;

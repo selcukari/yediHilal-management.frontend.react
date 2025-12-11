@@ -1,20 +1,20 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { omit } from 'ramda';
-import { Modal, TextInput, Button, Stack, Grid, Textarea } from '@mantine/core';
+import { Modal, TextInput, Button, Select, Stack, Grid, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DateTimePicker } from '@mantine/dates';
 import { IconCancel, IconCheck, IconCalendar } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useStockService } from '../../services/stockService';
+import { useWarehouseService } from '../../services/warehouseService';
 import { toast } from '../../utils/toastMessages';
 import { useAuth } from '~/authContext';
-import stripSpecialCharacters from '../../utils/stripSpecialCharacters';
 import { DayRenderer } from '../../components';
 
 export type StockAddDialogControllerRef = {
-  openDialog: (values: GetDtockData[]) => void;
+  open: () => void;
   close: () => void;
 };
 
@@ -22,21 +22,17 @@ interface UserAddProps {
   onSaveSuccess?: () => void; // Yeni prop
 }
 
-type GetDtockData = {
-  id: number;
-  name: string;
-  nameKey: string;
-}
-
 type FormValues = {
   updateUserId: number;
   updateUserFullName: string;
   expirationDate?: string | null;
   name: string;
-  nameKey: string;
   isActive: boolean;
   unitPrice?: string;
   totalPrice?: number;
+  shelveId: string | null;
+  place: string;
+  warehouseId: string | null;
   count?: string;
   description?: string;
   fromWhere?: string;
@@ -44,8 +40,12 @@ type FormValues = {
 
 const StockAdd = forwardRef<StockAddDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
-  const [stockData, setStockData] = useState<GetDtockData[]>([]);
+  const [warehouses, setWarehouses] = useState<{ value: string; label: string }[]>([]);
+  const [shelves, setShelves] = useState<{ value: string; label: string }[]>([]);
+  
   const [opened, { open, close }] = useDisclosure(false);
+  const serviceWarehouse = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
+  
   const service = useStockService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
   const { currentUser } = useAuth();
   
@@ -57,11 +57,13 @@ const StockAdd = forwardRef<StockAddDialogControllerRef, UserAddProps>(({onSaveS
       updateUserFullName: '',
       expirationDate: '',
       name: '',
-      nameKey: '',
       isActive: true,
       unitPrice: "1",
       totalPrice: 1,
       count: "1",
+      shelveId: null,
+      place: '',
+      warehouseId: null,
       description: '',
       fromWhere: 'Bim Market',
    
@@ -72,12 +74,7 @@ const StockAdd = forwardRef<StockAddDialogControllerRef, UserAddProps>(({onSaveS
           return "Ürün Adı en az 5 karakter olmalı";
         }
 
-        const keys = stockData?.map((item: GetDtockData) => item.nameKey);
-
-        if(keys.includes(stripSpecialCharacters(value))) {
-
-          return "Aynı item tekrar eklenemez";
-        }
+        return null;
       },
       unitPrice: (value) => {
         return (value && parseInt(value) > 0) ? null: "Birim fiyatı en az 1 olmalıdır"
@@ -88,6 +85,46 @@ const StockAdd = forwardRef<StockAddDialogControllerRef, UserAddProps>(({onSaveS
       },
     },
   });
+
+  useEffect(() => {
+    fetchWarehouseData();
+    fetchShelves();
+  }, []);
+
+  const fetchWarehouseData = async () => {
+    try {
+      const response = await serviceWarehouse.getWarehouses();
+        if (response) {
+         setWarehouses(
+           response.map((c: any) => ({
+             value: String(c.id),
+             label: c.name,
+           }))
+         );
+       } else {
+         console.error('No setWarehouses data found');
+        }
+     } catch (error: any) {
+      console.error('Error fetching countries:', error.message);
+     }
+   };
+  const fetchShelves = async () => {
+    try {
+      const response = await serviceWarehouse.getShelves();
+        if (response) {
+         setShelves(
+           response.map((c: any) => ({
+             value: String(c.id),
+             label: c.name,
+           }))
+         );
+       } else {
+         console.error('No fetchShelves data found');
+        }
+     } catch (error: any) {
+      console.error('Error fetching countries:', error.message);
+     }
+   };
 
   useEffect(() => {
     if (form.isDirty()) {
@@ -107,7 +144,8 @@ const StockAdd = forwardRef<StockAddDialogControllerRef, UserAddProps>(({onSaveS
       unitPrice: parseInt(values.unitPrice || "1"),
       count: parseInt(values.count || "1"),
       updateUserId: currentUser?.id as number,
-      nameKey: stripSpecialCharacters(values.name)
+      shelveId: values.shelveId ? parseInt(values.shelveId, 10) : undefined,
+      warehouseId: values.warehouseId ? parseInt(values.warehouseId, 10) : undefined,
     }
 
     const result = await service.addStock(newStockValue);
@@ -157,17 +195,8 @@ const StockAdd = forwardRef<StockAddDialogControllerRef, UserAddProps>(({onSaveS
       form.reset();
     }
   }
- const openDialog = (values: GetDtockData[]) => {
-
-    if (values?.length > 0) {
-      form.reset();
-      setStockData(values);
-      open();
-
-    }
-  }
   useImperativeHandle(ref, () => ({
-    openDialog,
+    open,
     close,
   }));
 
@@ -197,9 +226,33 @@ const StockAdd = forwardRef<StockAddDialogControllerRef, UserAddProps>(({onSaveS
               />
             </Grid.Col>
             <Grid.Col span={6}>
+              <Select
+                label="Depo" placeholder="depo seçiniz" data={warehouses}
+                searchable maxDropdownHeight={200} value={form.values.warehouseId}
+                nothingFoundMessage="depo bulunamadı..." required
+                onChange={(value) => form.setFieldValue('warehouseId', value)}
+              />
+            </Grid.Col>
+            <Grid.Col span={6}>
+              <Select
+                label="Raf" placeholder="Raf seçiniz" data={shelves}
+                searchable maxDropdownHeight={200} value={form.values.shelveId}
+                nothingFoundMessage="raf bulunamadı..." required
+                onChange={(value) => form.setFieldValue('shelveId', value)}
+              />
+            </Grid.Col>
+            <Grid.Col span={6}>
+              <TextInput
+                label="Ürün yeri"
+                placeholder="(10) yeri..."
+                required
+                {...form.getInputProps('place')}
+              />
+            </Grid.Col>
+            <Grid.Col span={6}>
             <TextInput
               label="Birim fiyatı"
-              placeholder="fiyat giriniz"
+              placeholder="fiyat giriniz(₺)"
               type='number'
               required
               min={1}
@@ -209,7 +262,7 @@ const StockAdd = forwardRef<StockAddDialogControllerRef, UserAddProps>(({onSaveS
 
           <Grid.Col span={6}>
             <TextInput
-              label="İtem sayısı"
+              label="Ürün sayısı"
               placeholder="item sayısı giriniz"
               type='number'
               required

@@ -43,6 +43,8 @@ export interface VehicleData {
   transmission: string; //Manual/Automatic
   insuranceDate?: string; // sigortaTarih
   inspectionDate?: string; // muane tarihi
+  kaskoDate?: string; // kasko tarihi
+  place: string | null;
   year: number;
   isDeposit: boolean;
   fuelLevel: string;
@@ -76,6 +78,7 @@ export default function Vehicle() {
     { field: 'color', header: 'Renk' },
     { field: 'engineNumber', header: 'Motor Numarası' },
     { field: 'inspectionDate', header: 'Muane Tarih' },
+    { field: 'kaskoDate', header: 'Kasko Tarih' },
     { field: 'insuranceDate', header: 'Sigorta Tarih' },
   ]);
 
@@ -228,6 +231,7 @@ export default function Vehicle() {
       <Table.Td style={{ color: vehicle.isDeposit ? "green" : "red"}}>{vehicle.isDeposit ? "Evet" : "Hayır"}</Table.Td>
       <Table.Td>{vehicle.brand}</Table.Td>
       <Table.Td>{vehicle.model}</Table.Td>
+      <Table.Td>{vehicle.place}</Table.Td>
       <Table.Td>{vehicle.year}</Table.Td>
       <Table.Td>{vehicle.mileage}</Table.Td>
       <Table.Td>{mockDataFuelLevel.find((i)=> i.id == vehicle.fuelLevel)?.name}</Table.Td>
@@ -245,6 +249,9 @@ export default function Vehicle() {
       </Table.Td>
       <Table.Td style={{ color: diffDateTimeForColor(vehicle.inspectionDate) }}>
         {formatDate(vehicle.inspectionDate, dateFormatStrings.dateTimeFormatWithoutSecond)}
+      </Table.Td>
+      <Table.Td style={{ color: diffDateTimeForColor(vehicle.kaskoDate) }}>
+        {formatDate(vehicle.kaskoDate, dateFormatStrings.dateTimeFormatWithoutSecond)}
       </Table.Td>
       <Table.Td style={{ color: diffDateTimeForColor(vehicle.insuranceDate) }}>
         {formatDate(vehicle.insuranceDate, dateFormatStrings.dateTimeFormatWithoutSecond)}
@@ -418,6 +425,7 @@ export default function Vehicle() {
                     <Table.Th>Emanet Durumu</Table.Th>
                     <Table.Th>Marka</Table.Th>
                     <Table.Th>Model</Table.Th>
+                    <Table.Th>Konum(Yeri)</Table.Th>
                     <Table.Th>Yıl</Table.Th>
                     <Table.Th>Kilometre</Table.Th>
                     <Table.Th>Yakıt Durumu</Table.Th>
@@ -430,6 +438,7 @@ export default function Vehicle() {
                     <Table.Th>İlk Kayıt</Table.Th>
                     <Table.Th>Son Güncelleme</Table.Th>
                     <Table.Th>Muane Tarihi</Table.Th>
+                    <Table.Th>Kasko Tarih</Table.Th>
                     <Table.Th>Sigorta Tarih</Table.Th>
                     <Table.Th>İşlemler</Table.Th>
                   </Table.Tr>

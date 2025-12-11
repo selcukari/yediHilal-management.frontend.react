@@ -2,7 +2,8 @@ import { forwardRef, useEffect, useMemo, useImperativeHandle, useState, useRef }
 import { useDisclosure } from '@mantine/hooks';
 import { Modal, TextInput, Button, Stack, Grid, Group, PasswordInput, Switch, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { IconCancel, IconCheck } from '@tabler/icons-react';
+import { DateTimePicker } from '@mantine/dates';
+import { IconCancel, IconCheck, IconCalendar } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../../components/confirmModal';
 import { CountrySelect } from '../addOrEdit/countrySelect';
@@ -12,6 +13,7 @@ import { useMemberService } from '../../services/memberService';
 import { toast } from '../../utils/toastMessages';
 import { MemberTypeSelect } from '../addOrEdit/memberTypeSelect';
 import { useAuth } from '~/authContext';
+import { DayRenderer } from '../../components';
 
 export type MemberAddDialogControllerRef = {
   open: () => void;
@@ -32,6 +34,7 @@ type FormValues = {
   dateOfBirth: string;
   referenceId: string;
   isActive: boolean;
+  createdDate?: string | null;
   isSms: boolean;
   isMail: boolean;
   typeIds: string;
@@ -71,6 +74,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
       isSms: true,
       isMail: true,
       deleteMessageTitle: '',
+      createdDate: '',
     },
     validate: {
       fullName: (value) => (value.trim().length < 5 ? 'İsim en az 5 karakter olmalı' : null),
@@ -154,6 +158,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
       provinceId: values.provinceId ? parseInt(values.provinceId) : undefined,
       countryId: values.countryId ? parseInt(values.countryId) : undefined,
       referenceId: values.referenceId ? parseInt(values.referenceId) : undefined,
+      createdDate: values.createdDate ? new Date(values.createdDate).toISOString() : null,
     }
 
     const result = await service.addMember(newMemberValue);
@@ -309,14 +314,13 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
             <TextInput
               label="Email"
               placeholder="Email giriniz"
-              {...form.getInputProps('email')}
+              {...form.getInputProps('email')} 
             />
           </Grid.Col>
           <Grid.Col span={6}>
           <PasswordInput
             label="Şifre"
             placeholder="Şifreniz"
-            required
             mt="md"
             {...form.getInputProps('password')}
           />
@@ -355,7 +359,12 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
               {...form.getInputProps('deleteMessageTitle')}
             />
           </Grid.Col>
-
+          <Grid.Col span={6}>
+            <DateTimePicker dropdownType="modal" label="İlk Kayıt Tarihi" placeholder="kayıt tarihi" clearable
+              leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
+              onChange={(value) => form.setFieldValue('createdDate', value)} locale="tr" renderDay={DayRenderer}
+            />
+           </Grid.Col>
           <Grid.Col span={6} offset={4}>
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
               İptal

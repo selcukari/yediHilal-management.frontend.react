@@ -12,7 +12,6 @@ import { useUserService } from '../../services/userService';
 import { toast } from '../../utils/toastMessages';
 import { useAuth } from '~/authContext';
 import type { VehicleData } from '../../routes/vehicle/vehicle';
-import { mockDataFuelLevel } from '../../utils/vehicleMockData';
 import { DayRenderer } from '../../components';
 interface VehicleDepositEditProps {
   onSaveSuccess?: () => void; // Yeni prop
@@ -31,11 +30,6 @@ type GetUserData = {
 
 type FormValues = {
   id: number;
-  // kilometresi
-  mileageStart: string | null;
-  mileageEnd: string | null;
-  fuelLevelStart: string;
-  fuelLevelEnd: string | null;
   // teslim tarihi
   returnDate?: string | null;
   vehicleId: string | null;
@@ -63,10 +57,6 @@ const VehicleDepositEdit = forwardRef<VehicleDepositEditDialogControllerRef, Veh
   const form = useForm<FormValues>({
     initialValues: {
       id: 0,
-      mileageStart: '100',
-      mileageEnd: '',
-      fuelLevelStart: '',
-      fuelLevelEnd: '',
       returnDate: '',
       vehicleId: "",
       givenToId: 0,
@@ -96,8 +86,6 @@ const VehicleDepositEdit = forwardRef<VehicleDepositEditDialogControllerRef, Veh
       givenToId: currentUser?.id as number,
       vehicleId: values.vehicleId ? parseInt(values.vehicleId) : 0,
       givenById: values.givenById ? parseInt(values.givenById) : 0,
-      mileageStart: (values.mileageStart ? parseInt(values.mileageStart): 0),
-      mileageEnd: (values.mileageEnd ? parseInt(values.mileageEnd): 0),
     }
 
     const result = await serviceVehicle.editVehicleDeposit(newVehicleDepositValue);
@@ -232,45 +220,6 @@ const VehicleDepositEdit = forwardRef<VehicleDepositEditDialogControllerRef, Veh
                 onChange={(value) => form.setFieldValue('givenById', value)}
               />
             </Grid.Col>
-          <Grid.Col span={2}>
-            <TextInput
-              label="Başlangıç kilometresi" placeholder="başlangıç kilometre giriniz"
-              type='number' min={100} required disabled
-              value={form.values.mileageStart || undefined}
-            />
-          </Grid.Col>
-          <Grid.Col span={2}>
-            <TextInput
-              label="Bitiş kilometresi" placeholder="bitiş kilometre giriniz"
-              required={form.values.returnDate ? true : false}
-              type='number' min={120} disabled={form.values.returnDate ? false : true}
-              value={form.values.mileageEnd || undefined}
-              {...form.getInputProps('mileageEnd')}
-            />
-          </Grid.Col>
-          <Grid.Col span={4}>
-            <Select
-              label="Başlangıç Yakıt Durumu"
-              placeholder="b. yakıt durumu Seçiniz"
-              data={mockDataFuelLevel.map(item => ({ value: item.id, label: item.name }))}
-              searchable clearable required maxDropdownHeight={200} disabled
-              nothingFoundMessage="b. yakıt durumu bulunamadı..."
-              value={form.values.fuelLevelStart}
-            />
-          </Grid.Col>
-          <Grid.Col span={4}>
-            <Select
-              label="Bitiş Yakıt Durumu"
-              placeholder="b. yakıt durumu Seçiniz"
-              disabled={form.values.returnDate ? false : true}
-              data={mockDataFuelLevel.map(item => ({ value: item.id, label: item.name }))}
-              searchable clearable maxDropdownHeight={200}
-              required={form.values.returnDate ? true : false}
-              nothingFoundMessage="b. yakıt durumu bulunamadı..."
-              value={form.values.fuelLevelEnd}
-              onChange={(value) => form.setFieldValue('fuelLevelEnd', value || '1/3')}
-            />
-          </Grid.Col>
           <Grid.Col span={4}>
             <DateTimePicker
               dropdownType="modal" label="Teslim Tarihi" placeholder="teslim tarihi" clearable renderDay={DayRenderer}

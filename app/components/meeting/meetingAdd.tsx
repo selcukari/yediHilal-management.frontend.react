@@ -31,9 +31,8 @@ type FormValues = {
   meetingTypeId?: string | null;
   provinceId?: string | null;
   districtId?: string | null;
-  address?: string | null;
+  participants?: string | null;
   participantCount: number;
-  duration?: number;
   agendas: string;
   notes?: string;
   time: string | null;
@@ -57,8 +56,7 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
       meetingTypeId: "",
       provinceId: '',
       districtId: '',
-      address: '',
-      duration: 1,
+      participants: '',
       agendas: "",
       participantCount: 5,
       notes: '',
@@ -73,6 +71,7 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
       meetingTypeId: (value) => (value ? null : 'Toplantı türü seçmek zorunlu'),
       provinceId: (value) => (value ? null : 'İl seçmek zorunlu'),
       districtId: (value) => (value ? null : 'İlçe seçmek zorunlu'),
+      participants: (value) => (value ? null : 'Katılımcı alanı zorunlu'),
     },
   });
 
@@ -106,7 +105,7 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
   };
 
   const validateStep2 = () => {
-    const fieldsToValidate = ['agendas', 'time', 'duration'];
+    const fieldsToValidate = ['agendas', 'time'];
     let isValid = true;
 
     fieldsToValidate.forEach(field => {
@@ -120,6 +119,20 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
   };
 
   const validateStep3 = () => {
+    const fieldsToValidate = ['participants'];
+    let isValid = true;
+
+    fieldsToValidate.forEach(field => {
+      const validateFunc = form.validateField(field);
+      if (validateFunc.hasError) {
+        isValid = false;
+      }
+    });
+
+    return isValid;
+  };
+
+  const validateStep4 = () => {
     const fieldsToValidate = ['notes'];
     let isValid = true;
 
@@ -147,12 +160,15 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
       case 2:
         isValid = validateStep3();
         break;
+      case 3:
+        isValid = validateStep4();
+        break;
       default:
         isValid = true;
     }
 
     if (isValid) {
-      setActiveStepper((current) => (current < 2 ? current + 1 : current));
+      setActiveStepper((current) => (current < 3 ? current + 1 : current));
     } else {
       // Validation hatalarını göster
       toast.warning('Lütfen tüm zorunlu alanları doğru şekilde doldurun.');
@@ -163,7 +179,7 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
 
   const handleSubmit = async (values: FormValues) => {
     // Son step için validation kontrolü
-    if (!validateStep3()) {
+    if (!validateStep4()) {
       toast.warning('Lütfen alınan kararlar alanını doldurun.');
       return;
     }
@@ -245,7 +261,7 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
         onClose={dialogClose}
         title="Yeni Toplantı Ekle"
         centered
-        size="700"
+        size="900"
         overlayProps={{
           backgroundOpacity: 0.55,
           blur: 3,
@@ -315,14 +331,6 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
                       />
                     </Grid.Col>
                     <Grid.Col span={4}>
-                      <TextInput
-                        label="Toplantı Süresi"
-                        placeholder="süre(saat)..."
-                        withAsterisk type='number'
-                        {...form.getInputProps('duration')}
-                      />
-                    </Grid.Col>
-                    <Grid.Col span={4}>
                       <DateTimePicker 
                         dropdownType="modal" 
                         label="Toplantı Tarihi" 
@@ -344,17 +352,8 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
                         label="Gündemler giriniz"
                         placeholder="gündemler..."
                         required
-                        withAsterisk 
-                        minRows={5}
+                        withAsterisk  autosize minRows={5} maxRows={10}
                         {...form.getInputProps('agendas')}
-                      />
-                    </Grid.Col>
-                    <Grid.Col span={12}>
-                      <Textarea
-                        label="Adres giriniz"
-                        placeholder="adres..."
-                        minRows={3}
-                        {...form.getInputProps('address')}
                       />
                     </Grid.Col>
                     <Grid.Col span={12}>
@@ -366,7 +365,21 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
                   </Grid>
                 </Box>
               </Stepper.Step>
-
+              <Stepper.Step label="Katılımcılar" description="Katılımcılar alanı">
+              <Box mt="md">
+              <Grid>
+              <Grid.Col span={12}>
+                <Textarea
+                  label="Katılımcı giriniz"
+                  placeholder="katılımcı..."
+                  value={form.values.participants}
+                  withAsterisk  autosize minRows={10} maxRows={15}
+                  {...form.getInputProps('participants')}
+                />
+              </Grid.Col>
+              </Grid>
+              </Box>
+              </Stepper.Step>
               <Stepper.Step label="Kararlar" description="Alınan kararlar">
                 <Box mt="md">
                   <Grid>
@@ -404,12 +417,12 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
               </Button>
               <Button 
                 variant="filled"
-                onClick={activeStepper === 2 ? () => handleSubmit(form.values) : nextStep}
-                leftSection={activeStepper === 2 ? <IconCheck size={14} /> : null}
-                disabled={isDisabledSubmit && activeStepper === 2}
+                onClick={activeStepper === 3 ? () => handleSubmit(form.values) : nextStep}
+                leftSection={activeStepper === 3 ? <IconCheck size={14} /> : null}
+                disabled={isDisabledSubmit && activeStepper === 3}
                 // loading={isDisabledSubmit}
               >
-                {activeStepper === 2 ? "Kaydet" : "İlerle"}
+                {activeStepper === 3 ? "Kaydet" : "İlerle"}
               </Button>
             </Group>
           </Stack>

@@ -1,95 +1,90 @@
 import { useState, useEffect, Fragment, useRef, useMemo } from 'react';
-import { pick } from 'ramda';
 import {
-  Container, Grid, Table, Text, Stack, Title, RingProgress, Badge, Button,
+  Container, Grid, Table, Text, Stack, Title, Button, Badge,
   Paper, TextInput, LoadingOverlay, Flex, Group, ActionIcon,
 } from '@mantine/core';
-import { differenceInDays } from 'date-fns';
 import { MenuActionButton } from '../../components'
 import { IconSearch, IconTrash, IconEdit, IconPlus } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
-import { useStockService } from '../../services/stockService';
+import { useWarehouseService } from '../../services/warehouseService';
 import { toast } from '../../utils/toastMessages';
 import { formatDate } from '../../utils/formatDate';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
-import { randaomColor } from '../../utils/randaomColor';
-import StockAdd, { type StockAddDialogControllerRef } from '../../components/stock/stockAdd';
-import StockEdit, { type StockEditDialogControllerRef } from '../../components/stock/stockEdit';
+import RequestStockAdd, { type RequestStockAddDialogControllerRef } from '../../components/stock/requestStockAdd';
+import RequestStockEdit, { type RequestStockEditDialogControllerRef } from '../../components/stock/requestStockEdit';
 import { type ColumnDefinition, type ValueData } from '../../utils/repor/exportToExcel';
 import { type PdfTableColumn } from '../../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../../utils/repor/calculateColumnWidth';
+import { useAuth } from '~/authContext';
+import { statuMockData } from '~/utils/priorityMockData';
 
-interface StockData {
+interface RequestStockData {
   id: number;
   updateUserId: number;
+  productId: number;
   updateUserFullName: string;
-  shelveId: number;
-  shelveName: string;
-  warehouseId: number;
-  warehouseName: string;
   createDate: string;
-  name: string;
-  updateDate: string;
-  expirationDate?: string;
-  nameKey: string;
-  place: string;
-  isActive: boolean;
-  unitPrice: number;
-  totalPrice?: number;
-  count?: number;
+  productName: string;
+  count: string;
+  status: string;
+  managerUserId: number;
+  managerUserFullName: string;
   description?: string;
-  fromWhere?: string;
+  managerNote?: string;
+  requestDate?: string;
+  approvedDate?: string;
   actions?: string;
 }
 interface Column {
-  field: keyof StockData;
+  field: keyof RequestStockData;
   header: string;
 }
 
-export default function Stock() {
-  const [stockData, setStockData] = useState<StockData[]>([]);
+export default function RequestStock() {
+  const [requestStockData, setRequestStockData] = useState<RequestStockData[]>([]);
   const [visible, { open, close }] = useDisclosure(false);
   const [searchText, setSearchText] = useState('');
-  const stockAddRef = useRef<StockAddDialogControllerRef>(null);
-  const stockEditRef = useRef<StockEditDialogControllerRef>(null);
 
-  const service = useStockService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
+  const requestStockAddRef = useRef<RequestStockAddDialogControllerRef>(null);
+  const requestStockEditRef = useRef<RequestStockEditDialogControllerRef>(null);
+  const { currentUser } = useAuth();
+
+  const service = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
 
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
     { field: 'id', header: 'Id' },
-    { field: 'name', header: 'Ürün Adı' },
-    { field: 'place', header: 'Konum' },
-    { field: 'warehouseName', header: 'Depo Adı' },
-    { field: 'shelveName', header: 'Raf Adı' },
-    { field: 'unitPrice', header: 'Birim Fiyat' },
-    { field: 'count', header: 'Sayısı' },
-    { field: 'totalPrice', header: 'Toplam Fiyat' },
-    { field: 'description', header: 'Açıklama' },
-    { field: 'updateUserFullName', header: 'Günceleyen Kişi' },
-    { field: 'fromWhere', header: 'Son Tedarik Edilen Yer' },
-    { field: 'expirationDate', header: 'Son Kullanma Tarih' },
+    { field: 'productName', header: 'Ürün Adı' },
+    { field: 'count', header: 'Ürün Sayısı' },
+    { field: 'status', header: 'Durum' },
+    { field: 'updateUserFullName', header: 'Talep Eden' },
+    { field: 'description', header: 'Açıklama Taleb edenin' },
+    { field: 'managerUserFullName', header: 'Yönetici' },
+    { field: 'managerNote', header: 'Yönetici Notu' },
+    { field: 'requestDate', header: 'Taleb Tarih' },
     { field: 'createDate', header: 'İlk Kayıt' },
-    { field: 'updateDate', header: 'Güncellenen Tarih' },
+    { field: 'approvedDate', header: 'Onaylanma Tarih' },
     { field: 'actions', header: 'İşlemler' },
   ]);
 
   useEffect(() => {
     setTimeout(() => {
-        fetchStock();
+        fetchShelves();
       }, 500);
   }, []);
 
-  const fetchStock = async () => {
+  const fetchShelves = async () => {
     open();
     try {
-      const getStocks = await service.getStocks();
+      const currentUserId = currentUser.id as number || undefined;
+
+      const getRequestStocks = await service.getRequestStocks(currentUserId);
       
-      if (getStocks) {
+      if (getRequestStocks) {
         
-        setStockData(getStocks);
+        setRequestStockData(getRequestStocks);
       } else {
         toast.info('Hiçbir veri yok!');
-        setStockData([]);
+        setRequestStockData([]);
       }
     } catch (error: any) {
       toast.error(`Stok yüklenirken hata: ${error.message}`);
@@ -100,35 +95,32 @@ export default function Stock() {
 
   const handleSaveSuccess = () => {
     setTimeout(() => {
-      fetchStock();
+      fetchShelves();
     }, 1500);
   };
 
-  const diffDateTimeForColor = (date?: string) => {
-    if (!date) return "green";
-    const daysDiff = differenceInDays(date, new Date());
-
-    if (daysDiff > 7) return "green";
-
-    if (new Date() >= new Date(date)) return "red";
-
-    return "yellow";
-  };
-
-  const handleDelete = async(id: number) => {
+  const handleDelete = async(item: RequestStockData) => {
      open();
 
     try {
 
-      const result = await service.deleteStock(id);
+      const newİtem = {
+        id: item.id,
+        count: parseInt(item.count, 10),
+        description: item.description || '',
+        productId: item.productId,
+        status: 'canceled',
+      }
+
+      const result = await service.updatRequestStock(newİtem);
       if (result == true) {
 
       toast.success('İşlem başarılı!');
       
-      fetchStock();
+      fetchShelves();
       
       close();
-
+ 
       return;
     }
     else if (result?.data == false && result?.errors?.length > 0) {
@@ -144,31 +136,29 @@ export default function Stock() {
       close();
     }
   }
-  const handleEdit = (value: StockData) => {
+  const handleEdit = (value: RequestStockData) => {
+    console.log("handleEdit", value);
 
-    stockEditRef.current?.openDialog({
-      ...value, unitPrice: value.unitPrice.toString(), count: value.count?.toString(),
-      shelveId: value.shelveId?.toString() || null, warehouseId: value.warehouseId?.toString() || null,
-      place: value.place || '',
-    })
+    requestStockEditRef.current?.openDialog({
+      ...value,
+    });
   }
 
     // Filtrelenmiş veriler
   const filteredStocks = useMemo(() => {
-    if (!searchText) return stockData;
+    if (!searchText) return requestStockData;
     
-    return stockData.filter(stock =>
-      stock.name.toLowerCase().includes(searchText.trim().toLowerCase()) ||
+    return requestStockData.filter(stock =>
+      stock.productName.toLowerCase().includes(searchText.trim().toLowerCase()) ||
       stock.updateUserFullName.toLowerCase().includes(searchText.trim().toLowerCase())
     );
-  }, [stockData, searchText]);
+  }, [requestStockData, searchText]);
 
   // raportdata
   const raportStockData = useMemo(() => {
-    return filteredStocks.map((stock: StockData) => ({
+    return filteredStocks.map((stock: RequestStockData) => ({
       ...stock,
       createDate: formatDate(stock.createDate, dateFormatStrings.dateTimeFormatWithoutSecond),
-      expirationDate: formatDate(stock.expirationDate, dateFormatStrings.dateTimeFormatWithoutSecond),
     }))
   }, [filteredStocks])
 
@@ -176,7 +166,7 @@ export default function Stock() {
   const pdfTableColumns = useMemo((): PdfTableColumn[] => {
 
     const newCols: Column[] = rowHeaders.filter(col =>
-      col.field != 'updateDate' && col.field != 'description' && col.field != 'actions');
+      col.field != 'requestDate' && col.field != 'description' && col.field != 'actions');
 
     return newCols.map(col => ({
       key: col.field,
@@ -189,7 +179,7 @@ export default function Stock() {
   const excelTableColumns = useMemo((): ColumnDefinition[] => {
 
     const newCols: Column[] = rowHeaders.filter(col =>
-      col.field != 'updateDate' && col.field != 'description' && col.field != 'actions');
+      col.field != 'requestDate' && col.field != 'description' && col.field != 'actions');
 
     return newCols.map(col => ({
       key: col.field as keyof ValueData,
@@ -199,38 +189,39 @@ export default function Stock() {
   }, [rowHeaders]);
 
   const reportTitle = (): string => {
-    return "Stok Ürünler Raporu";
+    return "İstek Taleb Raporu";
   }
+
+  const diffStatuForColor = (statu: string) => {
+    switch (statu) {
+      case 'pending':
+        return 'yellow';
+      case 'canceled':
+        return 'red';
+      case 'approved':
+        return 'green';
+      default:
+        return 'gray';
+    }
+  };
 
   const rowsTable = filteredStocks.map((item) => (
     <Table.Tr key={item.id}>
       {rowHeaders.map((header) => {
      
-        if (['createDate', 'updateDate'].includes(header.field)) {
+        if (['createDate', 'requestDate', 'approvedDate'].includes(header.field)) {
           return (
             <Table.Td key={header.field}>
               {item[header.field] ? formatDate(item[header.field] as string ?? null, dateFormatStrings.dateTimeFormatWithoutSecond): "-"}
             </Table.Td>
           );
         }
-
-        if (header.field === 'count') {
-          return (
-            <Table.Td key={header.field}>
-              {
-                <Badge color={(item[header.field] || 0) > 50 ? 'green' : 'red'}>
-                  {item[header.field]}
-                </Badge>
-              }
-            </Table.Td>
-          );
-        }
-        if (header.field === 'expirationDate') {
+        if (header.field === 'status') {
           return (
             <Table.Td key={header.field}>
               { 
-              <Badge color={diffDateTimeForColor(item[header.field])}>
-                {formatDate(item[header.field] as string ?? null, dateFormatStrings.dateTimeFormatWithoutSecond)}
+              <Badge color={diffStatuForColor(item[header.field])}>
+                {statuMockData.find(statu => statu.value === item[header.field])?.label || item[header.field]}
               </Badge>
               }
             </Table.Td>
@@ -243,6 +234,7 @@ export default function Stock() {
                 <ActionIcon 
                   variant="light" 
                   color="blue"
+                  disabled={item.status != "pending"}
                   onClick={() => handleEdit(item)}
                 >
                   <IconEdit size={16} />
@@ -250,8 +242,8 @@ export default function Stock() {
                 <ActionIcon 
                   variant="light" 
                   color="red"
-                  disabled={diffDateTimeForColor(item["expirationDate"]) != "red"}
-                  onClick={() => handleDelete(item.id)}
+                  disabled={item.status != "pending"}
+                  onClick={() => handleDelete(item)}
                 >
                   <IconTrash size={16} />
                 </ActionIcon>
@@ -269,15 +261,6 @@ export default function Stock() {
     </Table.Tr>
   ));
 
-  const calculateTotal = () => {
-    if (stockData?.length < 0) return 0;
-    return stockData.reduce((total, item) => total + (item.count ?? 0), 0);
-  };
-
-  const handleAddItem = (data: any) => {
-    console.log("handleAddItem")
-  }
-
   return (
     <Container size="xl">
       <LoadingOverlay
@@ -287,36 +270,19 @@ export default function Stock() {
         loaderProps={{ color: 'pink', type: 'bars' }}
       />
       <Stack gap="lg">
-          <Flex mih={50} gap="md" justify="center" align="center" direction="row" wrap="wrap">
-            <RingProgress
-              size={170}
-              thickness={16}
-              label={
-                <Text size="xs" ta="center" px="xs" style={{ pointerEvents: 'none' }}>
-                  Genel Toplam: {calculateTotal()}
-                </Text>
-              }
-              sections={(stockData || []).map(item => ({
-                value: ((item.count ?? 1) / Math.max(calculateTotal(), 1)) * 100,
-                color: randaomColor(),
-                tooltip: `${item.name}: ${item.count}`
-              }))}
-            />
-          </Flex>
            {/* Sayfa Başlığı */}
             <Group justify="space-between" align="center">
               <div>
-                <Title order={2}>Stok Sayfası</Title>
+                <Title order={2}>Talebler Sayfası</Title>
                 <Text size="sm" c="dimmed">
                   Toolbar Filtreleme Alanı
                 </Text>
               </div>
-              <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />} onClick={() => stockAddRef.current?.open()
-                }>Yeni Ekle</Button>
+              <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />} onClick={() => requestStockAddRef.current?.open()}>Yeni Ekle</Button>
               {/* Mobile için sadece icon buton */}
               <Button 
                 variant="filled" 
-                onClick={() => stockAddRef.current?.open()}
+                onClick={() => requestStockAddRef.current?.open()}
                 hiddenFrom="xs"
                 p="xs"
               >
@@ -335,7 +301,7 @@ export default function Stock() {
               <Grid>
                 <Grid.Col span={{ base: 12, sm: 6, md: 4}}>
                   <TextInput
-                    label="Ürün adı veya Kullanıcı Ara"
+                    label="Ürün Ara"
                     placeholder="text giriniz"
                     leftSection={<IconSearch size={18} />}
                     value={searchText}
@@ -369,7 +335,7 @@ export default function Stock() {
           {/* Örnek Tablo */}
           <Paper shadow="xs" p="lg" withBorder>
             <Stack gap="md">
-              <Title order={4}>Son Stok({rowsTable?.length || 0})</Title>
+              <Title order={4}>Son Depo({rowsTable?.length || 0})</Title>
               <Table.ScrollContainer minWidth={400} maxHeight={700}>
                 <Table striped highlightOnHover withColumnBorders>
                   <Table.Thead>
@@ -385,8 +351,8 @@ export default function Stock() {
             </Stack>
           </Paper>
       </Stack>
-      <StockAdd ref={stockAddRef} onSaveSuccess={handleSaveSuccess} />
-      <StockEdit ref={stockEditRef} onSaveSuccess={handleSaveSuccess} />
+      <RequestStockAdd ref={requestStockAddRef} onSaveSuccess={handleSaveSuccess} />
+      <RequestStockEdit ref={requestStockEditRef} onSaveSuccess={handleSaveSuccess} />
     </Container>
   );
 }

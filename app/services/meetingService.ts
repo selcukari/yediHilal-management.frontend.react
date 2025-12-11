@@ -12,9 +12,8 @@ type MeetingType = {
   agendas: string;
   time?: string | null;
   notes?: string | null;
-  address?: string | null;
+  participants?: string | null;
   isActive?: boolean;
-  duration?: number;
   files?: any[]
 };
 
@@ -58,8 +57,7 @@ export function useMeetingService(controller: string) {
         formData.append('agendas', params.agendas || '');
         formData.append('time', params.time || '');
         formData.append('notes', params.notes || '');
-        formData.append('address', params.address || '');
-        formData.append('duration', params.duration?.toString() || '0');
+        formData.append('participants', params.participants || '');
         // Dosyaları ekle
         (params.files || []).forEach((file: File) => {
           formData.append('files', file);
@@ -87,8 +85,7 @@ export function useMeetingService(controller: string) {
       formData.append('agendas', params.agendas || '');
       formData.append('time', params.time || '');
       formData.append('notes', params.notes || '');
-      formData.append('address', params.address || '');
-      formData.append('duration', params.duration?.toString() || '0');
+      formData.append('participants', params.participants || '');
       // Dosyaları ekle
       (params.files || []).forEach((file: File) => {
         formData.append('files', file);
