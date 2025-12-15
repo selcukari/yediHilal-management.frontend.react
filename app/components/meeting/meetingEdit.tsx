@@ -372,7 +372,6 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
             <Textarea
               label="Katılımcı giriniz"
               placeholder="katılımcı..."
-              value={form.values.participants}
               withAsterisk  autosize minRows={10} maxRows={15}
               {...form.getInputProps('participants')}
             />

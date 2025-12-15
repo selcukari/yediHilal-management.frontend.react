@@ -170,6 +170,22 @@ export default function Meeting() {
     toast.success('PDF başarıyla oluşturuldu!');
   }
 
+  const handleNewMeeting = (meeting: MeetingData) => {
+      console.log("meeting", meeting);
+
+    meetingAddRef.current?.openDialog({
+      name: "",
+      agendas: meeting.agendas ?? "",
+      participants: meeting.participants ?? "",
+      participantCount: meeting.participantCount ?? 1,  
+      meetingTypeId: meeting.meetingTypeId.toString(),
+      provinceId: meeting.provinceId.toString(),
+      districtId: meeting.districtId ? meeting.districtId.toString() : undefined,
+      notes: meeting.notes ?? "",
+      time: null,
+    });
+  }
+
   const onProvinceChange = (provinceValues: string[] | null): void => {
     setFilterProvinceIds(provinceValues);
   };
@@ -233,6 +249,15 @@ export default function Meeting() {
             onClick={() => handleDowlandPdf(element)}
           >
             <IconFileTypePdf size={16} />
+          </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Yeni Oluştur">
+          <ActionIcon 
+            variant="light" 
+            color="yellow"
+            onClick={() => handleNewMeeting(element)}
+          >
+            <IconPlus size={16} />
           </ActionIcon>
           </Tooltip>
         </Group>

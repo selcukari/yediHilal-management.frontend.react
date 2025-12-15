@@ -54,7 +54,7 @@ const MailSend = forwardRef<MailSendDialogControllerRef, unknown>((_props, ref) 
     return !form.isValid();
   }, [form.values]);
 
-   const openDialog = (value: ValueParams) => {
+  const openDialog = (value: ValueParams) => {
 
     if (value) {
       form.reset();

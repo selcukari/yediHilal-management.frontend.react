@@ -17,7 +17,7 @@ import { DayRenderer } from '../../components';
 import { useAuth } from '~/authContext';
 
 export type MeetingAddDialogControllerRef = {
-  openDialog: () => void;
+  openDialog: (value?: FormValues) => void;
   close: () => void;
 };
 
@@ -240,7 +240,12 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
     }
   }
 
-  const openDialog = () => {
+  const openDialog = (value?: FormValues) => {
+
+    if (value) {
+      console.log("value", value);
+      form.setValues(value);
+    }
     open();
     if (!isUserAdmin) {
       form.setFieldValue('responsibleFullName', currentUser?.fullName as string);
@@ -372,7 +377,6 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
                 <Textarea
                   label="Katılımcı giriniz"
                   placeholder="katılımcı..."
-                  value={form.values.participants}
                   withAsterisk  autosize minRows={10} maxRows={15}
                   {...form.getInputProps('participants')}
                 />
