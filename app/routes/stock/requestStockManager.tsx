@@ -61,7 +61,7 @@ export default function RequestStock() {
     { field: 'description', header: 'Açıklama Taleb edenin' },
     { field: 'managerUserFullName', header: 'Yönetici' },
     { field: 'managerNote', header: 'Yönetici Notu' },
-    { field: 'requestDate', header: 'Taleb Tarih' },
+    { field: 'requestDate', header: 'Talep Tarih' },
     { field: 'createDate', header: 'İlk Kayıt' },
     { field: 'approvedDate', header: 'Onaylanma Tarih' },
     { field: 'actions', header: 'İşlemler' },

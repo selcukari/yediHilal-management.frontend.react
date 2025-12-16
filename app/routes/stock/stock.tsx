@@ -65,7 +65,7 @@ export default function Stock() {
     { field: 'totalPrice', header: 'Toplam Fiyat' },
     { field: 'description', header: 'Açıklama' },
     { field: 'updateUserFullName', header: 'Günceleyen Kişi' },
-    { field: 'fromWhere', header: 'Son Tedarik Edilen Yer' },
+    // { field: 'fromWhere', header: 'Son Tedarik Edilen Yer' },
     { field: 'expirationDate', header: 'Son Kullanma Tarih' },
     { field: 'createDate', header: 'İlk Kayıt' },
     { field: 'updateDate', header: 'Güncellenen Tarih' },
@@ -215,7 +215,7 @@ export default function Stock() {
 
         if (header.field === 'count') {
           return (
-            <Table.Td key={header.field}>
+            <Table.Td key={header.field} style={{ width: '110px', minWidth: '100px' }}>
               {
                 <Badge color={(item[header.field] || 0) > 50 ? 'green' : 'red'}>
                   {item[header.field]}
@@ -373,7 +373,7 @@ export default function Stock() {
           <Paper shadow="xs" p="lg" withBorder>
             <Stack gap="md">
               <Title order={4}>Son Stok({rowsTable?.length || 0})</Title>
-              <Table.ScrollContainer minWidth={400} maxHeight={700}>
+              <Table.ScrollContainer minWidth={600} maxHeight={700}>
                 <Table striped highlightOnHover withColumnBorders>
                   <Table.Thead>
                     <Table.Tr>

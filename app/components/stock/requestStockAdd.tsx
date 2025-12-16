@@ -88,10 +88,6 @@ const RequestStockAdd = forwardRef<RequestStockAddDialogControllerRef, RequestSt
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
     { field: 'id', header: 'Id' },
     { field: 'name', header: 'Ürün Adı' },
-    { field: 'warehouseName', header: 'Depo Adı' },
-    { field: 'shelveName', header: 'Raf Adı' },
-    { field: 'unitPrice', header: 'Birim Fiyat' },
-    { field: 'count', header: 'Mevcut Sayı' },
     { field: 'requestCount', header: 'Taleb Edilen Sayı' },
     { field: 'description', header: 'Not' },
     { field: 'actions', header: 'Seçim' },
