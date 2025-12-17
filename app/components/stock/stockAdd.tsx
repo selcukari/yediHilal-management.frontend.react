@@ -41,7 +41,7 @@ type FormValues = {
 const StockAdd = forwardRef<StockAddDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [warehouses, setWarehouses] = useState<{ value: string; label: string }[]>([]);
-  const [shelves, setShelves] = useState<{ value: string; label: string }[]>([]);
+  const [shelves, setShelves] = useState<{ value: string; label: string; warehouseId: string }[]>([]);
   
   const [opened, { open, close }] = useDisclosure(false);
   const serviceWarehouse = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
@@ -88,8 +88,17 @@ const StockAdd = forwardRef<StockAddDialogControllerRef, UserAddProps>(({onSaveS
 
   useEffect(() => {
     fetchWarehouseData();
-    fetchShelves();
+    fetchShelves(); 
   }, []);
+
+  // depo değiştiğinde raf sıfırla ve rafları yeniden yükle
+  useEffect(() => {
+    // depo değiştiğinde ili resetle
+    form.setFieldValue('shelveId', null);
+
+    const filteredShelves = shelves.filter(shelf => shelf.warehouseId == form.values.warehouseId);
+    setShelves(filteredShelves);
+  }, [form.values.warehouseId]);
 
   const fetchWarehouseData = async () => {
     try {
@@ -116,6 +125,7 @@ const StockAdd = forwardRef<StockAddDialogControllerRef, UserAddProps>(({onSaveS
            response.map((c: any) => ({
              value: String(c.id),
              label: c.name,
+             warehouseId: String(c.warehouseId),
            }))
          );
        } else {
@@ -228,7 +238,7 @@ const StockAdd = forwardRef<StockAddDialogControllerRef, UserAddProps>(({onSaveS
             <Grid.Col span={6}>
               <Select
                 label="Depo" placeholder="depo seçiniz" data={warehouses}
-                searchable maxDropdownHeight={200} value={form.values.warehouseId}
+                searchable maxDropdownHeight={200}
                 nothingFoundMessage="depo bulunamadı..." required
                 onChange={(value) => form.setFieldValue('warehouseId', value)}
               />
@@ -236,8 +246,8 @@ const StockAdd = forwardRef<StockAddDialogControllerRef, UserAddProps>(({onSaveS
             <Grid.Col span={6}>
               <Select
                 label="Raf" placeholder="Raf seçiniz" data={shelves}
-                searchable maxDropdownHeight={200} value={form.values.shelveId}
-                nothingFoundMessage="raf bulunamadı..." required
+                searchable maxDropdownHeight={200} disabled={!form.values.warehouseId}
+                nothingFoundMessage="raf bulunamadı..." required value={form.values.shelveId}
                 onChange={(value) => form.setFieldValue('shelveId', value)}
               />
             </Grid.Col>

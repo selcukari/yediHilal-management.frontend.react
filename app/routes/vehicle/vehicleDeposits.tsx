@@ -30,6 +30,7 @@ interface VehicleData {
   createDate: string;
   returnDate?: string;
   note?: string;
+  statu: boolean;
   isActive: boolean;
   givenToFullName: string;
   givenToPhone: string;
@@ -99,6 +100,7 @@ export default function VehicleDeposit() {
       note: item.note ? item.note : "",
       givenById: item.givenById ? item.givenById.toString() : "",
       vehicleId: item.vehicleId ? item.vehicleId.toString() : null,
+      statu: item.statu,
     });
   }
   const handleDelete = async (id: number) => {
@@ -202,7 +204,7 @@ export default function VehicleDeposit() {
           <Tooltip label="Güncelle">
           <ActionIcon 
             variant="light" color="blue"
-            disabled={vehicleDeposit.returnDate ? true : false}
+            disabled={vehicleDeposit.statu}
             onClick={() => handleEdit(vehicleDeposit)}
           >
             <IconEdit size={16} />
@@ -211,7 +213,7 @@ export default function VehicleDeposit() {
           <Tooltip label="Sil">
           <ActionIcon 
             variant="light" color="red"
-            disabled={vehicleDeposit.returnDate ? true : false}
+            disabled={vehicleDeposit.statu}
             onClick={() => handleDelete(vehicleDeposit.id)}
           >
             <IconTrash size={16} />

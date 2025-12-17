@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { clone } from 'ramda';
-import { Modal, TextInput, Button, Stack, Grid, Textarea, Select } from '@mantine/core';
+import { Modal, TextInput, Button, Stack, Grid, Textarea, Select, Checkbox } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DateTimePicker } from '@mantine/dates';
 import { IconCancel, IconCheck, IconCalendar } from '@tabler/icons-react';
@@ -36,6 +36,7 @@ type FormValues = {
   givenToId: number;
   givenById: string | null;
   note: string | null;
+  statu: boolean;
 };
 export type VehicleDepositEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -62,10 +63,17 @@ const VehicleDepositEdit = forwardRef<VehicleDepositEditDialogControllerRef, Veh
       givenToId: 0,
       givenById: "",
       note: '',
+      statu: false,
     },
     validate: {
       vehicleId: (value) => value ? null: "Araç alanı zorunlu",
       givenById: (value) => value ? null: "Teslim eden alanı zorunlu",
+       returnDate: (value) => {
+        if (form.values.statu === true) {
+          return value ? null : "Teslim tarihi zorunlu";
+        }
+        return null;
+      }
     },
   });
 
@@ -224,9 +232,16 @@ const VehicleDepositEdit = forwardRef<VehicleDepositEditDialogControllerRef, Veh
             <DateTimePicker
               dropdownType="modal" label="Teslim Tarihi" placeholder="teslim tarihi" clearable renderDay={DayRenderer}
               minDate={new Date()} value={form.values.returnDate} leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
-              onChange={(value) => form.setFieldValue('returnDate', value)} locale="tr"
+              onChange={(value) => form.setFieldValue('returnDate', value)} locale="tr" error={form.errors.returnDate}
             />
-           </Grid.Col>
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <Checkbox 
+              mt="xl"
+              label="Araç teslim alındı olarak işaretle" 
+              {...form.getInputProps('statu', { type: 'checkbox' })}
+            />
+          </Grid.Col>
           <Grid.Col span={6}>
             <Textarea
               mt="md" label="Note" placeholder="messaj..." withAsterisk

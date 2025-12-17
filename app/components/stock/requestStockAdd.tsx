@@ -1,12 +1,10 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { omit } from 'ramda';
 import { Modal, TextInput, Button, Stack, Grid, Text, Select, Checkbox, Group, Badge, ActionIcon, Textarea, Paper, Table, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
-import { useWarehouseService } from '../../services/warehouseService';
 import { useStockService } from '../../services/stockService';
 import { toast } from '../../utils/toastMessages';
 import { useAuth } from '~/authContext';

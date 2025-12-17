@@ -2,8 +2,7 @@ import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 're
 import { useDisclosure } from '@mantine/hooks';
 import { Modal, Button, Stack, Grid, Textarea, Select } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { DateTimePicker } from '@mantine/dates';
-import { IconCancel, IconCheck, IconCalendar } from '@tabler/icons-react';
+import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useVehicleService } from '../../services/vehicleService';
@@ -11,7 +10,6 @@ import { useUserService } from '../../services/userService';
 import { toast } from '../../utils/toastMessages';
 import { useAuth } from '~/authContext';
 import type { VehicleData } from '../../routes/vehicle/vehicle';
-import { DayRenderer } from '../../components';
 
 interface VehicleDepositAddProps {
   onSaveSuccess?: () => void; // Yeni prop
@@ -30,7 +28,6 @@ type GetUserData = {
 
 type FormValues = {
   // teslim tarihi
-  returnDate?: string | null;
   vehicleId: string | null;
   givenToId: number;
   givenById: string | null;
@@ -55,7 +52,6 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
 
   const form = useForm<FormValues>({
     initialValues: {
-    returnDate: '',
     vehicleId: "",
     givenToId: 0,
     givenById: "",
@@ -64,6 +60,7 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
     validate: {
       vehicleId: (value) => value ? null: "Araç alanı zorunlu",
       givenById: (value) => value ? null: "Teslim eden alanı zorunlu",
+  
     },
   });
 
@@ -207,12 +204,6 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
                 onChange={(value) => form.setFieldValue('givenById', value)}
               />
             </Grid.Col>
-          <Grid.Col span={4}>
-            <DateTimePicker dropdownType="modal" label="Teslim Tarihi" placeholder="teslim tarihi" clearable
-              minDate={new Date()} leftSection={<IconCalendar size={18} stroke={1.5} />} leftSectionPointerEvents="none"
-              onChange={(value) => form.setFieldValue('returnDate', value)} locale="tr" renderDay={DayRenderer}
-            />
-           </Grid.Col>
           <Grid.Col span={6}>
             <Textarea
               mt="md"

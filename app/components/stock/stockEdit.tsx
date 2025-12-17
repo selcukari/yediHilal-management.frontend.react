@@ -10,7 +10,6 @@ import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { toast } from '../../utils/toastMessages';
 import { useWarehouseService } from '../../services/warehouseService';
 import { useStockService } from '../../services/stockService';
-import stripSpecialCharacters from '../../utils/stripSpecialCharacters';
 import { useAuth } from '~/authContext';
 import { DayRenderer } from '../../components';
 
@@ -51,7 +50,7 @@ type GetStockData = {
 const StockEdit = forwardRef<StockEditDialogControllerRef, UserEditProps>(({onSaveSuccess}, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
-  const [shelves, setShelves] = useState<{ value: string; label: string }[]>([]);
+  const [shelves, setShelves] = useState<{ value: string; label: string; warehouseId: string }[]>([]);
   const [warehouses, setWarehouses] = useState<{ value: string; label: string }[]>([]);
 
   const service = useStockService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
@@ -102,6 +101,15 @@ const StockEdit = forwardRef<StockEditDialogControllerRef, UserEditProps>(({onSa
     fetchWarehouseData();
     fetchShelves();
   }, []);
+
+  // depo değiştiğinde raf sıfırla ve rafları yeniden yükle
+  useEffect(() => {
+    // depo değiştiğinde ili resetle
+    form.setFieldValue('shelveId', null);
+
+    const filteredShelves = shelves.filter(shelf => shelf.warehouseId == form.values.warehouseId);
+    setShelves(filteredShelves);
+  }, [form.values.warehouseId]);
   
   const fetchWarehouseData = async () => {
     try {
@@ -111,6 +119,7 @@ const StockEdit = forwardRef<StockEditDialogControllerRef, UserEditProps>(({onSa
            response.map((c: any) => ({
              value: String(c.id),
              label: c.name,
+             warehouseId: String(c.warehouseId),
            }))
          );
        } else {
@@ -269,7 +278,7 @@ const StockEdit = forwardRef<StockEditDialogControllerRef, UserEditProps>(({onSa
               <Select
                 label="Raf" placeholder="Raf seçiniz" data={shelves}
                 searchable maxDropdownHeight={200} value={form.values.shelveId}
-                nothingFoundMessage="raf bulunamadı..." required
+                nothingFoundMessage="raf bulunamadı..." required disabled={!form.values.warehouseId}
                 onChange={(value) => form.setFieldValue('shelveId', value)}
               />
             </Grid.Col>

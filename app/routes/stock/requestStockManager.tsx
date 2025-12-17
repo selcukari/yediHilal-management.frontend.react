@@ -281,7 +281,7 @@ export default function RequestStock() {
                 <Tooltip label="Onayla">
                 <ActionIcon 
                   variant="light" 
-                  color="green"
+                  color="green" disabled={item.status === 'pending' ? false : true}
                   onClick={() => handleApproved(item)}
                 >
                   <IconCheck size={16} />
