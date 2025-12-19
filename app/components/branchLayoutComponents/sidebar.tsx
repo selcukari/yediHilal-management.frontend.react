@@ -44,7 +44,7 @@ const menuItems: MenuItem[] = [
   },
   { icon: IconClipboardList, label: 'Stok Yönetimi', key: 'stock', link: '/requestStocks',
      children: [
-      { label: 'Ürün Taleblerim', key: 'requestStock', link: '/requestStocks' }, 
+      { label: 'Ürün Taleplerim', key: 'requestStock', link: '/requestStocks' }, 
      ],
    },
   { label: 'Finans Yönetimi', key: 'finance', link: '/financeManagements',

@@ -142,7 +142,7 @@ const RequestStockEdit = forwardRef<RequestStockEditDialogControllerRef, Request
       onClose={() => {
         dialogClose();
       }}
-      title="Stok Düzenle"
+      title="Ürün Talep Düzenle"
       centered
       size="700"
       overlayProps={{

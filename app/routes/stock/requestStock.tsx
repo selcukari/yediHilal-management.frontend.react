@@ -277,7 +277,7 @@ export default function RequestStock() {
            {/* Sayfa Başlığı */}
             <Group justify="space-between" align="center">
               <div>
-                <Title order={2}>Talebler Sayfası</Title>
+                <Title order={2}>Talepler Sayfası</Title>
                 <Text size="sm" c="dimmed">
                   Toolbar Filtreleme Alanı
                 </Text>

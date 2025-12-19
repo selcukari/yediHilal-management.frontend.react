@@ -187,8 +187,9 @@ const RequestStockAdd = forwardRef<RequestStockAddDialogControllerRef, RequestSt
         close();
         form.reset();
         setSelectedItems(new Set());
-      } else {
-        toast.error('Talep oluşturulurken hata oluştu!');
+      }
+      if (result?.data === false && result?.errors?.length > 0) {
+        toast.warning(result.errors[0]);
       }
     } catch (error: any) {
       console.error('Talep gönderimi hatası:', error);
@@ -234,7 +235,7 @@ const RequestStockAdd = forwardRef<RequestStockAddDialogControllerRef, RequestSt
                   placeholder="Adet giriniz"
                   type="number"
                   min={1} required
-                  max={item.count || 0}
+                  // max={item.count || 0}
                   onChange={(e) => updateRequestItem(item.id, 'requestCount', parseInt(e.target.value) || 0)}
                   disabled={!isSelected}
                 />
@@ -328,7 +329,7 @@ const RequestStockAdd = forwardRef<RequestStockAddDialogControllerRef, RequestSt
                         <Table.Tbody>{rowsTable}</Table.Tbody>
                       </Table>
                     </Table.ScrollContainer>
-                    <Text size="sm" color="dimmed">
+                    <Text size="sm" c='red'>
                       * Sadece seçili ürünler için talep oluşturulacaktır
                     </Text>
                   </Stack>

@@ -157,8 +157,6 @@ export default function RequestStock() {
         // Yönetici ID'sini currentUser'dan alıyoruz
         managerUserId: currentUser?.id as number,
       };
-      console.log("updatedData:", updatedData);
-
 
       // API'yi çağırarak talebi güncelle
       const response = await service.updatRequestStock(updatedData);
@@ -170,6 +168,10 @@ export default function RequestStock() {
       if (response?.data === false && response?.errors?.length > 0) {
 
         toast.warning(response.errors[0]);
+
+        setTimeout(() => {
+          fetchShelves();
+        }, 2500);
 
       }
     } catch (error: any) {
@@ -313,7 +315,7 @@ export default function RequestStock() {
            {/* Sayfa Başlığı */}
             <Group justify="space-between" align="center">
               <div>
-                <Title order={2}>Talebler Sayfası</Title>
+                <Title order={2}>Talepler Sayfası</Title>
                 <Text size="sm" c="dimmed">
                   Toolbar Filtreleme Alanı
                 </Text>
