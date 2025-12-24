@@ -158,7 +158,7 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
       }}
       title="Yeni Proje Ekle"
       centered
-      size="700"
+      size="900"
       overlayProps={{
         backgroundOpacity: 0.55,
         blur: 3,
