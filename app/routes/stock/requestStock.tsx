@@ -29,6 +29,7 @@ interface RequestStockData {
   status: string;
   managerUserId: number;
   managerUserFullName: string;
+  note?: string;
   description?: string;
   managerNote?: string;
   requestDate?: string;
@@ -41,7 +42,7 @@ interface Column {
 }
 
 export default function RequestStock() {
-  const [requestStockData, setRequestStockData] = useState<RequestStockData[]>([]);
+  const [requestStockData, setRequestStockData] = useState<Record<string, RequestStockData[]>>({});
   const [visible, { open, close }] = useDisclosure(false);
   const [searchText, setSearchText] = useState('');
 
@@ -54,10 +55,10 @@ export default function RequestStock() {
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
     { field: 'id', header: 'Id' },
     { field: 'productName', header: 'Ürün Adı' },
-    { field: 'count', header: 'Ürün Sayısı' },
+    // { field: 'count', header: 'Ürün Sayısı' },
     { field: 'status', header: 'Durum' },
     { field: 'updateUserFullName', header: 'Talep Eden' },
-    { field: 'description', header: 'Açıklama Taleb edenin' },
+    { field: 'note', header: 'Açıklama Taleb edenin' },
     { field: 'managerUserFullName', header: 'Yönetici' },
     { field: 'managerNote', header: 'Yönetici Notu' },
     { field: 'requestDate', header: 'Talep Tarih' },
@@ -68,11 +69,11 @@ export default function RequestStock() {
 
   useEffect(() => {
     setTimeout(() => {
-        fetchShelves();
+        fetchRequestStocks();
       }, 500);
   }, []);
 
-  const fetchShelves = async () => {
+  const fetchRequestStocks = async () => {
     open();
     try {
       const currentUserId = currentUser.id as number || undefined;
@@ -80,11 +81,11 @@ export default function RequestStock() {
       const getRequestStocks = await service.getRequestStocks(currentUserId);
       
       if (getRequestStocks) {
-        
+        console.log('Fetched Request Stocks:', getRequestStocks);
         setRequestStockData(getRequestStocks);
       } else {
         toast.info('Hiçbir veri yok!');
-        setRequestStockData([]);
+        setRequestStockData({"123": []});
       }
     } catch (error: any) {
       toast.error(`Stok yüklenirken hata: ${error.message}`);
@@ -95,7 +96,7 @@ export default function RequestStock() {
 
   const handleSaveSuccess = () => {
     setTimeout(() => {
-      fetchShelves();
+      fetchRequestStocks();
     }, 1500);
   };
 
@@ -117,7 +118,7 @@ export default function RequestStock() {
 
       toast.success('İşlem başarılı!');
       
-      fetchShelves();
+      fetchRequestStocks();
       
       close();
  
@@ -136,37 +137,77 @@ export default function RequestStock() {
       close();
     }
   }
-  const handleEdit = (value: RequestStockData) => {
-    console.log("handleEdit", value);
+  const handleEdit = (value: RequestStockData[]) => {
 
-    requestStockEditRef.current?.openDialog({
-      ...value,
-    });
+    requestStockEditRef.current?.openDialog(value);
   }
 
     // Filtrelenmiş veriler
-  const filteredStocks = useMemo(() => {
-    if (!searchText) return requestStockData;
-    
-    return requestStockData.filter(stock =>
-      stock.productName.toLowerCase().includes(searchText.trim().toLowerCase()) ||
-      stock.updateUserFullName.toLowerCase().includes(searchText.trim().toLowerCase())
-    );
+   const filteredStocks = useMemo(() => {
+     if (!searchText) return requestStockData;
+  
+     return Object.fromEntries(
+    Object.entries(requestStockData)
+      .map(([key, items]) => {
+        const filteredItems = items.filter(item =>
+          item.productName.toLowerCase().includes(searchText.trim().toLowerCase()) ||
+          item.updateUserFullName.toLowerCase().includes(searchText.trim().toLowerCase())
+        );
+
+        return [key, filteredItems];
+      })
+      .filter(([_, items]) => items.length > 0) // boş grupları at
+  );
   }, [requestStockData, searchText]);
 
   // raportdata
   const raportStockData = useMemo(() => {
-    return filteredStocks.map((stock: RequestStockData) => ({
-      ...stock,
-      createDate: formatDate(stock.createDate, dateFormatStrings.dateTimeFormatWithoutSecond),
-    }))
-  }, [filteredStocks])
+    // Her grubu tek bir satıra dönüştür
+    const groupedStocks: RequestStockData[] = [];
+    
+    Object.entries(filteredStocks).forEach(([groupId, groupItems]) => {
+      if (groupItems.length === 0) return;
+      
+      const firstItem = groupItems[0];
+      
+      // Ürün adlarını ve count'ları birleştir
+      const productList = groupItems.map(item => 
+        `${item.productName} (${item.count})`
+      ).join(', ');
+
+      // status
+      const statusSet = statuMockData.find(s => s.value === firstItem.status)?.label;
+      
+      // Toplam count hesapla (eğer gerekliyse)
+      const totalCount = groupItems.reduce((sum, item) => 
+        sum + parseInt(item.count || '0', 10), 0
+      );
+      
+      groupedStocks.push({
+        ...firstItem,
+        id: parseInt(groupId), // veya firstItem.id
+        productName: productList,
+        status: statusSet || firstItem.status,
+        count: totalCount.toString(), // veya groupItems.length.toString()
+        requestDate: firstItem.requestDate 
+          ? formatDate(firstItem.requestDate, dateFormatStrings.dateTimeFormatWithoutSecond)
+          : "-",
+        approvedDate: firstItem.approvedDate 
+          ? formatDate(firstItem.approvedDate, dateFormatStrings.dateTimeFormatWithoutSecond)
+          : "-",
+        createDate: formatDate(firstItem.createDate, dateFormatStrings.dateTimeFormatWithoutSecond),
+        // Diğer alanları da ekleyebilirsiniz
+      });
+    });
+    
+    return groupedStocks;
+  }, [filteredStocks]);
 
   // useMemo hook'u ile sütunları önbelleğe alıyoruz
   const pdfTableColumns = useMemo((): PdfTableColumn[] => {
 
     const newCols: Column[] = rowHeaders.filter(col =>
-      col.field != 'requestDate' && col.field != 'description' && col.field != 'actions');
+      col.field != 'id' && col.field != 'managerNote' && col.field != 'createDate' && col.field != 'note' && col.field != 'description' && col.field != 'actions');
 
     return newCols.map(col => ({
       key: col.field,
@@ -179,7 +220,7 @@ export default function RequestStock() {
   const excelTableColumns = useMemo((): ColumnDefinition[] => {
 
     const newCols: Column[] = rowHeaders.filter(col =>
-      col.field != 'requestDate' && col.field != 'description' && col.field != 'actions');
+      col.field != 'id' && col.field != 'managerNote' && col.field != 'createDate' && col.field != 'note' && col.field != 'description' && col.field != 'actions');
 
     return newCols.map(col => ({
       key: col.field as keyof ValueData,
@@ -189,7 +230,7 @@ export default function RequestStock() {
   }, [rowHeaders]);
 
   const reportTitle = (): string => {
-    return "İstek Taleb Raporu";
+    return "İstek Talep Raporu";
   }
 
   const diffStatuForColor = (statu: string) => {
@@ -205,65 +246,112 @@ export default function RequestStock() {
     }
   };
 
-  const rowsTable = filteredStocks.map((item) => (
-    <Table.Tr key={item.id}>
+  const rowsTable = (
+    Object.entries(filteredStocks) as [string, RequestStockData[]][]
+    ).map(([requestStockId, items]) => {
+    const firstItem = items[0];
+
+  return (
+    <Table.Tr key={requestStockId}>
       {rowHeaders.map((header) => {
-     
+
+        // ✅ Ürün adlarını liste olarak yazdır
+        if (header.field === 'productName') {
+          return (
+            <Table.Td key={header.field}>
+              <ul style={{ margin: 0, paddingLeft: 16 }}>
+                {items.map((item) => (
+                  <li key={item.id}>
+                    {item.productName} ({item.count})
+                  </li>
+                ))}
+              </ul>
+            </Table.Td>
+          );
+        }
+
+        // ✅ Tarihler (ilk item baz alınır)
         if (['createDate', 'requestDate', 'approvedDate'].includes(header.field)) {
+          const value =
+            firstItem?.[header.field as keyof RequestStockData] as string | undefined;
+
           return (
             <Table.Td key={header.field}>
-              {item[header.field] ? formatDate(item[header.field] as string ?? null, dateFormatStrings.dateTimeFormatWithoutSecond): "-"}
+              {value
+                ? formatDate(
+                    value,
+                    dateFormatStrings.dateTimeFormatWithoutSecond
+                  )
+                : "-"}
             </Table.Td>
           );
         }
+
+        // ✅ Status
         if (header.field === 'status') {
+          const status = firstItem?.status;
+
           return (
             <Table.Td key={header.field}>
-              { 
-              <Badge color={diffStatuForColor(item[header.field])}>
-                {statuMockData.find(statu => statu.value === item[header.field])?.label || item[header.field]}
+              <Badge color={diffStatuForColor(status)}>
+                {statuMockData.find(s => s.value === status)?.label || status}
               </Badge>
-              }
             </Table.Td>
           );
         }
-        else if (header.field === 'actions') {
+
+        // ✅ note taleb edenin ek olarak yazdığı açıklama
+        if (header.field === 'note') {
+          const note = firstItem?.note;
+
+          return (
+            <Table.Td key={header.field}>
+              {note}
+            </Table.Td>
+          );
+        }
+
+        // ✅ Actions (grup bazlı)
+        if (header.field === 'actions') {
           return (
             <Table.Td key={header.field}>
               <Group gap="xs">
                 <Tooltip label="Güncelle">
-                <ActionIcon 
-                  variant="light" 
-                  color="blue"
-                  disabled={item.status != "pending"}
-                  onClick={() => handleEdit(item)}
-                >
-                  <IconEdit size={16} />
-                </ActionIcon>
+                  <ActionIcon
+                    variant="light"
+                    color="blue"
+                    disabled={firstItem?.status !== "pending"}
+                    onClick={() => handleEdit(items)}
+                  >
+                    <IconEdit size={16} />
+                  </ActionIcon>
                 </Tooltip>
+
                 <Tooltip label="Sil">
-                <ActionIcon 
-                  variant="light" 
-                  color="red"
-                  disabled={item.status != "pending"}
-                  onClick={() => handleDelete(item)}
-                >
-                  <IconTrash size={16} />
-                </ActionIcon>
+                  <ActionIcon
+                    variant="light"
+                    color="red"
+                    disabled={firstItem?.status !== "pending"}
+                    onClick={() => firstItem && handleDelete(firstItem)}
+                  >
+                    <IconTrash size={16} />
+                  </ActionIcon>
                 </Tooltip>
               </Group>
             </Table.Td>
           );
         }
 
+        // ✅ Default alanlar (ilk item)
         return (
           <Table.Td key={header.field}>
-            {item[header.field] || '-'}
+            {firstItem?.[header.field as keyof RequestStockData] ?? "-"}
           </Table.Td>
         );
       })}
     </Table.Tr>
-  ));
+  );
+});
 
   return (
     <Container size="xl">

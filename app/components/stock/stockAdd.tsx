@@ -42,6 +42,7 @@ const StockAdd = forwardRef<StockAddDialogControllerRef, UserAddProps>(({onSaveS
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [warehouses, setWarehouses] = useState<{ value: string; label: string }[]>([]);
   const [shelves, setShelves] = useState<{ value: string; label: string; warehouseId: string }[]>([]);
+  const [shelvesChange, setShelvesChange] = useState<{ value: string; label: string; warehouseId: string }[]>([]);
   
   const [opened, { open, close }] = useDisclosure(false);
   const serviceWarehouse = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
@@ -97,7 +98,7 @@ const StockAdd = forwardRef<StockAddDialogControllerRef, UserAddProps>(({onSaveS
     form.setFieldValue('shelveId', null);
 
     const filteredShelves = shelves.filter(shelf => shelf.warehouseId == form.values.warehouseId);
-    setShelves(filteredShelves);
+    setShelvesChange(filteredShelves);
   }, [form.values.warehouseId]);
 
   const fetchWarehouseData = async () => {
@@ -245,7 +246,7 @@ const StockAdd = forwardRef<StockAddDialogControllerRef, UserAddProps>(({onSaveS
             </Grid.Col>
             <Grid.Col span={6}>
               <Select
-                label="Raf" placeholder="Raf seçiniz" data={shelves}
+                label="Raf" placeholder="Raf seçiniz" data={shelvesChange}
                 searchable maxDropdownHeight={200} disabled={!form.values.warehouseId}
                 nothingFoundMessage="raf bulunamadı..." required value={form.values.shelveId}
                 onChange={(value) => form.setFieldValue('shelveId', value)}

@@ -1,20 +1,22 @@
 import { forwardRef, useImperativeHandle, useState, useEffect, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { clone, omit } from 'ramda';
-import { Modal, TextInput, Button, Stack, Grid, Group, Textarea } from '@mantine/core';
+import { clone, omit, product } from 'ramda';
+import { Modal, TextInput, Button, Stack, Grid, Flex, Group, Select, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { toast } from '../../utils/toastMessages';
 import { useWarehouseService } from '../../services/warehouseService';
+import { statuMockData } from '~/utils/priorityMockData';
+import { useAuth } from '~/authContext';
 
-export type RequestStockEditDialogControllerRef = {
+export type RequestStockEditManagerDialogControllerRef = {
   openDialog: (value: FormValues[]) => void;
   close: () => void;
 };
 
-interface RequestStockEditProps {
+interface RequestStockEditManagerProps {
   onSaveSuccess?: () => void; // Yeni prop
 }
 
@@ -24,17 +26,19 @@ type FormValues = {
   productName: string;
   count: string;
   status: string;
+  managerNote?: string;
   description?: string;
   actions?: string;
 };
 
-const RequestStockEdit = forwardRef<RequestStockEditDialogControllerRef, RequestStockEditProps>(({onSaveSuccess}, ref) => {
+const RequestStockEditManager = forwardRef<RequestStockEditManagerDialogControllerRef, RequestStockEditManagerProps>(({onSaveSuccess}, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
 
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const service = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
+  const { currentUser } = useAuth();
 
   const form = useForm<{items: FormValues[]}>({
     initialValues: {
@@ -43,6 +47,7 @@ const RequestStockEdit = forwardRef<RequestStockEditDialogControllerRef, Request
       productId: 0,
       productName: '',
       description: '',
+      managerNote: '',
       status: '',
       count: "",
       }],
@@ -82,7 +87,13 @@ const RequestStockEdit = forwardRef<RequestStockEditDialogControllerRef, Request
       values.items.map(item => {
         const payload = {
           ...(omit(['productName'], item)),
+          id: item.id,
+          productId: item.productId,
+          status: values.items[0].status,
+          managerNote: item.managerNote,
           count: parseInt(item.count, 10),
+          // Yönetici ID'sini currentUser'dan alıyoruz
+          managerUserId: currentUser?.id as number
         };
         return service.updatRequestStock(payload);
       })
@@ -149,7 +160,7 @@ const RequestStockEdit = forwardRef<RequestStockEditDialogControllerRef, Request
       <Stack gap="md">
         {form.values.items.map((item, index) => (
           <Grid key={item.id}>
-            <Grid.Col span={3}>
+            <Grid.Col span={2}>
               <TextInput
                 label="Ürün"
                 disabled
@@ -159,7 +170,7 @@ const RequestStockEdit = forwardRef<RequestStockEditDialogControllerRef, Request
 
             <Grid.Col span={2}>
               <TextInput
-                label="Adet"
+                label="Adet/Miktar"
                 type="number"
                 min={1}
                 required
@@ -167,20 +178,36 @@ const RequestStockEdit = forwardRef<RequestStockEditDialogControllerRef, Request
               />
             </Grid.Col>
 
-            <Grid.Col span={6}>
+            <Grid.Col span={4}>
               <Textarea
-                label="Açıklama"
+                label="Açıklama/Talep Neden"
                 {...form.getInputProps(`items.${index}.description`)}
+              />
+            </Grid.Col>
+            <Grid.Col span={4}>
+              <Textarea
+                label="Açıklama/Yönetici Notu"
+                {...form.getInputProps(`items.${index}.managerNote`)}
               />
             </Grid.Col>
           </Grid>
         ))}
         <TextInput
-          label="Açıklama"
-          required
+          label="Açıklama/Genel Not"
+          required disabled
           {...form.getInputProps(`items.0.note`)}
         />
-
+        <Flex
+          direction={{ base: 'column', sm: 'row' }}
+          gap={{ base: 'sm', sm: 'lg' }}
+          justify={{ sm: 'center' }}
+        >
+        <Select
+          data={statuMockData}
+          maxDropdownHeight={200}
+          {...form.getInputProps(`items.0.status`)}
+        />
+        </Flex>
         <Group justify="end">
           <Button
             variant="filled"
@@ -211,4 +238,4 @@ const RequestStockEdit = forwardRef<RequestStockEditDialogControllerRef, Request
   </>);
 });
 
-export default RequestStockEdit;
+export default RequestStockEditManager;

@@ -11,6 +11,7 @@ interface WarehouseDataParams {
 }
 
 interface UpdatRequestStockParams {
+  id: number;
   count?: number;
   productId: number;
   managerUserId?: number;

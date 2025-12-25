@@ -1,17 +1,16 @@
-import { useState, useEffect, Fragment, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import {
-  Container, Grid, Table, Text, Stack, Tooltip, Title, Button, Select,
+  Container, Grid, Table, Text, Stack, Tooltip, Title, Button, Badge,
   Paper, TextInput, LoadingOverlay, Flex, Group, ActionIcon,
 } from '@mantine/core';
 import { MenuActionButton } from '../../components'
-import { IconSearch, IconPlus, IconCheck } from '@tabler/icons-react';
+import { IconSearch, IconPlus, IconEdit } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { useWarehouseService } from '../../services/warehouseService';
-import { toast } from '../../utils/toastMessages';
 import { formatDate } from '../../utils/formatDate';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import RequestStockAdd, { type RequestStockAddDialogControllerRef } from '../../components/stock/requestStockAdd';
-import ShelveEdit, { type ShelveEditDialogControllerRef } from '../../components/stock/shelveEdit';
+import RequestStockEditManager, { type RequestStockEditManagerDialogControllerRef } from '../../components/stock/requestStockEditManager';
 import { type ColumnDefinition, type ValueData } from '../../utils/repor/exportToExcel';
 import { type PdfTableColumn } from '../../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../../utils/repor/calculateColumnWidth';
@@ -28,6 +27,7 @@ interface RequestStockManagerData {
   count: string;
   status: string;
   managerUserId: number;
+  note?: string;
   managerUserFullName: string;
   description?: string;
   managerNote?: string;
@@ -41,64 +41,43 @@ interface Column {
 }
 
 export default function RequestStock() {
-  const [requestStockData, setRequestStockData] = useState<RequestStockManagerData[]>([]);
-  const [editableData, setEditableData] = useState<Record<number, { status: string; managerNote: string; count: string }>>({});
+  const [requestStockData, setRequestStockData] = useState<Record<string, RequestStockManagerData[]>>({});
   const [visible, { open, close }] = useDisclosure(false);
   const [searchText, setSearchText] = useState('');
 
   const requestStockAddRef = useRef<RequestStockAddDialogControllerRef>(null);
-  const shelveEditRef = useRef<ShelveEditDialogControllerRef>(null);
-  const { currentUser } = useAuth();
+  const requestStockEditManagerRef = useRef<RequestStockEditManagerDialogControllerRef>(null);
 
   const service = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
 
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
-    { field: 'id', header: 'Id' },
+    // { field: 'id', header: 'Id' },
     { field: 'productName', header: 'Ürün Adı' },
-    { field: 'count', header: 'Ürün Sayısı' },
+    // { field: 'count', header: 'Ürün Sayısı' },
     { field: 'status', header: 'Durum' },
     { field: 'updateUserFullName', header: 'Talep Eden' },
     { field: 'description', header: 'Açıklama Taleb edenin' },
     { field: 'managerUserFullName', header: 'Yönetici' },
     { field: 'managerNote', header: 'Yönetici Notu' },
     { field: 'requestDate', header: 'Talep Tarih' },
-    { field: 'createDate', header: 'İlk Kayıt' },
+    // { field: 'createDate', header: 'İlk Kayıt' },
     { field: 'approvedDate', header: 'Onaylanma Tarih' },
     { field: 'actions', header: 'İşlemler' },
   ]);
 
   useEffect(() => {
     setTimeout(() => {
-        fetchShelves();
+        fetchRequestStocks();
       }, 500);
   }, []);
 
-  const fetchShelves = async () => {
+  const fetchRequestStocks = async () => {
     open();
     try {
+      const data = await service.getRequestStocks();
 
-      const getRequestStocks = await service.getRequestStocks();
-      
-      if (getRequestStocks) {
-        
-        setRequestStockData(getRequestStocks);
-        // EditableData'yı başlangıç değerleriyle doldur
-        const initialEditableData: Record<number, { status: string; managerNote: string; count: string }> = {};
-        getRequestStocks.forEach((item: RequestStockManagerData) => {
-          initialEditableData[item.id] = {
-            count: item.count || "",
-            status: item.status || '',
-            managerNote: item.managerNote || ''
-          };
-        });
-        setEditableData(initialEditableData);
-      } else {
-        toast.info('Hiçbir veri yok!');
-        setRequestStockData([]);
-        setEditableData({});
-      }
-    } catch (error: any) {
-      toast.error(`Stok yüklenirken hata: ${error.message}`);
+      setRequestStockData(data);
+
     } finally {
       close();
     }
@@ -106,102 +85,88 @@ export default function RequestStock() {
 
   const handleSaveSuccess = () => {
     setTimeout(() => {
-      fetchShelves();
+      fetchRequestStocks();
     }, 1500);
   };
 
-  const handleStatusChange = (id: number, value: string) => {
-    setEditableData(prev => ({
-      ...prev,
-      [id]: {
-        ...prev[id],
-        status: value
-      }
-    }));
-  };
-
-  const handleManagerNoteChange = (id: number, value: string) => {
-    setEditableData(prev => ({
-      ...prev,
-      [id]: {
-        ...prev[id],
-        managerNote: value
-      }
-    }));
-  };
-  const handleCountChange = (id: number, value: string) => {
-    setEditableData(prev => ({
-      ...prev,
-      [id]: {
-        ...prev[id],
-        count: value
-      }
-    }));
-  }
-
-  const handleApproved = async (item: RequestStockManagerData) => {
-    try {
-
-      const editableItem = editableData[item.id];
-      if (!editableItem) {
-        toast.error('Düzenlenebilir veri bulunamadı.');
-        return;
-      }
-
-      const updatedData = {
-        id: item.id,
-        productId: item.productId,
-        status: editableItem.status,
-        managerNote: editableItem.managerNote,
-        count: editableItem.count ? parseInt(editableItem.count, 10) : undefined,
-        // Yönetici ID'sini currentUser'dan alıyoruz
-        managerUserId: currentUser?.id as number,
-      };
-
-      // API'yi çağırarak talebi güncelle
-      const response = await service.updatRequestStock(updatedData);
-      if (response === true) {
-        toast.success('İşlem başarılı!');
-        // Listeyi yenile
-        fetchShelves();
-      }
-      if (response?.data === false && response?.errors?.length > 0) {
-
-        toast.warning(response.errors[0]);
-
-        setTimeout(() => {
-          fetchShelves();
-        }, 2500);
-
-      }
-    } catch (error: any) {
-      toast.error(`Talebi güncellenirken hata: ${error.message}`);
+  const diffStatuForColor = (statu: string) => {
+    switch (statu) {
+      case 'pending':
+        return 'yellow';
+      case 'canceled':
+        return 'red';
+      case 'approved':
+        return 'green';
+      default:
+        return 'gray';
     }
-  }
+  };
 
     // Filtrelenmiş veriler
   const filteredStocks = useMemo(() => {
     if (!searchText) return requestStockData;
-    
-    return requestStockData.filter(stock =>
-      stock.productName.toLowerCase().includes(searchText.trim().toLowerCase()) ||
-      stock.updateUserFullName.toLowerCase().includes(searchText.trim().toLowerCase())
-    );
+  
+    return Object.fromEntries(
+      Object.entries(requestStockData)
+      .map(([key, items]) => {
+        const filteredItems = items.filter(item =>
+          item.productName.toLowerCase().includes(searchText.trim().toLowerCase()) ||
+          item.updateUserFullName.toLowerCase().includes(searchText.trim().toLowerCase())
+        );
+
+        return [key, filteredItems];
+      })
+      .filter(([_, items]) => items.length > 0) // boş grupları at
+  );
   }, [requestStockData, searchText]);
 
   // raportdata
   const raportStockData = useMemo(() => {
-    return filteredStocks.map((stock: RequestStockManagerData) => ({
-      ...stock,
-      createDate: formatDate(stock.createDate, dateFormatStrings.dateTimeFormatWithoutSecond),
-    }))
-  }, [filteredStocks])
+    // Her grubu tek bir satıra dönüştür
+    const groupedStocks: RequestStockData[] = [];
+      
+    Object.entries(filteredStocks).forEach(([groupId, groupItems]) => {
+      if (groupItems.length === 0) return;
+      
+      const firstItem = groupItems[0];
+      
+      // Ürün adlarını ve count'ları birleştir
+      const productList = groupItems.map(item => 
+        `${item.productName} (${item.count})`
+      ).join(', ');
+  
+      // status
+      const statusSet = statuMockData.find(s => s.value === firstItem.status)?.label;
+      
+      // Toplam count hesapla (eğer gerekliyse)
+      const totalCount = groupItems.reduce((sum, item) => 
+        sum + parseInt(item.count || '0', 10), 0
+      );
+      
+      groupedStocks.push({
+        ...firstItem,
+        id: parseInt(groupId), // veya firstItem.id
+        productName: productList,
+        status: statusSet || firstItem.status,
+        count: totalCount.toString(), // veya groupItems.length.toString()
+        requestDate: firstItem.requestDate 
+          ? formatDate(firstItem.requestDate, dateFormatStrings.dateTimeFormatWithoutSecond)
+          : "-",
+        approvedDate: firstItem.approvedDate 
+          ? formatDate(firstItem.approvedDate, dateFormatStrings.dateTimeFormatWithoutSecond)
+          : "-",
+        createDate: formatDate(firstItem.createDate, dateFormatStrings.dateTimeFormatWithoutSecond),
+        // Diğer alanları da ekleyebilirsiniz
+      });
+    });
+      return groupedStocks;
+    }, [filteredStocks]);
 
   // useMemo hook'u ile sütunları önbelleğe alıyoruz
   const pdfTableColumns = useMemo((): PdfTableColumn[] => {
 
     const newCols: Column[] = rowHeaders.filter(col =>
-      col.field != 'requestDate' && col.field != 'description' && col.field != 'actions');
+      col.field != 'id' && col.field != 'managerNote' && col.field != 'createDate' && col.field != 'note' && col.field != 'description' && col.field != 'actions');
 
     return newCols.map(col => ({
       key: col.field,
@@ -214,7 +179,7 @@ export default function RequestStock() {
   const excelTableColumns = useMemo((): ColumnDefinition[] => {
 
     const newCols: Column[] = rowHeaders.filter(col =>
-      col.field != 'requestDate' && col.field != 'description' && col.field != 'actions');
+      col.field != 'id' && col.field != 'managerNote' && col.field != 'createDate' && col.field != 'note' && col.field != 'description' && col.field != 'actions');
 
     return newCols.map(col => ({
       key: col.field as keyof ValueData,
@@ -227,81 +192,83 @@ export default function RequestStock() {
     return "İstek Taleb Raporu";
   }
 
-  const rowsTable = filteredStocks.map((item) => (
-    <Table.Tr key={item.id}>
-      {rowHeaders.map((header) => {
-     
-        if (['createDate', 'requestDate', 'approvedDate'].includes(header.field)) {
-          return (
-            <Table.Td key={header.field}>
-              {item[header.field] ? formatDate(item[header.field] as string ?? null, dateFormatStrings.dateTimeFormatWithoutSecond): "-"}
-            </Table.Td>
-          );
-        }
-        if (header.field === 'status') {
-          return (
-            <Table.Td key={header.field}>
-              {
-              <Select
-                data={statuMockData}
-                maxDropdownHeight={200}
-                value={editableData[item.id]?.status || item[header.field]}
-                onChange={(value) => handleStatusChange(item.id, value || '')}
-              />
-              }
-            </Table.Td>
-          );
-        }
-        if (header.field === 'managerNote') {
-          return (
-            <Table.Td key={header.field}>
-              {
-              <TextInput
-                value={editableData[item.id]?.managerNote || item[header.field] || ''}
-                onChange={(event) => handleManagerNoteChange(item.id, event.currentTarget.value)}
-              />
-              }
-            </Table.Td>
-          );
-        }
-        if (header.field === 'count') {
-          return (
-            <Table.Td key={header.field}>
-              {
-              <TextInput
-                value={editableData[item.id]?.count || ""} type='number' min={1}
-                onChange={(event) => handleCountChange(item.id, event.currentTarget.value)}
-              />
-              }
-            </Table.Td>
-          );
-        }
-        else if (header.field === 'actions') {
-          return (
-            <Table.Td key={header.field}>
-              <Group gap="xs">
-                <Tooltip label="Onayla">
-                <ActionIcon 
-                  variant="light" 
-                  color="green" disabled={item.status === 'pending' ? false : true}
-                  onClick={() => handleApproved(item)}
-                >
-                  <IconCheck size={16} />
-                </ActionIcon>
-                </Tooltip>
-              </Group>
-            </Table.Td>
-          );
-        }
+  const handleEdit = (value: RequestStockManagerData[]) => {
 
-        return (
-          <Table.Td key={header.field}>
-            {item[header.field] || '-'}
+    requestStockEditManagerRef.current?.openDialog(value);
+  }
+
+  const rowsTable = Object.entries(requestStockData).map(
+    ([requestStockId, items]) => {
+
+      const firstItem = items[0];
+
+      return (
+        <Table.Tr key={requestStockId}>
+
+          {/* Ürünler */}
+          <Table.Td>
+            <ul style={{ margin: 0, paddingLeft: 16 }}>
+              {items.map(i => (
+                <li key={i.id}>
+                  {i.productName} ({i.count})
+                </li>
+              ))}
+            </ul>
           </Table.Td>
-        );
-      })}
-    </Table.Tr>
-  ));
+
+          {/* Status */}
+          <Table.Td>
+            <Badge color={diffStatuForColor(firstItem.status)}>
+              {statuMockData.find(s => s.value === firstItem.status)?.label || firstItem.status}
+            </Badge>
+          </Table.Td>
+
+          {/* TALEP EDEN */}
+          <Table.Td>
+            {firstItem.updateUserFullName}
+          </Table.Td>
+
+          {/* TALEP EDEN */}
+          <Table.Td>
+            {firstItem.note}
+          </Table.Td>
+
+          {/* yonetici */}
+          <Table.Td>
+            {firstItem.managerUserFullName}
+          </Table.Td>
+
+          {/* Manager Note */}
+          <Table.Td>
+            {firstItem.managerNote}
+          </Table.Td>
+          {/* Talep Tarih */}
+          <Table.Td>
+            {formatDate(firstItem.requestDate, dateFormatStrings.dateTimeFormatWithoutSecond)}
+          </Table.Td>
+
+          {/* Onaylanma Tarih */}
+          <Table.Td>
+            {formatDate(firstItem.approvedDate, dateFormatStrings.dateTimeFormatWithoutSecond)}
+          </Table.Td>
+
+          {/* Actions */}
+          <Table.Td>
+            <Tooltip label="Onayla / Düzenle" withArrow>
+            <ActionIcon
+              color="green" disabled={firstItem.status !== 'pending'}
+              onClick={() => handleEdit(items)}
+            >
+              <IconEdit size={16} />
+            </ActionIcon>
+            </Tooltip>
+          </Table.Td>
+
+        </Table.Tr>
+      );
+    }
+  );
+
 
   return (
     <Container size="xl">
@@ -394,7 +361,7 @@ export default function RequestStock() {
           </Paper>
       </Stack>
       <RequestStockAdd ref={requestStockAddRef} onSaveSuccess={handleSaveSuccess} />
-      <ShelveEdit ref={shelveEditRef} onSaveSuccess={handleSaveSuccess} />
+      <RequestStockEditManager ref={requestStockEditManagerRef} onSaveSuccess={handleSaveSuccess} />
     </Container>
   );
 }

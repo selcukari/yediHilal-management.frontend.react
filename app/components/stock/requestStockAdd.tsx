@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, TextInput, Button, Stack, Grid, Text, Select, Checkbox, Group, Badge, ActionIcon, Textarea, Paper, Table, Title } from '@mantine/core';
+import { Modal, TextInput, Button, Stack, Grid, Text, Checkbox, Group, Badge, ActionIcon, Textarea, Paper, Table, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
@@ -27,6 +27,7 @@ interface StockData {
   unitPrice: number;
   totalPrice?: number;
   count?: number;
+  note?: string;
   requestCount?: number; // Talep edilen sayı
   description?: string; // Talep notu
   fromWhere?: string;
@@ -53,6 +54,7 @@ interface RequestItem {
   stockId: number;
   requestCount: number;
   description: string;
+  note: string;
 }
 
 type FormValues = {
@@ -114,7 +116,8 @@ const RequestStockAdd = forwardRef<RequestStockAddDialogControllerRef, RequestSt
         const initialItems = getStocks.map((stock: any) => ({
           stockId: stock.id,
           requestCount: 0,
-          description: ''
+          description: '',
+          note: ''
         }));
         form.setFieldValue('items', initialItems);
       } else {
@@ -170,7 +173,8 @@ const RequestStockAdd = forwardRef<RequestStockAddDialogControllerRef, RequestSt
           updateUserId: currentUser?.id as number,
           productId: item.stockId,
           count: item.requestCount,
-          description: item.description // taleb edenin notu
+          description: item.description, // taleb edenin notu
+          note: item.note // ek not
         }))
       };
 
@@ -329,6 +333,10 @@ const RequestStockAdd = forwardRef<RequestStockAddDialogControllerRef, RequestSt
                         <Table.Tbody>{rowsTable}</Table.Tbody>
                       </Table>
                     </Table.ScrollContainer>
+                    <TextInput
+                      placeholder="Açıklama giriniz"
+                      onChange={(e) => updateRequestItem(stockData[0]?.id, 'note', e.target.value)}
+                    />
                     <Text size="sm" c='red'>
                       * Sadece seçili ürünler için talep oluşturulacaktır
                     </Text>

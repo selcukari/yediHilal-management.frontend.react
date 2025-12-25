@@ -41,16 +41,11 @@ type FormValues = {
   actions?: string;
 };
 
-type GetStockData = {
-  id: number;
-  name: string;
-  nameKey: string;
-}
-
 const StockEdit = forwardRef<StockEditDialogControllerRef, UserEditProps>(({onSaveSuccess}, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [shelves, setShelves] = useState<{ value: string; label: string; warehouseId: string }[]>([]);
+  const [shelvesChange, setShelvesChange] = useState<{ value: string; label: string; warehouseId: string }[]>([]);
   const [warehouses, setWarehouses] = useState<{ value: string; label: string }[]>([]);
 
   const service = useStockService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
@@ -108,7 +103,7 @@ const StockEdit = forwardRef<StockEditDialogControllerRef, UserEditProps>(({onSa
     form.setFieldValue('shelveId', null);
 
     const filteredShelves = shelves.filter(shelf => shelf.warehouseId == form.values.warehouseId);
-    setShelves(filteredShelves);
+    setShelvesChange(filteredShelves);
   }, [form.values.warehouseId]);
   
   const fetchWarehouseData = async () => {
@@ -137,6 +132,7 @@ const StockEdit = forwardRef<StockEditDialogControllerRef, UserEditProps>(({onSa
            response.map((c: any) => ({
              value: String(c.id),
              label: c.name,
+             warehouseId: String(c.warehouseId),
            }))
          );
        } else {
@@ -276,7 +272,7 @@ const StockEdit = forwardRef<StockEditDialogControllerRef, UserEditProps>(({onSa
             </Grid.Col>
             <Grid.Col span={6}>
               <Select
-                label="Raf" placeholder="Raf seçiniz" data={shelves}
+                label="Raf" placeholder="Raf seçiniz" data={shelvesChange}
                 searchable maxDropdownHeight={200} value={form.values.shelveId}
                 nothingFoundMessage="raf bulunamadı..." required disabled={!form.values.warehouseId}
                 onChange={(value) => form.setFieldValue('shelveId', value)}
