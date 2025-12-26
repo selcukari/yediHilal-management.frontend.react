@@ -150,7 +150,7 @@ const RequestStockEditManager = forwardRef<RequestStockEditManagerDialogControll
       }}
       title="Ürün Talep Düzenle"
       centered
-      size="700"
+      size="900"
       overlayProps={{
         backgroundOpacity: 0.55,
         blur: 3,
@@ -168,7 +168,7 @@ const RequestStockEditManager = forwardRef<RequestStockEditManagerDialogControll
               />
             </Grid.Col>
 
-            <Grid.Col span={2}>
+            <Grid.Col span={1.5}>
               <TextInput
                 label="Adet/Miktar"
                 type="number"
@@ -178,13 +178,20 @@ const RequestStockEditManager = forwardRef<RequestStockEditManagerDialogControll
               />
             </Grid.Col>
 
-            <Grid.Col span={4}>
+            <Grid.Col span={3}>
               <Textarea
-                label="Açıklama/Talep Neden"
+                label="Açıklama/Talep Neden" disabled
                 {...form.getInputProps(`items.${index}.description`)}
               />
             </Grid.Col>
-            <Grid.Col span={4}>
+            <Grid.Col span={2}>
+              <Select
+                data={statuMockData} label="Durum"
+                maxDropdownHeight={200}
+                {...form.getInputProps(`items.${index}.status`)}
+              />
+            </Grid.Col>
+            <Grid.Col span={3}>
               <Textarea
                 label="Açıklama/Yönetici Notu"
                 {...form.getInputProps(`items.${index}.managerNote`)}

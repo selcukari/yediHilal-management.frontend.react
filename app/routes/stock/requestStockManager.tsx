@@ -122,7 +122,7 @@ export default function RequestStock() {
   // raportdata
   const raportStockData = useMemo(() => {
     // Her grubu tek bir satıra dönüştür
-    const groupedStocks: RequestStockData[] = [];
+    const groupedStocks: RequestStockManagerData[] = [];
       
     Object.entries(filteredStocks).forEach(([groupId, groupItems]) => {
       if (groupItems.length === 0) return;
@@ -133,21 +133,31 @@ export default function RequestStock() {
       const productList = groupItems.map(item => 
         `${item.productName} (${item.count})`
       ).join(', ');
+
+      // managernote
+      const totalManagernote = groupItems
+        .map(item => item.managerNote || '')
+        .filter(note => note.trim() !== '') // Boş notları filtrele
+        .join(' - '); // "-" ile birleştir
   
       // status
-      const statusSet = statuMockData.find(s => s.value === firstItem.status)?.label;
+      const totalStatus = groupItems
+        .map(item => statuMockData.find(s => s.value === item.status)?.label || '')
+        .filter(note => note.trim() !== '') // Boş notları filtrele
+        .join(' - '); // "-" ile birleştir
       
       // Toplam count hesapla (eğer gerekliyse)
       const totalCount = groupItems.reduce((sum, item) => 
         sum + parseInt(item.count || '0', 10), 0
       );
-      
+
       groupedStocks.push({
         ...firstItem,
         id: parseInt(groupId), // veya firstItem.id
         productName: productList,
-        status: statusSet || firstItem.status,
+        status: totalStatus || firstItem.status,
         count: totalCount.toString(), // veya groupItems.length.toString()
+        managerNote: totalManagernote,
         requestDate: firstItem.requestDate 
           ? formatDate(firstItem.requestDate, dateFormatStrings.dateTimeFormatWithoutSecond)
           : "-",
@@ -202,7 +212,7 @@ export default function RequestStock() {
       const firstItem = items[0];
 
       return (
-        <Table.Tr key={requestStockId}>
+        <Table.Tr key={`${requestStockId}-${firstItem.id}`}>
 
           {/* Ürünler */}
           <Table.Td>
@@ -217,9 +227,13 @@ export default function RequestStock() {
 
           {/* Status */}
           <Table.Td>
-            <Badge color={diffStatuForColor(firstItem.status)}>
-              {statuMockData.find(s => s.value === firstItem.status)?.label || firstItem.status}
-            </Badge>
+            {
+              items.map(i => (
+                <Badge color={diffStatuForColor(i.status)} key={i.id}>
+                  {statuMockData.find(s => s.value === i.status)?.label || i.status}
+                </Badge>
+              ))
+            }
           </Table.Td>
 
           {/* TALEP EDEN */}
@@ -239,7 +253,7 @@ export default function RequestStock() {
 
           {/* Manager Note */}
           <Table.Td>
-            {firstItem.managerNote}
+            {(items || [])?.map(i => i.managerNote).filter(note => note && note.trim() !== '').join(' - ')}
           </Table.Td>
           {/* Talep Tarih */}
           <Table.Td>

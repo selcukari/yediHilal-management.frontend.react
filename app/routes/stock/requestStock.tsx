@@ -81,7 +81,6 @@ export default function RequestStock() {
       const getRequestStocks = await service.getRequestStocks(currentUserId);
       
       if (getRequestStocks) {
-        console.log('Fetched Request Stocks:', getRequestStocks);
         setRequestStockData(getRequestStocks);
       } else {
         toast.info('Hiçbir veri yok!');
@@ -175,8 +174,17 @@ export default function RequestStock() {
         `${item.productName} (${item.count})`
       ).join(', ');
 
+      // managernote
+      const totalManagernote = groupItems
+        .map(item => item.managerNote || '')
+        .filter(note => note.trim() !== '') // Boş notları filtrele
+        .join(' - '); // "-" ile birleştir
+
       // status
-      const statusSet = statuMockData.find(s => s.value === firstItem.status)?.label;
+      const totalStatus = groupItems
+        .map(item => statuMockData.find(s => s.value === item.status)?.label || '')
+        .filter(note => note.trim() !== '') // Boş notları filtrele
+        .join(' - '); // "-" ile birleştir
       
       // Toplam count hesapla (eğer gerekliyse)
       const totalCount = groupItems.reduce((sum, item) => 
@@ -187,7 +195,7 @@ export default function RequestStock() {
         ...firstItem,
         id: parseInt(groupId), // veya firstItem.id
         productName: productList,
-        status: statusSet || firstItem.status,
+        status: totalStatus || firstItem.status,
         count: totalCount.toString(), // veya groupItems.length.toString()
         requestDate: firstItem.requestDate 
           ? formatDate(firstItem.requestDate, dateFormatStrings.dateTimeFormatWithoutSecond)
@@ -248,17 +256,17 @@ export default function RequestStock() {
 
   const rowsTable = (
     Object.entries(filteredStocks) as [string, RequestStockData[]][]
-    ).map(([requestStockId, items]) => {
+    )?.map(([requestStockId, items]) => {
     const firstItem = items[0];
 
   return (
-    <Table.Tr key={requestStockId}>
-      {rowHeaders.map((header) => {
+    <Table.Tr key={`${requestStockId}-${firstItem.id}`}>
+      {rowHeaders.map((header, index) => {
 
         // ✅ Ürün adlarını liste olarak yazdır
         if (header.field === 'productName') {
           return (
-            <Table.Td key={header.field}>
+            <Table.Td key={index}>
               <ul style={{ margin: 0, paddingLeft: 16 }}>
                 {items.map((item) => (
                   <li key={item.id}>
@@ -276,7 +284,7 @@ export default function RequestStock() {
             firstItem?.[header.field as keyof RequestStockData] as string | undefined;
 
           return (
-            <Table.Td key={header.field}>
+            <Table.Td key={index}>
               {value
                 ? formatDate(
                     value,
@@ -289,13 +297,16 @@ export default function RequestStock() {
 
         // ✅ Status
         if (header.field === 'status') {
-          const status = firstItem?.status;
 
           return (
-            <Table.Td key={header.field}>
-              <Badge color={diffStatuForColor(status)}>
-                {statuMockData.find(s => s.value === status)?.label || status}
-              </Badge>
+            <Table.Td key={index}>
+              {
+                items.map(i => (
+                <Badge color={diffStatuForColor(i.status)} key={i.id}>
+                  {statuMockData.find(s => s.value === i.status)?.label || i.status}
+                </Badge>
+              ))
+              }
             </Table.Td>
           );
         }
@@ -305,8 +316,18 @@ export default function RequestStock() {
           const note = firstItem?.note;
 
           return (
-            <Table.Td key={header.field}>
+            <Table.Td key={index}>
               {note}
+            </Table.Td>
+          );
+        }
+
+        // ✅ managerNote taleb edenin ek olarak yazdığı açıklama
+        if (header.field === 'managerNote') {
+
+          return (
+            <Table.Td key={index}>
+              {(items || [])?.map(i => i.managerNote).filter(note => note && note.trim() !== '').join(' - ')}
             </Table.Td>
           );
         }
@@ -314,7 +335,7 @@ export default function RequestStock() {
         // ✅ Actions (grup bazlı)
         if (header.field === 'actions') {
           return (
-            <Table.Td key={header.field}>
+            <Table.Td key={index}>
               <Group gap="xs">
                 <Tooltip label="Güncelle">
                   <ActionIcon
@@ -344,7 +365,7 @@ export default function RequestStock() {
 
         // ✅ Default alanlar (ilk item)
         return (
-          <Table.Td key={header.field}>
+          <Table.Td key={index}>
             {firstItem?.[header.field as keyof RequestStockData] ?? "-"}
           </Table.Td>
         );
