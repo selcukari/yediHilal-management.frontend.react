@@ -1,6 +1,6 @@
 import { forwardRef, useImperativeHandle, useState, useEffect, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { clone, omit, product } from 'ramda';
+import { clone, omit } from 'ramda';
 import { Modal, TextInput, Button, Stack, Grid, Flex, Group, Select, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';

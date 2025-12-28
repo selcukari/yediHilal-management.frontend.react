@@ -5,25 +5,17 @@ import { dateFormatStrings } from '../dateFormatStrings';
 import RobotoRegular from '../../assets/fonts/roboto/Roboto-Regular.ttf';
 import RobotoBold from '../../assets/fonts/roboto/Roboto-Bold.ttf';
 
-interface MeetingData {
-  id: number;
+export interface RequestStockManagerDataPdf {
   name: string;
-  agendas?: string;
-  participants?: string;
-  participantCount?: number;
-  meetingTypeId: number;
-  meetingTypeName: string;
-  provinceId: number;
-  provinceName: string;
-  districtId?: number;
-  districtName?: string;
-  notes?: string;
-  isActive: boolean;
-  responsibleId: number;
-  responsibleFullName: string;
-  createDate: string;
-  UpdateDate?: string;
-  time?: string;
+  updateUserFullName: string;
+  productNameWithCount: string;
+  status: string;
+  note?: string;
+  managerUserFullName: string;
+  description?: string;
+  managerNote?: string;
+  requestDate?: string;
+  approvedDate?: string;
 }
 
 // HTML'i düz metne çeviren yardımcı fonksiyon
@@ -60,7 +52,7 @@ const convertHtmlToPlainText = (html: string): string => {
   return text;
 };
 
-export const generateMeetingPdf = (meeting: MeetingData): void => {
+export const generateMeetingPdf = (meeting: RequestStockManagerDataPdf): void => {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -94,12 +86,15 @@ export const generateMeetingPdf = (meeting: MeetingData): void => {
 
   // Toplantı Bilgileri Tablosu
   const meetingInfo = [
-    ['İl', meeting.provinceName || '-'],
-    ['İlçe', meeting.districtName || '-'],
-    ['Katılımcı Sayısı', meeting.participantCount?.toString() || '-'],
-    ['Sorumlu', meeting.responsibleFullName || '-'],
-    ['Toplantı Birimi', meeting.meetingTypeName || '-'],
-    ['Toplantı Tarihi', formatDate(meeting.time, dateFormatStrings.dateTimeFormatWithoutSecond) || '-'],
+    ['Talep Eden', meeting.updateUserFullName || '-'],
+    ['Ürün/Adet', meeting.productNameWithCount || '-'],
+    ['Durum', meeting.status || '-'],
+    ['Açıklama', meeting.description || '-'],
+    ['Genel Not', meeting.note || '-'],
+    ['Yönetici', meeting.managerUserFullName || '-'],
+    ['Yönetici Notu', meeting.managerNote || '-'],
+    ['Talep Tarihi', meeting.requestDate || '-'],
+    ['Onaylama Tarihi', meeting.approvedDate || '-'],
   ];
 
   autoTable(doc, {
@@ -130,106 +125,6 @@ export const generateMeetingPdf = (meeting: MeetingData): void => {
 
   yPosition = (doc as any).lastAutoTable.finalY + 15;
 
-  // Katılımcılar Bölümü
-  if (meeting.participants) {
-    // Başlık
-    doc.setFontSize(12);
-    doc.setFont('Roboto', 'bold');
-    doc.setTextColor(52, 152, 219);
-    doc.text('Katılımcılar:', margin, yPosition);
-    yPosition += 7;
-
-    // İçerik
-    doc.setFontSize(10);
-    doc.setFont('Roboto', 'normal');
-    doc.setTextColor(44, 44, 44);
-    
-    const participantsLines = doc.splitTextToSize(
-      meeting.participants,
-      pageWidth - (margin * 2)
-    );
-    
-    participantsLines.forEach((line: string) => {
-      if (yPosition > pageHeight - 30) {
-        doc.addPage();
-        yPosition = 20;
-      }
-      doc.text(line, margin, yPosition);
-      yPosition += 6;
-    });
-    
-    yPosition += 8;
-  }
-
-  // Gündemler Bölümü
-  if (meeting.agendas) {
-    if (yPosition > pageHeight - 40) {
-      doc.addPage();
-      yPosition = 20;
-    }
-
-    doc.setFontSize(12);
-    doc.setFont('Roboto', 'bold');
-    doc.setTextColor(52, 152, 219);
-    doc.text('Gündemler:', margin, yPosition);
-    yPosition += 7;
-
-    doc.setFontSize(10);
-    doc.setFont('Roboto', 'normal');
-    doc.setTextColor(44, 44, 44);
-    
-    const agendasLines = doc.splitTextToSize(
-      meeting.agendas,
-      pageWidth - (margin * 2)
-    );
-    
-    agendasLines.forEach((line: string) => {
-      if (yPosition > pageHeight - 30) {
-        doc.addPage();
-        yPosition = 20;
-      }
-      doc.text(line, margin, yPosition);
-      yPosition += 6;
-    });
-    
-    yPosition += 8;
-  }
-
-  // Alınan Kararlar Bölümü (HTML formatında)
-  if (meeting.notes) {
-    if (yPosition > pageHeight - 40) {
-      doc.addPage();
-      yPosition = 20;
-    }
-
-    doc.setFontSize(12);
-    doc.setFont('Roboto', 'bold');
-    doc.setTextColor(52, 152, 219);
-    doc.text('Alınan Kararlar:', margin, yPosition);
-    yPosition += 7;
-
-    // HTML'i temiz metne çevir
-    const cleanText = convertHtmlToPlainText(meeting.notes);
-    
-    doc.setFontSize(10);
-    doc.setFont('Roboto', 'normal');
-    doc.setTextColor(44, 44, 44);
-    
-    const notesLines = doc.splitTextToSize(
-      cleanText,
-      pageWidth - (margin * 2)
-    );
-    
-    notesLines.forEach((line: string) => {
-      if (yPosition > pageHeight - 30) {
-        doc.addPage();
-        yPosition = 20;
-      }
-      doc.text(line, margin, yPosition);
-      yPosition += 6;
-    });
-  }
-
   // Oluşturulma Tarihi (Alt kısımda ortalanmış)
   const pageCount = doc.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
@@ -259,7 +154,7 @@ export const generateMeetingPdf = (meeting: MeetingData): void => {
 };
 
 // Kullanım örneği
-export const handleDownloadPdf = (meeting: MeetingData) => {
+export const handleDownloadPdf = (meeting: RequestStockManagerDataPdf) => {
   try {
     generateMeetingPdf(meeting);
   } catch (error) {

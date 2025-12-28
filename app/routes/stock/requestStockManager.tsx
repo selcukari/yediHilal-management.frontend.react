@@ -4,7 +4,7 @@ import {
   Paper, TextInput, LoadingOverlay, Flex, Group, ActionIcon,
 } from '@mantine/core';
 import { MenuActionButton } from '../../components'
-import { IconSearch, IconPlus, IconEdit } from '@tabler/icons-react';
+import { IconSearch, IconPlus, IconEdit, IconFileTypePdf } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import { useWarehouseService } from '../../services/warehouseService';
 import { formatDate } from '../../utils/formatDate';
@@ -15,6 +15,8 @@ import { type ColumnDefinition, type ValueData } from '../../utils/repor/exportT
 import { type PdfTableColumn } from '../../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../../utils/repor/calculateColumnWidth';
 import { statuMockData } from '~/utils/priorityMockData';
+import { handleDownloadPdf, type RequestStockManagerDataPdf  } from '../../utils/repor/generateRequestStockPdf';
+import { toast } from '../../utils/toastMessages';
 
 interface RequestStockManagerData {
   id: number;
@@ -198,12 +200,31 @@ export default function RequestStock() {
   }, [rowHeaders]);
 
   const reportTitle = (): string => {
-    return "İstek Taleb Raporu";
+    return "İstek Talep Raporu";
   }
 
   const handleEdit = (value: RequestStockManagerData[]) => {
 
     requestStockEditManagerRef.current?.openDialog(value);
+  }
+
+  const handleDowlandPdf = (value: RequestStockManagerData[]) => {
+
+    const pdfData: RequestStockManagerDataPdf = {
+      name: 'İstek Talep Raporu',
+      updateUserFullName: value[0].updateUserFullName,
+      productNameWithCount: value.map(v => `${v.productName} (${v.count})`).join(', '),
+      status: value.map(v => statuMockData.find(s => s.value === v.status)?.label || v.status).join(' - '),
+      managerUserFullName: value[0].managerUserFullName,
+      note: value.find(i => i.note)?.note, // Talep edenin notu genel
+      description: value.map(v => v.description).filter(description => description && description.trim() !== '').join(' - '), // talep edenin notları birleştir
+      managerNote: value.map(v => v.managerNote).filter(managerNote => managerNote && managerNote.trim() !== '').join(' - '), // Yöneticilerin notları birleştir
+      requestDate: formatDate(value[0].requestDate, dateFormatStrings.dateTimeFormatWithoutSecond) || '',
+      approvedDate: formatDate(value[0].approvedDate, dateFormatStrings.dateTimeFormatWithoutSecond) || '',
+    };
+
+    handleDownloadPdf(pdfData);
+    toast.success('PDF başarıyla oluşturuldu!');
   }
 
   const rowsTable = Object.entries(requestStockData).map(
@@ -267,7 +288,7 @@ export default function RequestStock() {
 
           {/* Actions */}
           <Table.Td>
-            <Tooltip label="Onayla / Düzenle" withArrow>
+            <Tooltip label="Onayla/Düzenle" withArrow>
             <ActionIcon
               color="green" disabled={!items.some(i => i.status === "pending")}
               onClick={() => handleEdit(items)}
@@ -275,8 +296,15 @@ export default function RequestStock() {
               <IconEdit size={16} />
             </ActionIcon>
             </Tooltip>
+            <Tooltip label="PDF İndir">
+            <ActionIcon 
+              variant="light" 
+              color="green"
+              onClick={() => handleDowlandPdf(items)}>
+              <IconFileTypePdf size={16} />
+            </ActionIcon>
+            </Tooltip>
           </Table.Td>
-
         </Table.Tr>
       );
     }
