@@ -33,6 +33,7 @@ type FormValues = {
 
 const RequestStockEditManager = forwardRef<RequestStockEditManagerDialogControllerRef, RequestStockEditManagerProps>(({onSaveSuccess}, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
+  const [genarelStatus, setGenarelStatus] = useState<string | null>(null);
 
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const service = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
@@ -79,6 +80,12 @@ const RequestStockEditManager = forwardRef<RequestStockEditManagerDialogControll
      setIsDisabledSubmit(true);
   }, [form.values]);
 
+  useEffect(() => {
+    if (genarelStatus) {
+      setIsDisabledSubmit(false);
+    }
+
+  }, [genarelStatus]);
 
   const handleSubmit = async (values: { items: FormValues[] }) => {
     setIsDisabledSubmit(true);
@@ -89,7 +96,7 @@ const RequestStockEditManager = forwardRef<RequestStockEditManagerDialogControll
           ...(omit(['productName'], item)),
           id: item.id,
           productId: item.productId,
-          status: values.items[0].status,
+          status: genarelStatus || item.status,
           managerNote: item.managerNote,
           count: parseInt(item.count, 10),
           // Yönetici ID'sini currentUser'dan alıyoruz
@@ -210,9 +217,9 @@ const RequestStockEditManager = forwardRef<RequestStockEditManagerDialogControll
           justify={{ sm: 'center' }}
         >
         <Select
-          data={statuMockData}
+          data={statuMockData} label="Genel Durum"
           maxDropdownHeight={200}
-          {...form.getInputProps(`items.0.status`)}
+          onChange={(value) => setGenarelStatus(value)}
         />
         </Flex>
         <Group justify="end">

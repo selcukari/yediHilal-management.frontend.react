@@ -269,7 +269,7 @@ export default function RequestStock() {
           <Table.Td>
             <Tooltip label="Onayla / Düzenle" withArrow>
             <ActionIcon
-              color="green" disabled={firstItem.status !== 'pending'}
+              color="green" disabled={!items.some(i => i.status === "pending")}
               onClick={() => handleEdit(items)}
             >
               <IconEdit size={16} />
@@ -357,7 +357,7 @@ export default function RequestStock() {
           {/* Örnek Tablo */}
           <Paper shadow="xs" p="lg" withBorder>
             <Stack gap="md">
-              <Title order={4}>Son Depo({rowsTable?.length || 0})</Title>
+              <Title order={4}>Son Talebler({rowsTable?.length || 0})</Title>
               <Table.ScrollContainer minWidth={400} maxHeight={700}>
                 <Table striped highlightOnHover withColumnBorders>
                   <Table.Thead>

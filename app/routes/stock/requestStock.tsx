@@ -99,36 +99,37 @@ export default function RequestStock() {
     }, 1500);
   };
 
-  const handleDelete = async(item: RequestStockData) => {
+  const handleDelete = async(items: RequestStockData[]) => {
      open();
 
     try {
 
-      const newİtem = {
-        id: item.id,
-        count: parseInt(item.count, 10),
-        description: item.description || '',
-        productId: item.productId,
-        status: 'canceled',
-      }
+      const results = await Promise.all(
+        items.map(item => {
+          const payload = {
+            id: item.id,
+            count: parseInt(item.count, 10),
+            description: item.description || '',
+            productId: item.productId,
+            status: 'canceled',
+          };
+          return service.updatRequestStock(payload);
+        })
+      );
 
-      const result = await service.updatRequestStock(newİtem);
-      if (result == true) {
+    const failedResult = results.find(r => r !== true);
+
+
+      if (!failedResult) {
 
       toast.success('İşlem başarılı!');
       
       fetchRequestStocks();
       
-      close();
- 
-      return;
-    }
-    else if (result?.data == false && result?.errors?.length > 0) {
-
-      toast.warning(result.errors[0]);
-
     } else {
-      toast.error('Bir hata oluştu!');
+      toast.warning(
+        failedResult?.errors?.[0] ?? 'Bazı kayıtlar güncellenemedi!'
+      );
     }
       close();
     } catch (error: any) {
@@ -341,19 +342,19 @@ export default function RequestStock() {
                   <ActionIcon
                     variant="light"
                     color="blue"
-                    disabled={firstItem?.status !== "pending"}
+                    disabled={items?.some(i => i.status !== "pending")}
                     onClick={() => handleEdit(items)}
                   >
                     <IconEdit size={16} />
                   </ActionIcon>
                 </Tooltip>
 
-                <Tooltip label="Sil">
+                <Tooltip label="İptal Et">
                   <ActionIcon
                     variant="light"
                     color="red"
-                    disabled={firstItem?.status !== "pending"}
-                    onClick={() => firstItem && handleDelete(firstItem)}
+                    disabled={items?.some(i => i.status !== "pending")}
+                    onClick={() =>handleDelete(items)}
                   >
                     <IconTrash size={16} />
                   </ActionIcon>
@@ -448,7 +449,7 @@ export default function RequestStock() {
           {/* Örnek Tablo */}
           <Paper shadow="xs" p="lg" withBorder>
             <Stack gap="md">
-              <Title order={4}>Son Depo({rowsTable?.length || 0})</Title>
+              <Title order={4}>Son Talepler({rowsTable?.length || 0})</Title>
               <Table.ScrollContainer minWidth={400} maxHeight={700}>
                 <Table striped highlightOnHover withColumnBorders>
                   <Table.Thead>
