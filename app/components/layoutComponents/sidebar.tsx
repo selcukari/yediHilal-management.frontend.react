@@ -254,7 +254,7 @@ export function Sidebar({ active, setActive }: SidebarProps) {
     }
 
     if ([2,3].includes(currentUser?.roleId)) {
-      toast.error('Bu işlem için yetkiniz bulunmamaktadır.');
+      toast.warning('Bu işlem için yetkiniz bulunmamaktadır.');
       return;
     }
     navigate(link);
