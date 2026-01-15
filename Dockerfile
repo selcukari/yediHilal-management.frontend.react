@@ -1,22 +1,24 @@
-FROM node:22-alpine AS development-dependencies-env
-COPY . /app
+# 1. Aşama: Build (Derleme)
+FROM node:20-slim AS builder
 WORKDIR /app
-RUN npm ci
-
-FROM node:22-alpine AS production-dependencies-env
-COPY ./package.json package-lock.json /app/
-WORKDIR /app
-RUN npm ci --omit=dev
-
-FROM node:22-alpine AS build-env
-COPY . /app/
-COPY --from=development-dependencies-env /app/node_modules /app/node_modules
-WORKDIR /app
+COPY package*.json ./
+# Tüm bağımlılıkları yükle
+RUN npm install
+COPY . .
+# React Router build al (build/client klasörü oluşacak)
 RUN npm run build
 
-FROM node:22-alpine
-COPY ./package.json package-lock.json /app/
-COPY --from=production-dependencies-env /app/node_modules /app/node_modules
-COPY --from=build-env /app/build /app/build
+# 2. Aşama: Production (Çalıştırma)
+FROM node:20-slim
 WORKDIR /app
-CMD ["npm", "run", "start"]
+# Statik sunucuyu konteyner içine yükle
+RUN npm install -g serve
+# Sadece build edilen dosyaları bir üst aşamadan kopyala
+COPY --from=builder /app/build/client ./build/client
+
+# Port ayarı
+ENV PORT=8080
+EXPOSE 8080
+
+# Uygulamayı başlat (Bu komut Cloud Run için kritik)
+CMD ["serve", "-s", "build/client", "-l", "8080"]
