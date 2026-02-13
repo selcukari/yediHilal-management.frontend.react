@@ -94,6 +94,7 @@ const menuItems: MenuItem[] = [
       { label: 'Üniversite Rapor', key: 'reportUniversityBranch', link: '/reportUniversityBranches',
         children: [{ label: 'Görevli Rapor', key: 'report-uni-officer', link: '/report-uni-officer' },{ label: 'Başkan Rapor', key: 'report-uni-head', link: '/report-uni-head' }, ],
       },
+      { label: 'Üye Rapor', key: 'report-member', link: '/report-member' }
     ],
   },
   { icon: IconSettings, label: 'Ayarlar', key: 'setting', link: '/settings',

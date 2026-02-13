@@ -10,6 +10,6 @@ export default [
   route("branches", "routes/branch.tsx"), route("university-branches", "routes/universityBranch.tsx"), route("settings-userDuty", "routes/settings/userDuty.tsx"), route("settings-meetingType", "routes/settings/meetingType.tsx"),
   route("memberCreate", "routes/memberCreate.tsx"), route("documentTrackings", "routes/documentTracking.tsx"), route("phoneCallTrackings", "routes/phoneCallTracking.tsx"),
   route("privacyPolicy", "routes/privacyPolicy.tsx"), route("report-head", "routes/reports/branchReports/headReport.tsx"), route("report-uni-head", "routes/reports/universityReports/universityHeadReport.tsx"), route("report-officer", "routes/reports/branchReports/officerReport.tsx"),
-  route("report-uni-officer", "routes/reports/universityReports/universityOfficerReport.tsx"),
+  route("report-uni-officer", "routes/reports/universityReports/universityOfficerReport.tsx"), route("report-member", "routes/reports/memberReport.tsx")
 ] satisfies RouteConfig;
 
