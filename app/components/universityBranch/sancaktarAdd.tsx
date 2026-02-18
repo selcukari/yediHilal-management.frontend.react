@@ -20,6 +20,7 @@ type SancaktarDataGorevatama = {
   memberPhone?: string | null;
   userDutyName: string;
   userDutyId: string;
+  newItem: boolean;
   isActive: string;
   createDate: string;
   finisDate: string;
@@ -77,7 +78,8 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
           userDutyId: (userDuty.id || ""),
           createDate: new Date().toISOString(),
           finisDate: '',
-          isActive: "1"
+          isActive: "1",
+          newItem: true
         });
 
       toast.success('Üye Eklendi!');
