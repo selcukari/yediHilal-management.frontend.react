@@ -118,12 +118,6 @@ export default function OfficerReport() {
     }));
   };
 
-  useEffect(() => {
-    setTimeout(() => {
-      fetchBranch();
-    }, 500);
-  }, []);
-
   const fetchBranch = async () => {
      open();
   
@@ -181,6 +175,12 @@ export default function OfficerReport() {
       close();
     }
   };
+
+  useEffect(() => {
+    setTimeout(() => {
+      fetchBranch();
+    }, 500);
+  }, []);
 
    // Filtrelenmiş toplantı verileri
   const filteredBranchReports = useMemo(() => {

@@ -1,90 +1,104 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { IconSearch, IconCalendar, IconDownload, IconFilter } from '@tabler/icons-react';
-import {
-  Container,
-  Grid,
-  TextInput,
-  Select,
-  Stack,
-  Group,
-  Title,
-  Text,
-  Paper,
-  Table,
-  Button,
-  Badge,
-  LoadingOverlay,
-  Pagination,
-  Menu,
+import {  Container,  Grid,  TextInput, Stack,  Group,  Title,  Text,  Paper,  Table,  Button,  Badge,  LoadingOverlay,  Pagination,  Menu,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import 'dayjs/locale/tr';
-
-// --- Mock Data & Types (Örnek Veriler) ---
+import { calculateColumnWidthUser } from '../../utils/repor/calculateColumnWidth';
+import { type PdfConfig, type PdfTableColumn, PdfHelperService } from '../../utils/repor/exportToPdf';
+import { toast } from '../../utils/toastMessages';
+import { useMemberReportService } from '../../services/memberReportService';
+import { dateFormatStrings } from '../../utils/dateFormatStrings';
+import { formatDate } from '../../utils/formatDate';
 
 type FilterModels = {
   searchText?: string;
-  status?: string | null;
   dateRange?: [Date | null, Date | null];
 };
-
+interface Column {
+  field: string;
+  header: string;
+}
 interface MemberReportItem {
   id: number;
   fullName: string;
   branchName: string;
   provinceName: string;
   duty: string; // Görev
-  status: string;
-  phone: string;
+  user: string; // Güncelleyen Kullanıcı
   createDate: Date;
   finishDate?: Date;
 }
 
-// Örnek veri seti oluşturuyoruz
-const MOCK_DATA: MemberReportItem[] = Array.from({ length: 25 }).map((_, index) => ({
-  id: index + 1,
-  fullName: `Üye Adı ${index + 1}`,
-  branchName: `Şube ${Math.floor(index / 5) + 1}`,
-  provinceName: ['İstanbul', 'Ankara', 'İzmir', 'Konya', 'Bursa'][index % 5],
-  duty: index % 4 === 0 ? 'Başkan' : 'Üye',
-  status: index % 3 === 0 ? 'Pasif' : 'Aktif',
-  phone: `0555 ${100 + index} 22 33`,
-  createDate: new Date(2024, 0, (index % 28) + 1),
-  finishDate: index % 5 === 0 ? new Date(2024, 2, (index % 28) + 1) : undefined,
-}));
-
-const STATUS_OPTIONS = [
-  { value: 'Aktif', label: 'Aktif' },
-  { value: 'Pasif', label: 'Pasif' }
-];
-
 // --- Component ---
-
 export default function MemberReport() {
+  const pdfHelperService = new PdfHelperService();
+  
   const [loading, setLoading] = useState(false);
+  const [updateDateReport, setUpdateDateReport] = useState("");
+  const [memberReportData, setMemberReportData] = useState<MemberReportItem[]>([]);
   const [filters, setFilters] = useState<FilterModels>({
     searchText: '',
-    status: null,
     dateRange: [null, null]
   });
   const [activePage, setActivePage] = useState(1);
   const itemsPerPage = 10;
 
+  const [rowHeaders, setRowHeaders] = useState([
+    { field: 'id', header: 'Id' },
+    { field: 'fullName', header: 'Ad Soyad' },
+    { field: 'branchName', header: 'Şube/Temsilcilik' },
+    { field: 'duty', header: 'Görevi' },
+    { field: 'user', header: 'Güncelleyen Kullanıcı' },
+    { field: 'createDate', header: 'Oluşturulma Tarihi' },
+  ]);
+
+  const serviceMemberReport = useMemberReportService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+
+  const fetchMemberReport = async () => {
+    setLoading(true);
+    try {
+      const getMemberReport = await serviceMemberReport.getMemberReport();
+      // Burada gerçek veriyi state'e atabilirsiniz
+      setUpdateDateReport(getMemberReport.updateDate);
+      if (getMemberReport?.reportItems) {
+        const mappedData = getMemberReport.reportItems.map((item: any) => ({
+          id: item.memberId,
+          fullName: item.memberFullName,
+          branchName: item.reportName,
+          duty: item.dutyName,
+          user: item.userFullName,
+          createDate: new Date(item.updateDate),
+        }));
+        setMemberReportData(mappedData);
+      }
+        setLoading(false);
+    } catch (error: any) {
+        toast.error(`Üye raporu alınırken hata oluştu: ${error.message}`);
+        setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    setTimeout(() => {
+      fetchMemberReport();
+    }, 500);
+  }, []);
+
   // Filtreleme Mantığı
   const filteredData = useMemo(() => {
-    return MOCK_DATA.filter(item => {
+    return memberReportData?.filter(item => {
       const matchesSearch = !filters.searchText || 
         item.fullName.toLowerCase().includes(filters.searchText.toLowerCase()) ||
-        item.branchName.toLowerCase().includes(filters.searchText.toLowerCase());
-      
-      const matchesStatus = !filters.status || item.status === filters.status;
-      
-      const matchesDate = !filters.dateRange?.[0] || !filters.dateRange?.[1] || 
-        (item.createDate >= filters.dateRange[0] && item.createDate <= filters.dateRange[1]);
+        item.branchName.toLowerCase().includes(filters.searchText.toLowerCase()) ||
+        item.user.toLowerCase().includes(filters.searchText.toLowerCase());
 
-      return matchesSearch && matchesStatus && matchesDate;
+      const matchesDate = !filters.dateRange?.[0] || !filters.dateRange?.[1] || 
+        (item.createDate >= new Date(filters.dateRange[0]) && item.createDate <= new Date(filters.dateRange[1]));
+
+      return matchesSearch && matchesDate;
     });
-  }, [filters]);
+  }, [filters, memberReportData]);
 
   // Sayfalama Mantığı
   const paginatedData = useMemo(() => {
@@ -97,9 +111,40 @@ export default function MemberReport() {
     setActivePage(1); // Filtre değişince ilk sayfaya dön
   };
 
+     // useMemo hook'u ile sütunları önbelleğe alıyoruz
+    const pdfTableColumns = useMemo((): PdfTableColumn[] => {
+  
+      const newCols: Column[] = rowHeaders;
+  
+      return newCols.map(col => ({
+        key: col.field,
+        title: col.header,
+        // İsteğe bağlı olarak genişlik ayarları ekleyebilirsiniz
+        width: calculateColumnWidthUser(col.field) // Özel genişlik hesaplama fonksiyonu
+      }));
+    }, [rowHeaders]);
+
   const handleExport = (type: 'excel' | 'pdf') => {
     setLoading(true);
-    // Simüle edilmiş indirme işlemi
+    const config: PdfConfig = {
+      title: `YediHilal Üye Raporu`,
+      fileName: `yediHilal-uye-raporu.pdf`,
+      pageSize: 'a4',
+      orientation: 'landscape',
+      showCreationDate: true,
+      showPagination: true,
+      headerColor: '#3498db', // Mavi
+      alternateRowColor: '#f8f9fa', // Açık gri
+      textColor: '#2c3e50' // Koyu gri
+    };
+
+    const newData = filteredData?.map(item =>({
+      ...item,
+      createDate: item.createDate.toLocaleDateString('tr-TR'),
+    }));
+    
+    pdfHelperService.generatePdf(newData, pdfTableColumns, config);
+
     setTimeout(() => {
       setLoading(false);
       alert(`${type.toUpperCase()} raporu başarıyla oluşturuldu.`);
@@ -116,7 +161,7 @@ export default function MemberReport() {
           <div>
             <Title order={2}>Üye Raporları</Title>
             <Text size="sm" c="dimmed">
-              Sistemdeki üyelerin durumlarını, şubelerini ve detaylarını raporlayın.
+              Sistemdeki üyelerin durumlarını, şubelerini ve detaylarını raporlayın. {`Son güncelleme: ${formatDate(updateDateReport, dateFormatStrings.dateTimeFormatWithoutSecond)}`}
             </Text>
           </div>
           <Menu shadow="md" width={200}>
@@ -127,9 +172,6 @@ export default function MemberReport() {
             </Menu.Target>
             <Menu.Dropdown>
               <Menu.Label>Format Seçin</Menu.Label>
-              <Menu.Item leftSection={<IconFilter size={14} />} onClick={() => handleExport('excel')}>
-                Excel Olarak İndir
-              </Menu.Item>
               <Menu.Item leftSection={<IconFilter size={14} />} onClick={() => handleExport('pdf')}>
                 PDF Olarak İndir
               </Menu.Item>
@@ -151,17 +193,6 @@ export default function MemberReport() {
             </Grid.Col>
             
             <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-              <Select
-                label="Durum"
-                placeholder="Tümü"
-                data={STATUS_OPTIONS}
-                clearable
-                value={filters.status}
-                onChange={(val) => handleFilterChange('status', val)}
-              />
-            </Grid.Col>
-
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
               <DatePickerInput
                 type="range"
                 label="Kayıt Tarihi Aralığı"
@@ -172,18 +203,6 @@ export default function MemberReport() {
                 locale="tr"
                 clearable
               />
-            </Grid.Col>
-
-            <Grid.Col span={{ base: 12, sm: 6, md: 3 }}>
-               <Button 
-                 fullWidth 
-                 variant="light" 
-                 color="red" 
-                 onClick={() => setFilters({ searchText: '', status: null, dateRange: [null, null] })}
-                 disabled={!filters.searchText && !filters.status && !filters.dateRange?.[0]}
-               >
-                 Filtreleri Temizle
-               </Button>
             </Grid.Col>
           </Grid>
         </Paper>
@@ -201,31 +220,23 @@ export default function MemberReport() {
                   <Table.Tr>
                     <Table.Th>ID</Table.Th>
                     <Table.Th>Ad Soyad</Table.Th>
-                    <Table.Th>Şube</Table.Th>
-                    <Table.Th>İl</Table.Th>
-                    <Table.Th>Görev</Table.Th>
-                    <Table.Th>Telefon</Table.Th>
-                    <Table.Th>Durum</Table.Th>
+                    <Table.Th>Şube/Temsilcilik</Table.Th>
+                    <Table.Th>Görevi</Table.Th>
+                    <Table.Th>Güncelleyen Kullanıcı</Table.Th>
                     <Table.Th>Kayıt Tarihi</Table.Th>
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
                   {paginatedData.length > 0 ? (
-                    paginatedData.map((item) => (
-                      <Table.Tr key={item.id}>
+                    paginatedData?.map((item, index) => (
+                      <Table.Tr key={index}>
                         <Table.Td>{item.id}</Table.Td>
                         <Table.Td style={{ fontWeight: 500 }}>{item.fullName}</Table.Td>
                         <Table.Td>{item.branchName}</Table.Td>
-                        <Table.Td>{item.provinceName}</Table.Td>
                         <Table.Td>
                           <Badge variant="outline" color="blue">{item.duty}</Badge>
                         </Table.Td>
-                        <Table.Td>{item.phone}</Table.Td>
-                        <Table.Td>
-                          <Badge color={item.status === 'Aktif' ? 'green' : 'gray'}>
-                            {item.status}
-                          </Badge>
-                        </Table.Td>
+                        <Table.Td>{item.user}</Table.Td>
                         <Table.Td>{item.createDate.toLocaleDateString('tr-TR')}</Table.Td>
                       </Table.Tr>
                     ))
