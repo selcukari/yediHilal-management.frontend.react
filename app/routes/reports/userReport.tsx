@@ -19,24 +19,23 @@ interface Column {
   field: string;
   header: string;
 }
-interface MemberReportItem {
+interface UserReportItem {
   id: number;
   fullName: string;
   branchName: string;
   provinceName: string;
   duty: string; // Görev
-  user: string; // Güncelleyen Kullanıcı
   createDate: Date;
   finishDate?: Date;
 }
 
 // --- Component ---
-export default function MemberReport() {
+export default function UserReport() {
   const pdfHelperService = new PdfHelperService();
   
   const [loading, setLoading] = useState(false);
   const [updateDateReport, setUpdateDateReport] = useState("");
-  const [memberReportData, setMemberReportData] = useState<MemberReportItem[]>([]);
+  const [userReportData, setUserReportData] = useState<UserReportItem[]>([]);
   const [filters, setFilters] = useState<FilterModels>({
     searchText: '',
     dateRange: [null, null]
@@ -47,58 +46,55 @@ export default function MemberReport() {
   const [rowHeaders, setRowHeaders] = useState([
     { field: 'id', header: 'Id' },
     { field: 'fullName', header: 'Ad Soyad' },
-    { field: 'branchName', header: 'Şube/Temsilcilik' },
+    { field: 'branchName', header: 'Alan' },
     { field: 'duty', header: 'Görevi' },
-    { field: 'user', header: 'Güncelleyen Kullanıcı' },
     { field: 'createDate', header: 'Oluşturulma Tarihi' },
   ]);
 
   const serviceReport = useReportService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
-  const fetchMemberReport = async () => {
+  const fetchUserReport = async () => {
     setLoading(true);
     try {
-      const getMemberReport = await serviceReport.getMemberReport();
+      const getUserReport = await serviceReport.getUserReport();
       // Burada gerçek veriyi state'e atabilirsiniz
-      setUpdateDateReport(getMemberReport.updateDate);
-      if (getMemberReport?.reportItems) {
-        const mappedData = getMemberReport.reportItems.map((item: any) => ({
-          id: item.memberId,
-          fullName: item.memberFullName,
+      setUpdateDateReport(getUserReport.updateDate);
+      if (getUserReport?.reportItems) {
+        const mappedData = getUserReport.reportItems.map((item: any) => ({
+          id: item.userId,
+          fullName: item.userFullName,
           branchName: item.reportName,
           duty: item.dutyName,
-          user: item.userFullName,
           createDate: new Date(item.updateDate),
         }));
-        setMemberReportData(mappedData);
+        setUserReportData(mappedData);
       }
         setLoading(false);
     } catch (error: any) {
-        toast.error(`Üye raporu alınırken hata oluştu: ${error.message}`);
+        toast.error(`Kullanıcı raporu alınırken hata oluştu: ${error.message}`);
         setLoading(false);
     }
   };
 
   useEffect(() => {
     setTimeout(() => {
-      fetchMemberReport();
+      fetchUserReport();
     }, 500);
   }, []);
 
   // Filtreleme Mantığı
   const filteredData = useMemo(() => {
-    return memberReportData?.filter(item => {
+    return userReportData?.filter(item => {
       const matchesSearch = !filters.searchText || 
         item.fullName.toLowerCase().includes(filters.searchText.toLowerCase()) ||
-        item.branchName.toLowerCase().includes(filters.searchText.toLowerCase()) ||
-        item.user.toLowerCase().includes(filters.searchText.toLowerCase());
+        item.branchName.toLowerCase().includes(filters.searchText.toLowerCase());
 
       const matchesDate = !filters.dateRange?.[0] || !filters.dateRange?.[1] || 
         (item.createDate >= new Date(filters.dateRange[0]) && item.createDate <= new Date(filters.dateRange[1]));
 
       return matchesSearch && matchesDate;
     });
-  }, [filters, memberReportData]);
+  }, [filters, userReportData]);
 
   // Sayfalama Mantığı
   const paginatedData = useMemo(() => {
@@ -127,8 +123,8 @@ export default function MemberReport() {
   const handleExport = (type: 'pdf') => {
     setLoading(true);
     const config: PdfConfig = {
-      title: `YediHilal Üye Raporu`,
-      fileName: `yediHilal-uye-raporu.pdf`,
+      title: `YediHilal Kullanıcı Raporu`,
+      fileName: `yediHilal-kullanici-raporu.pdf`,
       pageSize: 'a4',
       orientation: 'landscape',
       showCreationDate: true,
@@ -220,9 +216,8 @@ export default function MemberReport() {
                   <Table.Tr>
                     <Table.Th>ID</Table.Th>
                     <Table.Th>Ad Soyad</Table.Th>
-                    <Table.Th>Şube/Temsilcilik</Table.Th>
+                    <Table.Th>Alan</Table.Th>
                     <Table.Th>Görevi</Table.Th>
-                    <Table.Th>Güncelleyen Kullanıcı</Table.Th>
                     <Table.Th>Kayıt Tarihi</Table.Th>
                   </Table.Tr>
                 </Table.Thead>
@@ -236,7 +231,6 @@ export default function MemberReport() {
                         <Table.Td>
                           <Badge variant="outline" color="blue">{item.duty}</Badge>
                         </Table.Td>
-                        <Table.Td>{item.user}</Table.Td>
                         <Table.Td>{item.createDate.toLocaleDateString('tr-TR')}</Table.Td>
                       </Table.Tr>
                     ))
