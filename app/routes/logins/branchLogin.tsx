@@ -26,7 +26,7 @@ export default function UserLogin() {
     const branchDutyId = "19"; // sube baskanı görevi id'si
     try {
       open()
-      const response = await login(values.email, values.password, "branchLogin", branchDutyId);
+      const response = await login(values.email, values.password, "branchLogin", branchDutyId, "branchLogin");
 
       if (response == true) {
         close()
