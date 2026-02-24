@@ -6,7 +6,7 @@ import { setWithExpiry, getWithExpiry } from './utils/useLocalStorage';
 
 interface AuthContextType {
   currentUser: any;
-  login: (email: string, password: string, loginType: string, dutyId?: string) => Promise<boolean>;
+  login: (email: string, password: string, loginType: string, dutyId?: string, userType?: string) => Promise<boolean>;
   memberLogin: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
@@ -51,10 +51,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   }, [currentUser, location.pathname]);
 
-  const login = async (email: string, password: string, loginType: string, dutyId?: string): Promise<boolean> => {
+  const login = async (email: string, password: string, loginType: string, dutyId?: string, userType?: string): Promise<boolean> => {
     setLoading(true);
     try {
-      const response = await api.get(`/${import.meta.env.VITE_APP_API_USER_CONTROLLER}/userLogin?email=${email}&password=${password}&dutyId=${dutyId || ''}`);
+      const response = await api.get(`/${import.meta.env.VITE_APP_API_USER_CONTROLLER}/userLogin?email=${email}&password=${password}&dutyId=${dutyId || ''}&loginType=${userType || ""}`);
       const getUser = response.data;
       getUser.data["userType"] = loginType;
 
