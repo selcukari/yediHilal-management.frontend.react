@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import {
   NavLink, Flex, Text, Stack, Divider, Group, ScrollArea, AppShell,
 } from '@mantine/core';
@@ -153,17 +153,21 @@ export function Sidebar({ active, setActive }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const currentMenuItems = useMemo(() => (
+    currentUser?.moduleRoles == null ? menuItems.filter(item => item.key !== 'user') : menuItems
+  ), [currentUser]);
+
   // URL'e göre aktif menüyü belirle
   useEffect(() => {
     const currentPath = location.pathname;
-    const allItems = findAllMenuItems(menuItems);
+    const allItems = findAllMenuItems(currentMenuItems);
     const activeItem = allItems.find(item => item.link === currentPath);
     
     if (activeItem) {
       setActive(activeItem.key);
       
       // Aktif öğenin tüm parent'larını açık hale getir
-      const parentKeys = findParentKeys(menuItems, activeItem.key);
+      const parentKeys = findParentKeys(currentMenuItems, activeItem.key);
       setOpenedItems(prev => {
         const newOpenedItems = [...prev];
         parentKeys.forEach(key => {
@@ -174,7 +178,7 @@ export function Sidebar({ active, setActive }: SidebarProps) {
         return newOpenedItems;
       });
     }
-  }, [location.pathname, setActive]);
+  }, [location.pathname, setActive, currentMenuItems]);
 
   const handleMenuItemClick = (key: string, link: string, hasChildren: boolean = false) => {
     if (hasChildren) {
@@ -208,7 +212,7 @@ export function Sidebar({ active, setActive }: SidebarProps) {
             </Text>
           </Flex>
           
-          {menuItems.map((item) => (
+          {currentMenuItems.map((item) => (
             <RecursiveNavLink
               key={item.key}
               item={item}
