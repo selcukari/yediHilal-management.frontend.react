@@ -37,11 +37,11 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
 
   if (loading) {
     return <LoadingOverlay
-            visible={true}
-            zIndex={1000}
-            overlayProps={{ radius: 'sm', blur: 2 }}
-            loaderProps={{ color: 'pink', type: 'bars' }}
-          />;
+        visible={true}
+        zIndex={1000}
+        overlayProps={{ radius: 'sm', blur: 2 }}
+        loaderProps={{ color: 'pink', type: 'bars' }}
+      />;
   }
 
   // Giriş yapmışsa children'ı render et
