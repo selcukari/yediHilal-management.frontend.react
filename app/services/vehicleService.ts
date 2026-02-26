@@ -124,7 +124,7 @@ export function useVehicleService(controller: string) {
     }
   };
 
-  return { getVehicles, editVehicle, deleteVehicle, getVehicleDeposits, addVehicle, addVehicleDeposit,
-    deleteVehicleDeposit, editVehicleDeposit
+  return { getVehicles, editVehicle, deleteVehicle, getVehicleDeposits,
+    addVehicle, addVehicleDeposit, deleteVehicleDeposit, editVehicleDeposit
    };
 }
