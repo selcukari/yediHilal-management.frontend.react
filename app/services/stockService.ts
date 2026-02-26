@@ -21,29 +21,6 @@ interface StockRequestDataParams {
   }[];
 }
 
-interface StockUsedExpenseParams {
-  buyerId: number;
-  items?: string;
-  isDelivery: boolean;
-  type: string;
-  title: string;
-  address?: string;
-  note?: string;
-  projectId?: number | null;
-  projectName?: string | null;
-}
-
-interface UpdateStockUsedExpenseParams {
-  id: number;
-  buyerId: number;
-  items?: string;
-  isDelivery: boolean;
-  type: string;
-  title: string;
-  address?: string;
-  note?: string;
-}
-
 export function useStockService(controller: string) {
   const { getCurrentToken, logout } = useAuth();
   const api = createApi(getCurrentToken() ?? undefined, logout);
@@ -104,6 +81,5 @@ export function useStockService(controller: string) {
     }
   };
 
-  return { getStocks, addStock, deleteStock, updateStock,
-    createStockRequest };
+  return { getStocks, addStock, deleteStock, updateStock, createStockRequest };
 }
