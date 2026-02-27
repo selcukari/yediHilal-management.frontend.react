@@ -15,7 +15,7 @@ import { CustomLayout } from './components';
 import ProtectedRoute from './protectedRoute'
 import type { Route } from "./+types/root";
 import { Container, Title, Text, Button, Group, Stack, Code, Alert } from '@mantine/core';
-import { IconAlertCircle, IconHome, IconRefresh } from '@tabler/icons-react';
+import { IconAlertCircle, IconHome } from '@tabler/icons-react';
 import { getWithExpiry } from './utils/useLocalStorage';
 import "./app.css";
 
