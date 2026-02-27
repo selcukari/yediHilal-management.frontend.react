@@ -187,11 +187,6 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     }
   };
 
-  // Ana sayfaya dön butonu için basit JavaScript kullanımı
-  const goToHome = () => {
-    window.location.href = '/';
-  };
-
   return (
     <html lang="en" {...mantineHtmlProps}>
       <head>
