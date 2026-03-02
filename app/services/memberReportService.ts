@@ -1,7 +1,7 @@
 import { createApi } from './api';
 import { useAuth } from '~/authContext';
 
-export function useReportService(controller: string) {
+export function useMemberReportService(controller: string) {
   const { getCurrentToken, logout } = useAuth();
   const api = createApi(getCurrentToken() ?? undefined, logout);
 

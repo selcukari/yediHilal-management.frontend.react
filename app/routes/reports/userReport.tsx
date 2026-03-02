@@ -7,7 +7,7 @@ import 'dayjs/locale/tr';
 import { calculateColumnWidthUser } from '../../utils/repor/calculateColumnWidth';
 import { type PdfConfig, type PdfTableColumn, PdfHelperService } from '../../utils/repor/exportToPdf';
 import { toast } from '../../utils/toastMessages';
-import { useReportService } from '../../services/memberReportService';
+import { useMemberReportService } from '../../services/memberReportService';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import { formatDate } from '../../utils/formatDate';
 
@@ -51,7 +51,7 @@ export default function UserReport() {
     { field: 'createDate', header: 'Oluşturulma Tarihi' },
   ]);
 
-  const serviceReport = useReportService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+  const serviceReport = useMemberReportService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
   const fetchUserReport = async () => {
     setLoading(true);
