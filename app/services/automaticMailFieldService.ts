@@ -8,7 +8,6 @@ interface AutomaticSmsFieldsDataParams {
   isActive: boolean;
 }
 
-
 export function useAutomaticMailFieldService(controller: string) {
   const { getCurrentToken, logout } = useAuth();
   const api = createApi(getCurrentToken() ?? undefined, logout);
