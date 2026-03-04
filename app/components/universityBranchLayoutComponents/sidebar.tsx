@@ -48,12 +48,12 @@ const menuItems: MenuItem[] = [
       { label: 'Ürün Taleplerim', key: 'requestStock', link: '/requestStocks' }, 
      ],
    },
-  { label: 'Finans Yönetimi', key: 'finance', link: '/financeManagements',
-    children: [
-      { icon: IconCoin, label: 'Finans', key: 'finance', link: '/finances' },
-      { icon: IconPhoneCall, label: 'Arama Takip', key: 'phoneCallTracking', link: '/phoneCallTrackings' },
-    ], 
-  },
+  // { label: 'Finans Yönetimi', key: 'finance', link: '/financeManagements',
+  //   children: [
+  //     { icon: IconCoin, label: 'Finans', key: 'finance', link: '/finances' },
+  //     { icon: IconPhoneCall, label: 'Arama Takip', key: 'phoneCallTracking', link: '/phoneCallTrackings' },
+  //   ], 
+  // },
   { icon: IconUser, label: 'Kullanıcı Yönetimi', key: 'user', link: '/users' },
 ];
 
