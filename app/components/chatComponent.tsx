@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { 
   Paper, 
   TextInput, 
-  Button, 
   Group, 
   Stack, 
   Text, 
@@ -107,7 +106,7 @@ export function ChatComponent({ title = "AI Asistan", height = 400 }: ChatCompon
               </Paper>
             )}
             
-            {messages.map((message) => (
+            {messages?.map((message) => (
               <Group 
                 key={message.id} 
                 align="flex-start" 
