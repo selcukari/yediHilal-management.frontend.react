@@ -11,7 +11,6 @@ export type MenuActionButtonRef = {
   open: () => void;
   close: () => void;
 };
-
 export interface MenuActionButtonProps {
   menuTitle?: string;
   reportTitle?: string;
