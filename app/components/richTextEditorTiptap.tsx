@@ -15,7 +15,7 @@ interface RichTextEditorTiptapProps {
   emitVaue?: string;
 }
 
-function RichTextEditorTiptap({form, required=false, value="", emitVaue = "body"}: RichTextEditorTiptapProps) {
+function RichTextEditorTiptap({form, required=false, value="", emitVaue="body"}: RichTextEditorTiptapProps) {
   const [error, setError] = useState("İçerik en az 10 karakter olmalıdır.");
   const editor = useEditor({
     extensions: [StarterKit, Underline, Highlight, Placeholder.configure({ placeholder: 'içerik mesajı...' })],
