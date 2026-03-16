@@ -2,7 +2,6 @@ import { Select } from '@mantine/core';
 import { useState, useEffect } from 'react';
 import type { UseFormReturnType } from '@mantine/form';
 import { useUserService } from '../../services/userService';
-
 interface ResponsibleUserSelectProps {
   form: UseFormReturnType<any>;
   countryId?: string;

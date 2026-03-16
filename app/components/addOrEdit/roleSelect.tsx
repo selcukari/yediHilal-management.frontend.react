@@ -2,7 +2,6 @@ import { Select } from '@mantine/core';
 import { useState, useEffect } from 'react';
 import type { UseFormReturnType } from '@mantine/form';
 import { useRoleService } from '../../services/roleService';
-
 interface RoleSelectProps {
   form: UseFormReturnType<any>;
   required?: boolean;

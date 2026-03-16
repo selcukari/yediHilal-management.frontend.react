@@ -2,7 +2,6 @@ import { MultiSelect } from '@mantine/core';
 import { useState, useEffect } from 'react';
 import type { UseFormReturnType } from '@mantine/form';
 import { modulesMockData } from '~/utils/modules';
-
 interface ModuleSelectProps {
   form: UseFormReturnType<any>;
   required?: boolean;

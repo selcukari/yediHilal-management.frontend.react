@@ -2,7 +2,6 @@ import { Select } from '@mantine/core';
 import { useState, useEffect } from 'react';
 import type { UseFormReturnType } from '@mantine/form';
 import { priorityMockData } from '../../utils/priorityMockData';
-
 interface PrioritySelectProps {
   form: UseFormReturnType<any>;
   required?: boolean;
