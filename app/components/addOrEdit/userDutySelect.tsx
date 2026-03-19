@@ -42,7 +42,7 @@ export function UserDutySelect({ form, required = false, isDisabled = false }: D
     ? form.values.dutiesIds.split(',').filter(Boolean)
     : [];
 
-  // Değer değiştiğinde array'i string'e çevirip form'a set1 et
+  // Değer değiştiğinde array'i string'e çevirip form'a set et
   const handleChange = (values: string[]) => {
     form.setFieldValue('dutiesIds', values.join(','));
   };
