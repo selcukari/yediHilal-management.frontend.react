@@ -51,7 +51,7 @@ export function UserDutySelect({ form, required = false, isDisabled = false }: D
 
   return (
     <MultiSelect
-      label="Görevi1"
+      label="Görevi"
       placeholder="Görevi Seçiniz"
       data={duties}
       searchable
