@@ -48,7 +48,7 @@ export function RoleSelect({ form, required = false, isDisabled = false }: RoleS
       required={required}
       disabled={isDisabled}
       maxDropdownHeight={200}
-      nothingFoundMessage="Role bulunamadı..."
+      nothingFoundMessage="Role bulunamadı.d.."
       {...form.getInputProps('roleId')}
     />
   );
