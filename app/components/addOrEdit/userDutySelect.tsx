@@ -52,7 +52,7 @@ export function UserDutySelect({ form, required = false, isDisabled = false }: D
   return (
     <MultiSelect
       label="Görevi"
-      placeholder="Görevi Seçiniz1"
+      placeholder="Görevi Seçiniz"
       data={duties}
       searchable
       clearable
