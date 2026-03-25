@@ -58,14 +58,14 @@ export default function UserReport() {
     try {
       const getUserReport = await serviceReport.getUserReport();
       // Burada gerçek veriyi state'e atabilirsiniz
-      setUpdateDateReport(getUserReport.updateDate);
+      setUpdateDateReport(getUserReport?.updateDate || '');
       if (getUserReport?.reportItems) {
         const mappedData = getUserReport.reportItems.map((item: any) => ({
           id: item.userId,
           fullName: item.userFullName,
           branchName: item.reportName,
           duty: item.dutyName,
-          createDate: new Date(item.updateDate),
+          createDate: new Date(item?.updateDate || ''),
         }));
         setUserReportData(mappedData);
       }
