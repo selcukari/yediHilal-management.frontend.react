@@ -76,7 +76,7 @@ const menuItems: MenuItem[] = [
       },
       { icon: IconClipboardList, label: 'Stok Yönetimi', key: 'stock', link: '/stocks',
         children: [{ label: 'Stok', key: 'stock-depo', link: '/stocks' },
-          { label: 'Talepler', key: 'stock-requestStocksManager', link: '/requestStocksManager' }, { label: 'Raflar', key: 'shelve-depo', link: '/shelves'},{ label: 'DepoLar', key: 'warehouse-depo', link: '/warehouses' }
+          { label: 'Talepler', key: 'stock-requestStocksManager', link: '/requestStocksManager' }, { label: 'Raflar', key: 'shelve-depo', link: '/shelves'},{ label: 'Depolar', key: 'warehouse-depo', link: '/warehouses' }
         ],
       },
     ]
