@@ -22,9 +22,9 @@ export function UserDutySelect({ form, required = false, isDisabled = false }: D
     try {
       const response = await service.getUserDuties();
 
-      if (response) {
+      if (response && Array.isArray(response)) {
         setDuties(
-          response.map((c: any) => ({
+          response?.map((c: any) => ({
             value: String(c.id),
             label: c.name,
           }))
