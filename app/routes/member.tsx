@@ -11,6 +11,7 @@ import MemberAdd, { type MemberAddDialogControllerRef } from '../components/memb
 import MemberEdit, { type MemberEditDialogControllerRef } from '../components/members/memberEdit';
 import PhoneCallTrackingSend, { type PhoneCallTrackingSendDialogControllerRef } from '../components/members/phoneCallTrackingSend';
 import ConfirmModalMessage, { type ConfirmModalMessageRef } from '../components/confirmModalMessage';
+import { MemberChatBotAi } from '../components/members/memberChatBot';
 import { useMemberService } from '../services/memberService';
 import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
@@ -523,6 +524,7 @@ export default function Member() {
         <MemberAdd ref={memberAddRef} onSaveSuccess={handleSaveSuccess} />
         <MemberEdit ref={memberEditRef} onSaveSuccess={handleSaveSuccess} />
         <PhoneCallTrackingSend ref={phoneCallTrackingRef} onSaveSuccess={handleSaveSuccess} />
+        <MemberChatBotAi />
       </Container>
   );
 }
