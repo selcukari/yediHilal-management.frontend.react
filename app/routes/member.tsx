@@ -524,7 +524,7 @@ export default function Member() {
         <MemberAdd ref={memberAddRef} onSaveSuccess={handleSaveSuccess} />
         <MemberEdit ref={memberEditRef} onSaveSuccess={handleSaveSuccess} />
         <PhoneCallTrackingSend ref={phoneCallTrackingRef} onSaveSuccess={handleSaveSuccess} />
-        <MemberChatBotAi />
+        <MemberChatBotAi onSaveSuccess={handleSaveSuccess} />
       </Container>
   );
 }

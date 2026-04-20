@@ -21,6 +21,10 @@ interface UserDataParams {
   deleteMessageTitle?: string;
 }
 
+interface MemberDataAi {
+  memberText: string;
+}
+
 type MemberParams = {
   countryId?: string | null;
   isActive: boolean;
@@ -61,6 +65,18 @@ export function useMemberService(controller: string) {
 
     try {
       const res = await api.post(`/${controller}/addMember`, params);
+
+      return res.data.data;
+    } catch (error: any) {
+
+      return error;
+    }
+  };
+
+  const addMemberByAi = async (params: MemberDataAi) => {
+
+    try {
+      const res = await api.post(`/${controller}/addMemberByAi`, params);
 
       return res.data.data;
     } catch (error: any) {
@@ -128,5 +144,5 @@ export function useMemberService(controller: string) {
     }
   };
 
-  return { addMember, members, updateMember, member, deleteMember, membersInCache, addExternalMember };
+  return { addMember, members, updateMember, member, deleteMember, membersInCache, addExternalMember, addMemberByAi };
 }

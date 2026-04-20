@@ -2,29 +2,37 @@ import { useState } from 'react';
 import { Affix, Button, Transition, Paper, Text, TextInput, Stack, ActionIcon, ScrollArea, Group } from '@mantine/core';
 import { IconMessageChatbot, IconX, IconSend } from '@tabler/icons-react';
 import { toast } from '../../utils/toastMessages';
+import { useMemberService } from '~/services/memberService';
 
-export function MemberChatBotAi() {
+export function MemberChatBotAi({onSaveSuccess}: {onSaveSuccess?: () => void}) {
   const [opened, setOpened] = useState(false);
   const [value, setValue] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const service = useMemberService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
+  
 
   const handleSendMessage = async () => {
     if (!value.trim()) return;
     
     setLoading(true);
     try {
-      // Backend API'nize ML.NET ile işlenmek üzere gönderiyoruz
-      const response = await fetch('/api/member/ai-add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: value }),
-      });
+      const result = await service.addMemberByAi({ memberText: value });
 
-      if (response.ok) {
+      if (result == true) {
         toast.success('Yapay zeka bilgileri ayrıştırdı ve üye eklendi!');
         setValue('');
         setOpened(false);
-      } else {
+        // onSaveSuccess event'ini tetikle
+        if (onSaveSuccess) {
+          onSaveSuccess();
+        }
+      }
+      if (result?.data == false && result?.errors?.length > 0) {
+
+      toast.warning(result.errors[0]);
+
+    } else {
         toast.error('Bilgiler tam anlaşılamadı, lütfen daha net yazınız.');
       }
     } catch (error) {
@@ -72,7 +80,7 @@ export function MemberChatBotAi() {
                 </Group>
                 
                 <Text size="xs" c="dimmed">
-                  Örn: "Adı Mehmet Can, kimlik 123, il İstanbul, doğum tarihi 2005, telefonu 0505111 olan yeni bir üye kaydet." şeklinde bilgileri yazabilirsiniz.
+                  Örn: "Adı Mehmet Can, kimlik 123, il İstanbul, doğum tarihi 2005, telefonu 505111, email ornek@example.com olan yeni bir üye kaydet." şeklinde bilgileri yazabilirsiniz.
                 </Text>
 
                 <TextInput
