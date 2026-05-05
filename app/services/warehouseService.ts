@@ -141,7 +141,6 @@ export function useWarehouseService(controller: string) {
     }
   };
 
-
   return { getWarehouses, addWarehouse, deleteWarehouse, updateWarehouse, updatRequestStock,
     getShelves, updateShelve, deleteShelve, addShelve, getRequestStocks };
 }

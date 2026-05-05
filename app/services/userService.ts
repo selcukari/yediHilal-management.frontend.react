@@ -94,7 +94,6 @@ export function useUserService(controller: string) {
   const usersInCache = async (countryId?: string) => {
 
     try {
-
       const res = await api.get(`/${controller}/getUsers`,{
         params: {
           ...(countryId ? { countryId: parseInt(countryId)} : { countryId: turkeyCountryId }),
