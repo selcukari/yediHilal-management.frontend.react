@@ -24,7 +24,7 @@ export type UserAddDialogControllerRef = {
 };
 
 interface UserAddProps {
-  onSaveSuccess?: () => void; // Yeni prop
+  onSaveSuccess?: () => void;
 }
 
 type FormValues = {
