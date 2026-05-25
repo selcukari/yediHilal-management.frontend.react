@@ -1,7 +1,7 @@
 import { forwardRef, useImperativeHandle, useState, useRef, useMemo } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { omit } from 'ramda';
-import { Modal, Textarea, Button, Stack, Grid, LoadingOverlay, Text } from '@mantine/core';
+import { Modal, Textarea, Button, Stack, Grid, LoadingOverlay } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
@@ -14,10 +14,6 @@ export type SmsSendDialogControllerRef = {
   close: () => void;
 };
 
-interface PhoneNumbersWithCountryCode {
-  telephone: string;
-  countryCode: string;
-}
 type ValueParams = {
   toUsers: Array<string>;
   toPhoneNumbers: Array<string>;
