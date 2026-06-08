@@ -68,9 +68,7 @@ export default function AutomaticSmsManagement() {
       console.error('Error fetching fetchReadyMessage:', error.message);
     }
   }
-
   
-
   const fetchAutomaticSmsData = async () => {
     try {
       open();
