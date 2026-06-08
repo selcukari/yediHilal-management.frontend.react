@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { Paper, TextInput, Group, Stack, Text, Avatar, ScrollArea, Loader, ActionIcon } from '@mantine/core';
 import { IconSend, IconRobot, IconUser, IconRefresh } from '@tabler/icons-react';
 import { useOpenApiService } from '../services/openApiService';
-
 export interface Message {
   id: string;
   text: string;
