@@ -53,8 +53,6 @@ export default function Mail() {
     }
   }, []);
 
-
-
   const rowsTable = filteredUsers.map((item) => (
     <Table.Tr key={item.id}>
       {rowHeaders.map((header) => {
