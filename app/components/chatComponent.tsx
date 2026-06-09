@@ -79,7 +79,7 @@ export function ChatComponent({ title = "YediHilal AI Asistan", height = 600 }: 
     abortControllerRef.current = new AbortController();
 
     try {
-      let accumulatedText = "";
+      let accumulatedText = " ";
       
       await service.streamChat(
         { session_id: sessionId, query: userText },
