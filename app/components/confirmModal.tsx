@@ -19,7 +19,7 @@ interface ConfirmModalProps {
 const ConfirmModal = forwardRef<ConfirmModalRef, ConfirmModalProps>(({
   headerTitle = "Dikkat!",
   message = "Yaptığınız değişiklikler iptal olacaktır. Devam etmek istiyor musunuz?",
-  confirmText = "Evet1",
+  confirmText = "Evet",
   cancelText = "Hayır",
   onConfirm,
   onCancel
