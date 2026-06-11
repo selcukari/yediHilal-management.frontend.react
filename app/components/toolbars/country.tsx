@@ -21,7 +21,7 @@ export function Country({ isRequired = false, isDisabled = false, valueId,
 
   useEffect(() => {
     fetchCountryData();
-    setCountry(valueId ? valueId : "1");
+    setCountry(valueId ? valueId : "1"); // turkiye default olarak seçili
   }, []);
 
   const fetchCountryData = async () => {
