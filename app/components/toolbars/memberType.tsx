@@ -32,7 +32,7 @@ export function MemberType({ onMemberTypeChange, isDisabled = false, valueId }: 
           }))
         );
       } else {
-        toast.info('Hiçbir veri yok!1');
+        toast.info('Hiçbir veri yok!');
       }
     } catch (error: any) {
       toast.error(`MemberTypes yüklenirken hata: ${error.message}`);
