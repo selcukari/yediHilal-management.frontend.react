@@ -51,7 +51,6 @@ const MeetingTypeEdit = forwardRef<MeetingTypeEditDialogControllerRef, MeetingTy
       form.setInitialValues(clone(value));
       // Sonra form values'larını set et
       open();
-
     }
   }
 
