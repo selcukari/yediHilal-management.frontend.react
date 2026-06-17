@@ -77,7 +77,6 @@ export default function DocumentTracking() {
     open();
 
      try {
-
       const result = await service.deletePhoneCallTracking(id);
       if (result == true) {
 
