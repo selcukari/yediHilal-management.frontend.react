@@ -157,13 +157,13 @@ function AppContent() {
 
 export default function App() {
   return (
-    // <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
       <MantineProvider theme={theme}>
         <AuthProvider>
           <AppContent />
         </AuthProvider>
       </MantineProvider>
-    // </QueryClientProvider>
+    </QueryClientProvider>
   );
 }
 
