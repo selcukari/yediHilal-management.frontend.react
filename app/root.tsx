@@ -4,6 +4,10 @@ import '@mantine/notifications/styles.css';
 import '@mantine/tiptap/styles.css';
 import '@mantine/dates/styles.css';
 import 'dayjs/locale/tr';
+import {
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 import { ColorSchemeScript, MantineProvider, mantineHtmlProps, createTheme } from '@mantine/core';
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, useLocation } from "react-router";
 import { useState, useEffect } from 'react';
@@ -36,6 +40,19 @@ export const links: Route.LinksFunction = () => [
 const theme = createTheme({
   fontFamily: 'Inter, sans-serif',
   primaryColor: 'blue',
+});
+// React Query Client konfigürasyonu
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5, // 5 dakika
+    },
+    mutations: {
+      retry: 1,
+    },
+  },
 });
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -140,11 +157,13 @@ function AppContent() {
 
 export default function App() {
   return (
-    <MantineProvider theme={theme}>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </MantineProvider>
+    // <QueryClientProvider client={queryClient}>
+      <MantineProvider theme={theme}>
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      </MantineProvider>
+    // </QueryClientProvider>
   );
 }
 
