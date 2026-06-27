@@ -5,7 +5,7 @@ import { Modal, TextInput, Button, Stack, Textarea, Grid, Flex, Switch, Select }
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
-import { DistrictceSelect } from '../addOrEdit/districtSelect';
+import { DistrictSelect } from '../addOrEdit/districtSelect';
 import { ProvinceSelect } from '../addOrEdit/provinceSelect';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useUserService } from '../../services/userService';
@@ -211,7 +211,7 @@ const UniversityBranchAdd = forwardRef<UniversityBranchAddDialogControllerRef, U
               />
             </Grid.Col>
             <Grid.Col span={6}>
-              <DistrictceSelect 
+              <DistrictSelect 
                 form={form}
                 required={true}
                 provinceId={form.values.provinceId}

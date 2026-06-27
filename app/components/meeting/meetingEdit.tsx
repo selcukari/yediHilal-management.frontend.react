@@ -8,7 +8,7 @@ import { IconCancel, IconCheck, IconCalendar } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { toast } from '../../utils/toastMessages';
-import { DistrictceSelect } from '../addOrEdit/districtSelect';
+import { DistrictSelect } from '../addOrEdit/districtSelect';
 import { ProvinceSelect } from '../addOrEdit/provinceSelect';
 import { MeetingTypeSelect } from '../addOrEdit/meetingTypeSelect';
 import { RichTextEditorTiptap } from '../richTextEditorTiptap';
@@ -320,7 +320,7 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
               />
             </Grid.Col>
             <Grid.Col span={4}>
-              <DistrictceSelect 
+              <DistrictSelect 
                 form={form}
                 required={true}
                 provinceId={form.values.provinceId ?? undefined}
