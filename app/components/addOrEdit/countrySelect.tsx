@@ -1,7 +1,7 @@
 import { Select } from '@mantine/core';
-import { useEffect, useState } from 'react';
 import type { UseFormReturnType } from '@mantine/form';
-import { useCountryService } from '../../services/countryService'
+import { useQuery } from '@tanstack/react-query';
+import { useCountryService } from '../../services/countryService';
 
 interface CountrySelectProps {
   form: UseFormReturnType<any>;
@@ -11,52 +11,48 @@ interface CountrySelectProps {
   disabled?: boolean;
 }
 
-export function CountrySelect({ 
-  form, 
-  label = "Ülke", 
-  placeholder = "Ülke Seçiniz", 
+export function CountrySelect({
+  form,
+  label = "Ülke",
+  placeholder = "Ülke Seçiniz",
   required = false,
-  disabled = false
+  disabled = false,
 }: CountrySelectProps) {
+  const service = useCountryService(
+    import.meta.env.VITE_APP_API_BASE_CONTROLLER
+  );
 
-  const [countries, setCountries] = useState<{ value: string; label: string }[]>([]);
-
-  const service = useCountryService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
-
-  useEffect(() => {
-    fetchCountryData();
-  }, []);
-
-  const fetchCountryData = async () => {
-    try {
+  const { data: countries = [], isLoading, isError } = useQuery({
+    queryKey: ["countries"],
+    queryFn: async () => {
       const response = await service.getCountries();
 
-      if (response) {
-        setCountries(
-          response.map((c: any) => ({
-            value: String(c.id),
-            label: c.name,
-          }))
-        );
-      } else {
-        console.error('No countries data found');
-      }
-    } catch (error: any) {
-      console.error('Error fetching countries:', error.message);
-    }
-  };
+      return (response ?? []).map((c: any) => ({
+        value: String(c.id),
+        label: c.name,
+      }));
+    },
+    staleTime: 1000 * 60 * 60 * 24 * 7, // 7 gun cache
+    gcTime: 1000 * 60 * 60 * 24 * 7, // 24 saat bellekte tut
+  });
 
   return (
     <Select
       label={label}
-      placeholder={placeholder}
+      placeholder={
+        isLoading ? "Ülkeler yükleniyor..." : placeholder
+      }
       data={countries}
       value={form.values.countryId}
       searchable
       maxDropdownHeight={200}
-      nothingFoundMessage="Ülke bulunamadı..."
+      nothingFoundMessage={
+        isError
+          ? "Ülkeler yüklenemedi."
+          : "Ülke bulunamadı..."
+      }
       required={required}
-      disabled={disabled}
+      disabled={disabled || isLoading}
       {...form.getInputProps('countryId')}
     />
   );
