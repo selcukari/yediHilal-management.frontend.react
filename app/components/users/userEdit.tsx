@@ -8,7 +8,7 @@ import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { CountrySelect } from '../addOrEdit/countrySelect';
 import { ProvinceSelect } from '../addOrEdit/provinceSelect';
-import { DistrictceSelect } from '../addOrEdit/districtSelect';
+import { DistrictSelect } from '../addOrEdit/districtSelect';
 import { useUserService } from '../../services/userService';
 import { RoleSelect } from '../addOrEdit/roleSelect';
 import { toast } from '../../utils/toastMessages';
@@ -355,7 +355,7 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
             />
           </Grid.Col>
           <Grid.Col span={4}>
-            <DistrictceSelect 
+            <DistrictSelect 
               form={form}
               required={true}
               provinceId={form.values.provinceId}
