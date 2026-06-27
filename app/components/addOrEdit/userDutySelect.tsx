@@ -1,8 +1,7 @@
 import { MultiSelect } from '@mantine/core';
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import type { UseFormReturnType } from '@mantine/form';
 import { useUserDutyService } from '../../services/userDutyService'; 
-
 interface DutySelectProps {
   form: UseFormReturnType<any>;
   required?: boolean;
@@ -11,31 +10,21 @@ interface DutySelectProps {
 }
 // gorevi
 export function UserDutySelect({ form, required = false, isDisabled = false }: DutySelectProps) {
-  const [duties, setDuties] = useState<{ value: string; label: string }[]>([]);
   const service =  useUserDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   
-  useEffect(() => {
-    fetchDutyData();
-  }, []);
-
-  const fetchDutyData = async () => {
-    try {
+  const { data: duties = [], isLoading, isError } = useQuery({
+    queryKey: ["duties"],
+    queryFn: async () => {
       const response = await service.getUserDuties();
 
-      if (response && Array.isArray(response)) {
-        setDuties(
-          response?.map((c: any) => ({
-            value: String(c.id),
-            label: c.name,
-          }))
-        );
-      } else {
-        console.error('No getDuties data found');
-      }
-    } catch (error: any) {
-      console.error('Error fetching getDuties:', error.message);
-    }
-  };
+      return (response ?? []).map((c: any) => ({
+        value: String(c.id),
+        label: c.name,
+      }));
+    },
+    staleTime: 1000 * 60 * 60 * 24 * 7, // 7 gun cache
+    gcTime: 1000 * 60 * 60 * 24 * 7, // 24 saat bellekte tut
+  });
 
   // Form değerini string'ten array'e çevir
   const selectedValues = form.values.dutiesIds 
@@ -56,12 +45,16 @@ export function UserDutySelect({ form, required = false, isDisabled = false }: D
       data={duties}
       searchable
       clearable
-      disabled={isDisabled}
+      disabled={isDisabled || isLoading}
       value={selectedValues}
       required={required}
       error={error}
       maxDropdownHeight={200}
-      nothingFoundMessage="Görevi bulunamadı..."
+      nothingFoundMessage={
+        isError
+          ? "Görevler yükleniyor..."
+          : "Görev bulunamadı..."
+      }
       onChange={handleChange}
     />
   );

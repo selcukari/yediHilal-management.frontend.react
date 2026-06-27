@@ -1,8 +1,7 @@
 import { Select } from '@mantine/core';
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import type { UseFormReturnType } from '@mantine/form';
 import { useMemberService } from '../../services/memberService';
-
 interface ReferansMemberSelectProps {
   form: UseFormReturnType<any>;
   countryId?: string;
@@ -11,34 +10,23 @@ interface ReferansMemberSelectProps {
 }
 
 export function ReferansMemberSelect({ form, countryId, isDisabled = false, memberId }: ReferansMemberSelectProps) {
-  const [referansMembers, setReferansMembers] = useState<{ value: string; label: string }[]>([]);
   
   const service = useMemberService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
 
-  useEffect(() => {
-    fetcReferansMembersData(countryId);
-  }, [countryId]);
-
-  const fetcReferansMembersData = async (countryId?: string) => {
-    try {
+  const { data: referansMembers = [], isLoading, isError } = useQuery({
+    queryKey: ["referansMembers", countryId],
+    enabled: !!countryId, // countryId boşsa API çağrısı yapmaz
+    queryFn: async () => {
       const response = await service.membersInCache(countryId);
 
-      if (response) {
-        setReferansMembers(
-          response
-            .filter((c: any) => String(c.id) != memberId)
-            .map((c: any) => ({
-              value: String(c.id),
-              label: c.fullName,
-            }))
-        );
-      } else {
-        console.error('No fetcReferansMembersData data found');
-      }
-    } catch (error: any) {
-      console.error('Error fetching fetcReferansMembersData:', error.message);
-    }
-  };
+      return (response ?? []).map((c: any) => ({
+        value: String(c.id),
+        label: c.fullName,
+      }));
+    },
+    staleTime: 1000 * 60 * 60 * 24 * 7,
+    gcTime: 1000 * 60 * 60 * 24 * 7,
+  });
 
   return (
     <Select
@@ -47,9 +35,13 @@ export function ReferansMemberSelect({ form, countryId, isDisabled = false, memb
       data={referansMembers}
       searchable
       clearable
-      disabled={isDisabled}
+      disabled={isDisabled || isLoading}
       maxDropdownHeight={200}
-      nothingFoundMessage="Referans bulunamadı..."
+      nothingFoundMessage={
+        isError
+          ? "Referans üyeler yükleniyor..."
+          : "Referans üye bulunamadı..."
+      }
       {...form.getInputProps('referenceId')}
     />
   );

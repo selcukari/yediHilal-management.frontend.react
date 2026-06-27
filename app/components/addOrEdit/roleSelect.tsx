@@ -1,5 +1,5 @@
 import { Select } from '@mantine/core';
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import type { UseFormReturnType } from '@mantine/form';
 import { useRoleService } from '../../services/roleService';
 interface RoleSelectProps {
@@ -9,32 +9,22 @@ interface RoleSelectProps {
 }
 
 export function RoleSelect({ form, required = false, isDisabled = false }: RoleSelectProps) {
-  const [roles, setRoles] = useState<{ value: string; label: string }[]>([]);
   
   const service = useRoleService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
-  useEffect(() => {
-    fetchRoleData();
-  }, []);
-
-  const fetchRoleData = async () => {
-    try {
+   const { data: roles = [], isLoading, isError } = useQuery({
+    queryKey: ["roles"],
+    queryFn: async () => {
       const response = await service.getRoles();
 
-      if (response) {
-        setRoles(
-          response.map((c: any) => ({
-            value: String(c.id),
-            label: c.name,
-          }))
-        );
-      } else {
-        console.error('No getRoles data found');
-      }
-    } catch (error: any) {
-      console.error('Error fetching getRoles:', error.message);
-    }
-  };
+      return (response ?? []).map((c: any) => ({
+        value: String(c.id),
+        label: c.name,
+      }));
+    },
+    staleTime: 1000 * 60 * 60 * 24 * 7, // 7 gun cache
+    gcTime: 1000 * 60 * 60 * 24 * 7, // 24 saat bellekte tut
+  });
 
   // Form'dan error mesajını al
   const error = form.errors.roleId;
@@ -46,9 +36,13 @@ export function RoleSelect({ form, required = false, isDisabled = false }: RoleS
       data={roles}
       error={error}
       required={required}
-      disabled={isDisabled}
+      disabled={isDisabled || isLoading}
       maxDropdownHeight={200}
-      nothingFoundMessage="Role bulunamadı..."
+      nothingFoundMessage={
+        isError
+          ? "Roller yükleniyor..."
+          : "Role bulunamadı..."
+      }
       {...form.getInputProps('roleId')}
     />
   );
