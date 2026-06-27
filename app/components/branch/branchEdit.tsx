@@ -8,7 +8,7 @@ import { useForm } from '@mantine/form';
 import { subDays } from 'date-fns';
 import { IconCancel, IconCheck, IconCalendar, IconTrash, IconPlus } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
-import { DistrictceSelect } from '../addOrEdit/districtSelect';
+import { DistrictSelect } from '../addOrEdit/districtSelect';
 import { ProvinceSelect } from '../addOrEdit/provinceSelect';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useUserService } from '../../services/userService';
@@ -343,7 +343,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
               />
             </Grid.Col>
             <Grid.Col span={6}>
-            <DistrictceSelect 
+            <DistrictSelect 
               form={form}
               // required={true}
               disabled={true}

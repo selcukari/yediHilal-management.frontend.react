@@ -8,7 +8,7 @@ import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck, IconCalendar } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import { ProvinceSelect } from '../addOrEdit/provinceSelect';
-import { DistrictceSelect } from '../addOrEdit/districtSelect';
+import { DistrictSelect } from '../addOrEdit/districtSelect';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useUserService } from '../../services/userService';
 import { useBranchService } from '../../services/branchService';
@@ -233,7 +233,7 @@ const BranchAdd = forwardRef<BranchAddDialogControllerRef, UserAddProps>(({onSav
               />
             </Grid.Col>
             <Grid.Col span={6}>
-              <DistrictceSelect 
+              <DistrictSelect 
                 form={form}
                 required={true}
                 provinceId={form.values.provinceId}
