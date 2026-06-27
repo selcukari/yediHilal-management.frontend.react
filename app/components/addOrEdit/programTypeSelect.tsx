@@ -1,5 +1,5 @@
 import { Select } from '@mantine/core';
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import type { UseFormReturnType } from '@mantine/form';
 import { useProgramTypeService } from '../../services/programTypeService';
 interface ProgramTypeSelectProps {
@@ -9,32 +9,22 @@ interface ProgramTypeSelectProps {
 }
 
 export function ProgramTypeSelect({ form, required = false, isDisabled = false }: ProgramTypeSelectProps) {
-  const [roles, setRoles] = useState<{ value: string; label: string }[]>([]);
   
   const service = useProgramTypeService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
-  useEffect(() => {
-    fetchProgramTypeData();
-  }, []);
-
-  const fetchProgramTypeData = async () => {
-    try {
+  const { data: roles = [], isLoading } = useQuery({
+    queryKey: ["roles"],
+    queryFn: async () => {
       const response = await service.getProgramTypes();
 
-      if (response) {
-        setRoles(
-          response.map((c: any) => ({
-            value: String(c.id),
-            label: c.name,
-          }))
-        );
-      } else {
-        console.error('No fetchProgramTypeData data found');
-      }
-    } catch (error: any) {
-      console.error('Error fetching fetchProgramTypeData:', error.message);
-    }
-  };
+      return (response ?? []).map((c: any) => ({
+        value: String(c.id),
+        label: c.name,
+      }));
+    },
+    staleTime: 1000 * 60 * 60 * 24 * 7, // 7 gun cache
+    gcTime: 1000 * 60 * 60 * 24 * 7, // 24 saat bellekte tut
+  });
 
   // Form'dan error mesajını al
   const error = form.errors.programTypeId;
@@ -46,9 +36,13 @@ export function ProgramTypeSelect({ form, required = false, isDisabled = false }
       data={roles}
       error={error}
       required={required}
-      disabled={isDisabled}
+      disabled={isDisabled || isLoading}
       maxDropdownHeight={200}
-      nothingFoundMessage="program türü bulunamadı..."
+      nothingFoundMessage={
+        isLoading
+          ? "Program türleri yükleniyor..."
+          : "Program türü bulunamadı..."
+      }
       {...form.getInputProps('programTypeId')}
     />
   );

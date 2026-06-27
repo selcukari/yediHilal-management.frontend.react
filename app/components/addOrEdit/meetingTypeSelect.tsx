@@ -1,8 +1,8 @@
 import { Select } from '@mantine/core';
+import { useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import type { UseFormReturnType } from '@mantine/form';
 import { useUserDutyService } from '../../services/userDutyService'; 
-
 interface MeetingTypeSelectProps {
   form: UseFormReturnType<any>;
   required?: boolean;
@@ -11,43 +11,37 @@ interface MeetingTypeSelectProps {
 }
 // gorevi
 export function MeetingTypeSelect({ form, required = false, isDisabled = false }: MeetingTypeSelectProps) {
-  const [meetings, setMeetings] = useState<{ value: string; label: string }[]>([]);
   const service =  useUserDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   
-  useEffect(() => {
-    fetchMeetingTypeData();
-  }, []);
-
-  const fetchMeetingTypeData = async () => {
-    try {
+  const { data: meetings = [], isLoading, isError } = useQuery({
+    queryKey: ["userDuties"],
+    queryFn: async () => {
       const response = await service.getUserDuties();
 
-      if (response) {
-        setMeetings(
-          response.map((c: any) => ({
-            value: String(c.id),
-            label: c.name,
-          }))
-        );
-      } else {
-        console.error('No fetchMeetingTypeData data found');
-      }
-    } catch (error: any) {
-      console.error('Error fetching fetchMeetingTypeData:', error.message);
-    }
-  };
+      return (response ?? []).map((c: any) => ({
+        value: String(c.id),
+        label: c.name,
+      }));
+    },
+    staleTime: 1000 * 60 * 60 * 24 * 7, // 7 gun cache
+    gcTime: 1000 * 60 * 60 * 24 * 7, // 24 saat bellekte tut
+  });
 
   return (
     <Select
       label="Toplantı Birim"
-      placeholder="toplantı birim seçiniz"
+      placeholder={isLoading ? "Toplantı birimleri yükleniyor..." : "Toplantı birimi seçiniz"}
       data={meetings}
       searchable
       clearable
+       nothingFoundMessage={
+        isError
+          ? "Toplantı birimleri yüklenemedi."
+          : "Toplantı birimi bulunamadı..."
+      }
       required={required}
-      disabled={isDisabled}
+      disabled={ isDisabled || isLoading}
       maxDropdownHeight={200}
-      nothingFoundMessage="toplantı birim bulunamadı..."
       {...form.getInputProps('meetingTypeId')}
     />
   );

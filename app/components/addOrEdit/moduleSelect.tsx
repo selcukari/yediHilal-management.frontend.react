@@ -1,5 +1,5 @@
 import { MultiSelect } from '@mantine/core';
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import type { UseFormReturnType } from '@mantine/form';
 import { modulesMockData } from '~/utils/modules';
 interface ModuleSelectProps {
@@ -10,22 +10,19 @@ interface ModuleSelectProps {
 }
 
 export function ModuleSelect({ form, required = false, isDisabled = false }: ModuleSelectProps) {
-  const [modules, setModules] = useState<{ value: string; label: string }[]>([]);
-  
-  useEffect(() => {
-    fetchRoleData();
-  }, []);
 
-  const fetchRoleData = async () => {
-      
-    setModules(
-      modulesMockData.map((c: any) => ({
-        value: c.key,
+   const { data: modules = [] } = useQuery({
+    queryKey: ["modules"],
+    queryFn: () => {
+
+      return (modulesMockData).map((c: any) => ({
+        value: String(c.key),
         label: c.label,
-      }))
-    );
-     
-  };
+      }));
+    },
+    staleTime: 1000 * 60 * 60 * 24 * 7, // 7 gun cache
+    gcTime: 1000 * 60 * 60 * 24 * 7, // 24 saat bellekte tut
+  });
 
   // Form değerini string'ten array'e çevir
   const selectedValues = form.values.moduleRoles 

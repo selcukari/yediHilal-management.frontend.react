@@ -1,5 +1,6 @@
 import { MultiSelect } from '@mantine/core';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import type { UseFormReturnType } from '@mantine/form';
 import { useMemberTypeService } from '../../services/memberTypeService';
 
@@ -11,36 +12,30 @@ interface MemberTypeSelectProps {
 }
 
 export function MemberTypeSelect({ form, required = false, disabled = false, valueId }: MemberTypeSelectProps) {
-  const [memberTypes, setMemberTypes] = useState<{ value: string; label: string }[]>([]);
   
   const service = useMemberTypeService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
   useEffect(() => {
-    fetchMemberTypeData();
-
     setTimeout(() => {
       form.setFieldValue('typeIds', valueId ?? form.values.typeIds);
     }, 400);
   }, []);
 
-  const fetchMemberTypeData = async () => {
-    try {
+
+
+  const { data: memberTypes = [], isLoading, isError } = useQuery({
+    queryKey: ["memberTypes"],
+    queryFn: async () => {
       const response = await service.getMemberTypes();
 
-      if (response) {
-        setMemberTypes(
-          response.map((c: any) => ({
-            value: String(c.id),
-            label: c.name,
-          }))
-        );
-      } else {
-        console.error('No fetchMemberTypeData data found');
-      }
-    } catch (error: any) {
-      console.error('Error fetching fetchMemberTypeData:', error.message);
-    }
-  };
+      return (response ?? []).map((c: any) => ({
+        value: String(c.id),
+        label: c.name,
+      }));
+    },
+    staleTime: 1000 * 60 * 60 * 24 * 7, // 7 gun cache
+    gcTime: 1000 * 60 * 60 * 24 * 7, // 24 saat bellekte tut
+  });
 
     // Form değerini string'ten array'e çevir
   const selectedValues = form.values.typeIds 
@@ -59,11 +54,15 @@ export function MemberTypeSelect({ form, required = false, disabled = false, val
       placeholder="Tipi Seçiniz"
       data={memberTypes}
       searchable
-      clearable disabled={disabled}
+      clearable disabled={disabled || isLoading}
       value={selectedValues}
       error={error}
       maxDropdownHeight={200}
-      nothingFoundMessage="Tipi bulunamadı..."
+      nothingFoundMessage={
+        isError
+          ? "Üye tipleri yüklenemedi."
+          : "Tipi bulunamadı..."
+      }
       onChange={handleChange}
     />
   );

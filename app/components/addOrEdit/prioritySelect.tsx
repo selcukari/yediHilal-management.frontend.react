@@ -1,5 +1,5 @@
 import { Select } from '@mantine/core';
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import type { UseFormReturnType } from '@mantine/form';
 import { priorityMockData } from '../../utils/priorityMockData';
 interface PrioritySelectProps {
@@ -8,21 +8,16 @@ interface PrioritySelectProps {
 }
 
 export function PrioritySelect({ form, required = false }: PrioritySelectProps) {
-  const [priorities, setPriorities] = useState<{ value: string; label: string }[]>([]);
   
-  useEffect(() => {
-    fetchPriorityData();
-  }, []);
+  const { data: priorities = [] } = useQuery({
+    queryKey: ["priorities"],
+    queryFn: () => {
 
-  const fetchPriorityData = () => {
-    try {
-
-      setPriorities(priorityMockData);
-      
-    } catch (error: any) {
-      console.error('Error fetching priority:', error.message);
-    }
-  };
+      return priorityMockData;
+    },
+    staleTime: 1000 * 60 * 60 * 24 * 7, // 7 gun cache
+    gcTime: 1000 * 60 * 60 * 24 * 7, // 24 saat bellekte tut
+  });
 
   return (
     <Select

@@ -1,5 +1,6 @@
 import { Select } from '@mantine/core';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import type { UseFormReturnType } from '@mantine/form';
 import { useProvinceService } from '../../services/provinceService'
 
@@ -22,13 +23,22 @@ export function ProvinceSelect({
   disabled = false
 }: ProvinceSelectProps) {
 
-  const [provinces, setProvinces] = useState<{ value: string; label: string }[]>([]);
-
   const service = useProvinceService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
-  
-  useEffect(() => {
-    fetchProvinceData(countryId);
-  }, [countryId]);
+
+  const { data: provinces = [], isLoading } = useQuery({
+    queryKey: ["provinces", countryId],
+    enabled: !!countryId, // countryId boşsa API çağrısı yapmaz
+    queryFn: async () => {
+      const response = await service.getProvinces(countryId);
+
+      return (response ?? []).map((c: any) => ({
+        value: String(c.id),
+        label: c.name,
+      }));
+    },
+    staleTime: 1000 * 60 * 60 * 24 * 7,
+    gcTime: 1000 * 60 * 60 * 24 * 7,
+  });
 
   useEffect(() => {
     setTimeout(() => {
@@ -36,25 +46,6 @@ export function ProvinceSelect({
     }, 400);
   }, []);
 
-  const fetchProvinceData = async (countryId?: string) => {
-    try {
-
-      const getProvinces = await service.getProvinces(countryId);
-      if (getProvinces) {
-        setProvinces(
-          getProvinces.map((c: any) => ({
-            value: String(c.id),
-            label: c.name,
-          }))
-        );
-
-      } else {
-        console.error('No getProvinces data found');
-      }
-    } catch (error: any) {
-      console.error('Error fetching getProvinces:', error.message);
-    }
-  }
   
   return (
     <Select
@@ -65,7 +56,7 @@ export function ProvinceSelect({
       maxDropdownHeight={200}
       nothingFoundMessage="İl bulunamadı"
       required={required}
-      disabled={disabled}
+      disabled={disabled || isLoading}
       {...form.getInputProps('provinceId')}
     />
   );
