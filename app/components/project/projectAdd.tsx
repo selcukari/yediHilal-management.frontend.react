@@ -15,6 +15,7 @@ import { RichTextEditorTiptap } from '../richTextEditorTiptap';
 import { FileUpload } from '../fileInput';
 import { DayRenderer } from '../../components';
 import { useAuth } from '~/authContext';
+import { useMutation } from '@tanstack/react-query';
 
 export type ProjectAddDialogControllerRef = {
   openDialog: () => void;
@@ -38,7 +39,6 @@ type FormValues = {
 };
 
 const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
-  const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
   
   const service = useProjectService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
@@ -69,53 +69,55 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
     return currentUser?.userType === 'userLogin';
   }, [currentUser]);
 
-  const handleSubmit = async (values: FormValues) => {
-    setIsDisabledSubmit(true);
-    
-    try {
-      // Dosya form değerlerinden al
-      const files = form.values.files || [];
+  const addProjectMutation = useMutation({
+    mutationFn: async (values: FormValues) => {
+    // 1. Form değerlerinden dosyaları al
+    const files = form.values.files || [];
 
-      const getUser = await serviceUser.user(parseInt(values.responsibleId ?? "1"));
+    // 2. Sorumlu kullanıcı bilgisini çek (Asenkron bağımlılık)
+    const getUser = await serviceUser.user(parseInt(values.responsibleId ?? "1"));
 
-      // Proje verilerini hazırla (dosya bilgilerini de ekle)
-      const projectData = {
-        ...values,
-        name: values.name.trim(),
-        ...(values.finisDate ? { finisDate: new Date(values.finisDate).toISOString()} : {}),
-        responsibleFullName: getUser?.fullName ? getUser.fullName : undefined,
-        responsibleId: values.responsibleId?.toString(),
-        budget: values.budget?.toString(),
-        files: files.length > 0 ? files : undefined,
-      };
+    // 3. Proje verilerini mutation gövdesi için hazırla
+    const projectData = {
+      ...values,
+      name: values.name.trim(),
+      ...(values.finisDate ? { finisDate: new Date(values.finisDate).toISOString() } : {}),
+      responsibleFullName: getUser?.fullName ? getUser.fullName : undefined,
+      responsibleId: values.responsibleId?.toString(),
+      budget: values.budget?.toString(),
+      files: files.length > 0 ? files : undefined,
+    };
 
-      const result = await service.addProject(projectData);
-
-      if (result === true) {
-        toast.success('Proje başarıyla eklendi!');
-        
-        // onSaveSuccess event'ini tetikle
-        if (onSaveSuccess) {
-          onSaveSuccess();
-        }
-        
-        close();
-        form.reset();
-        setIsDisabledSubmit(false);
-        return;
+    // 4. API'ye projeyi ekle ve sonucu dön
+    return await service.addProject(projectData);
+  },
+  onSuccess: (result: any) => {
+    if (result == true) {
+      toast.success('Proje başarıyla eklendi!');
+      
+      if (onSaveSuccess) {
+        onSaveSuccess();
       }
       
-      if (result?.data === false && result?.errors?.length > 0) {
-        toast.warning(result.errors[0]);
-      } else {
-        toast.error('Proje eklenirken bir hata oluştu!');
-      }
-    } catch (error) {
-      console.error('Submit error:', error);
-      toast.error('İşlem sırasında bir hata oluştu!');
-    } finally {
-      setIsDisabledSubmit(false);
+      close();
+      form.reset();
+      return;
     }
+    
+    if (result?.data === false && result?.errors?.length > 0) {
+      toast.warning(result.errors[0]);
+    } else {
+      toast.error('Proje eklenirken bir hata oluştu!');
+    }
+  },
+  onError: (error: any) => {
+    console.error('Submit error:', error);
+    toast.error('İşlem sırasında bir hata oluştu!');
+  }
+});
+
+  const handleSubmit = (values: FormValues) => {
+    addProjectMutation.mutate(values);
   };
 
   const confirmDialogHandleConfirm = () => {
@@ -231,7 +233,8 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
               İptal
             </Button>
-            <Button type="submit" variant="filled" size="xs" disabled={isDisabledSubmit}  leftSection={<IconCheck size={14} />} radius="xs">
+            <Button type="submit" variant="filled" size="xs"
+            disabled={addProjectMutation.isPending}  leftSection={<IconCheck size={14} />} radius="xs">
               Kaydet
             </Button>
           </Grid.Col>

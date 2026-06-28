@@ -1,5 +1,6 @@
-import { forwardRef, useEffect, useImperativeHandle, useState, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Modal, TextInput, Flex, Button, Select, Stack, Grid, PasswordInput, Switch, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
@@ -47,9 +48,7 @@ type FormValues = {
 };
 
 const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
-  const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
-  const [memberData, setMemberData] = useState<any[]>([]);
 
   const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceMember = useMemberService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
@@ -109,53 +108,83 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
     },
   });
 
-  const handleSubmit = async (values: FormValues) => {
-    setIsDisabledSubmit(true);
-    // Yeni görev verisi
-    const newDuty = {
-      ids: values.dutiesIds?.toString() ?? "",
-      authorizedPersonId: currentUser?.id,
-      authorizedPersonName: currentUser?.fullName,
-      createDate: formatDate(new Date().toISOString(), dateFormatStrings.dateTimeFormatWithoutSecond)
-    };
-
-    const newMemberValue = {
-      ...values,
-      fullName: values.fullName.trim(),
-      deleteMessageTitle: (values.isActive ? undefined : (values.deleteMessageTitle ? values.deleteMessageTitle.trim() : undefined )),
-      provinceId: values.provinceId ? parseInt(values.provinceId) : undefined,
-      districtId: values.districtId ? parseInt(values.districtId) : undefined,
-      countryId: values.countryId ? parseInt(values.countryId) : undefined,
-      roleId: values.roleId ? parseInt(values.roleId) : undefined,
-      duties: JSON.stringify([newDuty]),
-      dutyIds: values.dutiesIds ? values.dutiesIds.toString() : '',
-    }
-
-    const result = await service.addUser(newMemberValue);
-
-    if (result === true) {
-
-      toast.success('İşlem başarılı!');
-      
-      // onSaveSuccess event'ini tetikle
-      if (onSaveSuccess) {
-        onSaveSuccess();
+  // --- 1. MEMBRES FETCH (useQuery) ---
+  // Sadece modal açıkken tetiklenmesi için `enabled: opened` kontrolü eklendi.
+  const { data: memberData = [] } = useQuery({
+    queryKey: ['membersForUserAdd'],
+    queryFn: async () => {
+      const params = {
+        countryId: "1",
+        isActive: true,
+        typeIds: "10" // "görevli" üye tipindekiler gelsin "membertypes"
+      };
+      const getMembers = await serviceMember.members(params);
+      if (!getMembers || getMembers.length === 0) {
+        toast.info('Hiçbir veri yok!');
+        return [];
       }
-      
-      close();
-      form.reset();
-      setIsDisabledSubmit(false);
-
-      return;
+      return getMembers.map((i: any) => ({
+        id: i.id.toString(),
+        fullName: i.fullName,
+        phone: i.phone ?? "",
+        identificationNumber: i.identificationNumber,
+        email: i.email,
+        dateOfBirth: i.dateOfBirth?.toString()
+      }));
+    },
+    enabled: opened,
+    onError: (error: any) => {
+      toast.error(`Üyeler yüklenirken hata: ${error.message}`);
     }
-    if (result?.data === false && result?.errors?.length > 0) {
+  } as any);
 
-      toast.warning(result.errors[0]);
+  // --- 2. USER ADD MUTATION (useMutation) ---
+  const addUserMutation = useMutation({
+    mutationFn: async (values: FormValues) => {
+      const newDuty = {
+        ids: values.dutiesIds?.toString() ?? "",
+        authorizedPersonId: currentUser?.id,
+        authorizedPersonName: currentUser?.fullName,
+        createDate: formatDate(new Date().toISOString(), dateFormatStrings.dateTimeFormatWithoutSecond)
+      };
 
-    } else {
+      const newMemberValue = {
+        ...values,
+        fullName: values.fullName.trim(),
+        deleteMessageTitle: values.isActive ? undefined : (values.deleteMessageTitle ? values.deleteMessageTitle.trim() : undefined),
+        provinceId: values.provinceId ? parseInt(values.provinceId) : undefined,
+        districtId: values.districtId ? parseInt(values.districtId) : undefined,
+        countryId: values.countryId ? parseInt(values.countryId) : undefined,
+        roleId: values.roleId ? parseInt(values.roleId) : undefined,
+        duties: JSON.stringify([newDuty]),
+        dutyIds: values.dutiesIds ? values.dutiesIds.toString() : '',
+      };
+
+      return await service.addUser(newMemberValue);
+    },
+    onSuccess: (result) => {
+      if (result == true) {
+        toast.success('İşlem başarılı!');
+        
+        // Eğer bir üst componentte listeyi yenilemek için react-query key'i varsa invalidation yapılabilir:
+        // queryClient.invalidateQueries({ queryKey: ['users'] });
+
+        if (onSaveSuccess) onSaveSuccess();
+        close();
+        form.reset();
+      } else if (result?.data === false && result?.errors?.length > 0) {
+        toast.warning(result.errors[0]);
+      } else {
+        toast.error('Bir hata oluştu!');
+      }
+    },
+    onError: () => {
       toast.error('Bir hata oluştu!');
     }
-    setIsDisabledSubmit(false);
+  });
+
+  const handleSubmit = (values: FormValues) => {
+    addUserMutation.mutate(values);
   };
 
    // Ülke değiştiğinde ili sıfırla
@@ -186,35 +215,11 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
       form.reset();
     }
   }
-
-  const fetchMembers = async () => { 
-    try {
-      const params = {
-        countryId: "1",
-        isActive: true,
-        typeIds: "10" // "görevli" üye tipindekiler gelsin "membertypes"
-      }
-  
-      const getMembers = await serviceMember.members(params);
-      
-      if (getMembers) {
-        setMemberData(getMembers.map((i: any) => ({
-          id: i.id.toString(), fullName: i.fullName, phone: i.phone ?? "", identificationNumber: i.identificationNumber,
-          email: i.email, dateOfBirth: i.dateOfBirth?.toString() })));
-      } else {
-        toast.info('Hiçbir veri yok!');
-        setMemberData([]);
-      }
-    } catch (error: any) {
-      toast.error(`üyeler yüklenirken hata: ${error.message}`);
-    }
-  };
-
   const openDialog = () => {
 
-    setTimeout(() => {
-      fetchMembers();
-    }, 500);
+    // setTimeout(() => {
+    //   fetchMembers();
+    // }, 500);
     form.reset();
   
     open();
@@ -223,7 +228,9 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
   const handleChangeMember = (value: string | null) => {
 
     if (value) {
-      const getMember = memberData?.find(i => i.id.toString() == value);
+      const getMember = Array.isArray(memberData)
+        ? memberData.find(i => i.id.toString() == value)
+        : undefined;
       if(getMember) {
         form.setFieldValue("fullName", getMember.fullName ?? "");
         form.setFieldValue("phone", getMember.phone ?? "");
@@ -263,7 +270,12 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
               <Select
                 label="Üye İsmi"
                 placeholder="üye seçiniz"
-                data={memberData.map(item => ({ value: item.id?.toString(), label: item.fullName }))}
+                data={(Array.isArray(memberData) ? memberData : [])
+                  .filter((item: any) => item && item.id && item.fullName)
+                  .map((item: any) => ({
+                    value: item.id.toString(),
+                    label: item.fullName,
+                  }))}
                 searchable clearable maxDropdownHeight={200} required
                 nothingFoundMessage="üye bulunamadı..."
                 onChange={handleChangeMember}
@@ -393,7 +405,8 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
               İptal
             </Button>
-            <Button type="submit" variant="filled" size="xs" disabled={isDisabledSubmit}  leftSection={<IconCheck size={14} />} radius="xs">
+            {/* isDisabledSubmit yerine addUserMutation.isPending kullanıldı */}
+            <Button type="submit" variant="filled" size="xs" disabled={addUserMutation.isPending} leftSection={<IconCheck size={14} />} radius="xs">
               Kaydet
             </Button>
           </Grid.Col>

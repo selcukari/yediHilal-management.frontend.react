@@ -9,7 +9,7 @@ interface ResponsibleUserSelectProps {
   required?: boolean;
 }
 
-export function ResponsibleUserSelect({ form, countryId, isDisabled = false, required = false }: ResponsibleUserSelectProps) {
+export function ResponsibleUserSelect({ form, countryId = '1', isDisabled = false, required = false }: ResponsibleUserSelectProps) {
   
   const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 

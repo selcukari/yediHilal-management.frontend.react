@@ -7,6 +7,7 @@ import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useMeetingTypeService } from '../../services/meetingTypeService';
 import { toast } from '../../utils/toastMessages';
+import { useMutation } from '@tanstack/react-query';
 
 export type MeetingTypeAddDialogControllerRef = {
   open: () => void;
@@ -22,7 +23,6 @@ type FormValues = {
 };
 
 const MeetingTypeAdd = forwardRef<MeetingTypeAddDialogControllerRef, MeetingTypeAddProps>(({onSaveSuccess}, ref) => {
-  const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
 
   const service = useMeetingTypeService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
@@ -38,38 +38,37 @@ const MeetingTypeAdd = forwardRef<MeetingTypeAddDialogControllerRef, MeetingType
     },
   });
 
-  const handleSubmit = async (values: FormValues) => {
-    setIsDisabledSubmit(true);
+  const addMeetingTypeMutation = useMutation({
+    mutationFn: async (meetingTypeData: FormValues) => {
+      return await service.addMeetingType({
+        ...meetingTypeData,
+        name: meetingTypeData.name.trim()
+      });
+    },
+    onSuccess: (result: any) => {
+      if (result === true) {
+        toast.success('İşlem başarılı!');
 
-    const result = await service.addMeetingType({
-      ...values,
-      name: values.name.trim()
-    });
-
-    if (result === true) {
-
-      toast.success('İşlem başarılı!');
-      
-      // onSaveSuccess event'ini tetikle
-      if (onSaveSuccess) {
-        onSaveSuccess();
+        if (onSaveSuccess) onSaveSuccess();
+        close();
+        form.reset();
       }
-      
-      close();
-      form.reset();
-      setIsDisabledSubmit(false);
-
-      return;
-    }
-    else if (result?.data === false && result?.errors?.length > 0) {
+      else if (result?.data === false && result?.errors?.length > 0) {
 
       toast.warning(result.errors[0]);
 
     } else {
       toast.error('Bir hata oluştu!');
     }
-    setIsDisabledSubmit(false);
-  };
+    },
+    onError: () => {
+      toast.error('Bir hata oluştu!');
+    }
+  });
+
+  const handleSubmit = (values: FormValues) => {
+  addMeetingTypeMutation.mutate(values);
+};
 
   const confirmDialogHandleConfirm = () => {
     confirmModalRef.current?.close();
@@ -126,7 +125,8 @@ const MeetingTypeAdd = forwardRef<MeetingTypeAddDialogControllerRef, MeetingType
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
               İptal
             </Button>
-            <Button type="submit" variant="filled" size="xs" disabled={isDisabledSubmit}  leftSection={<IconCheck size={14} />} radius="xs">
+            <Button type="submit" variant="filled" size="xs"
+            disabled={addMeetingTypeMutation.isPending}  leftSection={<IconCheck size={14} />} radius="xs">
               Kaydet
             </Button>
           </Grid.Col>
