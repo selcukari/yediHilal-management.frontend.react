@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Container, Grid, TextInput, Text, Stack, Title, RingProgress,Badge,
   Paper, Button, Tooltip, LoadingOverlay, Flex, Table, Group, ActionIcon,
@@ -39,7 +40,6 @@ interface Column {
 }
 
 export default function Project() {
-  const [projectData, setProjectData] = useState<ProjectData[]>([]);
   const [visible, { open, close }] = useDisclosure(false);
   const [searchText, setSearchText] = useState('');
 
@@ -48,6 +48,8 @@ export default function Project() {
 
   const service = useProjectService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const { currentUser } = useAuth();
+
+  const queryClient = useQueryClient();
 
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
     { field: 'id', header: 'Id' },
@@ -61,35 +63,30 @@ export default function Project() {
     { field: 'finisDate', header: 'Bitiş T.' }
   ]);
 
-  useEffect(() => {
-    setTimeout(() => {
-        fetchProject();
-      }, 1000);
-  }, []);
-
   const isUserAdmin = useMemo(() => {
     return currentUser?.userType === 'userLogin';
   }, [currentUser]);
 
-  const fetchProject = async () => {
-    open();
-    try {
-      const responsibleId = !isUserAdmin ? currentUser.id as number : undefined;
-      const getProjects = await service.getProjects(responsibleId);
-      
-      if (getProjects) {
-        setProjectData(getProjects)
-      
-      } else {
-        toast.info('Hiçbir veri yok!');
-        setProjectData([]);
-      }
-    } catch (error: any) {
-      toast.error(`Stok yüklenirken hata: ${error.message}`);
-    } finally {
-      close();
+  const { data: projectData = [], isFetching } = useQuery<ProjectData[]>({
+  queryKey: ['projects', currentUser?.id, isUserAdmin],
+  queryFn: async () => {
+    // Admin değilse kullanıcının kendi ID'sini gönder
+    const responsibleId = !isUserAdmin ? (currentUser?.id as number) : undefined;
+    
+    const getProjects = await service.getProjects(responsibleId);
+    
+    if (!getProjects || getProjects.length === 0) {
+      toast.info('Hiçbir veri yok!');
+      return [];
     }
-  };
+    
+    return getProjects;
+  },
+  // currentUser yüklenmeden veya tanımsızken isteğin atılmasını engellemek için (opsiyonel)
+  enabled: !!currentUser, 
+});
+
+
 
   const handleEdit = (value: ProjectData) => {
     projectEditRef.current?.openDialog({
@@ -108,7 +105,7 @@ export default function Project() {
 
       toast.success('İşlem başarılı!');
       
-      fetchProject();
+      
       
       close();
 
@@ -130,7 +127,7 @@ export default function Project() {
 
   const handleSaveSuccess = () => {
     setTimeout(() => {
-      fetchProject();
+      queryClient.invalidateQueries({ queryKey: ['projects', currentUser?.id, isUserAdmin] });
     }, 1500);
   };
 
@@ -151,9 +148,9 @@ export default function Project() {
 
   // Filtrelenmiş proje verileri
   const filteredProjects = useMemo(() => {
-    if (!searchText) return projectData;
+    if (!searchText) return projectData as ProjectData[];
     
-    return projectData.filter(project => 
+    return (projectData as ProjectData[]).filter(project => 
       project.name.toLowerCase().includes(searchText.toLowerCase()) ||
       project.responsibleFullName?.toLowerCase().includes(searchText.toLowerCase()) ||
       project.note?.toLowerCase().includes(searchText.toLowerCase())
@@ -208,8 +205,8 @@ export default function Project() {
   });
 
   const calculateTotal = () => {
-    if (projectData.length < 0) return 0;
-    return projectData.reduce((total, item) => total + item.numberOfParticipant, 0);
+    if ((projectData as ProjectData[]).length < 0) return 0;
+    return (projectData as ProjectData[]).reduce((total, item) => total + item.numberOfParticipant, 0);
   };
   // useMemo hook'u ile sütunları önbelleğe alıyoruz
   const pdfTableColumns = useMemo((): PdfTableColumn[] => {
@@ -250,7 +247,7 @@ export default function Project() {
   return (
     <Container size="xl">
       <LoadingOverlay
-        visible={visible}
+        visible={isFetching && visible}
         zIndex={1000}
         overlayProps={{ radius: 'sm', blur: 2 }}
         loaderProps={{ color: 'pink', type: 'bars' }}
