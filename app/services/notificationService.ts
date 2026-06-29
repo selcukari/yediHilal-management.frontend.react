@@ -1,5 +1,5 @@
 import { createApi } from './api';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 interface NotificationParams {
   message: string; // user aldıgında, getirdiginde, getirmediginde, neler aldıgını mesaj olarak al
@@ -9,7 +9,7 @@ interface NotificationParams {
 }
 
 export function useSmsService(controller: string) {
-  const { getCurrentToken, logout } = useAuth();
+  const { getCurrentToken, logout } = useAuthStore();
   const api = createApi(getCurrentToken() ?? undefined, logout);
 
   const getNotifications = async (userId: number) => {

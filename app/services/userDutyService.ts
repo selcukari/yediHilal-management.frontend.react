@@ -1,12 +1,12 @@
 import { createApi } from './api';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 interface DutyDataParams {
   name: string;
 }
 
 export function useUserDutyService(controller: string) {
-  const { getCurrentToken, logout } = useAuth();
+  const { getCurrentToken, logout } = useAuthStore();
   const api = createApi(getCurrentToken() ?? undefined, logout);
 
   const getUserDuties = async () => {

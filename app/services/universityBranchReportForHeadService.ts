@@ -1,8 +1,8 @@
 import { createApi } from './api';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 export function useUniversityBranchReportForHeadService(controller: string) {
-  const { getCurrentToken, logout } = useAuth();
+  const { getCurrentToken, logout } = useAuthStore();
   const api = createApi(getCurrentToken() ?? undefined, logout);
 
   const getUniversityBranchReportForHeads = async () => {

@@ -1,6 +1,6 @@
 import { omit } from 'ramda';
 import { createApi } from './api';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 interface PhoneNumbersWithCountryCode {
   telephone: string;
@@ -16,7 +16,7 @@ interface SmsParams {
 }
 
 export function useSmsService(controller: string) {
-  const { getCurrentToken, logout } = useAuth();
+  const { getCurrentToken, logout } = useAuthStore();
   const api = createApi(getCurrentToken() ?? undefined, logout);
 
   const getSms = async (personType: number) => {
