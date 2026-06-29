@@ -17,7 +17,7 @@ import { areNumberSequencesEqual } from '../../utils/areNumberSequencesEqual';
 import { UserDutySelect } from '../addOrEdit/userDutySelect';
 import { formatDate } from '../../utils/formatDate';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 import { MenuActionButton } from '../../components'
 import { type ColumnDefinition, type ValueData } from '../../utils/repor/exportToExcel';
 import { type PdfTableColumn } from '../../utils/repor/exportToPdf';
@@ -75,7 +75,7 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
   const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
 
   const form = useForm<FormValues>({
     initialValues: {

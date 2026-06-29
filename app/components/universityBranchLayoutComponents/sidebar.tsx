@@ -3,12 +3,12 @@ import {
   NavLink, Flex, Text, Stack, Divider, Group, ScrollArea, AppShell,
 } from '@mantine/core';
 import {
-  IconUsers, IconFileCheck, IconCoin, IconClipboardList,
+  IconUsers, IconFileCheck, IconClipboardList,
   IconChevronRight, IconChevronDown, IconUser,
-  IconSchool, IconCalendarTime, IconPhoneCall,
+  IconSchool, IconCalendarTime,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 interface SidebarProps {
   active: string;
@@ -148,7 +148,7 @@ const RecursiveNavLink = ({
 };
 
 export function Sidebar({ active, setActive }: SidebarProps) {
-  const { isLoggedIn, currentUser } = useAuth();
+  const { isLoggedIn, currentUser } = useAuthStore();
   const [openedItems, setOpenedItems] = useState<string[]>([]);
   
   const navigate = useNavigate();

@@ -15,7 +15,7 @@ import { MemberChatBotAi } from '../components/members/memberChatBot';
 import { useMemberService } from '../services/memberService';
 import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 import { dateFormatStrings } from '../utils/dateFormatStrings';
 import { type PdfTableColumn } from '../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../utils/repor/calculateColumnWidth';
@@ -38,7 +38,7 @@ interface Column {
 }
 
 export default function Member() {
-  const { isLoggedIn, currentUser } = useAuth();
+  const { isLoggedIn, currentUser } = useAuthStore();
 
   const [resultData, setResultData] = useState<any[]>([]);
   const [isDisabledDeleteAction, setDisabledDeleteAction]= useState(false);

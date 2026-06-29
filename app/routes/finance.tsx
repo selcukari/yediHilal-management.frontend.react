@@ -9,7 +9,7 @@ import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
 import {  PaymentType, PaymentTypeStatus } from '../components'
 import { dateFormatStrings } from '../utils/dateFormatStrings';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 interface Column {
   field: string;
@@ -46,7 +46,7 @@ export default function Mail() {
     { field: 'createDate', header: 'Kayıt Tarihi' },
   ]);
 
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn } = useAuthStore();
 
   const service = useTransactionFinanceService(import.meta.env.VITE_APP_API_FINANCE_CONTROLLER);
 

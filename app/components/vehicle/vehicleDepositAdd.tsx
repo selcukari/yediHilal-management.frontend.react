@@ -8,7 +8,7 @@ import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useVehicleService } from '../../services/vehicleService';
 import { useUserService } from '../../services/userService';
 import { toast } from '../../utils/toastMessages';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 import type { VehicleData } from '../../routes/vehicle/vehicle';
 
 interface VehicleDepositAddProps {
@@ -46,7 +46,7 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
 
   const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceVehicle = useVehicleService(import.meta.env.VITE_APP_API_VEHICLE_CONTROLLER);
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 

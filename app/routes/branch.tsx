@@ -10,7 +10,7 @@ import BranchEdit, { type BranchEditDialogControllerRef } from '../components/br
 import { useBranchService } from '../services/branchService';
 import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 import { dateFormatStrings } from '../utils/dateFormatStrings';
 import { MenuActionButton } from '../components'
 import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToExcel';
@@ -49,7 +49,7 @@ export default function Branch() {
   const [resultData, setResultData] = useState<BranchType[]>([]);
   const [searchText, setSearchText] = useState('');
   const [visible, { open, close }] = useDisclosure(false);
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
   
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
     { field: 'id', header: 'Id' },

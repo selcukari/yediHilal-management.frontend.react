@@ -9,7 +9,7 @@ import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useVehicleService } from '../../services/vehicleService';
 import { toast } from '../../utils/toastMessages';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 import { DayRenderer } from '../../components';
 import stripSpecialCharacters from '../../utils/stripSpecialCharacters';
 import { mockDataFuelTypes, mockDataTransmissionTypes, mockDataFuelLevel } from '../../utils/vehicleMockData';
@@ -58,7 +58,7 @@ const VehicleEdit = forwardRef<VehicleEditDialogControllerRef, VehicleEditProps>
   const [vehicleData, setVehicleData] = useState<GetVehicleData[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
   const service = useVehicleService(import.meta.env.VITE_APP_API_VEHICLE_CONTROLLER);
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 

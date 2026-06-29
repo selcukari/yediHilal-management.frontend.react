@@ -17,7 +17,7 @@ import { ModuleSelect } from '../addOrEdit/moduleSelect';
 import { formatDate } from '../../utils/formatDate';
 import { useMemberService } from '../../services/memberService';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 export type UserAddDialogControllerRef = {
   openDialog: () => void;
@@ -53,7 +53,7 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
   const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceMember = useMemberService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
 
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
