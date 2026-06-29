@@ -14,7 +14,7 @@ import { toast } from '../../utils/toastMessages';
 import { RichTextEditorTiptap } from '../richTextEditorTiptap';
 import { FileUpload } from '../fileInput';
 import { DayRenderer } from '../../components';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 export type MeetingAddDialogControllerRef = {
   openDialog: (value?: FormValues) => void;
@@ -45,7 +45,7 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
   const [opened, { open, close }] = useDisclosure(false);
 
   const service = useMeetingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
 
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 

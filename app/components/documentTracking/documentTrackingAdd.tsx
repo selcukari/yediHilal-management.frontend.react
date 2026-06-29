@@ -8,7 +8,7 @@ import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useDocumentTrackingService } from '../../services/documentTrackingService';
 import { toast } from '../../utils/toastMessages';
 import { FileUpload } from '../fileInput';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 export type DocumentTrackingAddDialogControllerRef = {
   open: () => void;
@@ -32,7 +32,7 @@ const DocumentTrackingAdd = forwardRef<DocumentTrackingAddDialogControllerRef, D
   const service = useDocumentTrackingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
   const confirmModalRef = useRef<ConfirmModalRef>(null);
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
 
   const form = useForm<FormValues>({
     initialValues: {

@@ -1,11 +1,12 @@
 import { useRef } from 'react';
 import { Group, Image, Title, Button, Avatar, Menu, Box, Burger, AppShell, Switch, useMantineColorScheme } from '@mantine/core';
 import { IconBell, IconLogout, IconUser, IconMoon, IconSun } from '@tabler/icons-react';
-import { useAuth } from '../../authContext';
+import { useAuthStore } from '../../authContext';
 import { useNavigate } from "react-router";
 import { toast } from '../../utils/toastMessages';
 import UserEdit, { type UserEditDialogControllerRef } from '../../components/users/userEdit';
 import { useUserService } from '~/services/userService';
+import { useAuthActions } from '../../useAuthActions';
 
 interface NavbarProps {
   opened: boolean;
@@ -21,9 +22,10 @@ interface DutiesType {
 }
 
 export function Navbar({ opened, toggle }: NavbarProps) {
-  const { isLoggedIn, logout, currentUser } = useAuth();
+  const { isLoggedIn, logout, currentUser } = useAuthStore();
   const navigate = useNavigate();
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const { handleLogout } = useAuthActions();
   
   const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const userEditRef = useRef<UserEditDialogControllerRef>(null);
@@ -122,7 +124,7 @@ export function Navbar({ opened, toggle }: NavbarProps) {
                 <Menu.Divider />
                 <Menu.Item
                   color="red"
-                  onClick={logout}
+                  onClick={() => handleLogout()}
                   leftSection={<IconLogout size={14} />}
                 >
                   Çıkış Yap

@@ -15,7 +15,7 @@ import { RichTextEditorTiptap } from '../richTextEditorTiptap';
 import { useMeetingService } from '../../services/meetingService';
 import { FileUpload } from '../fileInput';
 import { DayRenderer } from '../../components';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 export type MeetingEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -47,7 +47,7 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
   const [activeStepper, setActiveStepper] = useState(0);
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const service = useMeetingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 

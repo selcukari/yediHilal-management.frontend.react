@@ -7,7 +7,7 @@ import {
   IconChevronRight, IconPhoneCall, IconCalendarTime, IconChevronDown, IconBuildings,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 interface SidebarProps {
   active: string;
@@ -147,7 +147,7 @@ const RecursiveNavLink = ({
 };
 
 export function Sidebar({ active, setActive }: SidebarProps) {
-  const { isLoggedIn, currentUser } = useAuth();
+  const { isLoggedIn, currentUser } = useAuthStore();
   const [openedItems, setOpenedItems] = useState<string[]>([]);
   
   const navigate = useNavigate();

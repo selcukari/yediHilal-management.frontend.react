@@ -1,17 +1,18 @@
 import { Group, Image, Title, Button, Avatar, Menu, Box, Burger, AppShell, Switch, useMantineColorScheme } from '@mantine/core';
 import { IconBell, IconLogout, IconMoon, IconSun } from '@tabler/icons-react';
-import { useAuth } from '../../authContext';
+import { useAuthStore } from '../../authContext';
 import { useNavigate } from "react-router";
-
+import { useAuthActions } from '../../useAuthActions';
 interface NavbarProps {
   opened: boolean;
   toggle: () => void;
 }
 
 export function Navbar({ opened, toggle }: NavbarProps) {
-  const { isLoggedIn, logout, currentUser } = useAuth();
+  const { isLoggedIn } = useAuthStore();
   const navigate = useNavigate();
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const { handleLogout } = useAuthActions();
 
   return (
     <AppShell.Header>
@@ -66,7 +67,7 @@ export function Navbar({ opened, toggle }: NavbarProps) {
                 <Menu.Divider />
                 <Menu.Item
                   color="red"
-                  onClick={logout}
+                  onClick={() => handleLogout()}
                   leftSection={<IconLogout size={14} />}
                 >
                   Çıkış Yap

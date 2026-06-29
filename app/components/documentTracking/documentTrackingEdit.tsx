@@ -9,7 +9,7 @@ import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useDocumentTrackingService } from '../../services/documentTrackingService';
 import { toast } from '../../utils/toastMessages';
 import { FileUpload } from '../fileInput';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 export type DocumentTrackingEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -33,7 +33,7 @@ const BranchEdit = forwardRef<DocumentTrackingEditDialogControllerRef, DocumentT
   
   const service = useDocumentTrackingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const confirmModalRef = useRef<ConfirmModalRef>(null);
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
 
   const form = useForm<FormValues>({
     initialValues: {
