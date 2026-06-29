@@ -12,7 +12,7 @@ import { ReferansMemberSelect } from '../addOrEdit/referansMemberSelect';
 import { useMemberService } from '../../services/memberService';
 import { toast } from '../../utils/toastMessages';
 import { MemberTypeSelect } from '../addOrEdit/memberTypeSelect';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 import { DayRenderer } from '../../components';
 
 export type MemberAddDialogControllerRef = {
@@ -51,7 +51,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
   const [isDisabledPhone, setIsDisabledPhone] = useState(false);
   const [dutyMemberTypeId, setDutyMemberTypeId] = useState<string>('10');
   
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
 
   const service = useMemberService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
   

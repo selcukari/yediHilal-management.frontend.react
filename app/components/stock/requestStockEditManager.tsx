@@ -9,7 +9,7 @@ import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { toast } from '../../utils/toastMessages';
 import { useWarehouseService } from '../../services/warehouseService';
 import { statuMockData } from '~/utils/priorityMockData';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 export type RequestStockEditManagerDialogControllerRef = {
   openDialog: (value: FormValues[]) => void;
@@ -39,7 +39,7 @@ const RequestStockEditManager = forwardRef<RequestStockEditManagerDialogControll
   const service = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
 
   const form = useForm<{items: FormValues[]}>({
     initialValues: {

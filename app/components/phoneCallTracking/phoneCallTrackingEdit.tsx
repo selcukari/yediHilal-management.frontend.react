@@ -12,7 +12,7 @@ import { useUserService } from '../../services/userService';
 import { toast } from '../../utils/toastMessages';
 import { formatDate } from '../../utils/formatDate';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 export type PhoneCallTrackingEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -42,7 +42,7 @@ const PhoneCallTrackingEdit = forwardRef<PhoneCallTrackingEditDialogControllerRe
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
 
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
   
   const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const service = usePhoneCallTrackingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);

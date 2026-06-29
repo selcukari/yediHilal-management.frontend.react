@@ -14,7 +14,7 @@ import { toast } from '../../utils/toastMessages';
 import { RichTextEditorTiptap } from '../richTextEditorTiptap';
 import { FileUpload } from '../fileInput';
 import { DayRenderer } from '../../components';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 import { useMutation } from '@tanstack/react-query';
 
 export type ProjectAddDialogControllerRef = {
@@ -44,7 +44,7 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
   const service = useProjectService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const confirmModalRef = useRef<ConfirmModalRef>(null);
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
 
   const form = useForm<FormValues>({
     initialValues: {

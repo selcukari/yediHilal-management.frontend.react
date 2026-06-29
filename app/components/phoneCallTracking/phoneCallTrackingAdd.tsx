@@ -8,7 +8,7 @@ import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { usePhoneCallTrackingService } from '../../services/phoneCallTrackingService';
 import { useUserService } from '../../services/userService';
 import { toast } from '../../utils/toastMessages';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 export type PhoneCallTrackingAddDialogControllerRef = {
   open: () => void;
@@ -33,7 +33,7 @@ const PhoneCallTrackingAdd = forwardRef<PhoneCallTrackingAddDialogControllerRef,
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [userData, setUserData] = useState<GetUserData[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
   
   const service = usePhoneCallTrackingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);

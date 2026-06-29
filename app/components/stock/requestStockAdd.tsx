@@ -7,7 +7,7 @@ import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useStockService } from '../../services/stockService';
 import { toast } from '../../utils/toastMessages';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 interface StockData {
   id: number;
@@ -69,7 +69,7 @@ const RequestStockAdd = forwardRef<RequestStockAddDialogControllerRef, RequestSt
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
 
   const serviceStock = useStockService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 

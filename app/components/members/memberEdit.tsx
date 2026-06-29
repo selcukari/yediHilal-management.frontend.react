@@ -13,7 +13,7 @@ import { ProvinceSelect } from '../addOrEdit/provinceSelect';
 import { useMemberService } from '../../services/memberService';
 import { toast } from '../../utils/toastMessages';
 import { MemberTypeSelect } from '../addOrEdit/memberTypeSelect';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 import { DayRenderer } from '../../components';
 
 export type MemberEditDialogControllerRef = {
@@ -53,7 +53,7 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
   const [isDisabledReference, setIsDisabledReference] = useState(false);
   const [isDisabledCountryCode, setIsDisabledCountryCode] = useState(false);
   const [isDisabledPhone, setIsDisabledPhone] = useState(false);
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
 
   const service = useMemberService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
   

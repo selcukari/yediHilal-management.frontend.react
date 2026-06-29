@@ -15,7 +15,7 @@ import { FileUpload } from '../fileInput';
 import SancaktarAdd, { type SancaktarAddDialogControllerRef } from './sancaktarAdd';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import { formatDate } from '../../utils/formatDate';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 export type UniversityBranchEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -67,7 +67,7 @@ const BranchEdit = forwardRef<UniversityBranchEditDialogControllerRef, Universit
   const [branchHeadUserData, setBranchHeadUserData] = useState<GetUserData[]>([]);
   const [sancaktarUserData, setSancaktarUserData] = useState<SancaktarDataGorevatama[]>([]);
   const [universityBranchHeadDutyId, setUniversityBranchHeadDutyIdDutyId] = useState<string>("20");
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
   
   const service = useUniversityBranchService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);

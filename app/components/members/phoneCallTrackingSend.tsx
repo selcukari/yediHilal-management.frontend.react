@@ -9,7 +9,7 @@ import { usePhoneCallTrackingService } from '../../services/phoneCallTrackingSer
 import { toast } from '../../utils/toastMessages';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import { formatDate } from '../../utils/formatDate';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 export type PhoneCallTrackingSendDialogControllerRef = {
   open: () => void;
@@ -40,7 +40,7 @@ const PhoneCallTrackingSend = forwardRef<PhoneCallTrackingSendDialogControllerRe
   const [phoneCallId, setPhoneCallId] = useState<string>("");
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
 
   const [rowHeaders, setRowHeaders] = useState([
     { field: 'id', header: 'Id' },
