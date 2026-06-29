@@ -15,7 +15,7 @@ import { MenuActionButton } from '../components'
 import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToExcel';
 import { type PdfTableColumn } from '../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../utils/repor/calculateColumnWidth';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 interface Column {
   field: keyof UniversityBranchType;
@@ -43,7 +43,7 @@ export default function Duty() {
   const [resultData, setResultData] = useState<UniversityBranchType[]>([]);
   const [searchText, setSearchText] = useState('');
   const [visible, { open, close }] = useDisclosure(false);
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
   
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
     { field: 'id', header: 'Id' },

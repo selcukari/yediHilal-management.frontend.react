@@ -7,7 +7,7 @@ import {
   LoadingOverlay } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
-import { useAuth } from '../../authContext';
+import { useAuthStore } from '../../authContext';
 import { toast } from '~/utils/toastMessages';
 import { useReadyMessageService } from '~/services/readyMessageService';
 import { useAutomaticMailFieldService } from '~/services/automaticMailFieldService';
@@ -30,7 +30,7 @@ type FormValues = {
 export default function AutomaticMailManagement() {
   const [readyMessage, setReadyMessage] = useState<{ value: string; label: string, body: string }[]>([]);
   const [selectedReadyMessageId, setSelectedReadyMessageId] = useState<string>("");
-  const { loading: authLoading, isLoggedIn } = useAuth();
+  const { loading: authLoading, isLoggedIn } = useAuthStore();
   const [visible, { open, close }] = useDisclosure(false);
 
   const service = useAutomaticMailFieldService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);

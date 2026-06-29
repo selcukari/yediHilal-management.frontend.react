@@ -9,7 +9,7 @@ import { toast } from '../../utils/toastMessages';
 import { formatDate } from '../../utils/formatDate';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import { stripHtml } from '../../utils/stripHtml';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 interface Column { 
   field: string;
@@ -31,7 +31,7 @@ export default function Mail() {
     { field: 'createdDate', header: 'Gönderim Tarihi' },
   ]);
 
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn } = useAuthStore();
 
   const service = useMailService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 

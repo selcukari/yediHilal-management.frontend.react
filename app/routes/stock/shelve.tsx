@@ -15,7 +15,7 @@ import ShelveEdit, { type ShelveEditDialogControllerRef } from '../../components
 import { type ColumnDefinition, type ValueData } from '../../utils/repor/exportToExcel';
 import { type PdfTableColumn } from '../../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../../utils/repor/calculateColumnWidth';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 interface ShelveData {
   id: number;
@@ -44,7 +44,7 @@ export default function Stock() {
 
   const shelveAddRef = useRef<ShelveAddDialogControllerRef>(null);
   const shelveEditRef = useRef<ShelveEditDialogControllerRef>(null);
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
 
   const service = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
 

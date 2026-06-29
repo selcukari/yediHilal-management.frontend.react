@@ -12,7 +12,7 @@ import { useMemberService } from '../services/memberService';
 import { toast } from '../utils/toastMessages';
 import { MemberTypeSelect } from '../components/addOrEdit/memberTypeSelect';
 import { isEquals } from '~/utils/isEquals';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 type FormValues = {
   id: number;
@@ -42,7 +42,7 @@ const MemberEditPage = () => {
   const [isDisabledReference, setIsDisabledReference] = useState(false);
   const [isDisabledCountryCode, setIsDisabledCountryCode] = useState(false);
   const [isDisabledPhone, setIsDisabledPhone] = useState(false);
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
 
   const confirmModalRef = useRef<ConfirmModalRef>(null);
   

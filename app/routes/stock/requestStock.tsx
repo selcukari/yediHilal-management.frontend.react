@@ -15,7 +15,7 @@ import RequestStockEdit, { type RequestStockEditDialogControllerRef } from '../.
 import { type ColumnDefinition, type ValueData } from '../../utils/repor/exportToExcel';
 import { type PdfTableColumn } from '../../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../../utils/repor/calculateColumnWidth';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 import { statuMockData } from '~/utils/priorityMockData';
 
 interface RequestStockData {
@@ -48,7 +48,7 @@ export default function RequestStock() {
 
   const requestStockAddRef = useRef<RequestStockAddDialogControllerRef>(null);
   const requestStockEditRef = useRef<RequestStockEditDialogControllerRef>(null);
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
 
   const service = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
 

@@ -10,7 +10,7 @@ import { usePhoneCallTrackingService } from '../services/phoneCallTrackingServic
 import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
 import { dateFormatStrings } from '../utils/dateFormatStrings';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 interface Column {
   field: keyof PhoneCallTrackingType;
   header: string;
@@ -33,7 +33,7 @@ export default function DocumentTracking() {
   const [resultData, setResultData] = useState<PhoneCallTrackingType[]>([]);
   const [searchText, setSearchText] = useState('');
   const [visible, { open, close }] = useDisclosure(false);
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
   
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
     { field: 'id', header: 'Id' },

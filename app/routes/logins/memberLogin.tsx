@@ -4,18 +4,18 @@ import {
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate } from 'react-router';
-import { useAuth } from '../../authContext';
+import { useAuthStore } from '../../authContext';
 import { toast } from '~/utils/toastMessages';
 
 export default function MemberLogin() {
-  const { memberLogin, loading: authLoading, isLoggedIn } = useAuth();
+  const { memberLogin, loading: authLoading, isLoggedIn } = useAuthStore();
   const navigate = useNavigate();
   const [visible, { open, close }] = useDisclosure(false);
 
   const form = useForm({
     initialValues: {
-      email: 'testdeneme@gmail.com',
-      password: '123456',
+      email: '',
+      password: '',
     },
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Geçerli bir e-posta girin'),

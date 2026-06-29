@@ -1,5 +1,5 @@
 import { createApi } from './api';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 interface AutomaticSmsFieldsDataParams {
   id: number;
@@ -9,7 +9,7 @@ interface AutomaticSmsFieldsDataParams {
 }
 
 export function useAutomaticMailFieldService(controller: string) {
-  const { getCurrentToken, logout } = useAuth();
+  const { getCurrentToken, logout } = useAuthStore();
   const api = createApi(getCurrentToken() ?? undefined, logout);
 
   const getAutomaticMailFields = async () => {
