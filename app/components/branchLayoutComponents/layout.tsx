@@ -17,7 +17,6 @@ export function BranchLayout({ children }: LayoutProps = {}) {
   
   // Zustand'dan durumu ve başlatıcı fonksiyonu alıyoruz
   const initializeAuth = useAuthStore((state) => state.initializeAuth);
-  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
   // Sayfa/Layout ilk yüklendiğinde localstorage'daki token'ı doğrulamak için
   useEffect(() => {
