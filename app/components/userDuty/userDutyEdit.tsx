@@ -8,6 +8,7 @@ import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useUserDutyService } from '../../services/userDutyService';
 import { toast } from '../../utils/toastMessages';
+import { useMutation } from '@tanstack/react-query';
 
 export type UserDutyEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -56,37 +57,36 @@ const UserDutyEdit = forwardRef<UserDutyEditDialogControllerRef, BranchDutyEditP
     }
   }
 
-  const handleSubmit = async (values: FormValues) => {
-    setIsDisabledSubmit(true);
-    
-    const result = await service.updateUserDuty({
-      ...values,
-      name: values.name.trim()
-    });
+  const updateUserDutyMutation = useMutation({
+    mutationFn: async (userDutyData: FormValues) => {
+      return await service.updateUserDuty({
+        ...userDutyData,
+        name: userDutyData.name.trim()
+      });
+    },
+    onSuccess: (result: any) => {
+      if (result === true) {
+        toast.success('İşlem başarılı!');
 
-    if (result == true) {
-
-      toast.success('İşlem başarılı!');
-      
-      // onSaveSuccess event'ini tetikle
-      if (onSaveSuccess) {
-        onSaveSuccess();
+        if (onSaveSuccess) onSaveSuccess();
+        close();
+        form.reset();
       }
-      form.reset();
-      
-      close();
-      setIsDisabledSubmit(false);
-
-      return;
-    }
-    else if (result?.data == false && result?.errors?.length > 0) {
+      else if (result?.data === false && result?.errors?.length > 0) {
 
       toast.warning(result.errors[0]);
 
     } else {
       toast.error('Bir hata oluştu!');
     }
-    setIsDisabledSubmit(false);
+    },
+    onError: () => {
+      toast.error('Bir hata oluştu!');
+    }
+  });
+
+  const handleSubmit = async (values: FormValues) => {
+    updateUserDutyMutation.mutate(values);
   };
 
   const confirmDialogHandleConfirm = () => {
@@ -154,7 +154,7 @@ const UserDutyEdit = forwardRef<UserDutyEditDialogControllerRef, BranchDutyEditP
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
               İptal
             </Button>
-            <Button type="submit" variant="filled" disabled={isDisabledSubmit} size="xs"  leftSection={<IconCheck size={14} />} radius="xs">
+            <Button type="submit" variant="filled" disabled={isDisabledSubmit || updateUserDutyMutation.isPending} size="xs"  leftSection={<IconCheck size={14} />} radius="xs">
               Kaydet
             </Button>
           </Grid.Col>

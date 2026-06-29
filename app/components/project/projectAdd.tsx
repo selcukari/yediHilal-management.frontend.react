@@ -234,7 +234,7 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
               İptal
             </Button>
             <Button type="submit" variant="filled" size="xs"
-            disabled={addProjectMutation.isPending}  leftSection={<IconCheck size={14} />} radius="xs">
+              disabled={addProjectMutation.isPending}  leftSection={<IconCheck size={14} />} radius="xs">
               Kaydet
             </Button>
           </Grid.Col>

@@ -1,12 +1,13 @@
 import { forwardRef, useImperativeHandle, useEffect, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, TextInput, Flex, Button, Stack, Grid } from '@mantine/core';
+import { Modal, TextInput, Button, Stack, Grid } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useUserDutyService } from '../../services/userDutyService';
 import { toast } from '../../utils/toastMessages';
+import { useMutation } from '@tanstack/react-query';
 
 export type UserDutyAddDialogControllerRef = {
   open: () => void;
@@ -37,37 +38,36 @@ const UserDutyAdd = forwardRef<UserDutyAddDialogControllerRef, UserAddProps>(({o
     },
   });
 
-  const handleSubmit = async (values: FormValues) => {
-    setIsDisabledSubmit(true);
-
-    const result = await service.addUserDuty({
-      ...values,
-      name: values.name.trim()
-    });
-
+  const addUserDutyMutation = useMutation({
+    mutationFn: async (userDutyData: FormValues) => {
+      return await service.addUserDuty({
+        ...userDutyData,
+        name: userDutyData.name.trim()
+      });
+    },
+    onSuccess: (result: any) => {
     if (result === true) {
-
       toast.success('İşlem başarılı!');
-      
-      // onSaveSuccess event'ini tetikle
-      if (onSaveSuccess) {
-        onSaveSuccess();
-      }
-      
+
+      if (onSaveSuccess) onSaveSuccess();
       close();
       form.reset();
-      setIsDisabledSubmit(false);
-
-      return;
     }
     else if (result?.data === false && result?.errors?.length > 0) {
 
-      toast.warning(result.errors[0]);
+    toast.warning(result.errors[0]);
 
     } else {
       toast.error('Bir hata oluştu!');
     }
-    setIsDisabledSubmit(false);
+    },
+    onError: () => {
+      toast.error('Bir hata oluştu!');
+    }
+  });
+
+  const handleSubmit = async (values: FormValues) => {
+    addUserDutyMutation.mutate(values);
   };
 
   useEffect(() => {
@@ -130,13 +130,12 @@ const UserDutyAdd = forwardRef<UserDutyAddDialogControllerRef, UserAddProps>(({o
                 required
                 {...form.getInputProps('name')}
               />
-
             </Grid.Col>
           <Grid.Col span={6} offset={4}>
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
               İptal
             </Button>
-            <Button type="submit" variant="filled" size="xs" disabled={isDisabledSubmit}  leftSection={<IconCheck size={14} />} radius="xs">
+            <Button type="submit" variant="filled" size="xs" disabled={isDisabledSubmit || addUserDutyMutation.isPending}  leftSection={<IconCheck size={14} />} radius="xs">
               Kaydet
             </Button>
           </Grid.Col>
