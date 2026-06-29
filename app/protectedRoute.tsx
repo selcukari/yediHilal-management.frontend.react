@@ -1,10 +1,10 @@
 import { useEffect, type ReactNode } from "react";
 import { useNavigate } from "react-router";
 import { LoadingOverlay } from '@mantine/core';
-import { useAuth } from './authContext';
+import { useAuthStore } from './authContext';
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { isLoggedIn, loading } = useAuth();
+  const { isLoggedIn, loading } = useAuthStore();
   const navigate = useNavigate();
 
   useEffect(() => {

@@ -1,60 +1,65 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { useNavigate } from "react-router";
+import { create } from 'zustand';
 import { createApi } from './services/api';
 import { setWithExpiry, getWithExpiry } from './utils/useLocalStorage';
 
-
-interface AuthContextType {
+// 1. State Arayüzünü Tanımlıyoruz
+interface AuthState {
   currentUser: any;
-  login: (email: string, password: string, loginType: string, dutyId?: string, userType?: string) => Promise<boolean>;
-  memberLogin: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
   loading: boolean;
   isLoggedIn: boolean;
+  login: (email: string, password: string, loginType: string, dutyId?: string, userType?: string) => Promise<boolean>;
+  memberLogin: (email: string, password: string) => Promise<boolean>;
+  logout: (onLogout?: () => void) => void;
   getCurrentToken: () => string | null;
+  initializeAuth: () => void; // useEffect yerine ilk yüklemede tetiklenecek fonksiyon
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const api = createApi();
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [loading, setLoading] = useState(true);
-  const api = createApi();
-  const navigate = useNavigate();
-
-  const [currentUser, setCurrentUser] = useState<any>(() => {
-    const storedUser = getWithExpiry("currentUser");
-    if (storedUser) {
-      try {
-        return JSON.parse(storedUser);
-      } catch {
-        localStorage.removeItem("currentUser");
-      }
+// 2. İlk Yükleme Esnasında LocalStorage Kontrolü
+const getInitialUser = () => {
+  const storedUser = getWithExpiry("currentUser");
+  if (storedUser) {
+    try {
+      return JSON.parse(storedUser);
+    } catch {
+      localStorage.removeItem("currentUser");
     }
-    return null;
-  });
+  }
+  return null;
+};
 
-  useEffect(() => {
-    if (!currentUser) {
+const initialUser = getInitialUser();
+
+// 3. Zustand Store Oluşturulması
+export const useAuthStore = create<AuthState>((set, get) => ({
+  currentUser: initialUser,
+  loading: false, // İlk kullanıcı senkron alındığı için direkt false başlatılabilir
+  isLoggedIn: !!initialUser,
+
+  // Uygulama ayağa kalktığında veya sayfa değiştiğinde güncelliği korumak için opsiyonel tetikleyici
+  initializeAuth: () => {
     const storedUser = getWithExpiry('currentUser');
     if (storedUser) {
       try {
-        const user =  JSON.parse(storedUser);
-        setCurrentUser(user);
-
+        const user = JSON.parse(storedUser);
+        set({ currentUser: user, isLoggedIn: true, loading: false });
       } catch (error) {
         console.error('Error parsing stored user:', error);
         localStorage.removeItem('currentUser');
-        setCurrentUser(null);
+        set({ currentUser: null, isLoggedIn: false, loading: false });
       }
+    } else {
+      set({ loading: false });
     }
-  }
-    setLoading(false);
-  }, [currentUser, location.pathname]);
+  },
 
-  const login = async (email: string, password: string, loginType: string, dutyId?: string, userType?: string): Promise<boolean> => {
-    setLoading(true);
+  login: async (email, password, loginType, dutyId, userType) => {
+    set({ loading: true });
     try {
-      const response = await api.get(`/${import.meta.env.VITE_APP_API_USER_CONTROLLER}/userLogin?email=${email}&password=${password}&dutyId=${dutyId || ''}&loginType=${userType || ""}`);
+      const response = await api.get(
+        `/${import.meta.env.VITE_APP_API_USER_CONTROLLER}/userLogin?email=${email}&password=${password}&dutyId=${dutyId || ''}&loginType=${userType || ""}`
+      );
       const getUser = response.data;
       getUser.data["userType"] = loginType;
 
@@ -62,24 +67,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error('Kullanıcı bulunamadı veya şifre yanlış.');
       }
 
-      setCurrentUser(getUser.data);
-      setWithExpiry('currentUser', JSON.stringify(getUser.data), 86400000 * 7); // a week
-
+      setWithExpiry('currentUser', JSON.stringify(getUser.data), 86400000 * 7); // 1 hafta
+      set({ currentUser: getUser.data, isLoggedIn: true });
       return true;
     } catch (error: any) {
-      setCurrentUser(null);
       localStorage.removeItem('currentUser');
-
-      return !!error.data;
+      set({ currentUser: null, isLoggedIn: false });
+      return !!error?.data;
     } finally {
-      setLoading(false);
+      set({ loading: false });
     }
-  };
+  },
 
-  const memberLogin = async (email: string, password: string): Promise<boolean> => {
-    setLoading(true);
+  memberLogin: async (email, password) => {
+    set({ loading: true });
     try {
-      const response = await api.get(`/${import.meta.env.VITE_APP_API_USER_CONTROLLER}/memberLogin?email=${email}&password=${password}`);
+      const response = await api.get(
+        `/${import.meta.env.VITE_APP_API_USER_CONTROLLER}/memberLogin?email=${email}&password=${password}`
+      );
       const getUser = response.data;
       getUser.data["userType"] = "memberLogin";
 
@@ -87,59 +92,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error('Kullanıcı bulunamadı veya şifre yanlış.');
       }
 
-      setCurrentUser(getUser.data);
-      setWithExpiry('currentUser', JSON.stringify(getUser.data), 86400000 * 7); // a week
-
+      setWithExpiry('currentUser', JSON.stringify(getUser.data), 86400000 * 7);
+      set({ currentUser: getUser.data, isLoggedIn: true });
       return true;
     } catch (error: any) {
-      setCurrentUser(null);
       localStorage.removeItem('currentUser');
-
-      return !!error.data;
+      set({ currentUser: null, isLoggedIn: false });
+      return !!error?.data;
     } finally {
-      setLoading(false);
+      set({ loading: false });
     }
-  };
+  },
 
-  const logout = () => {
-    setCurrentUser(null);
+  logout: (onLogout) => {
     localStorage.removeItem('currentUser');
+    set({ currentUser: null, isLoggedIn: false });
+    
+    // Eğer dışarıdan bir yönlendirme aksiyonu gönderildiyse çalıştır
+    if (onLogout) {
+      onLogout();
+    }
+  },
 
-    navigate("loginSelection")
-  };
-
-  const getCurrentToken = () => {
-    return currentUser?.token || null;
-  };
-
-  return (
-    <AuthContext.Provider value={{
-      currentUser,
-      login,
-      memberLogin,
-      logout,
-      loading,
-      isLoggedIn: !!currentUser,
-      getCurrentToken,
-    }}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    // throw new Error("useAuth must be used within an AuthProvider");
-    return {
-      currentUser: null,
-      login: async () => false,
-      memberLogin: async () => false,
-      logout: () => {},
-      loading: false,
-      isLoggedIn: false,
-      getCurrentToken: () => null,
-    };
-  }
-  return context;
-}
+  getCurrentToken: () => {
+    // get() fonksiyonu store'un o anki güncel durumuna erişmemizi sağlar
+    return get().currentUser?.token || null;
+  },
+}));

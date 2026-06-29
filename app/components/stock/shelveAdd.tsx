@@ -8,7 +8,7 @@ import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useWarehouseService } from '../../services/warehouseService';
 import { toast } from '../../utils/toastMessages';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 export type ShelveAddDialogControllerRef = {
   open: () => void;
@@ -35,7 +35,7 @@ const ShelveAdd = forwardRef<ShelveAddDialogControllerRef, ShelveAddProps>(({onS
   const [warehouses, setWarehouses] = useState<{ value: string; label: string }[]>([]);
 
   const service = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 

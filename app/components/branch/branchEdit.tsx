@@ -19,7 +19,7 @@ import { DayRenderer } from '../../components';
 import SancaktarAdd, { type SancaktarAddDialogControllerRef } from './sancaktarAdd';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import { formatDate } from '../../utils/formatDate';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 export type BranchEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -77,7 +77,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
   const [branchHeadUserData, setBranchHeadUserData] = useState<GetUserData[]>([]);
   const [sancaktarUserData, setSancaktarUserData] = useState<SancaktarDataGorevatama[]>([]);
   const [branchHeadDutyId, setBranchHeadDutyIdDutyId] = useState<string>("19");
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
   
   const service = useBranchService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);

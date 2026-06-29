@@ -10,7 +10,7 @@ import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useStockService } from '../../services/stockService';
 import { useWarehouseService } from '../../services/warehouseService';
 import { toast } from '../../utils/toastMessages';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 import { DayRenderer } from '../../components';
 
 export type StockAddDialogControllerRef = {
@@ -48,7 +48,7 @@ const StockAdd = forwardRef<StockAddDialogControllerRef, UserAddProps>(({onSaveS
   const serviceWarehouse = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
   
   const service = useStockService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
