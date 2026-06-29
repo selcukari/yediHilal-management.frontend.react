@@ -4,11 +4,11 @@ import {
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate } from 'react-router';
-import { useAuth } from '../../authContext';
+import { useAuthStore } from '../../authContext';
 import { toast } from '~/utils/toastMessages';
 
 export default function UserLogin() {
-  const { login, loading: authLoading, isLoggedIn } = useAuth();
+  const { login, loading: authLoading } = useAuthStore();
   const navigate = useNavigate();
   const [visible, { open, close }] = useDisclosure(false);
 

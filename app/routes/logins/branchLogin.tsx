@@ -8,14 +8,14 @@ import { useAuthStore } from '../../authContext';
 import { toast } from '~/utils/toastMessages';
 
 export default function UserLogin() {
-  const { login, loading: authLoading, isLoggedIn } = useAuthStore();
+  const { login, loading: authLoading } = useAuthStore();
   const navigate = useNavigate();
   const [visible, { open, close }] = useDisclosure(false);
 
   const form = useForm({
     initialValues: {
-      email: '',
-      password: '',
+      email: 'besow53889@elobits.com',
+      password: '1234567',
     },
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Geçerli bir e-posta girin'),
