@@ -13,7 +13,7 @@ import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration, 
 import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router";
 import { Notifications } from '@mantine/notifications';
-import { AuthProvider, useAuth } from './authContext';
+import { useAuthStore } from './authContext';
 import { Layout as AppLayout, MemberLayout, BranchLayout, UniversityBranchLayout } from './components';
 import { CustomLayout } from './components';
 import ProtectedRoute from './protectedRoute'
@@ -80,7 +80,7 @@ function AppContent() {
   const location = useLocation();
   const [locationPathname, setLocationPathname] = useState<boolean>(true);
   const navigate = useNavigate();
-  const { currentUser, isLoggedIn } = useAuth();
+  const { currentUser, isLoggedIn } = useAuthStore();
 
   useEffect(() => {
     setLocationPathname(!['/memberCreate', '/privacyPolicy'].includes(location.pathname));
@@ -159,9 +159,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <MantineProvider theme={theme}>
-        <AuthProvider>
-          <AppContent />
-        </AuthProvider>
+        <AppContent />
       </MantineProvider>
     </QueryClientProvider>
   );
@@ -173,7 +171,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = "An unexpected error occurred.";
   let status = 500;
   let stack: string | undefined;
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
 
   if (isRouteErrorResponse(error)) {
     status = error.status;
