@@ -18,7 +18,7 @@ import { MenuActionButton } from '../components'
 import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToExcel';
 import { type PdfTableColumn } from '../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../utils/repor/calculateColumnWidth';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 import { stripHtml } from '../utils/stripHtml';
 interface ProjectData {
   id: number;
@@ -47,7 +47,7 @@ export default function Project() {
   const projectEditRef = useRef<ProjectEditDialogControllerRef>(null);
 
   const service = useProjectService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuthStore();
 
   const queryClient = useQueryClient();
 

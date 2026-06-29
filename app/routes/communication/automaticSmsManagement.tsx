@@ -8,7 +8,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
-import { useAuth } from '../../authContext';
+import { useAuthStore } from '../../authContext';
 import { toast } from '~/utils/toastMessages';
 import { useAutomaticSmsFieldService } from '~/services/automaticSmsFieldService';
 import { useReadyMessageService } from '~/services/readyMessageService';
@@ -27,7 +27,7 @@ type FormValues = {
 export default function AutomaticSmsManagement() {
   const [readyMessage, setReadyMessage] = useState<{ value: string; label: string }[]>([]);
   const [selectedReadyMessageId, setSelectedReadyMessageId] = useState<string>("");
-  const { loading: authLoading } = useAuth();
+  const { loading: authLoading } = useAuthStore();
   const [visible, { open, close }] = useDisclosure(false);
 
   const serviceReadyMessage = useReadyMessageService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);

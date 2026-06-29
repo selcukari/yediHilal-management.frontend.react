@@ -1,5 +1,5 @@
 import { createApi } from './api';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 
 interface BranchDataParams {
   id?: number;
@@ -22,7 +22,7 @@ interface BranchDataParams {
 }
 
 export function useBranchService(controller: string) {
-  const { getCurrentToken, logout } = useAuth();
+  const { getCurrentToken, logout } = useAuthStore();
   const api = createApi(getCurrentToken() ?? undefined, logout);
 
   const getBranches = async (headId?: number) => {

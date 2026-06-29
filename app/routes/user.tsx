@@ -13,7 +13,7 @@ import { useUserService } from '../services/userService';
 import { toast } from '../utils/toastMessages';
 import { formatDate } from '../utils/formatDate';
 import { dateFormatStrings } from '../utils/dateFormatStrings';
-import { useAuth } from '~/authContext';
+import { useAuthStore } from '~/authContext';
 import { type PdfTableColumn } from '../utils/repor/exportToPdf';
 import { calculateColumnWidthUser } from '../utils/repor/calculateColumnWidth';
 import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToExcel';
@@ -70,7 +70,7 @@ export default function User() {
   const userEditRef = useRef<UserEditDialogControllerRef>(null);
   const confirmModalMessageRef = useRef<ConfirmModalMessageRef>(null);
 
-  const { isLoggedIn, currentUser } = useAuth();
+  const { isLoggedIn, currentUser } = useAuthStore();
 
   const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
