@@ -1,5 +1,6 @@
 import { MultiSelect } from '@mantine/core';
 import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from '../../utils/toastMessages';
 import { useTransactionFinanceService } from '../../services/transactionFinanceService';
 
@@ -10,34 +11,22 @@ interface PaymentTypeProps {
 
 export function PaymentType({ onPaymentTypeChange, paymentTypesData }: PaymentTypeProps) {
   const [paymentType, setPaymentType] = useState<string[] | undefined>(undefined);
-  const [paymentTypes, setPaymentTypes] = useState<{ value: string; label: string }[]>([]);
   
   const service = useTransactionFinanceService(import.meta.env.VITE_APP_API_FINANCE_CONTROLLER);
 
-  useEffect(() => {
-    fetchPaymentData();
-  }, []);
-
-  const fetchPaymentData = async () => {
-    try {
+  const { data: paymentTypes = []} = useQuery({
+    queryKey: ["paymentTypes"],
+    queryFn: async () => {
       const response = await service.getPaymentTypes();
 
-      if (response) {
-        setPaymentTypes(
-          response.map((c: any) => ({
-            value: String(c.id),
-            label: c.name,
-          }))
-        );
-
-        paymentTypesData(response);
-      } else {
-        toast.info('Hiçbir veri yok!');
-      }
-    } catch (error: any) {
-      toast.error(`paymentTypes yüklenirken hata: ${error.message}`);
-    }
-  };
+      return (response ?? []).map((c: any) => ({
+        value: String(c.id),
+        label: c.name,
+      }));
+    },
+    staleTime: 1000 * 60 * 60 * 24 * 7, // 7 gun cache
+    gcTime: 1000 * 60 * 60 * 24 * 7, // 24 saat bellekte tut
+  });
 
   const handleChange = (values: string[]) => {
     

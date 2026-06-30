@@ -1,5 +1,6 @@
 import { Select } from '@mantine/core';
 import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from '../../utils/toastMessages';
 import { useCountryService } from '../../services/countryService'
 
@@ -10,41 +11,44 @@ interface CountryProps {
   onCountryChange: (val: string | null, name?: string) => void;
 }
 
+interface CountryOption {
+  value: string;
+  label: string;
+}
+
+interface CountryResponse {
+  id: number;
+  name: string;
+}
+
 export function Country({ isRequired = false, isDisabled = false, valueId,
   onCountryChange,
  }: CountryProps) {
   const [county, setCountry] = useState<string | null>(null);
-  const [countries, setCountries] = useState<{ value: string; label: string }[]>([]);
   const [error, setError] = useState<string | null>(isRequired ? 'Ülke alanı gereklidir.' : null);
   
   const service = useCountryService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
 
   useEffect(() => {
-    fetchCountryData();
     setCountry(valueId ? valueId : "1"); // turkiye default olarak seçili
   }, []);
 
-  const fetchCountryData = async () => {
-    try {
+  const { data: countries = []} = useQuery<CountryOption[], Error>({
+    queryKey: ["countries"],
+    queryFn: async (): Promise<CountryOption[]> => {
       const response = await service.getCountries();
 
-      if (response) {
-        setCountries(
-          response.map((c: any) => ({
-            value: String(c.id),
-            label: c.name,
-          }))
-        );
-      } else {
-        toast.info('Hiçbir veri yok!');
-      }
-    } catch (error: any) {
-      toast.error(`countries yüklenirken hata: ${error.message}`);
-    }
-  };
+      return (response ?? []).map((c: CountryResponse) => ({
+        value: String(c.id),
+        label: c.name,
+      }));
+    },
+    staleTime: 1000 * 60 * 60 * 24 * 7, // 7 gun cache
+    gcTime: 1000 * 60 * 60 * 24 * 7, // 24 saat bellekte tut
+  });
 
-  const handleChange = (value: string | null) => {
-    onCountryChange(value, value ? countries.find(c => c.value == value)?.label : undefined);
+  const handleChange = (value: string | null): void => {
+    onCountryChange(value, value ? countries.find((c: CountryOption) => c.value == value)?.label : undefined);
     setCountry(value);
   };
 

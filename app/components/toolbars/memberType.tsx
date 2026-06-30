@@ -1,6 +1,6 @@
 import { MultiSelect } from '@mantine/core';
 import { useState, useEffect } from 'react';
-import { toast } from '../../utils/toastMessages';
+import { useQuery } from '@tanstack/react-query';
 import { useMemberTypeService } from '../../services/memberTypeService';
 
 interface MemberTypeProps {
@@ -11,37 +11,30 @@ interface MemberTypeProps {
 
 export function MemberType({ onMemberTypeChange, isDisabled = false, valueId }: MemberTypeProps) {
   const [memberType, setMemberType] = useState<string[] | undefined>(undefined);
-  const [memberTypes, setMemberTypes] = useState<{ value: string; label: string }[]>([]);
   
   const service = useMemberTypeService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
   useEffect(() => {
-    fetchRoleData();
     setMemberType(valueId ? valueId : undefined);
   }, []);
 
-  const fetchRoleData = async () => {
-    try {
+  const { data: memberTypes = [], isLoading, isError } = useQuery({
+    queryKey: ["memberTypes"],
+    queryFn: async () => {
       const response = await service.getMemberTypes();
 
-      if (response) {
-        setMemberTypes(
-          response.map((c: any) => ({
-            value: String(c.id),
-            label: c.name,
-          }))
-        );
-      } else {
-        toast.info('Hiçbir veri yok!');
-      }
-    } catch (error: any) {
-      toast.error(`MemberTypes yüklenirken hata: ${error.message}`);
-    }
-  };
+      return (response ?? []).map((c: any) => ({
+        value: String(c.id),
+        label: c.name,
+      }));
+    },
+    staleTime: 1000 * 60 * 60 * 24 * 2, // 7 gun cache
+    gcTime: 1000 * 60 * 60 * 24 * 2, // 24 saat bellekte tut
+  });
 
   const handleChange = (values: string[]) => {
     const selectedMemberTypeNames = values.map(value => {
-    const memberType = memberTypes.find(p => p.value == value);
+    const memberType = memberTypes.find((p: { value: string; label: string }) => p.value === value);
     return memberType?.label || '';
   }).filter(name => name != '');
   
