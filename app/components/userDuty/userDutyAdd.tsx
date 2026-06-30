@@ -7,7 +7,7 @@ import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useUserDutyService } from '../../services/userDutyService';
 import { toast } from '../../utils/toastMessages';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export type UserDutyAddDialogControllerRef = {
   open: () => void;
@@ -28,6 +28,7 @@ const UserDutyAdd = forwardRef<UserDutyAddDialogControllerRef, UserAddProps>(({o
   const service = useUserDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
   const confirmModalRef = useRef<ConfirmModalRef>(null);
+  const queryClient = useQueryClient();
 
   const form = useForm<FormValues>({
     initialValues: {
@@ -48,6 +49,8 @@ const UserDutyAdd = forwardRef<UserDutyAddDialogControllerRef, UserAddProps>(({o
     onSuccess: (result: any) => {
     if (result === true) {
       toast.success('İşlem başarılı!');
+
+      queryClient.invalidateQueries({ queryKey: ["userDuties", "duties"] });
 
       if (onSaveSuccess) onSaveSuccess();
       close();

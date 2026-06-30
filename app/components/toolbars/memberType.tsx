@@ -18,7 +18,7 @@ export function MemberType({ onMemberTypeChange, isDisabled = false, valueId }: 
     setMemberType(valueId ? valueId : undefined);
   }, []);
 
-  const { data: memberTypes = [], isLoading, isError } = useQuery({
+  const { data: memberTypes = [] } = useQuery({
     queryKey: ["memberTypes"],
     queryFn: async () => {
       const response = await service.getMemberTypes();

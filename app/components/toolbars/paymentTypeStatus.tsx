@@ -1,39 +1,30 @@
 import { Select } from '@mantine/core';
-import { useState, useEffect } from 'react';
-import { toast } from '../../utils/toastMessages';
-
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 interface PaymentTypeStatusProps {
   onPaymentTypeStatusChange: (val: string | null) => void;
 }
 
 export function PaymentTypeStatus({ onPaymentTypeStatusChange }: PaymentTypeStatusProps) {
   const [paymentTypeStatu, setPaymentTypeStatu] = useState<string | null>("");
-  const [paymentTypeStatus, setPaymentTypeStatus] = useState<{ value: string; label: string }[]>([]);
   
-
-  useEffect(() => {
-    fetchPaymentTypeStatusData();
-  }, []);
-
   const mockDataPaymentTypeStatus =[
     {id: "pending", name: "Bekliyor"},
     {id: "completed", name: "Tamamlandı"}
   ];
 
-  const fetchPaymentTypeStatusData = async () => {
-    try {
+  const { data: paymentTypeStatus = [] } = useQuery({
+    queryKey: ["paymentTypeStatus"],
+    queryFn: () => {
 
-     setPaymentTypeStatus(
-          mockDataPaymentTypeStatus.map((c: any) => ({
-            value: c.id,
-            label: c.name,
-          }))
-        );
-    } catch (error: any) {
-      toast.error(`PaymentTypeStatus yüklenirken hata: ${error.message}`);
-      
-    }
-  };
+      return (mockDataPaymentTypeStatus ?? []).map((c: any) => ({
+        value: c.id,
+        label: c.name,
+      }));
+    },
+    staleTime: 1000 * 60 * 60 * 24 * 7, // 7 gun cache
+    gcTime: 1000 * 60 * 60 * 24 * 7, // 24 saat bellekte tut
+  });
 
   const handleChange = (value: string | null) => {
     onPaymentTypeStatusChange(value);

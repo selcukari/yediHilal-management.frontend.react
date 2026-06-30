@@ -1,7 +1,21 @@
 import { MultiSelect } from '@mantine/core';
 import { useEffect, useState } from 'react';
-import { toast } from '../../utils/toastMessages';
+import { useQuery } from '@tanstack/react-query';
 import { useProvinceService } from '../../services/provinceService'
+
+interface ProvinceOption {
+  value: string;
+  label: string;
+}
+
+interface ProvinceResponse {
+  id: string;
+  name: string;
+}
+
+interface ProvinceService {
+  getProvinces(countryId?: string | null): Promise<ProvinceResponse[] | null>;
+}
 
 interface ProvinceProps {
   isRequired?: boolean;
@@ -14,36 +28,30 @@ interface ProvinceProps {
 export function Province({ 
  isRequired = false, countryId, isDisabled = false, onProvinceChange, valueId,
 }: ProvinceProps) {
-  const [provinces, setProvinces] = useState<{ value: string; label: string }[]>([]);
   const [province, setProvince] = useState<string[] | undefined>(undefined);
   const [error, setError] = useState<string | null>(isRequired ? 'Ülke alanı gereklidir.' : null);
   
-  const service = useProvinceService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
+  const service: ProvinceService = useProvinceService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
   
   useEffect(() => {
-    fetchProvinceData(countryId);
     setProvince(valueId ? [valueId] : undefined);
   }, [countryId]);
 
-  const fetchProvinceData = async (countryId?: string | null) => {
-    try {
 
-      const getProvinces = await service.getProvinces(countryId);
-      if (getProvinces) {
-        setProvinces(
-          getProvinces.map((c: any) => ({
-            value: String(c.id),
-            label: c.name,
-          }))
-        );
+  const { data: provinces = [] } = useQuery({
+    queryKey: ["provinces"],
+    queryFn: async () => {
 
-      } else {
-        toast.info('Hiçbir veri yok!');
-      }
-    } catch (error: any) {
-      toast.error(`countries yüklenirken hata: ${error.message}`);
-    }
-  }
+      const response = await service.getProvinces(countryId);
+
+      return (response ?? []).map((c: any) => ({
+        value: String(c.id),
+        label: c.name,
+      }));
+    },
+    staleTime: 1000 * 60 * 60 * 24 * 7, // 7 gun cache
+    gcTime: 1000 * 60 * 60 * 24 * 7, // 24 saat bellekte tut
+  });
 
   const handleChange = (values: string[]) => {
     const selectedProvinceNames = values.map(value => {

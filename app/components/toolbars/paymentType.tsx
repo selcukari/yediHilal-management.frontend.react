@@ -14,7 +14,7 @@ export function PaymentType({ onPaymentTypeChange, paymentTypesData }: PaymentTy
   
   const service = useTransactionFinanceService(import.meta.env.VITE_APP_API_FINANCE_CONTROLLER);
 
-  const { data: paymentTypes = []} = useQuery({
+  const { data: paymentTypes = [] } = useQuery({
     queryKey: ["paymentTypes"],
     queryFn: async () => {
       const response = await service.getPaymentTypes();
