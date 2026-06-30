@@ -1,7 +1,8 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { IconSearch, IconCalendar, IconDownload, IconFilter } from '@tabler/icons-react';
 import {  Container,  Grid,  TextInput, Stack,  Group,  Title,  Text,  Paper,  Table,  Button,  Badge,  LoadingOverlay,  Pagination,  Menu,
 } from '@mantine/core';
+import { useQuery } from "@tanstack/react-query";
 import { DatePickerInput } from '@mantine/dates';
 import 'dayjs/locale/tr';
 import { calculateColumnWidthUser } from '../../utils/repor/calculateColumnWidth';
@@ -35,7 +36,6 @@ export default function UserReport() {
   
   const [loading, setLoading] = useState(false);
   const [updateDateReport, setUpdateDateReport] = useState("");
-  const [userReportData, setUserReportData] = useState<UserReportItem[]>([]);
   const [filters, setFilters] = useState<FilterModels>({
     searchText: '',
     dateRange: [null, null]
@@ -53,38 +53,50 @@ export default function UserReport() {
 
   const serviceReport = useMemberReportService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
-  const fetchUserReport = async () => {
-    setLoading(true);
-    try {
-      const getUserReport = await serviceReport.getUserReport();
-      // Burada gerçek veriyi state'e atabilirsiniz
-      setUpdateDateReport(getUserReport?.updateDate || '');
-      if (getUserReport?.reportItems) {
-        const mappedData = getUserReport.reportItems.map((item: any) => ({
-          id: item.userId,
-          fullName: item.userFullName,
-          branchName: item.reportName,
-          duty: item.dutyName,
-          createDate: new Date(item?.updateDate || ''),
-        }));
-        setUserReportData(mappedData);
-      }
-        setLoading(false);
-    } catch (error: any) {
-        toast.error(`Kullanıcı raporu alınırken hata oluştu: ${error.message}`);
-        setLoading(false);
+  const { 
+  data: userReportData = [], 
+  isLoading, 
+  isError 
+} = useQuery({
+  queryKey: ['userReport'],
+  queryFn: async () => {
+    // API isteğini atıyoruz
+    const response = await serviceReport.getUserReport();
+    return response;
+  },
+  
+  // ✨ MUCİZE ÖZELLİK: select
+  // API'den gelen veriyi bileşene vermeden önce filtreler/dönüştürür
+  select: (getUserReport) => {
+    // Eğer yan bir state'e (örn: updateDate) ihtiyacın varsa bunu hala burada set edebilirsin.
+    // (Ancak React Query varken buna genelde gerek kalmaz, direkt verinin içinden okunabilir)
+    if (getUserReport?.updateDate) {
+      setUpdateDateReport(getUserReport.updateDate); 
     }
-  };
 
-  useEffect(() => {
-    setTimeout(() => {
-      fetchUserReport();
-    }, 500);
-  }, []);
+    if (!getUserReport?.reportItems) return [];
+
+    // Orijinal map'leme mantığın
+    return getUserReport.reportItems.map((item: any) => ({
+      id: item.userId,
+      fullName: item.userFullName,
+      branchName: item.reportName,
+      duty: item.dutyName,
+      createDate: new Date(item?.updateDate || ''),
+    }));
+  },
+
+  // 🚨 HATA YÖNETİMİ: İstek hata aldığında tetiklenir
+  meta: {
+    onError: (error: any) => {
+      toast.error(`Kullanıcı raporu alınırken hata oluştu: ${error.message}`);
+    }
+  }
+  });
 
   // Filtreleme Mantığı
   const filteredData = useMemo(() => {
-    return userReportData?.filter(item => {
+    return userReportData?.filter((item: any) => {
       const matchesSearch = !filters.searchText || 
         item.fullName.toLowerCase().includes(filters.searchText.toLowerCase()) ||
         item.branchName.toLowerCase().includes(filters.searchText.toLowerCase());
@@ -134,7 +146,7 @@ export default function UserReport() {
       textColor: '#2c3e50' // Koyu gri
     };
 
-    const newData = filteredData?.map(item =>({
+    const newData = filteredData?.map((item: any) =>({
       ...item,
       createDate: item.createDate.toLocaleDateString('tr-TR'),
     }));
@@ -223,7 +235,7 @@ export default function UserReport() {
                 </Table.Thead>
                 <Table.Tbody>
                   {paginatedData.length > 0 ? (
-                    paginatedData?.map((item, index) => (
+                    paginatedData?.map((item: any, index: number) => (
                       <Table.Tr key={index}>
                         <Table.Td>{item.id}</Table.Td>
                         <Table.Td style={{ fontWeight: 500 }}>{item.fullName}</Table.Td>

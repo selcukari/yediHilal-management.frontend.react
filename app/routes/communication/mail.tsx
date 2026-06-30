@@ -1,24 +1,43 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { IconSearch } from '@tabler/icons-react';
+import { useQuery } from '@tanstack/react-query';
 import {
   Container, Grid, TextInput, Stack, Group, Title, Text, Paper, Table, LoadingOverlay,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useMailService } from '../../services/mailService';
-import { toast } from '../../utils/toastMessages';
 import { formatDate } from '../../utils/formatDate';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import { stripHtml } from '../../utils/stripHtml';
 import { useAuthStore } from '~/authContext';
 
-interface Column { 
-  field: string;
+interface Column {
+  field: keyof Mail;
   header: string;
 }
 
+interface Mail {
+  id: string | number;
+  subject: string;
+  body: string;
+  count: number;
+  toUsers: string;
+  toEmails: string;
+  createdDate: string;
+}
+
+interface RawMail {
+  id: string | number;
+  subject: string;
+  body: string;
+  count: number;
+  toUsers: string;
+  toEmails: string;
+  createdDate: string;
+}
+
 export default function Mail() {
-  const [resultData, setResultData] = useState<any[]>([]);
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState<string>('');
   const [visible, { open, close }] = useDisclosure(false);
   
   const [rowHeaders, setRowHeaders] = useState<Column[]>([
@@ -31,12 +50,35 @@ export default function Mail() {
     { field: 'createdDate', header: 'Gönderim Tarihi' },
   ]);
 
-  const { isLoggedIn } = useAuthStore();
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
   const service = useMailService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
-  // Filtrelenmiş veriler
-  const filteredUsers = useMemo(() => {
+  const { data: resultData = [], isLoading, isError } = useQuery<Mail[]>({
+    queryKey: ["mails"],
+    queryFn: async () => {
+      const params: number = 2; // 1: user, 2: member
+
+      const response = await service.getMails(params);
+
+      return (response ?? []).map((mail: RawMail) => ({
+        id: mail.id,
+        subject: mail.subject,
+        toEmails: mail.toEmails,
+        toUsers: mail.toUsers,
+        body: stripHtml(mail.body as string),
+        count: mail.count,
+        createdDate: formatDate(mail.createdDate, dateFormatStrings.dateTimeFormatWithoutSecond),
+      }));
+    },
+    enabled: !!isLoggedIn,
+    initialData: !isLoggedIn ? [] : undefined,
+    staleTime: 1000 * 60 * 60,
+    gcTime: 1000 * 60 * 60,
+  });
+
+    // Filtrelenmiş veriler
+  const filteredUsers = useMemo<Mail[]>(() => {
     if (!searchText) return resultData;
     
     return resultData.filter(mail =>
@@ -45,15 +87,7 @@ export default function Mail() {
     );
   }, [resultData, searchText]);
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      setTimeout(() => {
-        fetchMails();
-      }, 1000);
-    }
-  }, []);
-
-  const rowsTable = filteredUsers.map((item) => (
+    const rowsTable = filteredUsers.map((item: Mail) => (
     <Table.Tr key={item.id}>
       {rowHeaders.map((header) => {
      
@@ -87,36 +121,6 @@ export default function Mail() {
       })}
     </Table.Tr>
   ));
-
-  const fetchMails = async () => {
-     open();
-
-    const params: number = 2; // 1: user, 2: member
-     try {
-
-      const getMails = await service.getMails(params);
-      if (getMails) {
-        setResultData(getMails.map((mail: any) => ({
-          id: mail.id,
-          subject: mail.subject,
-          toEmails: mail.toEmails,
-          toUsers: mail.toUsers,
-          body: stripHtml(mail.body as string),
-          count: mail.count,
-          createdDate: formatDate(mail.createdDate, dateFormatStrings.dateTimeFormatWithoutSecond),
-        })));
-       
-      } else {
-        toast.info('Hiçbir veri yok!');
-
-        setResultData([]);
-      }
-        close();
-    } catch (error: any) {
-      toast.error(`Mail yüklenirken hata: ${error.message}`);
-      close();
-    }
-  };
 
   return (
       <Container size="xl">
