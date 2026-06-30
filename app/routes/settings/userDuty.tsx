@@ -67,7 +67,7 @@ export default function UserDuty() {
       if (result === true) {
         toast.success('İşlem başarılı!');
         // ✨ "duties" key'ine sahip query'yi geçersiz kıl ve otomatik fetch etmesini sağla!
-        queryClient.invalidateQueries({ queryKey: ["duties"] });
+        queryClient.invalidateQueries({ queryKey: ["duties", "userDuties"] });
       } else if (result?.data === false && result?.errors?.length > 0) {
         toast.warning(result.errors[0]);
       } else {
