@@ -143,7 +143,7 @@ export default function RequestStock() {
   }
 
     // Filtrelenmiş veriler
-   const filteredStocks = useMemo(() => {
+   const filteredStocks = useMemo<Record<string, RequestStockData[]>>(() => {
      if (!searchText) return requestStockData;
   
      return Object.fromEntries(
@@ -154,10 +154,10 @@ export default function RequestStock() {
           item.updateUserFullName.toLowerCase().includes(searchText.trim().toLowerCase())
         );
 
-        return [key, filteredItems];
+        return [key, filteredItems] as [string, RequestStockData[]];
       })
       .filter(([_, items]) => items.length > 0) // boş grupları at
-  );
+  ) as Record<string, RequestStockData[]>;
   }, [requestStockData, searchText]);
 
   // raportdata
