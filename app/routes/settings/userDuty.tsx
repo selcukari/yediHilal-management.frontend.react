@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { IconSearch, IconEdit, IconTrash, IconPlus } from '@tabler/icons-react';
 import {
   Container, Grid, TextInput, ActionIcon, Stack, Group, Title, Text, Paper, Table, LoadingOverlay, Button,
   Tooltip,
 } from '@mantine/core';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"; // ✨ useMutation ve useQueryClient eklendi
 import { useDisclosure } from '@mantine/hooks';
 import UserDutyAdd, { type UserDutyAddDialogControllerRef } from '../../components/userDuty/userDutyAdd';
 import UserDutyEdit, { type UserDutyEditDialogControllerRef } from '../../components/userDuty/userDutyEdit';
@@ -23,94 +24,88 @@ interface UserDutyType {
 }
 
 export default function UserDuty() {
-  const [resultData, setResultData] = useState<UserDutyType[]>([]);
   const [searchText, setSearchText] = useState('');
   const [visible, { open, close }] = useDisclosure(false);
   
-  const [rowHeaders, setRowHeaders] = useState<Column[]>([
+  // ✨ React Query istemcisini çağırıyoruz
+  const queryClient = useQueryClient();
+
+  const [rowHeaders] = useState<Column[]>([
     { field: 'id', header: 'Id' },
     { field: 'name', header: 'Mesaj' },
     { field: 'actions', header: 'İşlemler' },
   ]);
+  
   const userDutyAddRef = useRef<UserDutyAddDialogControllerRef>(null);
   const userDutyEditRef = useRef<UserDutyEditDialogControllerRef>(null);
 
   const service = useUserDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
+  // 1. VERİ ÇEKME (Query)
+  const { data: resultData = [], isLoading: isQueryLoading } = useQuery({
+    queryKey: ["duties"],
+    queryFn: async () => {
+      const response = await service.getUserDuties();
+      return (response ?? []).map((duty: UserDutyType) => ({
+        id: duty.id,
+        name: duty.name,
+        isActive: duty.isActive
+      }));
+    },
+    staleTime: 1000 * 60 * 60 *24, // güncellik için 1 gun daha idealdir
+  });
+
+  // 2. VERİ SİLME (Mutation) - fetchDuty() yerine geçen sihirli kısım
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await service.deleteUserDuty(id);
+    },
+    onMutate: () => {
+      open(); // Loading overlay aç
+    },
+    onSuccess: (result) => {
+      if (result === true) {
+        toast.success('İşlem başarılı!');
+        // ✨ "duties" key'ine sahip query'yi geçersiz kıl ve otomatik fetch etmesini sağla!
+        queryClient.invalidateQueries({ queryKey: ["duties"] });
+      } else if (result?.data === false && result?.errors?.length > 0) {
+        toast.warning(result.errors[0]);
+      } else {
+        toast.error('Bir hata oluştu!');
+      }
+    },
+    onError: (error: any) => {
+      toast.error(`Silme işleminde bir hata: ${error.message}`);
+    },
+    onSettled: () => {
+      close(); // Loading overlay kapat
+    }
+  });
+
   // Filtrelenmiş veriler
   const filteredUsers = useMemo(() => {
     if (!searchText) return resultData;
-    
-    return resultData.filter(duty => duty.name.toLowerCase().includes(searchText.trim().toLowerCase()));
+    return resultData.filter((duty: UserDutyType) => 
+      duty.name.toLowerCase().includes(searchText.trim().toLowerCase())
+    );
   }, [resultData, searchText]);
-
-  const fetchDuty = async () => {
-    open();
-
-    try {
-
-      const getDuties = await service.getUserDuties();
-      if (getDuties) {
-        setResultData(getDuties.map((duty: UserDutyType) => ({
-          id: duty.id,
-          name: duty.name,
-          isActive: duty.isActive
-        })));
-      
-      } else {
-        toast.info('Hiçbir veri yok!');
-
-        setResultData([]);
-      }
-        close();
-
-    } catch (error: any) {
-        toast.error(`getDuties yüklenirken hata: ${error.message}`);
-      close();
-    }
-  };
-
-  useEffect(() => {
-    setTimeout(() => {
-      fetchDuty();
-    }, 1000);
-  }, []);
 
   const handleEdit = (item: UserDutyType) => {
     userDutyEditRef.current?.openDialog(item);
   };
 
-  const handleDelete = async (id: number) => {
-    open();
-
-     try {
-
-      const result = await service.deleteUserDuty(id);
-      if (result == true) {
-
-      toast.success('İşlem başarılı!');
-      
-      fetchDuty();
-      
-      close();
-
-      return;
-    }
-    else if (result?.data == false && result?.errors?.length > 0) {
-
-      toast.warning(result.errors[0]);
-
-    } else {
-      toast.error('Bir hata oluştu!');
-    }
-      close();
-    } catch (error: any) {
-      toast.error(`silme işleminde bir hata: ${error.message}`);
-      close();
-    }
+  const handleDelete = (id: number) => {
+    // Yazdığımız mutation'ı tetikliyoruz
+    deleteMutation.mutate(id);
   };
 
-  const rowsTable = filteredUsers.map((item) => (
+  // 3. YENİ EKLEME VEYA GÜNCELLEME BAŞARILI OLDUĞUNDA
+  const handleSaveSuccess = () => {
+    // Manuel setTimeout ve fetchDuty() yerine doğrudan query'yi yeniliyoruz
+    queryClient.invalidateQueries({ queryKey: ["duties"] });
+  };
+
+  const rowsTable = filteredUsers.map((item: UserDutyType) => (
     <Table.Tr key={item.id}>
       {rowHeaders.map((header) => {
         if (header.field === 'actions') {
@@ -118,22 +113,14 @@ export default function UserDuty() {
             <Table.Td key={header.field}>
               <Group gap="xs">
                 <Tooltip label="Güncelle">
-                <ActionIcon 
-                  variant="light" 
-                  color="blue"
-                  onClick={() => handleEdit(item)}
-                >
-                  <IconEdit size={16} />
-                </ActionIcon>
+                  <ActionIcon variant="light" color="blue" onClick={() => handleEdit(item)}>
+                    <IconEdit size={16} />
+                  </ActionIcon>
                 </Tooltip>
                 <Tooltip label="Sil">
-                <ActionIcon 
-                  variant="light" 
-                  color="red"
-                  onClick={() => handleDelete(item.id)}
-                >
-                  <IconTrash size={16} />
-                </ActionIcon>
+                  <ActionIcon variant="light" color="red" onClick={() => handleDelete(item.id)}>
+                    <IconTrash size={16} />
+                  </ActionIcon>
                 </Tooltip>
               </Group>
             </Table.Td>
@@ -148,53 +135,29 @@ export default function UserDuty() {
     </Table.Tr>
   ));
 
-  const handleSaveSuccess = () => {
-
-    setTimeout(() => {
-      fetchDuty();
-    }, 1500);
-  };
-
   return (
       <Container size="xl">
         <LoadingOverlay
-          visible={visible}
+          visible={visible || isQueryLoading} // Sayfa ilk açılırken veya silme yapılırken loader gösterir
           zIndex={1000}
           overlayProps={{ radius: 'sm', blur: 2 }}
           loaderProps={{ color: 'pink', type: 'bars' }}
         />
         <Stack gap="lg">
-          {/* Sayfa Başlığı */}
           <Group justify="space-between" align="center">
             <div>
               <Title order={2}>Görev Türleri</Title>
-              <Text size="sm" c="dimmed">
-                Toolbar Filtreleme Alanı
-              </Text>
+              <Text size="sm" c="dimmed">Toolbar Filtreleme Alanı</Text>
             </div>
             <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14}/>} onClick={() => userDutyAddRef.current?.open()}>Yeni Ekle</Button>
-            {/* Mobile için sadece icon buton */}
-            <Button 
-              variant="filled" 
-              onClick={() => userDutyAddRef.current?.open()}
-              hiddenFrom="xs"
-              p="xs"
-            >
+            <Button variant="filled" onClick={() => userDutyAddRef.current?.open()} hiddenFrom="xs" p="xs">
               <IconPlus size={18} />
             </Button>
           </Group>
 
-          {/* İçerik Kartları */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-              gap: '1rem',
-            }}
-          >
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
-
                 <Grid.Col span={{ base: 12, sm: 6, md: 4}}>
                   <TextInput
                     label="Görev Ara"
@@ -204,12 +167,10 @@ export default function UserDuty() {
                     onChange={(event) => setSearchText(event.currentTarget.value)}
                   />
                 </Grid.Col>
-
               </Grid>
             </Paper>
           </div>
 
-          {/* Örnek Tablo */}
           <Paper shadow="xs" p="lg" withBorder>
             <Stack gap="md">
               <Title order={4}>Görevler({rowsTable?.length || 0})</Title>
