@@ -16,6 +16,7 @@ import { type ColumnDefinition, type ValueData } from '../../utils/repor/exportT
 import { type PdfTableColumn } from '../../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../../utils/repor/calculateColumnWidth';
 import { useAuthStore } from '~/authContext';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface WarehouseData {
   id: number;
@@ -37,6 +38,7 @@ export default function Stock() {
   const [warehouseData, setWarehouseData] = useState<WarehouseData[]>([]);
   const [visible, { open, close }] = useDisclosure(false);
   const [searchText, setSearchText] = useState('');
+  const queryClient = useQueryClient();
 
   const warehouseAddRef = useRef<WarehouseAddDialogControllerRef>(null);
   const warehouseEditRef = useRef<WarehouseEditDialogControllerRef>(null);
@@ -91,10 +93,10 @@ export default function Stock() {
     try {
 
       const result = await service.deleteWarehouse(id);
-      if (result == true) {
+      if (result == true) { 
 
       toast.success('İşlem başarılı!');
-      
+      queryClient.invalidateQueries({ queryKey: ["warehouses", "duties"] });
       fetchWarehouse();
       
       close();

@@ -5,6 +5,7 @@ import { Modal, TextInput, Button, Stack, Grid, Select, Textarea } from '@mantin
 import { useForm } from '@mantine/form';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
+import { useQuery } from '@tanstack/react-query';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { toast } from '../../utils/toastMessages';
 import { useWarehouseService } from '../../services/warehouseService';
@@ -33,7 +34,6 @@ type FormValues = {
 
 const WarehouseEdit = forwardRef<ShelveEditDialogControllerRef, ShelveEditProps>(({onSaveSuccess}, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
-  const [warehouses, setWarehouses] = useState<{ value: string; label: string }[]>([]);
 
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const service = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
@@ -69,28 +69,19 @@ const WarehouseEdit = forwardRef<ShelveEditDialogControllerRef, ShelveEditProps>
     },
   });
 
-  useEffect(() => {
-    fetchWarehouseData();
-  }, []);
-
-  const fetchWarehouseData = async () => {
-    try {
+  const { data: warehouses = [] } = useQuery({
+    queryKey: ["warehouses"],
+    queryFn: async () => {
       const response = await service.getWarehouses();
 
-      if (response) {
-        setWarehouses(
-          response.map((c: any) => ({
-            value: String(c.id),
-            label: c.name,
-          }))
-        );
-      } else {
-        console.error('No setWarehouses data found');
-      }
-    } catch (error: any) {
-      console.error('Error fetching countries:', error.message);
-    }
-  };
+      return (response ?? []).map((c: any) => ({
+        value: String(c.id),
+        label: c.name,
+      }));
+    },
+    staleTime: 1000 * 60 * 60 * 24 * 7, // 7 gun cache
+    gcTime: 1000 * 60 * 60 * 24 * 7, // 24 saat bellekte tut
+  });
 
 
   const openDialog = (value: FormValues) => {
@@ -111,7 +102,7 @@ const WarehouseEdit = forwardRef<ShelveEditDialogControllerRef, ShelveEditProps>
   useEffect(() => {
     if (form.isDirty()) {
       setIsDisabledSubmit(false);
-       return;
+      return;
     }
      setIsDisabledSubmit(true);
   }, [form.values]);

@@ -8,6 +8,7 @@ import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useWarehouseService } from '../../services/warehouseService';
 import { toast } from '../../utils/toastMessages';
+import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '~/authContext';
 
 export type ShelveAddDialogControllerRef = {
@@ -32,7 +33,6 @@ type FormValues = {
 const ShelveAdd = forwardRef<ShelveAddDialogControllerRef, ShelveAddProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
-  const [warehouses, setWarehouses] = useState<{ value: string; label: string }[]>([]);
 
   const service = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
   const { currentUser } = useAuthStore();
@@ -76,28 +76,19 @@ const ShelveAdd = forwardRef<ShelveAddDialogControllerRef, ShelveAddProps>(({onS
     setIsDisabledSubmit(true);
   }, [form.values]);
 
-  useEffect(() => {
-    fetchWarehouseData();
-  }, []);
-
-  const fetchWarehouseData = async () => {
-    try {
+  const { data: warehouses = [] } = useQuery({
+    queryKey: ["warehouses"],
+    queryFn: async () => {
       const response = await service.getWarehouses();
 
-      if (response) {
-        setWarehouses(
-          response.map((c: any) => ({
-            value: String(c.id),
-            label: c.name,
-          }))
-        );
-      } else {
-        console.error('No setWarehouses data found');
-      }
-    } catch (error: any) {
-      console.error('Error fetching countries:', error.message);
-    }
-  };
+      return (response ?? []).map((c: any) => ({
+        value: String(c.id),
+        label: c.name,
+      }));
+    },
+    staleTime: 1000 * 60 * 60 * 24 * 7, // 7 gun cache
+    gcTime: 1000 * 60 * 60 * 24 * 7, // 24 saat bellekte tut
+  });
 
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
