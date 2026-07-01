@@ -105,7 +105,7 @@ export default function Project() {
 
       toast.success('İşlem başarılı!');
       
-      
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
       
       close();
 
