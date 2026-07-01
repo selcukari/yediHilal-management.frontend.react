@@ -3,6 +3,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { omit } from 'ramda';
 import { Modal, TextInput, Button, Stack, Grid, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
@@ -32,6 +33,7 @@ const WarehouseAdd = forwardRef<WarehouseAddDialogControllerRef, WarehouseAddPro
   const [opened, { open, close }] = useDisclosure(false);
   const service = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
   const { currentUser } = useAuthStore();
+  const queryClient = useQueryClient();
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
@@ -64,38 +66,39 @@ const WarehouseAdd = forwardRef<WarehouseAddDialogControllerRef, WarehouseAddPro
     setIsDisabledSubmit(true);
   }, [form.values]);
 
-  const handleSubmit = async (values: FormValues) => {
-    setIsDisabledSubmit(true);
-    const newWarehouseValue = {
+  const addWarehousesMutation = useMutation({
+    mutationFn: async (values: FormValues) => {
+      const newWarehouseValue = {
       ...(omit(['updateUserFullName'], values)),
       updateUserId: currentUser?.id as number,
     }
-
-    const result = await service.addWarehouse(newWarehouseValue);
-
+      return await service.addWarehouse(newWarehouseValue);
+    },
+    onSuccess: (result: any) => {
     if (result === true) {
-
       toast.success('İşlem başarılı!');
-      
-      // onSaveSuccess event'ini tetikle
-      if (onSaveSuccess) {
-        onSaveSuccess();
-      }
-      
+
+      queryClient.invalidateQueries({ queryKey: ["warehouses", "duties"] });
+
+      if (onSaveSuccess) onSaveSuccess();
       close();
       form.reset();
-      setIsDisabledSubmit(false);
-
-      return;
     }
-    if (result?.data === false && result?.errors?.length > 0) {
+    else if (result?.data === false && result?.errors?.length > 0) {
 
-      toast.warning(result.errors[0]);
+    toast.warning(result.errors[0]);
 
     } else {
       toast.error('Bir hata oluştu!');
     }
-    setIsDisabledSubmit(false);
+    },
+    onError: () => {
+      toast.error('Bir hata oluştu!');
+    }
+  });
+
+  const handleSubmit = async (values: FormValues) => {
+    addWarehousesMutation.mutate(values);
   };
 
   const confirmDialogHandleConfirm = () => {
