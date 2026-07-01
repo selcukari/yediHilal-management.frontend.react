@@ -9,6 +9,7 @@ import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { toast } from '../../utils/toastMessages';
 import { useWarehouseService } from '../../services/warehouseService';
 import { useAuthStore } from '~/authContext';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export type WarehouseEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -35,6 +36,7 @@ const WarehouseEdit = forwardRef<WarehouseEditDialogControllerRef, WareEditProps
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
   const { currentUser } = useAuthStore();
+  const queryClient = useQueryClient();
 
   const form = useForm<FormValues>({
     initialValues: {
@@ -79,40 +81,39 @@ const WarehouseEdit = forwardRef<WarehouseEditDialogControllerRef, WareEditProps
      setIsDisabledSubmit(true);
   }, [form.values]);
 
-
-  const handleSubmit = async (values: FormValues) => {
-    setIsDisabledSubmit(true);
-
-    const newWarehouseValue = {
-      ...(omit(['updateUserFullName'], values)),
-      updateUserId: currentUser?.id as number,
-    }
-
-    const result = await service.updateWarehouse(newWarehouseValue);
-
-    if (result == true) {
-
-      toast.success('İşlem başarılı!');
-      
-      // onSaveSuccess event'ini tetikle
-      if (onSaveSuccess) {
-        onSaveSuccess();
+  const updateWarehouseMutation = useMutation({
+    mutationFn: async (values: FormValues) => {
+      const newWarehouseValue = {
+        ...(omit(['updateUserFullName'], values)),
+        updateUserId: currentUser?.id as number,
       }
-      form.reset();
-      
+
+      return await service.updateWarehouse(newWarehouseValue);
+    },
+    onSuccess: (result: any) => {
+    if (result === true) {
+      toast.success('İşlem başarılı!');
+
+      queryClient.invalidateQueries({ queryKey: ["warehouses", "duties"] });
+
+      if (onSaveSuccess) onSaveSuccess();
       close();
-      setIsDisabledSubmit(false);
-
-      return;
+      form.reset();
     }
-    if (result?.data == false && result?.errors?.length > 0) {
+    else if (result?.data === false && result?.errors?.length > 0) {
 
-      toast.warning(result.errors[0]);
+    toast.warning(result.errors[0]);
 
     } else {
       toast.error('Bir hata oluştu!');
     }
-    setIsDisabledSubmit(false);
+    },
+    onError: () => {
+      toast.error('Bir hata oluştu!');
+    }
+  });
+  const handleSubmit = async (values: FormValues) => {
+    updateWarehouseMutation.mutate(values);
   };
 
 
