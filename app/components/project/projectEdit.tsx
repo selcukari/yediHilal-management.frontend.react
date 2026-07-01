@@ -1,6 +1,7 @@
 import { forwardRef, useImperativeHandle, useState, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { clone } from 'ramda';
+import { useQueryClient } from '@tanstack/react-query';
 import { Modal, TextInput, Button, Stack, Grid, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DateTimePicker } from '@mantine/dates';
@@ -44,6 +45,7 @@ const ProjectEdit = forwardRef<ProjectEditDialogControllerRef, UserEditProps>(({
   const service = useProjectService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
+  const queryClient = useQueryClient();
 
   const form = useForm<FormValues>({
     initialValues: {
@@ -96,6 +98,7 @@ const ProjectEdit = forwardRef<ProjectEditDialogControllerRef, UserEditProps>(({
     if (result == true) {
 
       toast.success('İşlem başarılı!');
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
       
       // onSaveSuccess event'ini tetikle
       if (onSaveSuccess) {
