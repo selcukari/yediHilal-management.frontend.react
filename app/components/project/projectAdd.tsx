@@ -16,6 +16,7 @@ import { FileUpload } from '../fileInput';
 import { DayRenderer } from '../../components';
 import { useAuthStore } from '~/authContext';
 import { useMutation } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 export type ProjectAddDialogControllerRef = {
   openDialog: () => void;
@@ -45,6 +46,7 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
   const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const confirmModalRef = useRef<ConfirmModalRef>(null);
   const { currentUser } = useAuthStore();
+  const queryClient = useQueryClient();
 
   const form = useForm<FormValues>({
     initialValues: {
@@ -94,6 +96,7 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
   onSuccess: (result: any) => {
     if (result == true) {
       toast.success('Proje başarıyla eklendi!');
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
       
       if (onSaveSuccess) {
         onSaveSuccess();
