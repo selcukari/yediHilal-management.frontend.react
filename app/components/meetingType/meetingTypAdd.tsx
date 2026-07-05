@@ -67,8 +67,8 @@ const MeetingTypeAdd = forwardRef<MeetingTypeAddDialogControllerRef, MeetingType
   });
 
   const handleSubmit = (values: FormValues) => {
-  addMeetingTypeMutation.mutate(values);
-};
+    addMeetingTypeMutation.mutate(values);
+  };
 
   const confirmDialogHandleConfirm = () => {
     confirmModalRef.current?.close();
