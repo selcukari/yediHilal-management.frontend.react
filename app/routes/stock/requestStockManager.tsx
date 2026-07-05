@@ -110,7 +110,7 @@ export default function RequestStock() {
     return Object.fromEntries(
       Object.entries(requestStockData)
       .map(([key, items]) => {
-        const filteredItems = items.filter(item =>
+        const filteredItems = (items as RequestStockManagerData[]).filter(item =>
           item.productName.toLowerCase().includes(searchText.trim().toLowerCase()) ||
           item.updateUserFullName.toLowerCase().includes(searchText.trim().toLowerCase())
         );
@@ -127,29 +127,29 @@ export default function RequestStock() {
     const groupedStocks: RequestStockManagerData[] = [];
       
     Object.entries(filteredStocks).forEach(([groupId, groupItems]) => {
-      if (groupItems.length === 0) return;
+      if (Array.isArray(groupItems) && groupItems.length === 0) return;
       
-      const firstItem = groupItems[0];
+      const firstItem = Array.isArray(groupItems) && groupItems[0]; 
       
       // Ürün adlarını ve count'ları birleştir
-      const productList = groupItems.map(item => 
+      const productList = (groupItems as RequestStockManagerData[]).map(item => 
         `${item.productName} (${item.count})`
       ).join(', ');
 
       // managernote
-      const totalManagernote = groupItems
+      const totalManagernote = Array.isArray(groupItems) && groupItems
         .map(item => item.managerNote || '')
         .filter(note => note.trim() !== '') // Boş notları filtrele
         .join(' - '); // "-" ile birleştir
   
       // status
-      const totalStatus = groupItems
+      const totalStatus = Array.isArray(groupItems) && groupItems
         .map(item => statuMockData.find(s => s.value === item.status)?.label || '')
         .filter(note => note.trim() !== '') // Boş notları filtrele
         .join(' - '); // "-" ile birleştir
       
       // Toplam count hesapla (eğer gerekliyse)
-      const totalCount = groupItems.reduce((sum, item) => 
+      const totalCount = Array.isArray(groupItems) && groupItems.reduce((sum, item) => 
         sum + parseInt(item.count || '0', 10), 0
       );
 

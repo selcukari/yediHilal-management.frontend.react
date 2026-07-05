@@ -5,6 +5,7 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { omit } from 'ramda';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'; // ✨ React Query kancaları eklendi
 import { DatePickerInput } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
 import DocumentTrackingAdd, { type DocumentTrackingAddDialogControllerRef } from '../components/documentTracking/documentTrackingAdd';
@@ -38,7 +39,6 @@ interface DocumentTrackingType {
 }
 
 export default function DocumentTracking() {
-  const [resultData, setResultData] = useState<DocumentTrackingType[]>([]);
   const [searchText, setSearchText] = useState('');
   const [rangeDate, setRangeDate] = useState<[string | null, string | null]>([null, null] )
   const [visible, { open, close }] = useDisclosure(false);
@@ -56,14 +56,32 @@ export default function DocumentTracking() {
   ]);
   const documentTrackingAddRef = useRef<DocumentTrackingAddDialogControllerRef>(null);
   const documentTrackingEditRef = useRef<DocumentTrackingEditDialogControllerRef>(null);
-
+  const queryClient = useQueryClient();
   const service = useDocumentTrackingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+
+  const {data: resultData = [], isLoading, isError, error} = useQuery({
+    queryKey: ['documentTrackings'],
+    queryFn: async () => {
+      const getDocumentTrackings = await service.getDocumentTrackings();
+      if (getDocumentTrackings) {
+        return getDocumentTrackings.map((documentTracking: DocumentTrackingType) => ({
+          ...documentTracking,
+          updateDate: documentTracking.updateDate ? formatDate(documentTracking.updateDate, dateFormatStrings.defaultDateFormat) : null,
+          createDate: documentTracking.createDate ? formatDate(documentTracking.createDate, dateFormatStrings.dateTimeFormatWithoutSecond) : null,
+        }));
+      } else {
+        toast.info('Hiçbir veri yok!');
+        return [];
+      }
+    },
+    staleTime: 1000 * 60 * 60 * 24, // Veriyi 1 gün güncel kabul et, gereksiz API isteklerini önle
+  });
 
   // Filtrelenmiş veriler
   const filteredDocumentTrackings = useMemo(() => {
   if (!resultData) return [];
 
-  return resultData.filter(branch => {
+  return resultData.filter((branch: DocumentTrackingType) => {
     // metin arama kontrolü
     const matchesSearch = !searchText 
       || branch.name?.toLowerCase().includes(searchText.trim().toLowerCase());
@@ -86,16 +104,10 @@ export default function DocumentTracking() {
   });
 }, [resultData, searchText, rangeDate]);
 
-  useEffect(() => {
-    setTimeout(() => {
-      fetchDocumentTracking();
-    }, 1000);
-  }, []);
-
   const handleEdit = (item: DocumentTrackingType) => {
-     documentTrackingEditRef.current?.openDialog({
+    documentTrackingEditRef.current?.openDialog({
       ...omit(['actions', 'isActive', 'createDate', 'updateDate', 'responsibleId', 'responsibleFullName'], item),
-     });
+    });
   };
   const getFileNameWithoutUUID = (url: string) => {
     try {
@@ -117,37 +129,37 @@ export default function DocumentTracking() {
     }
   }
 
+  const deleteMutation = useMutation({
+      mutationFn: async (id: number) => {
+        return await service.deleteDocumentTracking(id);
+      },
+      onMutate: () => {
+        open(); // İşlem başladığında LoadingOverlay göster
+      },
+      onSuccess: (result) => {
+        if (result === true) {
+          toast.success('İşlem başarılı!');
+          // ✨ Liste önbelleğini (cache) geçersiz kılıp otomatik güncel veriyi çektiriyoruz
+          queryClient.invalidateQueries({ queryKey: ['documentTrackings'] });
+        } else if (result?.data === false && result?.errors?.length > 0) {
+          toast.warning(result.errors[0]);
+        } else {
+          toast.error('Bir hata oluştu!');
+        }
+      },
+      onError: (error: any) => {
+        toast.error(`Silme işleminde bir hata: ${error.message}`);
+      },
+      onSettled: () => {
+        close(); // İşlem bittiğinde LoadingOverlay gizle
+      }
+    });
+
   const handleDelete = async (id: number) => {
-    open();
-
-     try {
-
-      const result = await service.deleteDocumentTracking(id);
-      if (result == true) {
-
-      toast.success('İşlem başarılı!');
-      
-      fetchDocumentTracking();
-      
-      close();
-
-      return;
-    }
-    else if (result?.data == false && result?.errors?.length > 0) {
-
-      toast.warning(result.errors[0]);
-
-    } else {
-      toast.error('Bir hata oluştu!');
-    }
-      close();
-    } catch (error: any) {
-      toast.error(`silme işleminde bir hata: ${error.message}`);
-      close();
-    }
+    deleteMutation.mutate(id);
   };
 
-  const rowsTable = filteredDocumentTrackings.map((item) => (
+  const rowsTable = filteredDocumentTrackings.map((item: DocumentTrackingType) => (
     <Table.Tr key={item.id}>
       {rowHeaders.map((header) => {
     
@@ -200,37 +212,10 @@ export default function DocumentTracking() {
     </Table.Tr>
   ));
 
-  const fetchDocumentTracking = async () => {
-     open();
-
-     try {
-
-      const getDocumentTrackings = await service.getDocumentTrackings();
-      if (getDocumentTrackings) {
-        setResultData(getDocumentTrackings.map((documentTracking: DocumentTrackingType) => ({
-          ...documentTracking,
-          updateDate: documentTracking.updateDate ? formatDate(documentTracking.updateDate, dateFormatStrings.defaultDateFormat) : null,
-          createDate: documentTracking.createDate ? formatDate(documentTracking.createDate, dateFormatStrings.dateTimeFormatWithoutSecond) : null,
-        })));
-       
-      } else {
-        toast.info('Hiçbir veri yok!');
-
-        setResultData([]);
-      }
-        close();
-
-    } catch (error: any) {
-        toast.error(`DocumentTracking yüklenirken hata: ${error.message}`);
-        close();
-    }
-  };
+ 
 
   const handleSaveSuccess = () => {
-
-    setTimeout(() => {
-      fetchDocumentTracking();
-    }, 1000);
+    queryClient.invalidateQueries({ queryKey: ['documentTrackings'] });
   };
   // useMemo hook'u ile sütunları önbelleğe alıyoruz
   const pdfTableColumns = useMemo((): PdfTableColumn[] => {
