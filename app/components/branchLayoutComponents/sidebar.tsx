@@ -3,8 +3,8 @@ import {
   NavLink, Flex, Text, Stack, Divider, Group, ScrollArea, AppShell,
 } from '@mantine/core';
 import {
-  IconUsers, IconUser, IconFileCheck, IconCoin, IconClipboardList,
-  IconChevronRight, IconPhoneCall, IconCalendarTime, IconChevronDown, IconBuildings,
+  IconUsers, IconUser, IconFileCheck, IconClipboardList,
+  IconChevronRight, IconCalendarTime, IconChevronDown, IconBuildings,
 } from '@tabler/icons-react';
 import { useNavigate, useLocation } from 'react-router';
 import { useAuthStore } from '~/authContext';
