@@ -2,6 +2,7 @@ import { forwardRef, useImperativeHandle, useEffect, useState, useRef } from 're
 import { useDisclosure } from '@mantine/hooks';
 import { Modal, TextInput, Button, Stack, Textarea, Grid, Flex, Switch, Select } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
@@ -30,7 +31,7 @@ const DocumentTrackingAdd = forwardRef<DocumentTrackingAddDialogControllerRef, D
   const [opened, { open, close }] = useDisclosure(false);
   
   const service = useDocumentTrackingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
-
+  const queryClient = useQueryClient();
   const confirmModalRef = useRef<ConfirmModalRef>(null);
   const { currentUser } = useAuthStore();
 
@@ -48,42 +49,43 @@ const DocumentTrackingAdd = forwardRef<DocumentTrackingAddDialogControllerRef, D
     },
   });
 
-  const handleSubmit = async (values: FormValues) => {
-    setIsDisabledSubmit(true);
-    // Dosya form değerlerinden al
-    const files = form.values.files || [];
+  const addDocumentTrackingMutation = useMutation({
+    mutationFn: async (values: FormValues) => {
+      const files = form.values.files || [];
 
-    const result = await service.addDocumentTracking({
-      ...values,
-      files: files.length > 0 ? files : undefined,
-      responsibleId: currentUser?.id?.toString() as string,
-      responsibleFullName: currentUser?.fullName as string,
-      responsiblePhone: `${currentUser?.countryCode}${currentUser?.phone}` as string,
-    });
+      return await service.addDocumentTracking({
+        ...values,
+        files: files.length > 0 ? files : undefined,
+        responsibleId: currentUser?.id?.toString() as string,
+        responsibleFullName: currentUser?.fullName as string,
+        responsiblePhone: `${currentUser?.countryCode}${currentUser?.phone}` as string,
+      });
+    },
+    onSuccess: (result: any) => {
+      if (result === true) {
+        toast.success('İşlem başarılı!');
 
-    if (result === true) {
+        queryClient.invalidateQueries({ queryKey: ['documentTrackings'] });
 
-      toast.success('İşlem başarılı!');
-      
-      // onSaveSuccess event'ini tetikle
-      if (onSaveSuccess) {
-        onSaveSuccess();
+        if (onSaveSuccess) onSaveSuccess();
+        close();
+        form.reset();
       }
-      
-      close();
-      form.reset();
-      setIsDisabledSubmit(false);
+      else if (result?.data === false && result?.errors?.length > 0) {
 
-      return;
-    }
-    else if (result?.data === false && result?.errors?.length > 0) {
+        toast.warning(result.errors[0]);
 
-      toast.warning(result.errors[0]);
-
-    } else {
+      } else {
+        toast.error('Bir hata oluştu!');
+      }
+    },
+    onError: () => {
       toast.error('Bir hata oluştu!');
     }
-    setIsDisabledSubmit(false);
+  });
+
+  const handleSubmit = async (values: FormValues) => {
+    addDocumentTrackingMutation.mutate(values);
   };
 
   const confirmDialogHandleConfirm = () => {
