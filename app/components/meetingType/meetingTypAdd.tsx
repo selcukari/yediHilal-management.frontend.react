@@ -7,7 +7,7 @@ import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useMeetingTypeService } from '../../services/meetingTypeService';
 import { toast } from '../../utils/toastMessages';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export type MeetingTypeAddDialogControllerRef = {
   open: () => void;
@@ -26,7 +26,7 @@ const MeetingTypeAdd = forwardRef<MeetingTypeAddDialogControllerRef, MeetingType
   const [opened, { open, close }] = useDisclosure(false);
 
   const service = useMeetingTypeService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
-
+  const queryClient = useQueryClient();
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
   const form = useForm<FormValues>({
@@ -48,6 +48,7 @@ const MeetingTypeAdd = forwardRef<MeetingTypeAddDialogControllerRef, MeetingType
     onSuccess: (result: any) => {
       if (result === true) {
         toast.success('İşlem başarılı!');
+        queryClient.invalidateQueries({ queryKey: ['meetingTypes'] });
 
         if (onSaveSuccess) onSaveSuccess();
         close();
