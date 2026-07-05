@@ -1,8 +1,9 @@
-import { forwardRef, useImperativeHandle, useState, useRef, useEffect } from 'react';
+import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { clone, omit } from 'ramda';
-import { Modal, TextInput, Button, Stack, Textarea, Title, Table, Paper, Grid, Flex, Switch, Select } from '@mantine/core';
+import { clone } from 'ramda';
+import { Modal, TextInput, Button, Stack, Textarea, Grid, Flex } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
@@ -28,10 +29,10 @@ type FormValues = {
 };
 
 const BranchEdit = forwardRef<DocumentTrackingEditDialogControllerRef, DocumentTrackingEditProps>(({onSaveSuccess}, ref) => {
-  const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
   
   const service = useDocumentTrackingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+  const queryClient = useQueryClient();
   const confirmModalRef = useRef<ConfirmModalRef>(null);
   const { currentUser } = useAuthStore();
 
@@ -47,42 +48,43 @@ const BranchEdit = forwardRef<DocumentTrackingEditDialogControllerRef, DocumentT
     },
   });
 
-  const handleSubmit = async (values: FormValues) => {
-    setIsDisabledSubmit(true);
-    // Dosya form değerlerinden al
-    const files = form.values.files || [];
-    
-    const result = await service.updateDocumentTracking({
-      ...values,
-      files: files.length > 0 ? files : undefined,
-      responsibleId: currentUser?.id?.toString() as string,
-      responsibleFullName: currentUser?.fullName as string,
-      responsiblePhone: `${currentUser?.countryCode}${currentUser?.phone}` as string,
-    });
+  const updateDocumentTrackingMutation = useMutation({
+    mutationFn: async (values: FormValues) => {
+      const files = form.values.files || [];
 
-    if (result === true) {
+      return await service.updateDocumentTracking({
+        ...values,
+        files: files.length > 0 ? files : undefined,
+        responsibleId: currentUser?.id?.toString() as string,
+        responsibleFullName: currentUser?.fullName as string,
+        responsiblePhone: `${currentUser?.countryCode}${currentUser?.phone}` as string,
+      });
+    },
+    onSuccess: (result: any) => {
+      if (result === true) {
+        toast.success('İşlem başarılı!');
 
-      toast.success('İşlem başarılı!');
-      
-      // onSaveSuccess event'ini tetikle
-      if (onSaveSuccess) {
-        onSaveSuccess();
+        queryClient.invalidateQueries({ queryKey: ['documentTrackings'] });
+
+        if (onSaveSuccess) onSaveSuccess();
+        close();
+        form.reset();
       }
-      
-      close();
-      form.reset();
-      setIsDisabledSubmit(false);
-
-      return;
-    }
-    else if (result?.data === false && result?.errors?.length > 0) {
+      else if (result?.data === false && result?.errors?.length > 0) {
 
       toast.warning(result.errors[0]);
 
     } else {
       toast.error('Bir hata oluştu!');
     }
-    setIsDisabledSubmit(false);
+    },
+    onError: () => {
+      toast.error('Bir hata oluştu!');
+    }
+  });
+
+  const handleSubmit = async (values: FormValues) => {
+    updateDocumentTrackingMutation.mutate(values);
   };
 
   const confirmDialogHandleConfirm = () => {
@@ -173,7 +175,7 @@ const BranchEdit = forwardRef<DocumentTrackingEditDialogControllerRef, DocumentT
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
               İptal
             </Button>
-            <Button type="submit" variant="filled" size="xs" disabled={isDisabledSubmit}  leftSection={<IconCheck size={14} />} radius="xs">
+            <Button type="submit" variant="filled" size="xs" disabled={updateDocumentTrackingMutation.isPending}  leftSection={<IconCheck size={14} />} radius="xs">
               Kaydet
             </Button>
           </Grid.Col>
