@@ -3,6 +3,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { Modal, TextInput, Button, Stack, Grid } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { clone } from 'ramda';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
@@ -29,6 +30,7 @@ const MeetingTypeEdit = forwardRef<MeetingTypeEditDialogControllerRef, MeetingTy
   const service = useMeetingTypeService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
+  const queryClient = useQueryClient();
 
   const form = useForm<FormValues>({
     initialValues: {
@@ -54,37 +56,38 @@ const MeetingTypeEdit = forwardRef<MeetingTypeEditDialogControllerRef, MeetingTy
     }
   }
 
-  const handleSubmit = async (values: FormValues) => {
-    setIsDisabledSubmit(true);
-    
-    const result = await service.updateMeetingType({
-      ...values,
+  const updateMeetingTypeMutation = useMutation({
+    mutationFn: async (values: FormValues) => {
+      return await service.updateMeetingType({
+        ...values,
       name: values.name.trim()
-    });
+      });
+    },
+    onSuccess: (result: any) => {
+      if (result === true) {
+        toast.success('İşlem başarılı!');
 
-    if (result == true) {
+        queryClient.invalidateQueries({ queryKey: ['meetingTypes'] });
 
-      toast.success('İşlem başarılı!');
-      
-      // onSaveSuccess event'ini tetikle
-      if (onSaveSuccess) {
-        onSaveSuccess();
+        if (onSaveSuccess) onSaveSuccess();
+        close();
+        form.reset();
       }
-      form.reset();
-      
-      close();
-      setIsDisabledSubmit(false);
-
-      return;
-    }
-    else if (result?.data == false && result?.errors?.length > 0) {
+      else if (result?.data === false && result?.errors?.length > 0) {
 
       toast.warning(result.errors[0]);
 
     } else {
       toast.error('Bir hata oluştu!');
     }
-    setIsDisabledSubmit(false);
+    },
+    onError: () => {
+      toast.error('Bir hata oluştu!');
+    }
+  });
+
+  const handleSubmit = async (values: FormValues) => {
+    updateMeetingTypeMutation.mutate(values);
   };
 
   const confirmDialogHandleConfirm = () => {
