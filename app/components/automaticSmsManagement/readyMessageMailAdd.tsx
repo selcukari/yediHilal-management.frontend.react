@@ -23,7 +23,6 @@ type FormValues = {
   body: string;
 };
 
-
 const ReadyMessageMailAdd = forwardRef<ReadyMessageAddDialogControllerRef, SancaktarAddProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);

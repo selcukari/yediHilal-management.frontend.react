@@ -22,7 +22,6 @@ type FormValues = {
   message: string;
 };
 
-
 const ReadyMessageAdd = forwardRef<ReadyMessageAddDialogControllerRef, SancaktarAddProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
