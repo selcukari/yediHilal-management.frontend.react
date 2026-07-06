@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { IconSearch, IconEdit, IconTrash, IconPlus, IconCalendar } from '@tabler/icons-react';
 import {
-  Container, Grid, TextInput, Badge, Flex, ActionIcon, Stack, Group, Title, Text, Paper, Table, LoadingOverlay, Button,
+  Container, Grid, TextInput, Flex, ActionIcon, Stack, Group, Title, Text, Paper, Table, LoadingOverlay, Button,
   Tooltip,
 } from '@mantine/core';
 import { omit } from 'ramda';

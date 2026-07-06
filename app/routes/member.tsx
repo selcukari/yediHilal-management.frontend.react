@@ -6,6 +6,7 @@ import {
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
+import { useQuery } from '@tanstack/react-query';
 import { Country, ProgramType, Province, MemberType, MenuActionButton } from '../components'
 import MemberAdd, { type MemberAddDialogControllerRef } from '../components/members/memberAdd';
 import MemberEdit, { type MemberEditDialogControllerRef } from '../components/members/memberEdit';
@@ -40,7 +41,6 @@ interface Column {
 export default function Member() {
   const { isLoggedIn, currentUser } = useAuthStore();
 
-  const [resultData, setResultData] = useState<any[]>([]);
   const [isDisabledDeleteAction, setDisabledDeleteAction]= useState(false);
   const [selectedCountry, setSelectedCountry] = useState<string | null | undefined>(null);
   const [filterModel, setFilterModel] = useState<filterModels>({ isActive: true, countryId: '1', dateRange: [null, null] });
@@ -130,7 +130,71 @@ export default function Member() {
     confirmModalMessageRef.current?.open()
   };
 
-  const rowsTable = resultData.map((item) => (
+  const onMemberTypeChange = (memberTypeValues: string[] | null, memberTypeNames?: string[] | null): void => {
+    setSelectedMemberTypeName(memberTypeNames || []);
+
+    setFilterModel((prev) => ({
+      ...prev,
+      typeIds: memberTypeValues,
+    }));
+  };
+
+  const onCountrySelected = (countryValue: string | null, countryName?: string): void => {
+    setSelectedCountryName(countryName || '');
+    setSelectedCountry(countryValue);
+    setSelectedProvinceNames([]);
+
+    setFilterModel((prev) => ({
+      ...prev,
+      provinceIds: [],
+      countryId: countryValue,
+    }));
+  }
+
+  const onProvinceChange = (provinceValues: string[] | null, provinceNames?: string[]): void => {
+    setSelectedProvinceNames(provinceNames || []);
+
+    setFilterModel((prev) => ({
+      ...prev,
+      provinceIds: provinceValues,
+    }));
+  };
+
+  // TanStack Query Entegrasyonu
+  const { data: resultData = [], isLoading, refetch } = useQuery({
+    queryKey: ['members', filterModel.isActive], // Sadece aktiflik durumu veya filtre tetiklemesine bağlı anahtar
+    queryFn: async () => {
+      const params = {
+        ...filterModel,
+        provinceIds: (filterModel.provinceIds && filterModel.provinceIds?.length > 0) ? filterModel.provinceIds?.join(",") : undefined,
+        typeIds: (filterModel.typeIds && filterModel.typeIds?.length > 0) ? filterModel.typeIds?.join(",") : undefined,
+        searchText: (filterModel.searchText && filterModel.searchText.length > 3 ? filterModel.searchText.trim() : undefined),
+        programTypeId: filterModel.programTypeId ? parseInt(filterModel.programTypeId) : null 
+      };
+
+      const getMembers = await service.members(params);
+      
+      if (getMembers && getMembers.length > 0) {
+        return getMembers.map((item: any) => ({
+          ...item,
+          createdDate: formatDate(item.createdDate, dateFormatStrings.dateTimeFormatWithoutSecond),
+          updateDate: formatDate(item.updateDate, dateFormatStrings.dateTimeFormatWithoutSecond),
+          phoneWithCountryCode: (item.countryCode && item.phone) ? `${item.countryCode}${item.phone}` : undefined
+        }));
+      }
+      
+      return [];
+    },
+    enabled: isLoggedIn, // Kullanıcı giriş yaptıysa otomatik tetiklenir
+    staleTime: 1000 * 60 * 60, // 5 dakika cache
+  });
+
+
+  const handleSaveSuccess = () => {
+    refetch();
+  };
+
+   const rowsTable = resultData.map((item: any) => (
     <Table.Tr key={item.id}>
       {rowHeaders.map((header) => {
         if (header.field === 'actions') {
@@ -186,85 +250,6 @@ export default function Member() {
     </Table.Tr>
   ));
 
-  const onMemberTypeChange = (memberTypeValues: string[] | null, memberTypeNames?: string[] | null): void => {
-    setSelectedMemberTypeName(memberTypeNames || []);
-
-    setFilterModel((prev) => ({
-      ...prev,
-      typeIds: memberTypeValues,
-    }));
-  };
-
-  const onCountrySelected = (countryValue: string | null, countryName?: string): void => {
-    setSelectedCountryName(countryName || '');
-    setSelectedCountry(countryValue);
-    setSelectedProvinceNames([]);
-
-    setFilterModel((prev) => ({
-      ...prev,
-      provinceIds: [],
-      countryId: countryValue,
-    }));
-  }
-
-  const onProvinceChange = (provinceValues: string[] | null, provinceNames?: string[]): void => {
-    setSelectedProvinceNames(provinceNames || []);
-
-    setFilterModel((prev) => ({
-      ...prev,
-      provinceIds: provinceValues,
-    }));
-  };
-
-  const fetchMembers = async () => {
-     open();
-
-    const params = {
-      ...filterModel,
-      provinceIds: (filterModel.provinceIds && filterModel.provinceIds?.length > 0) ? filterModel.provinceIds?.join(",") : undefined,
-      typeIds: (filterModel.typeIds && filterModel.typeIds?.length > 0) ? filterModel.typeIds?.join(",") : undefined,
-      searchText: (filterModel.searchText && filterModel.searchText.length > 3 ? filterModel.searchText.trim() : undefined),
-      programTypeId: filterModel.programTypeId ? parseInt(filterModel.programTypeId) : null 
-    }
-
-    try {
-
-      const getMembers = await service.members(params);
-      if (getMembers) {
-        setResultData(getMembers.map((item: any) => ({
-          ...item,
-          createdDate: formatDate(item.createdDate, dateFormatStrings.dateTimeFormatWithoutSecond),
-          updateDate: formatDate(item.updateDate, dateFormatStrings.dateTimeFormatWithoutSecond),
-          phoneWithCountryCode: (item.countryCode && item.phone) ? `${item.countryCode}${item.phone}` : undefined
-        })));
-       
-      } else {
-        toast.info('Hiçbir veri yok!');
-
-        setResultData([]);
-      }
-        close();
-        setDisabledDeleteAction(!filterModel.isActive)
-    } catch (error: any) {
-      toast.error(`Üye yüklenirken hata: ${error.message}`);
-      close();
-    }
-  };
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      setTimeout(() => {
-        fetchMembers();
-      }, 1000);
-    }
-  }, []);
-
-  const handleSaveSuccess = () => {
-    setTimeout(() => {
-      fetchMembers();
-    }, 1500);
-  };
-
   const confirmModalMessageHandleConfirm = async (messageText: string) => {
     // Burada silme işlemini yap
     if (selectedItemId) {
@@ -272,7 +257,7 @@ export default function Member() {
 
       if (result) {
         toast.success('Üye başarıyla silindi!');
-        fetchMembers(); // Verileri yeniden çek
+        refetch(); // Verileri yeniden çek
       } else {
         toast.error('Üye silinirken hata oluştu!');
       }
@@ -454,7 +439,7 @@ export default function Member() {
                   >
                     <Button
                       leftSection={<IconFilter size={14} />}
-                      onClick={fetchMembers}>
+                      onClick={() => refetch()}>
                       Filtrele
                     </Button>
                   </Flex>
