@@ -2,6 +2,7 @@ import { forwardRef, useImperativeHandle, useEffect, useState, useRef, useMemo }
 import { useDisclosure } from '@mantine/hooks';
 import { Modal, Textarea, TextInput, Button, Stack, Grid } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useMutation } from '@tanstack/react-query';
 import { IconCancel, IconCheck } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
@@ -46,37 +47,32 @@ const ReadyMessageMailAdd = forwardRef<ReadyMessageAddDialogControllerRef, Sanca
     },
   });
 
-  const handleSubmit = async (values: FormValues) => {
-    setIsDisabledSubmit(true);
-
-    const result = await service.addReadyMessageMail({
-        ...values,
-    });
-
+  const addReadyMessageMailMutation = useMutation({
+    mutationFn: async (values: FormValues) => {
+      return await service.addReadyMessageMail(values);
+    },
+    onSuccess: (result: any) => {
       if (result === true) {
-
         toast.success('İşlem başarılı!');
-        
         // onSaveSuccess event'ini tetikle
         if (onSaveSuccess) {
           onSaveSuccess();
         }
-        
         close();
         form.reset();
         setIsDisabledSubmit(false);
-
-        return;
       }
       else if (result?.data === false && result?.errors?.length > 0) {
-
         toast.warning(result.errors[0]);
-
       } else {
         toast.error('Bir hata oluştu!');
       }
-      setIsDisabledSubmit(false);
-    };
+    }
+  });
+
+  const handleSubmit = async (values: FormValues) => {
+    addReadyMessageMailMutation.mutate(values);
+  };
 
   useEffect(() => {
     if (form.isDirty()) {
@@ -151,7 +147,7 @@ const ReadyMessageMailAdd = forwardRef<ReadyMessageAddDialogControllerRef, Sanca
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
               İptal
             </Button>
-            <Button type="submit" variant="filled" size="xs" disabled={isDisabledSubmit}  leftSection={<IconCheck size={14} />} radius="xs">
+            <Button type="submit" variant="filled" size="xs" disabled={addReadyMessageMailMutation.isPending || isDisabledSubmit}  leftSection={<IconCheck size={14} />} radius="xs">
               Ekle
             </Button>
           </Grid.Col>
