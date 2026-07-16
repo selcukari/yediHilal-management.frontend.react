@@ -186,7 +186,7 @@ export default function Member() {
       return [];
     },
     enabled: isLoggedIn, // Kullanıcı giriş yaptıysa otomatik tetiklenir
-    staleTime: 1000 * 60 * 60, // 5 dakika cache
+    staleTime: 60 * 60 * 1000, // 60 dakika boyunca veriyi taze kabul et
   });
 
 
