@@ -10,6 +10,7 @@ import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { toast } from '../../utils/toastMessages';
 import { useWarehouseService } from '../../services/warehouseService';
 import { useAuthStore } from '~/authContext';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type ShelveEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -34,6 +35,7 @@ type FormValues = {
 
 const WarehouseEdit = forwardRef<ShelveEditDialogControllerRef, ShelveEditProps>(({onSaveSuccess}, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
+  const connection = useSignalR();
 
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const service = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
@@ -68,6 +70,21 @@ const WarehouseEdit = forwardRef<ShelveEditDialogControllerRef, ShelveEditProps>
       },
     },
   });
+   useEffect(() => {
+  
+      if (!connection) return;
+  
+     connection.on('ReceiveValueUpdated', (data: any) => {
+      
+      // Toast veya state güncellemesi
+      toast.success('İşlem başarılı! ' + data.valueName);
+    });
+  
+      // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+      return () => {
+        connection.off('ReceiveValueUpdated');
+      };
+    }, [connection]);
 
   const { data: warehouses = [] } = useQuery({
     queryKey: ["warehouses"],
@@ -121,8 +138,6 @@ const WarehouseEdit = forwardRef<ShelveEditDialogControllerRef, ShelveEditProps>
 
     if (result == true) {
 
-      toast.success('İşlem başarılı!');
-      
       // onSaveSuccess event'ini tetikle
       if (onSaveSuccess) {
         onSaveSuccess();

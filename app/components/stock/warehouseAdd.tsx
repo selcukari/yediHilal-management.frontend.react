@@ -10,6 +10,7 @@ import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useWarehouseService } from '../../services/warehouseService';
 import { toast } from '../../utils/toastMessages';
 import { useAuthStore } from '~/authContext';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type WarehouseAddDialogControllerRef = {
   open: () => void;
@@ -34,6 +35,7 @@ const WarehouseAdd = forwardRef<WarehouseAddDialogControllerRef, WarehouseAddPro
   const service = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
   const { currentUser } = useAuthStore();
   const queryClient = useQueryClient();
+  const connection = useSignalR();
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
@@ -55,6 +57,21 @@ const WarehouseAdd = forwardRef<WarehouseAddDialogControllerRef, WarehouseAddPro
       },
     },
   });
+    useEffect(() => {
+    
+        if (!connection) return;
+    
+       connection.on('ReceiveValueCreated', (data: any) => {
+        
+        // Toast veya state güncellemesi
+        toast.success('İşlem başarılı! ' + data.valueName);
+      });
+    
+        // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+        return () => {
+          connection.off('ReceiveValueCreated');
+        };
+      }, [connection]);
 
   useEffect(() => {
     if (form.isDirty()) {
@@ -76,7 +93,6 @@ const WarehouseAdd = forwardRef<WarehouseAddDialogControllerRef, WarehouseAddPro
     },
     onSuccess: (result: any) => {
     if (result === true) {
-      toast.success('İşlem başarılı!');
 
       queryClient.invalidateQueries({ queryKey: ["warehouses", "duties"] });
 

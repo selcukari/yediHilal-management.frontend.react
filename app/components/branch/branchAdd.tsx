@@ -15,6 +15,7 @@ import { useBranchService } from '../../services/branchService';
 import { toast } from '../../utils/toastMessages';
 import { FileUpload } from '../fileInput';
 import { DayRenderer } from '../../components';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type BranchAddDialogControllerRef = {
   openDialog: () => void;
@@ -58,6 +59,8 @@ const BranchAdd = forwardRef<BranchAddDialogControllerRef, UserAddProps>(({onSav
 
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
+  const connection = useSignalR();
+
   const form = useForm<FormValues>({
     initialValues: {
       branchName: '',
@@ -86,6 +89,21 @@ const BranchAdd = forwardRef<BranchAddDialogControllerRef, UserAddProps>(({onSav
     },
   });
 
+   // 2. SignalR Dinleyicisini Aktif Et
+  useEffect(() => {
+    if (!connection) return;
+
+    connection.on('ReceiveValueCreated', (data) => {
+      // Ekrana anlık olarak listeye ekliyoruz (Kullanıcı sayfayı yenilemeden görür)
+      toast.success('İşlem başarılı! ' + data.valueName);
+    });
+
+    // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+    return () => {
+      connection.off('ReceiveValueCreated');
+    };
+  }, [connection]);
+
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
     // Dosya form değerlerinden al
@@ -104,8 +122,6 @@ const BranchAdd = forwardRef<BranchAddDialogControllerRef, UserAddProps>(({onSav
 
     if (result === true) {
 
-      toast.success('İşlem başarılı!');
-      
       // onSaveSuccess event'ini tetikle
       if (onSaveSuccess) {
         onSaveSuccess();

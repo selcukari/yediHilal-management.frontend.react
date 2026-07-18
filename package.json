@@ -15,6 +15,7 @@
     "@mantine/hooks": "^8.3.0",
     "@mantine/notifications": "^8.3.0",
     "@mantine/tiptap": "^8.3.0",
+    "@microsoft/signalr": "^10.0.0",
     "@react-router/node": "^7.7.1",
     "@react-router/serve": "^7.7.1",
     "@tabler/icons-react": "^3.34.1",

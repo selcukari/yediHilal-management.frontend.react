@@ -9,6 +9,7 @@ import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useMeetingTypeService } from '../../services/meetingTypeService';
 import { toast } from '../../utils/toastMessages';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type MeetingTypeEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -28,6 +29,7 @@ const MeetingTypeEdit = forwardRef<MeetingTypeEditDialogControllerRef, MeetingTy
   const [opened, { open, close }] = useDisclosure(false);
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const service = useMeetingTypeService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+  const connection = useSignalR();
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
   const queryClient = useQueryClient();
@@ -41,6 +43,23 @@ const MeetingTypeEdit = forwardRef<MeetingTypeEditDialogControllerRef, MeetingTy
       name: (value) => (value.trim().length < 5 ? 'Toplantı Türü Adı en az 5 karakter olmalı' : null),
     },
   });
+
+  // 2. SignalR Dinleyicisini Aktif Et
+  useEffect(() => {
+
+    if (!connection) return;
+
+   connection.on('ReceiveValueUpdated', (data) => {
+    
+    // Toast veya state güncellemesi
+    toast.success('İşlem başarılı! ' + data.valueName);
+  });
+
+    // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+    return () => {
+      connection.off('ReceiveValueUpdated');
+    };
+  }, [connection]);
 
 
   const openDialog = (value: FormValues) => {
@@ -65,7 +84,6 @@ const MeetingTypeEdit = forwardRef<MeetingTypeEditDialogControllerRef, MeetingTy
     },
     onSuccess: (result: any) => {
       if (result === true) {
-        toast.success('İşlem başarılı!');
 
         queryClient.invalidateQueries({ queryKey: ['meetingTypes'] });
 

@@ -16,6 +16,7 @@ import { useMeetingService } from '../../services/meetingService';
 import { FileUpload } from '../fileInput';
 import { DayRenderer } from '../../components';
 import { useAuthStore } from '~/authContext';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type MeetingEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -48,6 +49,7 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const service = useMeetingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const { currentUser } = useAuthStore();
+  const connection = useSignalR();
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
@@ -102,6 +104,23 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
 
     return isValid;
   };
+
+   // 2. SignalR Dinleyicisini Aktif Et
+  useEffect(() => {
+
+    if (!connection) return;
+
+   connection.on('ReceiveValueUpdated', (data) => {
+    
+    // Toast veya state güncellemesi
+    toast.success('İşlem başarılı! ' + data.valueName);
+  });
+
+    // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+    return () => {
+      connection.off('ReceiveValueUpdated');
+    };
+  }, [connection]);
 
   const validateStep2 = () => {
     const fieldsToValidate = ['agendas', 'time'];
@@ -213,8 +232,6 @@ const MeetingEdit = forwardRef<MeetingEditDialogControllerRef, MeetingEditProps>
 
     if (result == true) {
 
-      toast.success('İşlem başarılı!');
-      
       // onSaveSuccess event'ini tetikle
       if (onSaveSuccess) {
         onSaveSuccess();

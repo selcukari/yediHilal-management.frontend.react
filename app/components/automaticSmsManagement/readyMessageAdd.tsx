@@ -8,6 +8,7 @@ import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useReadyMessageService } from '../../services/readyMessageService';
 import { toast } from '../../utils/toastMessages';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type ReadyMessageAddDialogControllerRef = {
   open: () => void;
@@ -27,6 +28,7 @@ const ReadyMessageAdd = forwardRef<ReadyMessageAddDialogControllerRef, Sancaktar
   const [opened, { open, close }] = useDisclosure(false);
   
   const service = useReadyMessageService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
+  const connection = useSignalR();
 
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
@@ -45,7 +47,6 @@ const ReadyMessageAdd = forwardRef<ReadyMessageAddDialogControllerRef, Sancaktar
     },
     onSuccess: (result: any) => {
       if (result === true) {
-        toast.success('İşlem başarılı!');
         // onSaveSuccess event'ini tetikle
         if (onSaveSuccess) {
           onSaveSuccess();
@@ -61,6 +62,21 @@ const ReadyMessageAdd = forwardRef<ReadyMessageAddDialogControllerRef, Sancaktar
       }
     }
   });
+
+    // 2. SignalR Dinleyicisini Aktif Et
+    useEffect(() => {
+      if (!connection) return;
+  
+      connection.on('ReceiveValueCreated', (data) => {
+        // Ekrana anlık olarak listeye ekliyoruz (Kullanıcı sayfayı yenilemeden görür)
+        toast.success('İşlem başarılı! ' + data.valueName);
+      });
+  
+      // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+      return () => {
+        connection.off('ReceiveValueCreated');
+      };
+    }, [connection]);
 
   const handleSubmit = (values: FormValues) => {
     addReadyMessageMutation.mutate(values);

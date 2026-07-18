@@ -15,6 +15,7 @@ import { RichTextEditorTiptap } from '../richTextEditorTiptap';
 import { FileUpload } from '../fileInput';
 import { DayRenderer } from '../../components';
 import { useAuthStore } from '~/authContext';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type MeetingAddDialogControllerRef = {
   openDialog: (value?: FormValues) => void;
@@ -43,6 +44,7 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
   const [activeStepper, setActiveStepper] = useState(0);
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
+  const connection = useSignalR();
 
   const service = useMeetingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const { currentUser } = useAuthStore();
@@ -82,6 +84,22 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
     }
     setIsDisabledSubmit(true);
   }, [form.values]);
+
+   useEffect(() => {
+  
+      if (!connection) return;
+  
+     connection.on('ReceiveValueCreated', (data) => {
+      
+      // Toast veya state güncellemesi
+      toast.success('İşlem başarılı! ' + data.valueName);
+    });
+  
+      // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+      return () => {
+        connection.off('ReceiveValueCreated');
+      };
+    }, [connection]);
 
   const isUserAdmin = useMemo(() => {
     const result = currentUser?.userType === 'userLogin';
@@ -198,7 +216,6 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
     });
 
     if (result === true) {
-      toast.success('İşlem başarılı!');
       
       if (onSaveSuccess) {
         onSaveSuccess();

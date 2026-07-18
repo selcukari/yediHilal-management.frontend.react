@@ -16,6 +16,7 @@ import SancaktarAdd, { type SancaktarAddDialogControllerRef } from './sancaktarA
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import { formatDate } from '../../utils/formatDate';
 import { useAuthStore } from '~/authContext';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type UniversityBranchEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -68,6 +69,7 @@ const BranchEdit = forwardRef<UniversityBranchEditDialogControllerRef, Universit
   const [sancaktarUserData, setSancaktarUserData] = useState<SancaktarDataGorevatama[]>([]);
   const [universityBranchHeadDutyId, setUniversityBranchHeadDutyIdDutyId] = useState<string>("20");
   const { currentUser } = useAuthStore();
+  const connection = useSignalR();
   
   const service = useUniversityBranchService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
@@ -93,6 +95,20 @@ const BranchEdit = forwardRef<UniversityBranchEditDialogControllerRef, Universit
     },
   });
 
+    useEffect(() => {
+      if (!connection) return;
+  
+      connection.on('ReceiveValueUpdated', (data) => {
+        // Ekrana anlık olarak listeye ekliyoruz (Kullanıcı sayfayı yenilemeden görür)
+        toast.success('İşlem başarılı! ' + data.valueName);
+      });
+  
+      // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+      return () => {
+        connection.off('ReceiveValueUpdated');
+      };
+    }, [connection]);
+
   const isUserAdmin = useMemo(() => {
     return currentUser?.userType === 'userLogin';
   }, [currentUser]);
@@ -112,8 +128,6 @@ const BranchEdit = forwardRef<UniversityBranchEditDialogControllerRef, Universit
 
     if (result === true) {
 
-      toast.success('İşlem başarılı!');
-      
       // onSaveSuccess event'ini tetikle
       if (onSaveSuccess) {
         onSaveSuccess();

@@ -12,6 +12,7 @@ import { useWarehouseService } from '../../services/warehouseService';
 import { toast } from '../../utils/toastMessages';
 import { useAuthStore } from '~/authContext';
 import { DayRenderer } from '../../components';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type StockAddDialogControllerRef = {
   open: () => void;
@@ -43,6 +44,7 @@ const StockAdd = forwardRef<StockAddDialogControllerRef, UserAddProps>(({onSaveS
   const [warehouses, setWarehouses] = useState<{ value: string; label: string }[]>([]);
   const [shelves, setShelves] = useState<{ value: string; label: string; warehouseId: string }[]>([]);
   const [shelvesChange, setShelvesChange] = useState<{ value: string; label: string; warehouseId: string }[]>([]);
+  const connection = useSignalR();
   
   const [opened, { open, close }] = useDisclosure(false);
   const serviceWarehouse = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
@@ -86,6 +88,21 @@ const StockAdd = forwardRef<StockAddDialogControllerRef, UserAddProps>(({onSaveS
       },
     },
   });
+   useEffect(() => {
+    
+        if (!connection) return;
+    
+       connection.on('ReceiveValueCreated', (data: any) => {
+        
+        // Toast veya state güncellemesi
+        toast.success('İşlem başarılı! ' + data.valueName);
+      });
+    
+        // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+        return () => {
+          connection.off('ReceiveValueCreated');
+        };
+      }, [connection]);
 
   useEffect(() => {
     fetchWarehouseData();
@@ -163,8 +180,6 @@ const StockAdd = forwardRef<StockAddDialogControllerRef, UserAddProps>(({onSaveS
 
     if (result === true) {
 
-      toast.success('İşlem başarılı!');
-      
       // onSaveSuccess event'ini tetikle
       if (onSaveSuccess) {
         onSaveSuccess();

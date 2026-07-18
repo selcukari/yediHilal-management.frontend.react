@@ -10,6 +10,7 @@ import { useWarehouseService } from '../../services/warehouseService';
 import { toast } from '../../utils/toastMessages';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '~/authContext';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type ShelveAddDialogControllerRef = {
   open: () => void;
@@ -33,6 +34,7 @@ type FormValues = {
 const ShelveAdd = forwardRef<ShelveAddDialogControllerRef, ShelveAddProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
+  const connection = useSignalR();
 
   const service = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
   const { currentUser } = useAuthStore();
@@ -65,6 +67,21 @@ const ShelveAdd = forwardRef<ShelveAddDialogControllerRef, ShelveAddProps>(({onS
       },
     },
   });
+   useEffect(() => {
+    
+        if (!connection) return;
+    
+       connection.on('ReceiveValueCreated', (data: any) => {
+        
+        // Toast veya state güncellemesi
+        toast.success('İşlem başarılı! ' + data.valueName);
+      });
+    
+        // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+        return () => {
+          connection.off('ReceiveValueCreated');
+        };
+      }, [connection]);
 
   useEffect(() => {
     if (form.isDirty()) {
@@ -102,8 +119,6 @@ const ShelveAdd = forwardRef<ShelveAddDialogControllerRef, ShelveAddProps>(({onS
 
     if (result === true) {
 
-      toast.success('İşlem başarılı!');
-      
       // onSaveSuccess event'ini tetikle
       if (onSaveSuccess) {
         onSaveSuccess();

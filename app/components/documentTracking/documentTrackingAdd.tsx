@@ -10,6 +10,7 @@ import { useDocumentTrackingService } from '../../services/documentTrackingServi
 import { toast } from '../../utils/toastMessages';
 import { FileUpload } from '../fileInput';
 import { useAuthStore } from '~/authContext';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type DocumentTrackingAddDialogControllerRef = {
   open: () => void;
@@ -29,6 +30,7 @@ type FormValues = {
 const DocumentTrackingAdd = forwardRef<DocumentTrackingAddDialogControllerRef, DocumentTrackingAddProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
+  const connection = useSignalR();
   
   const service = useDocumentTrackingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const queryClient = useQueryClient();
@@ -48,6 +50,22 @@ const DocumentTrackingAdd = forwardRef<DocumentTrackingAddDialogControllerRef, D
       },
     },
   });
+    // 2. SignalR Dinleyicisini Aktif Et
+  useEffect(() => {
+
+    if (!connection) return;
+
+   connection.on('ReceiveValueCreated', (data) => {
+    
+    // Toast veya state güncellemesi
+    toast.success('İşlem başarılı! ' + data.valueName);
+  });
+
+    // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+    return () => {
+      connection.off('ReceiveValueCreated');
+    };
+  }, [connection]);
 
   const addDocumentTrackingMutation = useMutation({
     mutationFn: async (values: FormValues) => {
@@ -63,7 +81,6 @@ const DocumentTrackingAdd = forwardRef<DocumentTrackingAddDialogControllerRef, D
     },
     onSuccess: (result: any) => {
       if (result === true) {
-        toast.success('İşlem başarılı!');
 
         queryClient.invalidateQueries({ queryKey: ['documentTrackings'] });
 

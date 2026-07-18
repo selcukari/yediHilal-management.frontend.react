@@ -12,6 +12,7 @@ import { useUserService } from '../../services/userService';
 import { useUniversityBranchService } from '../../services/universityBranchService';
 import { toast } from '../../utils/toastMessages';
 import { FileUpload } from '../fileInput';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type UniversityBranchAddDialogControllerRef = {
   openDialog: () => void;
@@ -43,6 +44,7 @@ const UniversityBranchAdd = forwardRef<UniversityBranchAddDialogControllerRef, U
   const [opened, { open, close }] = useDisclosure(false);
   const [userData, setUserData] = useState<GetUserData[]>([]);
   const [branchHeadDutyId, setBranchHeadDutyIdDutyId] = useState<string>("20");
+  const connection = useSignalR();
   
   const service = useUniversityBranchService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
@@ -65,6 +67,21 @@ const UniversityBranchAdd = forwardRef<UniversityBranchAddDialogControllerRef, U
       universityName: (value) => (value.trim().length < 5 ? 'Üniversite Adı en az 5 karakter olmalı' : null),
     },
   });
+  useEffect(() => {
+
+    if (!connection) return;
+
+   connection.on('ReceiveValueCreated', (data) => {
+    
+    // Toast veya state güncellemesi
+    toast.success('İşlem başarılı! ' + data.valueName);
+  });
+
+    // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+    return () => {
+      connection.off('ReceiveValueCreated');
+    };
+  }, [connection]);
 
   const handleSubmit = async (values: FormValues) => {
     setIsDisabledSubmit(true);
@@ -82,8 +99,6 @@ const UniversityBranchAdd = forwardRef<UniversityBranchAddDialogControllerRef, U
 
     if (result === true) {
 
-      toast.success('İşlem başarılı!');
-      
       // onSaveSuccess event'ini tetikle
       if (onSaveSuccess) {
         onSaveSuccess();

@@ -18,6 +18,7 @@ import { formatDate } from '../../utils/formatDate';
 import { useMemberService } from '../../services/memberService';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import { useAuthStore } from '~/authContext';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type UserAddDialogControllerRef = {
   openDialog: () => void;
@@ -49,6 +50,7 @@ type FormValues = {
 
 const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuccess}, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
+  const connection = useSignalR();
 
   const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceMember = useMemberService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
@@ -108,6 +110,20 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
     },
   });
 
+    useEffect(() => {
+    if (!connection) return;
+
+    connection.on('ReceiveValueCreated', (data) => {
+      // Ekrana anlık olarak listeye ekliyoruz (Kullanıcı sayfayı yenilemeden görür)
+      toast.success('İşlem başarılı! ' + data.valueName);
+    });
+
+    // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+    return () => {
+      connection.off('ReceiveValueCreated');
+    };
+  }, [connection]);
+
   // --- 1. MEMBRES FETCH (useQuery) ---
   // Sadece modal açıkken tetiklenmesi için `enabled: opened` kontrolü eklendi.
   const { data: memberData = [] } = useQuery({
@@ -164,7 +180,6 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
     },
     onSuccess: (result) => {
       if (result == true) {
-        toast.success('İşlem başarılı!');
         
         // Eğer bir üst componentte listeyi yenilemek için react-query key'i varsa invalidation yapılabilir:
         // queryClient.invalidateQueries({ queryKey: ['users'] });

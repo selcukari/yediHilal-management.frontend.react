@@ -9,6 +9,7 @@ import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useUserDutyService } from '../../services/userDutyService';
 import { toast } from '../../utils/toastMessages';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type UserDutyEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -28,6 +29,7 @@ const UserDutyEdit = forwardRef<UserDutyEditDialogControllerRef, BranchDutyEditP
   const [opened, { open, close }] = useDisclosure(false);
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const service = useUserDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
+  const connection = useSignalR();
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
   const queryClient = useQueryClient();
@@ -41,6 +43,20 @@ const UserDutyEdit = forwardRef<UserDutyEditDialogControllerRef, BranchDutyEditP
       name: (value) => (value.trim().length < 5 ? 'Görev Adı en az 5 karakter olmalı' : null),
     },
   });
+
+   useEffect(() => {
+    if (!connection) return;
+
+    connection.on('ReceiveValueUpdated', (data) => {
+      // Ekrana anlık olarak listeye ekliyoruz (Kullanıcı sayfayı yenilemeden görür)
+      toast.success('İşlem başarılı! ' + data.valueName);
+    });
+
+    // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+    return () => {
+      connection.off('ReceiveValueUpdated');
+    };
+  }, [connection]);
 
 
   const openDialog = (value: FormValues) => {
@@ -67,7 +83,6 @@ const UserDutyEdit = forwardRef<UserDutyEditDialogControllerRef, BranchDutyEditP
     },
     onSuccess: (result: any) => {
       if (result === true) {
-        toast.success('İşlem başarılı!');
 
         queryClient.invalidateQueries({ queryKey: ["userDuties", "duties"] });
 

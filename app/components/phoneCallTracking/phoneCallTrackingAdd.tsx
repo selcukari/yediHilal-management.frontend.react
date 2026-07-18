@@ -9,6 +9,7 @@ import { usePhoneCallTrackingService } from '../../services/phoneCallTrackingSer
 import { useUserService } from '../../services/userService';
 import { toast } from '../../utils/toastMessages';
 import { useAuthStore } from '~/authContext';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type PhoneCallTrackingAddDialogControllerRef = {
   open: () => void;
@@ -34,6 +35,7 @@ const PhoneCallTrackingAdd = forwardRef<PhoneCallTrackingAddDialogControllerRef,
   const [userData, setUserData] = useState<GetUserData[]>([]);
   const [opened, { open, close }] = useDisclosure(false);
   const { currentUser } = useAuthStore();
+  const connection = useSignalR();
   
   const service = usePhoneCallTrackingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
@@ -51,6 +53,22 @@ const PhoneCallTrackingAdd = forwardRef<PhoneCallTrackingAddDialogControllerRef,
       responsibleId: (value) => (value ? null : 'Sorumlu kişi alanı zorunlu'),
     },
   });
+
+  useEffect(() => {
+  
+      if (!connection) return;
+  
+     connection.on('ReceiveValueCreated', (data: any) => {
+      
+      // Toast veya state güncellemesi
+      toast.success('İşlem başarılı! ' + data.valueName);
+    });
+  
+      // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+      return () => {
+        connection.off('ReceiveValueCreated');
+      };
+    }, [connection]);
 
   const isUserAdmin = useMemo(() => {
     return currentUser?.userType === 'userLogin';
@@ -92,8 +110,6 @@ const PhoneCallTrackingAdd = forwardRef<PhoneCallTrackingAddDialogControllerRef,
 
     if (result === true) {
 
-      toast.success('İşlem başarılı!');
-      
       // onSaveSuccess event'ini tetikle
       if (onSaveSuccess) {
         onSaveSuccess();

@@ -20,6 +20,7 @@ import SancaktarAdd, { type SancaktarAddDialogControllerRef } from './sancaktarA
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import { formatDate } from '../../utils/formatDate';
 import { useAuthStore } from '~/authContext';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type BranchEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -78,6 +79,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
   const [sancaktarUserData, setSancaktarUserData] = useState<SancaktarDataGorevatama[]>([]);
   const [branchHeadDutyId, setBranchHeadDutyIdDutyId] = useState<string>("19");
   const { currentUser } = useAuthStore();
+  const connection = useSignalR();
   
   const service = useBranchService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
@@ -118,6 +120,23 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
       },
     },
   });
+
+   // 2. SignalR Dinleyicisini Aktif Et
+  useEffect(() => {
+
+    if (!connection) return;
+
+   connection.on('ReceiveValueUpdated', (data) => {
+    
+    // Toast veya state güncellemesi
+    toast.success('İşlem başarılı! ' + data.valueName);
+  });
+
+    // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+    return () => {
+      connection.off('ReceiveValueUpdated');
+    };
+  }, [connection]);
 
   const isUserAdmin = useMemo(() => {
     return currentUser?.userType === 'userLogin';

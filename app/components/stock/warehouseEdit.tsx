@@ -10,6 +10,7 @@ import { toast } from '../../utils/toastMessages';
 import { useWarehouseService } from '../../services/warehouseService';
 import { useAuthStore } from '~/authContext';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type WarehouseEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -33,6 +34,7 @@ const WarehouseEdit = forwardRef<WarehouseEditDialogControllerRef, WareEditProps
   const [opened, { open, close }] = useDisclosure(false);
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const service = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
+  const connection = useSignalR();
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
   const { currentUser } = useAuthStore();
@@ -56,6 +58,21 @@ const WarehouseEdit = forwardRef<WarehouseEditDialogControllerRef, WareEditProps
       },
     },
   });
+    useEffect(() => {
+  
+      if (!connection) return;
+  
+     connection.on('ReceiveValueUpdated', (data: any) => {
+      
+      // Toast veya state güncellemesi
+      toast.success('İşlem başarılı! ' + data.valueName);
+    });
+  
+      // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+      return () => {
+        connection.off('ReceiveValueUpdated');
+      };
+    }, [connection]);
 
 
   const openDialog = (value: FormValues) => {
@@ -92,8 +109,6 @@ const WarehouseEdit = forwardRef<WarehouseEditDialogControllerRef, WareEditProps
     },
     onSuccess: (result: any) => {
     if (result === true) {
-      toast.success('İşlem başarılı!');
-
       queryClient.invalidateQueries({ queryKey: ["warehouses", "duties"] });
 
       if (onSaveSuccess) onSaveSuccess();

@@ -8,6 +8,7 @@ import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useReadyMessageService } from '../../services/readyMessageService';
 import { toast } from '../../utils/toastMessages';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type ReadyMessageAddDialogControllerRef = {
   open: () => void;
@@ -26,6 +27,7 @@ type FormValues = {
 const ReadyMessageMailAdd = forwardRef<ReadyMessageAddDialogControllerRef, SancaktarAddProps>(({onSaveSuccess}, ref) => {
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
+  const connection = useSignalR();
   
   const service = useReadyMessageService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
 
@@ -46,13 +48,29 @@ const ReadyMessageMailAdd = forwardRef<ReadyMessageAddDialogControllerRef, Sanca
     },
   });
 
+    // 2. SignalR Dinleyicisini Aktif Et
+    useEffect(() => {
+  
+      if (!connection) return;
+  
+     connection.on('ReceiveValueUpdated', (data) => {
+      
+      // Toast veya state güncellemesi
+      toast.success('İşlem başarılı! ' + data.valueName);
+    });
+  
+      // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+      return () => {
+        connection.off('ReceiveValueUpdated');
+      };
+    }, [connection]);
+
   const addReadyMessageMailMutation = useMutation({
     mutationFn: async (values: FormValues) => {
       return await service.addReadyMessageMail(values);
     },
     onSuccess: (result: any) => {
       if (result === true) {
-        toast.success('İşlem başarılı!');
         // onSaveSuccess event'ini tetikle
         if (onSaveSuccess) {
           onSaveSuccess();

@@ -8,7 +8,7 @@ import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useStockService } from '../../services/stockService';
 import { toast } from '../../utils/toastMessages';
 import { useAuthStore } from '~/authContext';
-
+import { useSignalR } from '../../context/SignalRContext';
 interface StockData {
   id: number;
   updateUserId: number;
@@ -67,6 +67,7 @@ const RequestStockAdd = forwardRef<RequestStockAddDialogControllerRef, RequestSt
   const [opened, { open, close }] = useDisclosure(false);
   const [stockData, setStockData] = useState<StockData[]>([]);
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
+  const connection = useSignalR();
 
   const serviceStock = useStockService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
   const { currentUser } = useAuthStore();
@@ -92,6 +93,20 @@ const RequestStockAdd = forwardRef<RequestStockAddDialogControllerRef, RequestSt
     { field: 'description', header: 'Not' },
     { field: 'actions', header: 'Seçim' },
   ]);
+   useEffect(() => {
+  
+      if (!connection) return;
+  
+     connection.on('ReceiveValueCreated', (data: any) => {
+      
+      toast.success('Talep başarıyla oluşturuldu!');
+    });
+  
+      // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+      return () => {
+        connection.off('ReceiveValueCreated');
+      };
+    }, [connection]);
 
   useEffect(() => {
     if (form.isDirty()) {
@@ -182,7 +197,6 @@ const RequestStockAdd = forwardRef<RequestStockAddDialogControllerRef, RequestSt
       const result = await serviceStock.createStockRequest(requestData);
 
       if (result == true) {
-        toast.success('Talep başarıyla oluşturuldu!');
         
         if (onSaveSuccess) {
           onSaveSuccess();

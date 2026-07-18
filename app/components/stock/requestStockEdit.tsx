@@ -8,6 +8,7 @@ import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { toast } from '../../utils/toastMessages';
 import { useWarehouseService } from '../../services/warehouseService';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type RequestStockEditDialogControllerRef = {
   openDialog: (value: FormValues[]) => void;
@@ -30,6 +31,7 @@ type FormValues = {
 
 const RequestStockEdit = forwardRef<RequestStockEditDialogControllerRef, RequestStockEditProps>(({onSaveSuccess}, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
+  const connection = useSignalR();
 
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const service = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
@@ -50,6 +52,21 @@ const RequestStockEdit = forwardRef<RequestStockEditDialogControllerRef, Request
     validate: {
     },
   });
+   useEffect(() => {
+  
+      if (!connection) return;
+  
+     connection.on('ReceiveValueUpdated', (data: any) => {
+      
+      // Toast veya state güncellemesi
+      toast.success('İşlem başarılı! ' + data.valueName);
+    });
+  
+      // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+      return () => {
+        connection.off('ReceiveValueUpdated');
+      };
+    }, [connection]);
 
   const openDialog = (value: FormValues[]) => {
     if (value && value.length > 0) {
@@ -91,7 +108,6 @@ const RequestStockEdit = forwardRef<RequestStockEditDialogControllerRef, Request
     const failedResult = results.find(r => r !== true);
 
     if (!failedResult) {
-      toast.success('Tüm işlemler başarıyla tamamlandı!');
       onSaveSuccess?.();
       form.reset();
       close();

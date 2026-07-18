@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useImperativeHandle, useEffect, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { Modal, TextInput, Button, Stack, Grid } from '@mantine/core';
 import { useForm } from '@mantine/form';
@@ -8,6 +8,7 @@ import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { useMeetingTypeService } from '../../services/meetingTypeService';
 import { toast } from '../../utils/toastMessages';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type MeetingTypeAddDialogControllerRef = {
   open: () => void;
@@ -23,6 +24,7 @@ type FormValues = {
 };
 
 const MeetingTypeAdd = forwardRef<MeetingTypeAddDialogControllerRef, MeetingTypeAddProps>(({onSaveSuccess}, ref) => {
+  const connection = useSignalR();
   const [opened, { open, close }] = useDisclosure(false);
 
   const service = useMeetingTypeService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
@@ -38,6 +40,22 @@ const MeetingTypeAdd = forwardRef<MeetingTypeAddDialogControllerRef, MeetingType
     },
   });
 
+  // 2. SignalR Dinleyicisini Aktif Et
+  useEffect(() => {
+    if (!connection) return;
+
+    // `.NET CommandHandler` içinden tetiklediğimiz metot ismiyle birebir aynı olmalı
+    connection.on('ReceiveValueCreated', (data) => {
+      // Ekrana anlık olarak listeye ekliyoruz (Kullanıcı sayfayı yenilemeden görür)
+      toast.success('İşlem başarılı! ' + data.valueName);
+    });
+
+    // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+    return () => {
+      connection.off('ReceiveValueCreated');
+    };
+  }, [connection]);
+
   const addMeetingTypeMutation = useMutation({
     mutationFn: async (meetingTypeData: FormValues) => {
       return await service.addMeetingType({
@@ -47,7 +65,6 @@ const MeetingTypeAdd = forwardRef<MeetingTypeAddDialogControllerRef, MeetingType
     },
     onSuccess: (result: any) => {
       if (result === true) {
-        toast.success('İşlem başarılı!');
         queryClient.invalidateQueries({ queryKey: ['meetingTypes'] });
 
         if (onSaveSuccess) onSaveSuccess();

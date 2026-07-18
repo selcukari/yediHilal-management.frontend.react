@@ -13,6 +13,7 @@ import { toast } from '../../utils/toastMessages';
 import { formatDate } from '../../utils/formatDate';
 import { dateFormatStrings } from '../../utils/dateFormatStrings';
 import { useAuthStore } from '~/authContext';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type PhoneCallTrackingEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -41,6 +42,7 @@ const PhoneCallTrackingEdit = forwardRef<PhoneCallTrackingEditDialogControllerRe
   const [membersData, setMembersData] = useState<any[]>([]);
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
+  const connection = useSignalR();
 
   const { currentUser } = useAuthStore();
   
@@ -107,6 +109,21 @@ const PhoneCallTrackingEdit = forwardRef<PhoneCallTrackingEditDialogControllerRe
       toast.error(`User yüklenirken hata: ${error.message}`);
     }
   };
+   useEffect(() => {
+  
+      if (!connection) return;
+  
+     connection.on('ReceiveValueUpdated', (data) => {
+      
+      // Toast veya state güncellemesi
+      toast.success('İşlem başarılı! ' + data.valueName);
+    });
+  
+      // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+      return () => {
+        connection.off('ReceiveValueUpdated');
+      };
+    }, [connection]);
 
   useEffect(() => {
     fetchUsers();
@@ -126,8 +143,6 @@ const PhoneCallTrackingEdit = forwardRef<PhoneCallTrackingEditDialogControllerRe
 
     if (result === true) {
 
-      toast.success('İşlem başarılı!');
-      
       // onSaveSuccess event'ini tetikle
       if (onSaveSuccess) {
         onSaveSuccess();

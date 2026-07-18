@@ -12,6 +12,7 @@ import { useWarehouseService } from '../../services/warehouseService';
 import { useStockService } from '../../services/stockService';
 import { useAuthStore } from '~/authContext';
 import { DayRenderer } from '../../components';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type StockEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -47,6 +48,7 @@ const StockEdit = forwardRef<StockEditDialogControllerRef, UserEditProps>(({onSa
   const [shelves, setShelves] = useState<{ value: string; label: string; warehouseId: string }[]>([]);
   const [shelvesChange, setShelvesChange] = useState<{ value: string; label: string; warehouseId: string }[]>([]);
   const [warehouses, setWarehouses] = useState<{ value: string; label: string }[]>([]);
+  const connection = useSignalR();
 
   const service = useStockService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
   const serviceWarehouse = useWarehouseService(import.meta.env.VITE_APP_API_STOCK_CONTROLLER);
@@ -77,8 +79,6 @@ const StockEdit = forwardRef<StockEditDialogControllerRef, UserEditProps>(({onSa
         if(value.trim().length < 5 ) {
           return "Ürün Adı en az 5 karakter olmalı";
         }
-
-
         return null;
       },
       unitPrice: (value) => {
@@ -90,6 +90,21 @@ const StockEdit = forwardRef<StockEditDialogControllerRef, UserEditProps>(({onSa
       },
     },
   });
+   useEffect(() => {
+  
+      if (!connection) return;
+  
+     connection.on('ReceiveValueUpdated', (data: any) => {
+      
+      // Toast veya state güncellemesi
+      toast.success('İşlem başarılı! ' + data.valueName);
+    });
+  
+      // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+      return () => {
+        connection.off('ReceiveValueUpdated');
+      };
+    }, [connection]);
 
   
   useEffect(() => {
@@ -185,8 +200,6 @@ const StockEdit = forwardRef<StockEditDialogControllerRef, UserEditProps>(({onSa
 
     if (result == true) {
 
-      toast.success('İşlem başarılı!');
-      
       // onSaveSuccess event'ini tetikle
       if (onSaveSuccess) {
         onSaveSuccess();

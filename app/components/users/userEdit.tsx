@@ -22,6 +22,7 @@ import { MenuActionButton } from '../../components'
 import { type ColumnDefinition, type ValueData } from '../../utils/repor/exportToExcel';
 import { type PdfTableColumn } from '../../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../../utils/repor/calculateColumnWidth';
+import { useSignalR } from '../../context/SignalRContext';
 interface DutiesType {
   ids: string;
   names?: string;
@@ -71,6 +72,7 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
   const [opened, { open, close }] = useDisclosure(false);
   const [resultDutyData, setresultDutyData] = useState<DutiesType[]>([]);
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
+  const connection = useSignalR();
   
   const service = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   
@@ -131,6 +133,19 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
       },
     },
   });
+    useEffect(() => {
+      if (!connection) return;
+  
+      connection.on('ReceiveValueUpdated', (data) => {
+        // Ekrana anlık olarak listeye ekliyoruz (Kullanıcı sayfayı yenilemeden görür)
+        toast.success('İşlem başarılı! ' + data.valueName);
+      });
+  
+      // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+      return () => {
+        connection.off('ReceiveValueUpdated');
+      };
+    }, [connection]);
 
   const [rowDutyHeaders, setRowDutyHeaders] = useState<TableHeader[]>([
     { field: 'names', header: 'Görevi' },
@@ -212,8 +227,6 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
 
     if (result == true) {
 
-      toast.success('İşlem başarılı!');
-      
       // onSaveSuccess event'ini tetikle
       if (onSaveSuccess) {
         onSaveSuccess();

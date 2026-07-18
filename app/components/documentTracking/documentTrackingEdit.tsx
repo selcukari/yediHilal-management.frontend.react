@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { clone } from 'ramda';
 import { Modal, TextInput, Button, Stack, Textarea, Grid, Flex } from '@mantine/core';
@@ -11,6 +11,7 @@ import { useDocumentTrackingService } from '../../services/documentTrackingServi
 import { toast } from '../../utils/toastMessages';
 import { FileUpload } from '../fileInput';
 import { useAuthStore } from '~/authContext';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type DocumentTrackingEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -30,6 +31,7 @@ type FormValues = {
 
 const BranchEdit = forwardRef<DocumentTrackingEditDialogControllerRef, DocumentTrackingEditProps>(({onSaveSuccess}, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
+  const connection = useSignalR();
   
   const service = useDocumentTrackingService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const queryClient = useQueryClient();
@@ -47,6 +49,22 @@ const BranchEdit = forwardRef<DocumentTrackingEditDialogControllerRef, DocumentT
       name: (value) => (value.trim().length < 5 ? 'Belge Adı en az 5 karakter olmalı' : null),
     },
   });
+  
+  useEffect(() => {
+  
+      if (!connection) return;
+  
+     connection.on('ReceiveValueUpdated', (data) => {
+      
+      // Toast veya state güncellemesi
+      toast.success('İşlem başarılı! ' + data.valueName);
+    });
+  
+      // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+      return () => {
+        connection.off('ReceiveValueUpdated');
+      };
+    }, [connection]);
 
   const updateDocumentTrackingMutation = useMutation({
     mutationFn: async (values: FormValues) => {

@@ -15,6 +15,7 @@ import { toast } from '../../utils/toastMessages';
 import { MemberTypeSelect } from '../addOrEdit/memberTypeSelect';
 import { useAuthStore } from '~/authContext';
 import { DayRenderer } from '../../components';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type MemberEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -54,6 +55,7 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
   const [isDisabledCountryCode, setIsDisabledCountryCode] = useState(false);
   const [isDisabledPhone, setIsDisabledPhone] = useState(false);
   const { currentUser } = useAuthStore();
+  const connection = useSignalR();
 
   const service = useMemberService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
   
@@ -125,6 +127,22 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
     },
   });
 
+  useEffect(() => {
+  
+      if (!connection) return;
+  
+     connection.on('ReceiveValueUpdated', (data) => {
+      
+      // Toast veya state güncellemesi
+      toast.success('İşlem başarılı! ' + data.valueName);
+    });
+  
+      // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+      return () => {
+        connection.off('ReceiveValueUpdated');
+      };
+    }, [connection]);
+
    const openDialog = (value: FormValues) => {
 
     if (value) {
@@ -171,7 +189,6 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
     const result = await service.updateMember(newMemberValue);
     if (result == true) {
 
-      toast.success('İşlem başarılı!');
       
       // onSaveSuccess event'ini tetikle
       if (onSaveSuccess) {

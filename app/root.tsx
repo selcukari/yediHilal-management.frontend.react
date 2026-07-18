@@ -22,6 +22,7 @@ import { Container, Title, Text, Button, Group, Stack, Code, Alert } from '@mant
 import { IconAlertCircle, IconHome } from '@tabler/icons-react';
 import { getWithExpiry } from './utils/useLocalStorage';
 import "./app.css";
+import { SignalRProvider } from './context/SignalRContext';
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -159,7 +160,9 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <MantineProvider theme={theme}>
-        <AppContent />
+        <SignalRProvider>
+          <AppContent />
+        </SignalRProvider>
       </MantineProvider>
     </QueryClientProvider>
   );
