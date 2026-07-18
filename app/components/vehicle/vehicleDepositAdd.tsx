@@ -10,7 +10,7 @@ import { useUserService } from '../../services/userService';
 import { toast } from '../../utils/toastMessages';
 import { useAuthStore } from '~/authContext';
 import type { VehicleData } from '../../routes/vehicle/vehicle';
-
+import { useSignalR } from '../../context/SignalRContext';
 interface VehicleDepositAddProps {
   onSaveSuccess?: () => void; // Yeni prop
 }
@@ -43,6 +43,7 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
   const [opened, { open, close }] = useDisclosure(false);
   const [vehicleData, setVehicleData] = useState<GetVehicleData[]>([]);
   const [userData, setUserData] = useState<GetUserData[]>([]);
+  const connection = useSignalR();
 
   const serviceUser = useUserService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
   const serviceVehicle = useVehicleService(import.meta.env.VITE_APP_API_VEHICLE_CONTROLLER);
@@ -63,6 +64,19 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
   
     },
   });
+  useEffect(() => {
+    if (!connection) return;
+
+    connection.on('ReceiveValueCreated', (data) => {
+      // Ekrana anlık olarak listeye ekliyoruz (Kullanıcı sayfayı yenilemeden görür)
+      toast.success('İşlem başarılı! ' + data.valueName);
+    });
+
+    // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+    return () => {
+      connection.off('ReceiveValueCreated');
+    };
+  }, [connection]);
 
   useEffect(() => {
     if (form.isDirty()) {
@@ -87,8 +101,6 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
 
     if (result === true) {
 
-      toast.success('İşlem başarılı!');
-      
       // onSaveSuccess event'ini tetikle
       if (onSaveSuccess) {
         onSaveSuccess();

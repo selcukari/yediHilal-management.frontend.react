@@ -14,6 +14,7 @@ import { toast } from '../../utils/toastMessages';
 import { MemberTypeSelect } from '../addOrEdit/memberTypeSelect';
 import { useAuthStore } from '~/authContext';
 import { DayRenderer } from '../../components';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type MemberAddDialogControllerRef = {
   open: () => void;
@@ -50,6 +51,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
   const [isDisabledCountryCode, setIsDisabledCountryCode] = useState(false);
   const [isDisabledPhone, setIsDisabledPhone] = useState(false);
   const [dutyMemberTypeId, setDutyMemberTypeId] = useState<string>('10');
+  const connection = useSignalR();
   
   const { currentUser } = useAuthStore();
 
@@ -122,6 +124,21 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
       typeIds: (value) => (value ? null : 'Üye tipi alanı zorunlu'),
     },
   });
+  useEffect(() => {
+
+    if (!connection) return;
+
+   connection.on('ReceiveValueCreated', (data) => {
+    
+    // Toast veya state güncellemesi
+    toast.success('İşlem başarılı! ' + data.valueName);
+  });
+
+    // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+    return () => {
+      connection.off('ReceiveValueCreated');
+    };
+  }, [connection]);
 
   // Phone alanını izle ve değişiklik olduğunda isDisabledSelect'i güncelle
   useEffect(() => {
@@ -165,8 +182,6 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
 
     if (result == true) {
 
-      toast.success('İşlem başarılı!');
-      
       // onSaveSuccess event'ini tetikle
       if (onSaveSuccess) {
         onSaveSuccess();

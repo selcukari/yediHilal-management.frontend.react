@@ -12,6 +12,7 @@ import { useAuthStore } from '~/authContext';
 import stripSpecialCharacters from '../../utils/stripSpecialCharacters';
 import { mockDataFuelTypes, mockDataTransmissionTypes, mockDataFuelLevel } from '../../utils/vehicleMockData';
 import { DayRenderer } from '../../components';
+import { useSignalR } from '../../context/SignalRContext';
 interface VehicleAddProps {
   onSaveSuccess?: () => void; // Yeni prop
 }
@@ -56,6 +57,7 @@ const VehicleAdd = forwardRef<VehicleAddDialogControllerRef, VehicleAddProps>(({
   const [opened, { open, close }] = useDisclosure(false);
   const service = useVehicleService(import.meta.env.VITE_APP_API_VEHICLE_CONTROLLER);
   const { currentUser } = useAuthStore();
+  const connection = useSignalR();
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
 
@@ -99,6 +101,19 @@ const VehicleAdd = forwardRef<VehicleAddDialogControllerRef, VehicleAddProps>(({
       year: (value) => (parseInt(value ?? "1") > 1900 && parseInt(value ?? "1") <= new Date().getFullYear()) ? null : "Geçersiz yıl",
     },
   });
+  useEffect(() => {
+    if (!connection) return;
+
+    connection.on('ReceiveValueCreated', (data) => {
+      // Ekrana anlık olarak listeye ekliyoruz (Kullanıcı sayfayı yenilemeden görür)
+      toast.success('İşlem başarılı! ' + data.valueName);
+    });
+
+    // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+    return () => {
+      connection.off('ReceiveValueCreated');
+    };
+  }, [connection]);
 
   useEffect(() => {
     if (form.isDirty()) {
