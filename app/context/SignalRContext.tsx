@@ -22,7 +22,7 @@ export const SignalRProvider = ({ children }) => {
      console.log('SignalR Bağlantısı Başladı');
 
     if (connection) {
-      connection
+      connection?
         .start()
         .then(() => console.log('SignalR Bağlantısı Başarılı! ✅'))
         .catch((error) => console.error('SignalR Bağlantı Hatası: ❌', error));
