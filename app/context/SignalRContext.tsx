@@ -19,7 +19,6 @@ export const SignalRProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-     console.log('SignalR Bağlantısı Başladı');
 
     if (connection) {
       connection
