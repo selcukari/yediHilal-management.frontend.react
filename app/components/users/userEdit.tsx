@@ -1,9 +1,9 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, useRef, useMemo } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { omit, last, clone } from 'ramda';
+import { omit, clone } from 'ramda';
 import { Modal, TextInput, Paper, Title, Table, Flex, Button, Select, Stack, Grid, PasswordInput, Group, Switch, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { IconCancel, IconCheck } from '@tabler/icons-react';
+import { IconCancel, IconCheck, IconChevronRight, IconMoneybagPlus } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import ConfirmModal, { type ConfirmModalRef } from '../confirmModal';
 import { CountrySelect } from '../addOrEdit/countrySelect';
@@ -23,6 +23,7 @@ import { type ColumnDefinition, type ValueData } from '../../utils/repor/exportT
 import { type PdfTableColumn } from '../../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../../utils/repor/calculateColumnWidth';
 import { useSignalR } from '../../context/SignalRContext';
+import FinanceModal from '../members/finans';
 interface DutiesType {
   ids: string;
   names?: string;
@@ -70,6 +71,8 @@ type FormValues = {
 
 const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSaveSuccess}, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
+  const [financeOpened, { open: openFinance, close: closeFinance }] = useDisclosure(false);
+
   const [resultDutyData, setresultDutyData] = useState<DutiesType[]>([]);
   const [isDisabledSubmit, setIsDisabledSubmit] = useState(false);
   const connection = useSignalR();
@@ -469,6 +472,22 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
               {...form.getInputProps('deleteMessageTitle')}
             />
           </Grid.Col>
+          <Grid.Col span={{ base: 12, sm: 6, md: 4}}>
+            <Flex
+            mih={50}
+            gap="md"
+            justify="flex-end"
+            align="flex-end"
+            direction="row"
+            wrap="wrap"
+          >
+            <Button variant="filled" size="xl"
+              onClick={openFinance} type="button"
+              rightSection={<IconChevronRight size={20} />}  leftSection={<IconMoneybagPlus size={20} />} radius="xs">
+              Finans
+            </Button>
+          </Flex>
+          </Grid.Col>
           {rowsDutyTable?.length > 0 &&
           <Grid.Col span={{ base: 12, sm: 6, md: 4}}>
             <Flex
@@ -540,6 +559,12 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
       ref={confirmModalRef}
       onConfirm={confirmDialogHandleConfirm}
       onCancel={confirmDialogHandleCancel}
+    />
+    <FinanceModal 
+      opened={financeOpened} 
+      onClose={closeFinance} 
+      memberId={form.values.id}
+      memberFullName={form.values.fullName}
     />
   </>);
 });

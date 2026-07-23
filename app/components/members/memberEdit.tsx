@@ -1,9 +1,10 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, useMemo, useRef } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { omit } from 'ramda';
-import { Modal, TextInput, Button, Stack, Grid, PasswordInput, Text, Group, Switch, Textarea } from '@mantine/core';
+import { Modal, TextInput, Button, Stack, Flex, Grid, PasswordInput, Text, Group, Switch, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { IconCancel, IconCheck, IconCalendar } from '@tabler/icons-react';
+import FinanceModal from './finans';
+import { IconCancel, IconCheck, IconMoneybagPlus, IconChevronRight, IconCalendar } from '@tabler/icons-react';
 import { isEquals } from '~/utils/isEquals';
 import { DateTimePicker } from '@mantine/dates';
 import { ReferansMemberSelect } from '../addOrEdit/referansMemberSelect';
@@ -50,6 +51,7 @@ type FormValues = {
 
 const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({onSaveSuccess}, ref) => {
   const [opened, { open, close }] = useDisclosure(false);
+  const [financeOpened, { open: openFinance, close: closeFinance }] = useDisclosure(false);
   const [isDisabledSelect, setIsDisabledSelect] = useState(false);
   const [isDisabledReference, setIsDisabledReference] = useState(false);
   const [isDisabledCountryCode, setIsDisabledCountryCode] = useState(false);
@@ -399,6 +401,21 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
           {form.values.sancaktarGorev && <Grid.Col span={6}>
             <Text>Şube/Teşkilat Görevi: {form.values.sancaktarGorev}</Text>
           </Grid.Col> }
+          <Flex
+              mih={50}
+              gap="md"
+              justify="center"
+              align="flex-end"
+              direction="row"
+              wrap="wrap">
+           <Grid.Col span={6}>
+            <Button variant="filled" size="xl"
+              onClick={openFinance} type="button"
+              rightSection={<IconChevronRight size={20} />}  leftSection={<IconMoneybagPlus size={20} />} radius="xs">
+              Finans
+            </Button>
+           </Grid.Col>
+           </Flex>
           <Grid.Col span={6} offset={4}>
             <Button variant="filled" size="xs" radius="xs" mr={2} onClick={dialogClose} leftSection={<IconCancel size={14} />}color="red">
               İptal
@@ -416,6 +433,12 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
       ref={confirmModalRef}
       onConfirm={confirmDialogHandleConfirm}
       onCancel={confirmDialogHandleCancel}
+    />
+    <FinanceModal 
+      opened={financeOpened} 
+      onClose={closeFinance} 
+      memberId={form.values.id}
+      memberFullName={form.values.fullName}
     />
   </>);
 });

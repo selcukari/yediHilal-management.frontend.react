@@ -10,7 +10,7 @@ export const SignalRProvider = ({ children }) => {
   useEffect(() => {
     // Backend'de Program.cs'e yazdığımız endpoint adresi
     const newConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`${import.meta.env.VITE_APP_API}/notifications`) // Kendi API portunuzla değiştirin
+      .withUrl(`${import.meta.env.VITE_APP_API.replace('api', '')}notifications`) // Kendi API portunuzla değiştirin
       .withAutomaticReconnect() // Bağlantı koparsa otomatik yeniden bağlanmayı sağlar
       .configureLogging(signalR.LogLevel.Information)
       .build();

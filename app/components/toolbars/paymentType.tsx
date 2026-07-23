@@ -6,10 +6,9 @@ import { useTransactionFinanceService } from '../../services/transactionFinanceS
 
 interface PaymentTypeProps {
   onPaymentTypeChange: (vals: string[] | null) => void;
-  paymentTypesData: (vals: any[]) => void;
 }
 
-export function PaymentType({ onPaymentTypeChange, paymentTypesData }: PaymentTypeProps) {
+export function PaymentType({ onPaymentTypeChange }: PaymentTypeProps) {
   const [paymentType, setPaymentType] = useState<string[] | undefined>(undefined);
   
   const service = useTransactionFinanceService(import.meta.env.VITE_APP_API_FINANCE_CONTROLLER);
