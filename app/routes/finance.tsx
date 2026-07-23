@@ -3,6 +3,7 @@ import { IconSearch, IconFilter } from '@tabler/icons-react';
 import {
   Container, Grid, TextInput, Stack, Button, Flex, Group, Title, Text, Paper, Table, LoadingOverlay,
 } from '@mantine/core';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { useDisclosure } from '@mantine/hooks';
 import { useTransactionFinanceService } from '../services/transactionFinanceService';
 import { toast } from '../utils/toastMessages';
@@ -10,7 +11,6 @@ import { formatDate } from '../utils/formatDate';
 import {  PaymentType, PaymentTypeStatus } from '../components'
 import { dateFormatStrings } from '../utils/dateFormatStrings';
 import { useAuthStore } from '~/authContext';
-
 interface Column {
   field: string;
   header: string;
@@ -60,13 +60,31 @@ export default function Mail() {
     );
   }, [resultData, searchText]);
 
+  const mockDataPaymentTypeStatus =[
+    {value: "failed", label: "Hata"},
+    {value: "pending", label: "Bekliyor"},
+    {value: "completed", label: "Ödendi"}
+  ];
+
   useEffect(() => {
     if (isLoggedIn) {
       setTimeout(() => {
         fetchTransactionFinance();
+        getPaymentTypes();
       }, 1000);
     }
   }, []);
+
+  const getPaymentTypes = async () => {
+    const response = await service.getPaymentTypes();
+
+    return setPaymentTypesData((response ?? []).map((c: any) => ({
+      value: String(c.id),
+      label: c.name,
+    })));
+  };
+
+
 
   const onPaymentTypeChange = (paymentTypeValues: string[] | null): void => {
     setPaymentTypeIds(paymentTypeValues)
@@ -82,7 +100,7 @@ export default function Mail() {
        if (header.field === 'paymentType') {
           return (
             <Table.Td key={header.field}>
-              {item[header.field] ? `${paymentTypesData.find(i => i.id == item[header.field]).name}`: "-"}
+              {item[header.field] ? `${paymentTypesData.find(i => i.value == item[header.field])?.label}`: "-"}
             </Table.Td>
           );
         }
@@ -113,7 +131,7 @@ export default function Mail() {
           receiver: finance.receiver,
           amount: finance.amount,
           transactionType: finance.transactionType,
-          status: finance.status,
+          status: mockDataPaymentTypeStatus.find((s) => s.value === finance.status)?.label || 'Bilinmiyor',
           transactionDate: formatDate(finance.transactionDate, dateFormatStrings.dateTimeFormatWithoutSecond),
           receiverAccount: finance.receiverAccount,
           transactionReference: finance.transactionReference,
@@ -187,7 +205,6 @@ export default function Mail() {
                 <Grid.Col span={3}>
                   <PaymentType
                     onPaymentTypeChange={onPaymentTypeChange}
-                    paymentTypesData={(value) => setPaymentTypesData(value)}
                   ></PaymentType>
                 </Grid.Col>
                 <Grid.Col span={3}>

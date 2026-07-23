@@ -6,6 +6,17 @@ interface FinanceParams {
   paymentTypeIds?: string;
 }
 
+interface FinanceRecord {
+  id: string;
+  paymentType: string;
+  amount: string;
+  transactionDate: string;
+  status: string; // 'Ödendi' | 'Bekliyor'
+  sender: string; // gonderici
+  receiver: string; //alici
+  userId: number; // üye id
+}
+
 export function useTransactionFinanceService(controller: string) {
   const { getCurrentToken, logout } = useAuthStore();
   const api = createApi(getCurrentToken() ?? undefined, logout);
@@ -48,5 +59,16 @@ export function useTransactionFinanceService(controller: string) {
     }
   };
 
-  return { getPaymentTypes, getFinances, getFinanceCurrentBalance };
+  const addFinance = async (params: FinanceRecord) => {
+
+    try {
+      const res = await api.post(`/${controller}/addFinance`, params);
+
+      return res.data.data;
+    } catch (error: any) {
+      return error;
+    }
+  };
+
+  return { getPaymentTypes, addFinance, getFinances, getFinanceCurrentBalance };
 }

@@ -144,5 +144,21 @@ export function useMemberService(controller: string) {
     }
   };
 
-  return { addMember, members, updateMember, member, deleteMember, membersInCache, addExternalMember, addMemberByAi };
+    const finansByUserId = async (userId: number) => {
+
+    try {
+
+      const res = await api.get(`/${controller}/getFinancesByUserId`,{
+        params: {
+          userId: userId
+        }
+      });
+
+      return res.data.data;
+    } catch (error: any) {
+      return error;
+    }
+  };
+
+  return { addMember, members, updateMember, member, deleteMember, finansByUserId, membersInCache, addExternalMember, addMemberByAi };
 }
