@@ -17,6 +17,7 @@ import { DayRenderer } from '../../components';
 import { useAuthStore } from '~/authContext';
 import { useMutation } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type ProjectAddDialogControllerRef = {
   openDialog: () => void;
@@ -47,6 +48,7 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
   const confirmModalRef = useRef<ConfirmModalRef>(null);
   const { currentUser } = useAuthStore();
   const queryClient = useQueryClient();
+  const connection = useSignalR();
 
   const form = useForm<FormValues>({
     initialValues: {

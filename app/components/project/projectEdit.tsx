@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState, useRef } from 'react';
+import { forwardRef, useImperativeHandle, useState, useRef, useEffect } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { clone } from 'ramda';
 import { useQueryClient } from '@tanstack/react-query';
@@ -15,6 +15,7 @@ import { ResponsibleUserSelect } from '../addOrEdit/responsibleUserSelect';
 import { RichTextEditorTiptap } from '../richTextEditorTiptap';
 import { FileUpload } from '../fileInput';
 import { DayRenderer } from '../../components';
+import { useSignalR } from '../../context/SignalRContext';
 
 export type ProjectEditDialogControllerRef = {
   openDialog: (value: FormValues) => void;
@@ -46,6 +47,7 @@ const ProjectEdit = forwardRef<ProjectEditDialogControllerRef, UserEditProps>(({
   
   const confirmModalRef = useRef<ConfirmModalRef>(null);
   const queryClient = useQueryClient();
+  const connection = useSignalR();
 
   const form = useForm<FormValues>({
     initialValues: {
