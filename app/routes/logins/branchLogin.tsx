@@ -14,8 +14,8 @@ export default function UserLogin() {
 
   const form = useForm({
     initialValues: {
-      email: 'besow53889@elobits.com',
-      password: '1234567',
+      email: '',
+      password: '',
     },
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Geçerli bir e-posta girin'),

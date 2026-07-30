@@ -14,8 +14,8 @@ export default function MemberLogin() {
 
   const form = useForm({
     initialValues: {
-      email: 'testdeneme@gmail.com',
-      password: '123456',
+      email: '',
+      password: '',
     },
     validate: {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Geçerli bir e-posta girin'),
