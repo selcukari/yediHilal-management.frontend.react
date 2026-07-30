@@ -66,22 +66,22 @@ const ProjectEdit = forwardRef<ProjectEditDialogControllerRef, UserEditProps>(({
       priority: (value) => (value ? null : 'Öncelik alanı zorunlu'),
     },
   });
-   useEffect(() => {
+   
+  useEffect(() => {
     
-        if (!connection) return;
-    
-       connection.on('ReceiveValueCreated', (data: any) => {
-        
-        // Toast veya state güncellemesi
-        toast.success('İşlem başarılı! ' + data.valueName);
-      });
-    
-        // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
-        return () => {
-          connection.off('ReceiveValueCreated');
-        };
-      }, [connection]);
+    if (!connection) return;
 
+    connection.on('ReceiveValueCreated', (data: any) => {
+      
+      // Toast veya state güncellemesi
+      toast.success('İşlem başarılı! ' + data.valueName);
+    });
+  
+    // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+    return () => {
+      connection.off('ReceiveValueCreated');
+    };
+  }, [connection]);
 
   const openDialog = (value: FormValues) => {
 

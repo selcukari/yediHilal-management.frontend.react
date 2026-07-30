@@ -53,11 +53,11 @@ const ReadyMessageMailAdd = forwardRef<ReadyMessageAddDialogControllerRef, Sanca
   
       if (!connection) return;
   
-     connection.on('ReceiveValueUpdated', (data) => {
+      connection.on('ReceiveValueUpdated', (data) => {
       
-      // Toast veya state güncellemesi
-      toast.success('İşlem başarılı! ' + data.valueName);
-    });
+        // Toast veya state güncellemesi
+        toast.success('İşlem başarılı! ' + data.valueName);
+      });
   
       // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
       return () => {

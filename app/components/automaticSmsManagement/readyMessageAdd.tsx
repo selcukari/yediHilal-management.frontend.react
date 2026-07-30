@@ -63,20 +63,20 @@ const ReadyMessageAdd = forwardRef<ReadyMessageAddDialogControllerRef, Sancaktar
     }
   });
 
-    // 2. SignalR Dinleyicisini Aktif Et
-    useEffect(() => {
-      if (!connection) return;
-  
-      connection.on('ReceiveValueCreated', (data) => {
-        // Ekrana anlık olarak listeye ekliyoruz (Kullanıcı sayfayı yenilemeden görür)
-        toast.success('İşlem başarılı! ' + data.valueName);
-      });
-  
-      // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
-      return () => {
-        connection.off('ReceiveValueCreated');
-      };
-    }, [connection]);
+  // 2. SignalR Dinleyicisini Aktif Et
+  useEffect(() => {
+    if (!connection) return;
+
+    connection.on('ReceiveValueCreated', (data) => {
+      // Ekrana anlık olarak listeye ekliyoruz (Kullanıcı sayfayı yenilemeden görür)
+      toast.success('İşlem başarılı! ' + data.valueName);
+    });
+
+    // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+    return () => {
+      connection.off('ReceiveValueCreated');
+    };
+  }, [connection]);
 
   const handleSubmit = (values: FormValues) => {
     addReadyMessageMutation.mutate(values);
