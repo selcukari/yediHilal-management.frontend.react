@@ -359,15 +359,8 @@ export default function RequestStock() {
                   />
                 </Grid.Col>
                 <Grid.Col span={{ base: 12, sm: 6, md: 4}}>
-                  <Flex
-                  mih={50}
-                  gap="md"
-                  justify="flex-end"
-                  align="flex-end"
-                  direction="row"
-                  wrap="wrap"
-                >
-                  <MenuActionButton
+                  <Flex mih={50} gap="md" justify="flex-end" align="flex-end" direction="row" wrap="wrap">
+                <MenuActionButton
                   reportTitle={reportTitle()}
                   excelColumns={excelTableColumns}
                   valueData={raportStockData}
