@@ -220,18 +220,9 @@ export default function Stock() {
     </Table.Tr>
   ));
 
-  const handleAddItem = (data: any) => {
-    console.log("handleAddItem")
-  }
-
   return (
     <Container size="xl">
-      <LoadingOverlay
-        visible={visible}
-        zIndex={1000}
-        overlayProps={{ radius: 'sm', blur: 2 }}
-        loaderProps={{ color: 'pink', type: 'bars' }}
-      />
+      <LoadingOverlay visible={visible} zIndex={1000} overlayProps={{ radius: 'sm', blur: 2 }} loaderProps={{ color: 'pink', type: 'bars' }}/>
       <Stack gap="lg">
            {/* Sayfa Başlığı */}
             <Group justify="space-between" align="center">
@@ -272,23 +263,16 @@ export default function Stock() {
                   />
                 </Grid.Col>
                 <Grid.Col span={{ base: 12, sm: 6, md: 4}}>
-                  <Flex
-                  mih={50}
-                  gap="md"
-                  justify="flex-end"
-                  align="flex-end"
-                  direction="row"
-                  wrap="wrap"
-                >
+                  <Flex mih={50} gap="md" justify="flex-end" align="flex-end" direction="row" wrap="wrap">
                   <MenuActionButton
-                  reportTitle={reportTitle()}
-                  excelColumns={excelTableColumns}
-                  valueData={raportStockData}
-                  pdfColumns={pdfTableColumns}
-                  type={2}
-                  isMailDisabled={true}
-                  isSmsDisabled={true}
-                  isWhatsAppDisabled={true}
+                    reportTitle={reportTitle()}
+                    excelColumns={excelTableColumns}
+                    valueData={raportStockData}
+                    pdfColumns={pdfTableColumns}
+                    type={2}
+                    isMailDisabled={true}
+                    isSmsDisabled={true}
+                    isWhatsAppDisabled={true}
                   />
                 </Flex>
                 </Grid.Col>
