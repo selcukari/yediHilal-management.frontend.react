@@ -465,17 +465,8 @@ export default function Member() {
                   </Flex>
                 </Grid.Col>
                 <Grid.Col span={{ base: 6, sm: 3, md: 2}}>
-                  <Flex
-                    mih={50}
-                    gap="md"
-                    justify="flex-start"
-                    align="flex-end"
-                    direction="row"
-                    wrap="wrap"
-                  >
-                    <Button
-                      leftSection={<IconPhoneCall size={14} />}
-                      onClick={() => phoneCallTrackingRef.current?.open()}>
+                  <Flex  mih={50}  gap="md"  justify="flex-start"  align="flex-end"  direction="row"  wrap="wrap">
+                    <Button leftSection={<IconPhoneCall size={14} />} onClick={() => phoneCallTrackingRef.current?.open()}>
                       Arama Takip Olş.
                     </Button>
                   </Flex>

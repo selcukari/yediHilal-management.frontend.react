@@ -33,113 +33,104 @@ type FormValues = {
 };
 
 export default function MemberCreate() {
-   const [isDisabledSelect, setIsDisabledSelect] = useState(false);
-   const [showChat, setShowChat] = useState(false);
+  const [isDisabledSelect, setIsDisabledSelect] = useState(false);
+  const [showChat, setShowChat] = useState(false);
 
-    const confirmModalRef = useRef<ConfirmModalRef>(null);
-    const approvedConfirmModalRef = useRef<ApprovedConfirmModalRef>(null);
-    const service = useMemberService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
+  const confirmModalRef = useRef<ConfirmModalRef>(null);
+  const approvedConfirmModalRef = useRef<ApprovedConfirmModalRef>(null);
+  const service = useMemberService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
 
-    const form = useForm<FormValues>({
-      initialValues: {
-        fullName: '',
-        identificationNumber: '',
-        email: '',
-        countryCode: '90',
-        phone: '',
-        dateOfBirth: '',
-        typeIds: '7',
-        countryId: '1',
-        provinceId: '',
-        programTypeId: "1",
-        isActive: true,
-        isSms: true,
-        isMail: true,
+  const form = useForm<FormValues>({
+    initialValues: {
+      fullName: '',
+      identificationNumber: '',
+      email: '',
+      countryCode: '90',
+      phone: '',
+      dateOfBirth: '',
+      typeIds: '7',
+      countryId: '1',
+      provinceId: '',
+      programTypeId: "1",
+      isActive: true,
+      isSms: true,
+      isMail: true,
+    },
+    validate: {
+      fullName: (value) => (value.trim().length < 5 ? 'İsim en az 5 karakter olmalı' : null),
+      identificationNumber: (value) => {
+         if (!value?.trim()) return null;
+        // Sadece rakam kontrolü
+        if (!/^[0-9]+$/.test(value)) return 'Sadece rakam girebilirsiniz';
+
+        return null; // Geçerli
       },
-      validate: {
-        fullName: (value) => (value.trim().length < 5 ? 'İsim en az 5 karakter olmalı' : null),
-        identificationNumber: (value) => {
-           if (!value?.trim()) return null;
-          // Sadece rakam kontrolü
-          if (!/^[0-9]+$/.test(value)) return 'Sadece rakam girebilirsiniz';
-
-          return null; // Geçerli
-        },
-        email: (value) => {
-          if (form.values.isMail) {
-            return /^\S+@\S+$/.test(value) ? null : 'Geçersiz email adresi';
-          }
-          if (!value?.trim()) return null;
-
+      email: (value) => {
+        if (form.values.isMail) {
           return /^\S+@\S+$/.test(value) ? null : 'Geçersiz email adresi';
-        },
-        typeIds: (value) => (value ? null : 'Üye tipi alanı zorunlu'),
+        }
+        if (!value?.trim()) return null;
+
+        return /^\S+@\S+$/.test(value) ? null : 'Geçersiz email adresi';
       },
-    });
+      typeIds: (value) => (value ? null : 'Üye tipi alanı zorunlu'),
+    },
+  });
 
-    const dialogClose = () => {
-       if (!isEquals(form.getInitialValues(), form.getValues())) {
+  const dialogClose = () => {
+     if (!isEquals(form.getInitialValues(), form.getValues())) {
 
-        confirmModalRef.current?.open();
-      } else {
-      
-        form.reset();
-      }
+      confirmModalRef.current?.open();
+    } else {
+    
+      form.reset();
     }
+  }
     
-    useEffect(() => {
-      if (form.isDirty()) {
-        setIsDisabledSelect(false);
+  useEffect(() => {
+    if (form.isDirty()) {
+      setIsDisabledSelect(false);
 
+      return;
+    }
+
+    setIsDisabledSelect(true);
+  }, [form.values]);
+
+  const handleSubmit = async (values: FormValues) => {
+    const typeIdVoluntarily = "1";
+    setIsDisabledSelect(true);
+    const newMemberValue = {
+      ...values,
+      fullName: values.fullName.trim(),
+      typeIds: values.typeIds ? values.typeIds : typeIdVoluntarily,
+      provinceId: values.provinceId ? parseInt(values.provinceId) : undefined,
+      countryId: values.countryId ? parseInt(values.countryId) : undefined,
+      programTypeId: values.programTypeId ? parseInt(values.programTypeId) : null
+    }
+    const result = await service.addExternalMember(newMemberValue);
+      if (result == true) {
+        approvedConfirmModalRef.current?.open();
+      
+      form.reset();
+      form.setFieldValue('provinceId', null);
+      setIsDisabledSelect(false);
         return;
-      }
-
-      setIsDisabledSelect(true);
-    }, [form.values]);
-
-     const handleSubmit = async (values: FormValues) => {
-        const typeIdVoluntarily = "1";
-    
-        setIsDisabledSelect(true);
-        const newMemberValue = {
-          ...values,
-          fullName: values.fullName.trim(),
-          typeIds: values.typeIds ? values.typeIds : typeIdVoluntarily,
-          provinceId: values.provinceId ? parseInt(values.provinceId) : undefined,
-          countryId: values.countryId ? parseInt(values.countryId) : undefined,
-          programTypeId: values.programTypeId ? parseInt(values.programTypeId) : null
-        }
-    
-        const result = await service.addExternalMember(newMemberValue);
-    
-        if (result == true) {
-    
-          approvedConfirmModalRef.current?.open();
-          
-          form.reset();
-          form.setFieldValue('provinceId', null);
-          setIsDisabledSelect(false);
-    
-          return;
-        }
-        if (result?.data == false && result?.errors?.length > 0) {
-    
-          toast.warning(result.errors[0]);
-    
-        } else {
-          toast.error('Bir hata oluştu! Tekrar deneyiniz.');
-        }
-        setIsDisabledSelect(false);
-      };
-
-    const confirmDialogHandleConfirm = () => {
-        confirmModalRef.current?.close();
-        form.reset();
-    };
-
-  const confirmDialogHandleCancel = () => {
-   toast.info("İşlem iptal edildi");
+    }
+    if (result?.data == false && result?.errors?.length > 0) {
+      toast.warning(result.errors[0]);
+    } else {
+      toast.error('Bir hata oluştu! Tekrar deneyiniz.');
+    }
+    setIsDisabledSelect(false);
   };
+
+  const confirmDialogHandleConfirm = () => {
+    confirmModalRef.current?.close();
+    form.reset();
+  };
+
+  const confirmDialogHandleCancel = () => toast.info("İşlem iptal edildi");
 
   return (
     <Container size="xl">
