@@ -47,7 +47,6 @@ export default function Mail() {
   ]);
 
   const { isLoggedIn } = useAuthStore();
-
   const service = useTransactionFinanceService(import.meta.env.VITE_APP_API_FINANCE_CONTROLLER);
 
   // Filtrelenmiş veriler
