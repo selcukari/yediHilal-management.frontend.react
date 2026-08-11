@@ -83,11 +83,7 @@ export default function Mail() {
     })));
   };
 
-
-
-  const onPaymentTypeChange = (paymentTypeValues: string[] | null): void => {
-    setPaymentTypeIds(paymentTypeValues)
-  };
+  const onPaymentTypeChange = (paymentTypeValues: string[] | null): void => setPaymentTypeIds(paymentTypeValues);
 
   const onPaymentTypeStatusChange = (statusValues: string | null): void => {
     setPaymentStatus(statusValues)
