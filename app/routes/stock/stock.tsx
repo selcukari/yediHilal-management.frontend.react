@@ -343,16 +343,16 @@ export default function Stock() {
                 </Grid.Col>
                 <Grid.Col span={{ base: 12, sm: 6, md: 4}}>
                   <Flex mih={50} gap="md" justify="flex-end" align="flex-end" direction="row" wrap="wrap">
-                  <MenuActionButton
-                    reportTitle={reportTitle()}
-                    excelColumns={excelTableColumns}
-                    valueData={raportStockData}
-                    pdfColumns={pdfTableColumns}
-                    type={2}
-                    isMailDisabled={true}
-                    isSmsDisabled={true}
-                    isWhatsAppDisabled={true}
-                  />
+                    <MenuActionButton
+                      reportTitle={reportTitle()}
+                      excelColumns={excelTableColumns}
+                      valueData={raportStockData}
+                      pdfColumns={pdfTableColumns}
+                      type={2}
+                      isMailDisabled={true}
+                      isSmsDisabled={true}
+                      isWhatsAppDisabled={true}
+                    />
                 </Flex>
                 </Grid.Col>
               </Grid>
