@@ -83,8 +83,7 @@ export default function DocumentTracking() {
 
   return resultData.filter((branch: DocumentTrackingType) => {
     // metin arama kontrolü
-    const matchesSearch = !searchText 
-      || branch.name?.toLowerCase().includes(searchText.trim().toLowerCase());
+    const matchesSearch = !searchText || branch.name?.toLowerCase().includes(searchText.trim().toLowerCase());
 
     // tarih aralığı kontrolü
     const [startDate, endDate] = rangeDate;
@@ -130,30 +129,30 @@ export default function DocumentTracking() {
   }
 
   const deleteMutation = useMutation({
-      mutationFn: async (id: number) => {
-        return await service.deleteDocumentTracking(id);
-      },
-      onMutate: () => {
-        open(); // İşlem başladığında LoadingOverlay göster
-      },
-      onSuccess: (result) => {
-        if (result === true) {
-          toast.success('İşlem başarılı!');
-          // ✨ Liste önbelleğini (cache) geçersiz kılıp otomatik güncel veriyi çektiriyoruz
-          queryClient.invalidateQueries({ queryKey: ['documentTrackings'] });
-        } else if (result?.data === false && result?.errors?.length > 0) {
-          toast.warning(result.errors[0]);
-        } else {
-          toast.error('Bir hata oluştu!');
-        }
-      },
-      onError: (error: any) => {
-        toast.error(`Silme işleminde bir hata: ${error.message}`);
-      },
-      onSettled: () => {
-        close(); // İşlem bittiğinde LoadingOverlay gizle
+    mutationFn: async (id: number) => {
+      return await service.deleteDocumentTracking(id);
+    },
+    onMutate: () => {
+      open(); // İşlem başladığında LoadingOverlay göster
+    },
+    onSuccess: (result) => {
+      if (result === true) {
+        toast.success('İşlem başarılı!');
+        // ✨ Liste önbelleğini (cache) geçersiz kılıp otomatik güncel veriyi çektiriyoruz
+        queryClient.invalidateQueries({ queryKey: ['documentTrackings'] });
+      } else if (result?.data === false && result?.errors?.length > 0) {
+        toast.warning(result.errors[0]);
+      } else {
+        toast.error('Bir hata oluştu!');
       }
-    });
+    },
+    onError: (error: any) => {
+      toast.error(`Silme işleminde bir hata: ${error.message}`);
+    },
+    onSettled: () => {
+      close(); // İşlem bittiğinde LoadingOverlay gizle
+    }
+  });
 
   const handleDelete = async (id: number) => {
     deleteMutation.mutate(id);
