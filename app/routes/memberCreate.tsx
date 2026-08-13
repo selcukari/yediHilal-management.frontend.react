@@ -142,9 +142,7 @@ export default function MemberCreate() {
         <Group justify="space-between" align="center">
           <div>
             <Title order={2}>Kayıt Form</Title>
-            <Text size="sm" c="dimmed">
-              Yeni kayıt ekle
-            </Text> 
+            <Text size="sm" c="dimmed">Yeni kayıt ekle</Text> 
           </div>
           <Button 
             variant="light" onClick={() => setShowChat(!showChat)} color="blue" visibleFrom='sm'>
