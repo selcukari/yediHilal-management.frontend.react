@@ -214,9 +214,7 @@ export default function Duty() {
       // İsteğe bağlı olarak genişlik ayarları ekleyebilirsiniz
     }));
   }, [rowHeaders]);
-  const reportTitle = (): string => {
-    return "Üniversiteler Raporu";
-  }
+  const reportTitle = (): string => "Üniversiteler Raporu";
 
   // raportdata
   const raportVehicleData = useMemo(() => {
