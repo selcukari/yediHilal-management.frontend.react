@@ -22,7 +22,7 @@ export function useAutomaticSmsFieldService(controller: string) {
     }
   };
 
-   const updateAutomaticSmsFields = async (params: AutomaticSmsFieldsDataParams) => {
+  const updateAutomaticSmsFields = async (params: AutomaticSmsFieldsDataParams) => {
 
     try {
       const res = await api.put(`/${controller}/updateAutomaticSmsFields`, params);
