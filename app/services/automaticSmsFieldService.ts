@@ -7,7 +7,6 @@ interface AutomaticSmsFieldsDataParams {
   isActive: boolean;
 }
 
-
 export function useAutomaticSmsFieldService(controller: string) {
   const { getCurrentToken, logout } = useAuthStore();
   const api = createApi(getCurrentToken() ?? undefined, logout);
