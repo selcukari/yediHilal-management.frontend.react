@@ -86,8 +86,6 @@ export default function Project() {
   enabled: !!currentUser, 
 });
 
-
-
   const handleEdit = (value: ProjectData) => {
     projectEditRef.current?.openDialog({
       ...value,
