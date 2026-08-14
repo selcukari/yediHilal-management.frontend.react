@@ -144,7 +144,7 @@ export function useMemberService(controller: string) {
     }
   };
 
-    const finansByUserId = async (userId: number) => {
+  const finansByUserId = async (userId: number) => {
 
     try {
 
