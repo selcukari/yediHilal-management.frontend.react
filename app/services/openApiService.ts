@@ -1,9 +1,4 @@
 import axios from 'axios';
-interface MessageOpenApiParams {
-  message: string;
-  context?: string | null;
-}
-
 interface ChatStreamParams {
   session_id: string;
   query: string;
