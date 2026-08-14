@@ -1,5 +1,5 @@
 // src/context/SignalRContext.jsx
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import * as signalR from '@microsoft/signalr';
 
 const SignalRContext = createContext(null);
