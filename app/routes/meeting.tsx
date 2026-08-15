@@ -224,18 +224,12 @@ export default function Meeting() {
       <Table.Td>
         <Group gap="xs">
           <Tooltip label="Güncelle">
-          <ActionIcon 
-            variant="light" 
-            color="blue"
-            onClick={() => handleEdit(element)}
-          >
+          <ActionIcon  variant="light"  color="blue" onClick={() => handleEdit(element)}>
             <IconEdit size={16} />
           </ActionIcon>
           </Tooltip>
           <Tooltip label="Sil">
-          <ActionIcon 
-            variant="light" 
-            color="red"
+          <ActionIcon variant="light" color="red"
             disabled={isUserAdmin ? ((differenceInDays(element.time ?? new Date(), new Date())<0 ? true : false)) : true}
             onClick={() => handleDelete(element.id)}
           >
@@ -243,11 +237,7 @@ export default function Meeting() {
           </ActionIcon>
           </Tooltip>
           <Tooltip label="PDF İndir">
-          <ActionIcon 
-            variant="light" 
-            color="green"
-            onClick={() => handleDowlandPdf(element)}
-          >
+          <ActionIcon  variant="light"  color="green" onClick={() => handleDowlandPdf(element)}>
             <IconFileTypePdf size={16} />
           </ActionIcon>
           </Tooltip>
