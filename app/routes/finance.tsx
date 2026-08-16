@@ -3,7 +3,6 @@ import { IconSearch, IconFilter } from '@tabler/icons-react';
 import {
   Container, Grid, TextInput, Stack, Button, Flex, Group, Title, Text, Paper, Table, LoadingOverlay,
 } from '@mantine/core';
-import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { useDisclosure } from '@mantine/hooks';
 import { useTransactionFinanceService } from '../services/transactionFinanceService';
 import { toast } from '../utils/toastMessages';
