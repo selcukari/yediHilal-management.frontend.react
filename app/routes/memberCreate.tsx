@@ -100,6 +100,7 @@ export default function MemberCreate() {
   const handleSubmit = async (values: FormValues) => {
     const typeIdVoluntarily = "1";
     setIsDisabledSelect(true);
+
     const newMemberValue = {
       ...values,
       fullName: values.fullName.trim(),
@@ -108,6 +109,7 @@ export default function MemberCreate() {
       countryId: values.countryId ? parseInt(values.countryId) : undefined,
       programTypeId: values.programTypeId ? parseInt(values.programTypeId) : null
     }
+
     const result = await service.addExternalMember(newMemberValue);
       if (result == true) {
         approvedConfirmModalRef.current?.open();
@@ -160,9 +162,7 @@ export default function MemberCreate() {
             <Grid>
               <Grid.Col span={6}>
                 <TextInput
-                  label="Ad Soyad" placeholder="İsim giriniz" required
-                  {...form.getInputProps('fullName')}
-              />
+                  label="Ad Soyad" placeholder="İsim giriniz" required {...form.getInputProps('fullName')}/>
             </Grid.Col>
 
             <Grid.Col span={6}>
