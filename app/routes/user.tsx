@@ -428,7 +428,6 @@ export default function User() {
             </Paper>
           </div>
         }
-
           {/* Örnek Tablo */}
           <Paper shadow="xs" p="lg" withBorder>
             <Stack gap="md">
