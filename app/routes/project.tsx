@@ -277,23 +277,12 @@ export default function Project() {
             </div>
             <Button variant="filled" visibleFrom="xs" leftSection={<IconPlus size={14} />}  onClick={() => projectAddRef.current?.openDialog()}>Yeni Ekle</Button>
                  {/* Mobile için sadece icon buton */}
-                <Button 
-                  variant="filled" 
-                  onClick={() => projectAddRef.current?.openDialog()}
-                  hiddenFrom="xs"
-                  p="xs"
-                >
+                <Button  variant="filled"  onClick={() => projectAddRef.current?.openDialog()} hiddenFrom="xs" p="xs">
                   <IconPlus size={18} />
                 </Button>
           </Group>
           {/* İçerik Kartları */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-              gap: '1rem',
-            }}
-          >
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
             <Paper shadow="xs" p="lg" withBorder>
               <Grid>
                 <Grid.Col span={{ base: 12, sm: 6, md: 4}}>
@@ -314,16 +303,7 @@ export default function Project() {
                   direction="row"
                   wrap="wrap"
                 >
-                  <MenuActionButton
-                  reportTitle={reportTitle()}
-                  excelColumns={excelTableColumns}
-                  valueData={raportProjectData}
-                  pdfColumns={pdfTableColumns}
-                  type={2}
-                  isMailDisabled={true}
-                  isSmsDisabled={true}
-                  isWhatsAppDisabled={true}
-                  />
+                  <MenuActionButton reportTitle={reportTitle()} excelColumns={excelTableColumns} valueData={raportProjectData} pdfColumns={pdfTableColumns} type={2} isMailDisabled={true} isSmsDisabled={true} isWhatsAppDisabled={true}/>
                 </Flex>
               </Grid.Col>
               </Grid>
