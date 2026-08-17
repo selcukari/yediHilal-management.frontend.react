@@ -328,10 +328,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
       opened={opened}
       onClose={() => {
         dialogClose();
-      }}
-      title="Temsilcilik Güncelle"
-      centered
-      size="700"
+      }} title="Temsilcilik Güncelle" centered size="700"
       overlayProps={{
         backgroundOpacity: 0.55,
         blur: 3,
@@ -406,13 +403,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
               onChange={(value) => form.setFieldValue('openingDate', value)}
            />
           </Grid.Col>
-          <Flex
-            mih={50}
-            gap="md"
-            justify="center"
-            align="flex-end"
-            direction="row"
-            wrap="wrap">
+          <Flex mih={50} gap="md" justify="center" align="flex-end" direction="row" wrap="wrap">
             <Grid.Col span={6}>
               <Switch
                 label="Kiralık mı?" 
@@ -458,13 +449,7 @@ const BranchEdit = forwardRef<BranchEditDialogControllerRef, UserAddProps>(({onS
           </Grid.Col>
           {/* dagişen sancaktar baskana baglı olanlar listesi */}
           {(rowsSancaktarUserTable())?.length > 0 &&
-          <Flex
-            mih={50}
-            gap="md"
-            justify="center"
-            align="center"
-            direction="row"
-            wrap="wrap">
+          <Flex mih={50} gap="md" justify="center" align="center" direction="row" wrap="wrap">
             <Grid.Col span={12}>
             <Paper shadow="xs" p="lg" withBorder>
               <Stack gap="md">

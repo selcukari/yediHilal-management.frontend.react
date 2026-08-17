@@ -292,13 +292,7 @@ const BranchAdd = forwardRef<BranchAddDialogControllerRef, UserAddProps>(({onSav
              onChange={(value) => form.setFieldValue('openingDate', value)}
            />
           </Grid.Col>
-          <Flex
-            mih={50}
-            gap="md"
-            justify="center"
-            align="flex-end"
-            direction="row"
-            wrap="wrap">
+          <Flex mih={50} gap="md" justify="center" align="flex-end" direction="row" wrap="wrap">
             <Grid.Col span={6}>
               <Switch
                 label="Kiralık mı?" 
