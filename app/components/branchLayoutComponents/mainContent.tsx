@@ -1,15 +1,5 @@
 import React from 'react';
-import {
-  Container,
-  Stack,
-  Group,
-  Title,
-  Text,
-  Button,
-  Paper,
-  AppShell,
-} from '@mantine/core';
-
+import { Container, Stack, Group, Title, Text, Button, Paper, AppShell } from '@mantine/core';
 interface MainContentProps {
   activeSection: string;
 }
