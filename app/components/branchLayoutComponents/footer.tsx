@@ -9,31 +9,13 @@ export function Footer() {
           {`© 2025 YediHilal Yönetim Sistemi. Tüm hakları saklıdır. <selcuk.ari/>`}
         </Text>
         <Group gap="md">
-          <Text
-            size="sm"
-            c="dimmed"
-            component="a"
-            href="privacyPolicy"
-            style={{ textDecoration: 'none', cursor: 'pointer' }}
-          >
+          <Text size="sm" c="dimmed" component="a" href="privacyPolicy" style={{ textDecoration: 'none', cursor: 'pointer' }}>
             Gizlilik Politikası
           </Text>
-          <Text
-            size="sm"
-            c="dimmed"
-            component="a"
-            href="#"
-            style={{ textDecoration: 'none', cursor: 'pointer' }}
-          >
+          <Text size="sm" c="dimmed" component="a" href="#" style={{ textDecoration: 'none', cursor: 'pointer' }}>
             Kullanım Şartları
           </Text>
-          <Text
-            size="sm"
-            c="dimmed"
-            component="a"
-            href="#"
-            style={{ textDecoration: 'none', cursor: 'pointer' }}
-          >
+          <Text size="sm" c="dimmed" component="a" href="#" style={{ textDecoration: 'none', cursor: 'pointer' }}>
             Destek
           </Text>
         </Group>
