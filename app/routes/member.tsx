@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { IconSearch, IconFilter, IconEdit, IconTrash, IconPlus, IconCalendar, IconPhoneCall } from '@tabler/icons-react';
 import {
   Container, Grid, TextInput, Switch, Stack, Group, Title, Text, Button, Paper, Table, Badge,
@@ -6,7 +6,7 @@ import {
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Country, ProgramType, Province, MemberType, MenuActionButton } from '../components'
 import MemberAdd, { type MemberAddDialogControllerRef } from '../components/members/memberAdd';
 import MemberEdit, { type MemberEditDialogControllerRef } from '../components/members/memberEdit';
@@ -22,6 +22,7 @@ import { type PdfTableColumn } from '../utils/repor/exportToPdf';
 import { calculateColumnWidthMember } from '../utils/repor/calculateColumnWidth';
 import { type ColumnDefinition, type ValueData } from '../utils/repor/exportToExcel';
 import { DayRenderer } from '../components';
+import { MemberChatBotFilterAi } from '~/components/llmWithSearch';
 
 type filterModels = {
   countryId?: string | null;
@@ -40,7 +41,7 @@ interface Column {
 
 export default function Member() {
   const { isLoggedIn, currentUser } = useAuthStore();
-
+  const queryClient = useQueryClient();
   const [isDisabledDeleteAction, setDisabledDeleteAction]= useState(false);
   const [selectedCountry, setSelectedCountry] = useState<string | null | undefined>(null);
   const [filterModel, setFilterModel] = useState<filterModels>({ isActive: true, countryId: '1', dateRange: [null, null] });
@@ -192,6 +193,22 @@ export default function Member() {
 
   const handleSaveSuccess = () => {
     refetch();
+  };
+
+  const handleAiFilterApply = (data: any[]) => {
+    console.log('SmartMemberFilter deneme fonksiyonu tetiklendi. Gelen veri:', data);
+    if (data && data.length > 0) {
+       const filteredData = data.map((item: any) => ({
+         ...item,
+         createdDate: formatDate(item.createdDate, dateFormatStrings.dateTimeFormatWithoutSecond),
+         updateDate: formatDate(item.updateDate, dateFormatStrings.dateTimeFormatWithoutSecond),
+         phoneWithCountryCode: (item.countryCode && item.phone) ? `${item.countryCode}${item.phone}` : undefined
+       }));
+
+      queryClient.setQueryData(['members', filterModel.isActive], filteredData);
+    } else {
+      toast.info('Arama sonucunda üye bulunamadı.');
+    }
   };
 
    const rowsTable = resultData.map((item: any) => (
@@ -486,7 +503,7 @@ export default function Member() {
                       {rowHeaders.map((header) => (
                         <Table.Th key={header.field}>{header.header}</Table.Th>
                       ))}
-                    </Table.Tr>
+                    </Table.Tr> 
                   </Table.Thead>
                   <Table.Tbody>{rowsTable}</Table.Tbody>
                 </Table>
@@ -501,6 +518,7 @@ export default function Member() {
         <MemberEdit ref={memberEditRef} onSaveSuccess={handleSaveSuccess} />
         <PhoneCallTrackingSend ref={phoneCallTrackingRef} onSaveSuccess={handleSaveSuccess} />
         <MemberChatBotAi onSaveSuccess={handleSaveSuccess} />
+        <MemberChatBotFilterAi onFilterApply={handleAiFilterApply} />
       </Container>
   );
 }
