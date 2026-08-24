@@ -196,8 +196,7 @@ export default function Member() {
   };
 
   const handleAiFilterApply = (data: any[]) => {
-    console.log('SmartMemberFilter deneme fonksiyonu tetiklendi. Gelen veri:', data);
-    if (data && data.length > 0) {
+    if (data && Array.isArray(data) && data.length > 0) {
        const filteredData = data.map((item: any) => ({
          ...item,
          createdDate: formatDate(item.createdDate, dateFormatStrings.dateTimeFormatWithoutSecond),
