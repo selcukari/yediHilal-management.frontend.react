@@ -196,12 +196,7 @@ export default function AutomaticMailManagement() {
 
   return (
     <Container size={620} my={40}>
-      <LoadingOverlay
-        visible={visible}
-        zIndex={1000}
-        overlayProps={{ radius: 'sm', blur: 2 }}
-        loaderProps={{ color: 'pink', type: 'bars' }}
-      />
+      <LoadingOverlay visible={visible} zIndex={1000} overlayProps={{ radius: 'sm', blur: 2 }} loaderProps={{ color: 'pink', type: 'bars' }}/>
       <Title ta="center" mb="md">Otomatik Mail Alanı</Title>
       <Paper withBorder shadow="md" p={30} radius="md">
         <Text c="dimmed">Son Güncelle: {formatDate(form.values.updateDate, dateFormatStrings.dateTimeFormatWithoutSecond)}</Text>
@@ -226,29 +221,10 @@ export default function AutomaticMailManagement() {
               required={true}
               value={form.values.body}
               {...form.getInputProps('body')}
-          />
-          <Flex
-            mih={50}
-            gap="md"
-            justify="center"
-            align="flex-end"
-            direction="row"
-            wrap="wrap">
-          <TextInput
-            label="Ayın Kaçında"
-            placeholder="kaçıncı günü"
-            {...form.getInputProps('day')}
-            type="number" required
-            min={1} max={27}
-          />
-          <TimePicker
-            label="Saat" error={error}
-            withDropdown
-            required
-            value={form.values.hour}
-            onChange={(val) => form.setFieldValue('hour', val)}
-            presets={['09:00', '10:30', '12:00', '13:00', '14:30', '15:00']}
-          />
+            />
+          <Flex mih={50} gap="md" justify="center" align="flex-end" direction="row" wrap="wrap">
+            <TextInput label="Ayın Kaçında" placeholder="kaçıncı günü" {...form.getInputProps('day')} type="number" required min={1} max={27}/>
+            <TimePicker label="Saat" error={error} withDropdown required value={form.values.hour} onChange={(val) => form.setFieldValue('hour', val)} presets={['09:00', '10:30', '12:00', '13:00', '14:30', '15:00']}/>
           </Flex>
           <Switch 
             label="Aktiflik Durumu" mt={4}
@@ -256,18 +232,8 @@ export default function AutomaticMailManagement() {
             {...form.getInputProps('isActive')}
           />
           <Flex
-            mih={50}
-            gap="md"
-            justify="center"
-            align="flex-end"
-            direction="row"
-          wrap="wrap">
-            <Button 
-            mt="xl" onClick={updateReadyMessage}
-            loading={authLoading}
-            disabled={!form.isDirty()}>
-            Hazır Message Kaydet
-          </Button>
+            mih={50} gap="md" justify="center" align="flex-end" direction="row" wrap="wrap">
+            <Button mt="xl" onClick={updateReadyMessage}loading={authLoading}disabled={!form.isDirty()}>Hazır Message Kaydet</Button>
           <Button 
             variant="filled" 
             p="xs" onClick={() => readyMessageMailAdd.current?.open()}
@@ -275,13 +241,7 @@ export default function AutomaticMailManagement() {
             <IconPlus size={18} />
           </Button>
           </Flex>
-          <Button 
-            fullWidth 
-            mt="xl" 
-            type="submit" 
-            loading={authLoading}
-            disabled={!form.isDirty()}
-          >
+          <Button fullWidth mt="xl" type="submit" loading={authLoading} disabled={!form.isDirty()}>
             Kaydet
           </Button>
         </form>

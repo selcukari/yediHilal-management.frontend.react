@@ -4,7 +4,7 @@ import * as signalR from '@microsoft/signalr';
 
 const SignalRContext = createContext(null);
 
-export const SignalRProvider = ({ children }) => {
+export const SignalRProvider = ({ children }: { children: React.ReactNode }) => {
   const [connection, setConnection] = useState(null);
 
   useEffect(() => {
