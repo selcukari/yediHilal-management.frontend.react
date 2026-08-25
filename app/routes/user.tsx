@@ -88,28 +88,28 @@ export default function User() {
   }, [currentUser]);
 
   const handleEdit = (item: any) => {
-     userEditRef.current?.openDialog({
-      id: item.id,
-      fullName: item.fullName,
-      identificationNumber: item.identificationNumber,
-      email: item.email,
-      countryCode: item.countryCode,
-      phone: item.phone,
-      dateOfBirth: item.dateOfBirth ? item.dateOfBirth.toString() : '',
-      isActive: item.isActive,
-      password: item.password,
-      moduleRoles: item.moduleRoles,
-      roleId: item.roleId.toString(),
-      districtId: item.districtId?.toString(),
-      countryId: item.countryId.toString(),
-      provinceId: item.provinceId?.toString(),
-      deleteMessageTitle: item.deleteMessageTitle?.toString(),
-      createdDate: item.createdDate,
-      duties: (item.duties && item.duties) as DutiesType[],
-      dutiesIds: item.duties && item.duties[item.duties.length -1].ids as string,
-      updateDate: item.updateDate,
-      dutyIds: item.dutyIds,
-     });
+    userEditRef.current?.openDialog({
+     id: item.id,
+     fullName: item.fullName,
+     identificationNumber: item.identificationNumber,
+     email: item.email,
+     countryCode: item.countryCode,
+     phone: item.phone,
+     dateOfBirth: item.dateOfBirth ? item.dateOfBirth.toString() : '',
+     isActive: item.isActive,
+     password: item.password,
+     moduleRoles: item.moduleRoles,
+     roleId: item.roleId.toString(),
+     districtId: item.districtId?.toString(),
+     countryId: item.countryId.toString(),
+     provinceId: item.provinceId?.toString(),
+     deleteMessageTitle: item.deleteMessageTitle?.toString(),
+     createdDate: item.createdDate,
+     duties: (item.duties && item.duties) as DutiesType[],
+     dutiesIds: item.duties && item.duties[item.duties.length -1].ids as string,
+     updateDate: item.updateDate,
+     dutyIds: item.dutyIds,
+    });
   };
 
   const handleDelete = (id: number) => {
