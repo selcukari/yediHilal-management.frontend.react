@@ -210,14 +210,7 @@ export default function AutomaticSmsManagement() {
               type="number" required
               min={1} max={27}
             />
-          <TimePicker
-            label="Saat" error={error}
-            withDropdown
-            required
-            value={form.values.hour}
-            onChange={(val) => form.setFieldValue('hour', val)}
-            presets={['09:00', '10:30', '12:00', '13:00', '14:30', '15:00']}
-          />
+          <TimePicker label="Saat" error={error} withDropdown required value={form.values.hour} onChange={(val) => form.setFieldValue('hour', val)} presets={['09:00', '10:30', '12:00', '13:00', '14:30', '15:00']}/>
           </Flex>
           <Switch 
             label="Aktiflik Durumu" 
