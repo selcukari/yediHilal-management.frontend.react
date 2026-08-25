@@ -202,20 +202,14 @@ export default function AutomaticSmsManagement() {
             required autosize minRows={10} maxRows={15}
             {...form.getInputProps('message')}
           />
-          <Flex
-            mih={50}
-            gap="md"
-            justify="center"
-            align="flex-end"
-            direction="row"
-            wrap="wrap">
-          <TextInput
-            label="Ayın Kaçında"
-            placeholder="kaçıncı günü"
-            {...form.getInputProps('day')}
-            type="number" required
-            min={1} max={27}
-          />
+          <Flex mih={50} gap="md" justify="center" align="flex-end" direction="row" wrap="wrap">
+            <TextInput
+              label="Ayın Kaçında"
+              placeholder="kaçıncı günü"
+              {...form.getInputProps('day')}
+              type="number" required
+              min={1} max={27}
+            />
           <TimePicker
             label="Saat" error={error}
             withDropdown
@@ -243,20 +237,11 @@ export default function AutomaticSmsManagement() {
             disabled={!form.isDirty()}>
             Hazır Message Kaydet
           </Button>
-          <Button 
-            variant="filled" 
-            p="xs" onClick={() => readyMessageAdd.current?.open()}
-            loading={authLoading}>
+          <Button variant="filled" p="xs" onClick={() => readyMessageAdd.current?.open()} loading={authLoading}>
             <IconPlus size={18} />
           </Button>
           </Flex>
-          <Button 
-            fullWidth 
-            mt="xl" 
-            type="submit" 
-            loading={authLoading}
-            disabled={!form.isDirty()}
-          >
+          <Button  fullWidth  mt="xl"  type="submit"  loading={authLoading} disabled={!form.isDirty()}>
             Kaydet
           </Button>
         </form>
