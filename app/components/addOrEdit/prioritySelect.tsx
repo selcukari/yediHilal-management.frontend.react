@@ -2,6 +2,7 @@ import { Select } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import type { UseFormReturnType } from '@mantine/form';
 import { priorityMockData } from '../../utils/priorityMockData';
+
 interface PrioritySelectProps {
   form: UseFormReturnType<any>;
   required?: boolean;
