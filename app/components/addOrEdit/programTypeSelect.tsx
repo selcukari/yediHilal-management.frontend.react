@@ -2,6 +2,7 @@ import { Select } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import type { UseFormReturnType } from '@mantine/form';
 import { useProgramTypeService } from '../../services/programTypeService';
+
 interface ProgramTypeSelectProps {
   form: UseFormReturnType<any>;
   required?: boolean;
