@@ -55,7 +55,7 @@ const DocumentTrackingAdd = forwardRef<DocumentTrackingAddDialogControllerRef, D
 
     if (!connection) return;
 
-   connection.on('ReceiveValueCreated', (data) => {
+    connection.on('ReceiveValueCreated', (data) => {
     
     // Toast veya state güncellemesi
     toast.success('İşlem başarılı! ' + data.valueName);

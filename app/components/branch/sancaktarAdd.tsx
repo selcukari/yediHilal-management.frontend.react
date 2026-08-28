@@ -68,29 +68,29 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
 
     const memberFind = sancaktarData.find(i => i.id == values.memberId);
 
-      // onSaveSuccess event'ini tetikle
-      if (onSaveSuccess) {
-        onSaveSuccess({
-          memberId: values.memberId ?? "",
-          memberFullName: memberFind?.fullName ?? "",
-          memberPhone: memberFind?.phone,
-          userDutyName: (userDuty.name || ""),
-          userDutyId: (userDuty.id || ""),
-          createDate: new Date().toISOString(),
-          finisDate: '',
-          isActive: "1",
-          newItem: true
-        });
+    // onSaveSuccess event'ini tetikle
+    if (onSaveSuccess) {
+      onSaveSuccess({
+        memberId: values.memberId ?? "",
+        memberFullName: memberFind?.fullName ?? "",
+        memberPhone: memberFind?.phone,
+        userDutyName: (userDuty.name || ""),
+        userDutyId: (userDuty.id || ""),
+        createDate: new Date().toISOString(),
+        finisDate: '',
+        isActive: "1",
+        newItem: true
+      });
 
       toast.success('Üye Eklendi!');
-      }
+    }
       
-      close();
-      form.reset();
-      setIsDisabledSubmit(false);
+    close();
+    form.reset();
+    setIsDisabledSubmit(false);
 
-      return;
-    };
+    return;
+  };
 
   useEffect(() => {
     if (form.isDirty()) {
@@ -113,7 +113,7 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
   };
 
   const dialogClose = () => {
-     if (!isEquals(form.getInitialValues(), form.getValues())) {
+    if (!isEquals(form.getInitialValues(), form.getValues())) {
 
       confirmModalRef.current?.open();
     } else {
