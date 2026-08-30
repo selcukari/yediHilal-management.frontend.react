@@ -52,19 +52,17 @@ const BranchEdit = forwardRef<DocumentTrackingEditDialogControllerRef, DocumentT
   
   useEffect(() => {
   
-      if (!connection) return;
+    if (!connection) return;
   
-     connection.on('ReceiveValueUpdated', (data) => {
+    connection.on('ReceiveValueUpdated', (data) => {
       
-      // Toast veya state güncellemesi
-      toast.success('İşlem başarılı! ' + data.valueName);
+    // Toast veya state güncellemesi
+    toast.success('İşlem başarılı! ' + data.valueName);
     });
   
-      // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
-      return () => {
-        connection.off('ReceiveValueUpdated');
-      };
-    }, [connection]);
+    // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+    return () => connection.off('ReceiveValueUpdated');
+  }, [connection]);
 
   const updateDocumentTrackingMutation = useMutation({
     mutationFn: async (values: FormValues) => {

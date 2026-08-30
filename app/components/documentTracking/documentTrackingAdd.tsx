@@ -62,9 +62,7 @@ const DocumentTrackingAdd = forwardRef<DocumentTrackingAddDialogControllerRef, D
   });
 
     // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
-    return () => {
-      connection.off('ReceiveValueCreated');
-    };
+    return () => connection.off('ReceiveValueCreated');
   }, [connection]);
 
   const addDocumentTrackingMutation = useMutation({
