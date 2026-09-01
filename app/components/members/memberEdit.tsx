@@ -130,20 +130,18 @@ const MemberEdit = forwardRef<MemberEditDialogControllerRef, MemberEditProps>(({
   });
 
   useEffect(() => {
-  
-      if (!connection) return;
-  
-     connection.on('ReceiveValueUpdated', (data) => {
-      
+
+    if (!connection) return;
+
+    connection.on('ReceiveValueUpdated', (data) => {
+    
       // Toast veya state güncellemesi
       toast.success('İşlem başarılı! ' + data.valueName);
     });
-  
-      // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
-      return () => {
-        connection.off('ReceiveValueUpdated');
-      };
-    }, [connection]);
+
+    // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+    return () => connection.off('ReceiveValueUpdated');
+  }, [connection]);
 
    const openDialog = (value: FormValues) => {
 

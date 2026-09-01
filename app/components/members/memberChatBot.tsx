@@ -10,7 +10,6 @@ export function MemberChatBotAi({onSaveSuccess}: {onSaveSuccess?: () => void}) {
   const [loading, setLoading] = useState(false);
 
   const service = useMemberService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
-  
 
   const handleSendMessage = async () => {
     if (!value.trim()) return;
