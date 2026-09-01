@@ -91,9 +91,7 @@ const PhoneCallTrackingSend = forwardRef<PhoneCallTrackingSendDialogControllerRe
     close();
   };
 
-  const confirmDialogHandleCancel = () => {
-    toast.info("İşlem iptal edildi");
-  };
+  const confirmDialogHandleCancel = () => toast.info("İşlem iptal edildi");
 
   const dialogClose = () => {
     setSelectedRows([]);
