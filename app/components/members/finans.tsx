@@ -83,36 +83,36 @@ export const FinanceModal = ({ opened, onClose, memberId, memberFullName }: Fina
     gcTime: 1000 * 60 * 60 * 24 * 7, // 24 saat bellekte tut
   });
 
-    const { data: resultData = [], isLoading: isQueryLoading, refetch } = useQuery({
-        queryKey: ['finansByUserId', memberId],
-        enabled: !!memberId, // memberId boşsa API çağrısı yapmaz
-        queryFn: async () => {
-            if (!memberId) {
-                toast.error('Üye ID bulunamadı!');
-                return [];
-            }
-
-            const getFinansByUserId = await service.finansByUserId(memberId);
-            if (getFinansByUserId) {
-                const getStatusText = (status: string) => {
-                    if (status === 'completed') return 'Ödendi';
-                    if (status === 'pending') return 'Bekliyor';
-                    return 'Hata';
-                };
-
-                return getFinansByUserId.map((finans: any) => ({
-                    id: finans.id,
-                    amount: finans.amount.toString(),
-                    paymentType: finans.paymentType.name,
-                    status: getStatusText(finans.status),
-                    transactionDate: formatDate(finans.transactionDate, dateFormatStrings.dateTimeFormatWithoutSecond),
-                }));
-            }
-            toast.info('Hiçbir veri yok!');
+  const { data: resultData = [], isLoading: isQueryLoading, refetch } = useQuery({
+      queryKey: ['finansByUserId', memberId],
+      enabled: !!memberId, // memberId boşsa API çağrısı yapmaz
+      queryFn: async () => {
+        if (!memberId) {
+            toast.error('Üye ID bulunamadı!');
             return [];
-        },
-        staleTime: 1000 * 60 * 60 * 24, // Veriyi 1 gün güncel kabul et, gereksiz API isteklerini önle
-    });
+        }
+
+        const getFinansByUserId = await service.finansByUserId(memberId);
+        if (getFinansByUserId) {
+          const getStatusText = (status: string) => {
+            if (status === 'completed') return 'Ödendi';
+            if (status === 'pending') return 'Bekliyor';
+            return 'Hata';
+          };
+
+          return getFinansByUserId.map((finans: any) => ({
+            id: finans.id,
+            amount: finans.amount.toString(),
+            paymentType: finans.paymentType.name,
+            status: getStatusText(finans.status),
+            transactionDate: formatDate(finans.transactionDate, dateFormatStrings.dateTimeFormatWithoutSecond),
+          }));
+        }
+        toast.info('Hiçbir veri yok!');
+        return [];
+      },
+      staleTime: 1000 * 60 * 60 * 24, // Veriyi 1 gün güncel kabul et, gereksiz API isteklerini önle
+  });
 
   // Yeni Ödeme Kaydetme Fonksiyonu
   const handleAddPaymentSubmit = async (values: PaymentFormValues) => {
