@@ -96,7 +96,7 @@ const PhoneCallStatu = forwardRef<PhoneCallStatuDialogControllerRef, PhoneCallSt
      setIsDisabledSubmit(true);
   }, [form.values]);
 
-const openDialog = (value: FormValues) => {
+  const openDialog = (value: FormValues) => {
 
     if (value) {
       form.reset();

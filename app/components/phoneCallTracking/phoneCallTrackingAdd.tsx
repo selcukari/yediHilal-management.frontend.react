@@ -56,18 +56,16 @@ const PhoneCallTrackingAdd = forwardRef<PhoneCallTrackingAddDialogControllerRef,
 
   useEffect(() => {
   
-      if (!connection) return;
+    if (!connection) return;
   
-     connection.on('ReceiveValueCreated', (data: any) => {
+    connection.on('ReceiveValueCreated', (data: any) => {
       
       // Toast veya state güncellemesi
       toast.success('İşlem başarılı! ' + data.valueName);
     });
   
-      // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
-      return () => {
-        connection.off('ReceiveValueCreated');
-      };
+    // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+    return () => connection.off('ReceiveValueCreated');
     }, [connection]);
 
   const isUserAdmin = useMemo(() => {
