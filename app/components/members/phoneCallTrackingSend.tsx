@@ -145,12 +145,13 @@ const PhoneCallTrackingSend = forwardRef<PhoneCallTrackingSendDialogControllerRe
   };
 
   const fetchPhoneCallTracking = async () => {
-     open();
+    open();
 
-     try {
+    try {
       const responsibleId = !isUserAdmin ? currentUser.id as number : undefined;
 
       const getphoneCallTrackings = await servicePhoneCall.getPhoneCallTrackings(responsibleId);
+      
       if (getphoneCallTrackings) {
         setResultDataPhoneCall(getphoneCallTrackings);
        
@@ -159,11 +160,11 @@ const PhoneCallTrackingSend = forwardRef<PhoneCallTrackingSendDialogControllerRe
 
         setResultDataPhoneCall([]);
       }
-        close();
+      close();
 
     } catch (error: any) {
-        toast.error(`PhoneCallTracking yüklenirken hata: ${error.message}`);
-        close();
+      toast.error(`PhoneCallTracking yüklenirken hata: ${error.message}`);
+      close();
     }
   };
 
