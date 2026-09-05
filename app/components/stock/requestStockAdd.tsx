@@ -95,17 +95,15 @@ const RequestStockAdd = forwardRef<RequestStockAddDialogControllerRef, RequestSt
   ]);
    useEffect(() => {
   
-      if (!connection) return;
+    if (!connection) return;
   
-     connection.on('ReceiveValueCreated', (data: any) => {
+    connection.on('ReceiveValueCreated', (data: any) => {
       
       toast.success('Talep başarıyla oluşturuldu!');
     });
   
       // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
-      return () => {
-        connection.off('ReceiveValueCreated');
-      };
+      return () => connection.off('ReceiveValueCreated');
     }, [connection]);
 
   useEffect(() => {
@@ -157,6 +155,7 @@ const RequestStockAdd = forwardRef<RequestStockAddDialogControllerRef, RequestSt
   // Seçili ürünleri güncelle
   const toggleItemSelection = (stockId: number) => {
     const newSelected = new Set(selectedItems);
+    
     if (newSelected.has(stockId)) {
       newSelected.delete(stockId);
       // Seçimi kaldırılırsa talep alanlarını sıfırla

@@ -54,18 +54,16 @@ const RequestStockEdit = forwardRef<RequestStockEditDialogControllerRef, Request
   });
    useEffect(() => {
   
-      if (!connection) return;
+    if (!connection) return;
   
-     connection.on('ReceiveValueUpdated', (data: any) => {
+    connection.on('ReceiveValueUpdated', (data: any) => {
       
-      // Toast veya state güncellemesi
-      toast.success('İşlem başarılı! ' + data.valueName);
+    // Toast veya state güncellemesi
+    toast.success('İşlem başarılı! ' + data.valueName);
     });
   
       // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
-      return () => {
-        connection.off('ReceiveValueUpdated');
-      };
+      return () => connection.off('ReceiveValueUpdated');
     }, [connection]);
 
   const openDialog = (value: FormValues[]) => {
