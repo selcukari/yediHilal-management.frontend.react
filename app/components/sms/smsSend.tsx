@@ -49,7 +49,7 @@ const SmsSend = forwardRef<SmsSendDialogControllerRef, unknown>((_props, ref) =>
     return !form.isValid();
   }, [form.values]);
 
-   const openDialog = (smsType: string, value: ValueParams) => {
+  const openDialog = (smsType: string, value: ValueParams) => {
 
     if (value) {
       setSmsType(smsType);
@@ -122,7 +122,7 @@ const SmsSend = forwardRef<SmsSendDialogControllerRef, unknown>((_props, ref) =>
   };
 
   const dialogClose = () => {
-     if (!isEquals(form.getInitialValues(), form.getValues())) {
+    if (!isEquals(form.getInitialValues(), form.getValues())) {
 
       confirmModalRef.current?.open();
     } else {
