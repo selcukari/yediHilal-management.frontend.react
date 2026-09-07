@@ -53,9 +53,7 @@ const UserDutyEdit = forwardRef<UserDutyEditDialogControllerRef, BranchDutyEditP
     });
 
     // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
-    return () => {
-      connection.off('ReceiveValueUpdated');
-    };
+    return () => connection.off('ReceiveValueUpdated');
   }, [connection]);
 
 
