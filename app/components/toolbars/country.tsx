@@ -23,7 +23,7 @@ interface CountryResponse {
 
 export function Country({ isRequired = false, isDisabled = false, valueId,
   onCountryChange,
- }: CountryProps) {
+}: CountryProps) {
   const [county, setCountry] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(isRequired ? 'Ülke alanı gereklidir.' : null);
   

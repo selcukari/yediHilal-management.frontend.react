@@ -1,7 +1,6 @@
 import { MultiSelect } from '@mantine/core';
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { toast } from '../../utils/toastMessages';
 import { useTransactionFinanceService } from '../../services/transactionFinanceService';
 
 interface PaymentTypeProps {

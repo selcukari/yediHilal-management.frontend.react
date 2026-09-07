@@ -26,7 +26,7 @@ interface ProvinceProps {
 }
 
 export function Province({ 
- isRequired = false, countryId, isDisabled = false, onProvinceChange, valueId,
+  isRequired = false, countryId, isDisabled = false, onProvinceChange, valueId,
 }: ProvinceProps) {
   const [province, setProvince] = useState<string[] | undefined>(undefined);
   const [error, setError] = useState<string | null>(isRequired ? 'Ülke alanı gereklidir.' : null);

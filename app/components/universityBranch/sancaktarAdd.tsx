@@ -59,8 +59,7 @@ const SancaktarAdd = forwardRef<SancaktarAddDialogControllerRef, SancaktarAddPro
       userDutyId: '',
       memberId: ""
     },
-    validate: {
-    },
+    validate: {},
   });
 
   const handleSubmit = async (values: FormValues) => {
