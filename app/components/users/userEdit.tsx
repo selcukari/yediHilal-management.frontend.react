@@ -145,9 +145,7 @@ const UserEdit = forwardRef<UserEditDialogControllerRef, UserEditProps>(({onSave
       });
   
       // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
-      return () => {
-        connection.off('ReceiveValueUpdated');
-      };
+      return () => connection.off('ReceiveValueUpdated');
     }, [connection]);
 
   const [rowDutyHeaders, setRowDutyHeaders] = useState<TableHeader[]>([
