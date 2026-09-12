@@ -73,9 +73,7 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
     });
 
     // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
-    return () => {
-      connection.off('ReceiveValueCreated');
-    };
+    return () => connection.off('ReceiveValueCreated');
   }, [connection]);
 
   useEffect(() => {
@@ -149,7 +147,6 @@ const VehicleDepositAdd = forwardRef<VehicleDepositAddDialogControllerRef, Vehic
       fetchVehicle();
     }, 200);
     open();
-
   };
 
   useImperativeHandle(ref, () => ({
