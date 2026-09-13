@@ -68,6 +68,7 @@ export function ChatComponent({ title = "YediHilal AI Asistan", height = 600 }: 
 
     // Bot için boş placeholder oluştur
     const botMsgId = (Date.now() + 1).toString();
+    
     setMessages(prev => [...prev, {
       id: botMsgId,
       text: '',

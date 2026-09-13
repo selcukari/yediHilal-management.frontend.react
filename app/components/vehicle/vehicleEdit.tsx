@@ -113,9 +113,7 @@ const VehicleEdit = forwardRef<VehicleEditDialogControllerRef, VehicleEditProps>
     });
 
     // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
-    return () => {
-      connection.off('ReceiveValueUpdated');
-    };
+    return () => connection.off('ReceiveValueUpdated');
   }, [connection]);
 
   useEffect(() => {
@@ -183,7 +181,7 @@ const VehicleEdit = forwardRef<VehicleEditDialogControllerRef, VehicleEditProps>
       form.reset();
     }
   }
- const openDialog = (value: FormValues, vehicleData: GetVehicleData[]) => {
+  const openDialog = (value: FormValues, vehicleData: GetVehicleData[]) => {
 
     if (value && vehicleData?.length > 0) {
       form.reset();
@@ -196,7 +194,6 @@ const VehicleEdit = forwardRef<VehicleEditDialogControllerRef, VehicleEditProps>
       // Sonra form values'larını set et
 
       open();
-
     }
   }
 
