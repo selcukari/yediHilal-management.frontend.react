@@ -153,6 +153,7 @@ export default function AutomaticMailManagement() {
           form.setInitialValues(form.values);
           fetchReadyMessage();
           close();
+
           return;
         } else {
           toast.error('Hazır mesaj kaydedilirken bir hata oluştu!');
@@ -175,6 +176,7 @@ export default function AutomaticMailManagement() {
         form.setValues(values);
         
         close();
+
         return;
       } else {
         close();
@@ -188,9 +190,7 @@ export default function AutomaticMailManagement() {
     }
   };
 
-  const handleSaveSuccessForReadyMessage = () => {
-    fetchReadyMessage();
-  }
+  const handleSaveSuccessForReadyMessage = () => fetchReadyMessage();
 
   const error = form.errors.hour;
 
