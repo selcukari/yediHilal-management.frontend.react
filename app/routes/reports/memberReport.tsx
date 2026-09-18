@@ -126,6 +126,7 @@ export default function MemberReport() {
 
   const handleExport = (type: 'pdf') => {
     setLoading(true);
+    
     const config: PdfConfig = {
       title: `YediHilal Üye Raporu`,
       fileName: `yediHilal-uye-raporu.pdf`,
