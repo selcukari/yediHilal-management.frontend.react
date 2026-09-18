@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { IconSearch, IconCalendar } from '@tabler/icons-react';
 import {
-  Container, Grid, TextInput, Select, Stack, Group, Title, Text, Button, Paper, Table,
-  Badge, LoadingOverlay, Flex,
+  Container, Grid, TextInput, Select, Stack, Group, Title, Text, Paper, Table,
+  LoadingOverlay, Flex,
 } from '@mantine/core';
 import { isEmpty } from 'ramda';
 import { DatePickerInput } from '@mantine/dates';
@@ -147,10 +147,10 @@ export default function HeadReport() {
   }
 
   useEffect(() => {
-      setTimeout(() => {
-        fetchBranch();
-        fetchProvinceData("1"); // turkiye
-      }, 500);
+    setTimeout(() => {
+      fetchBranch();
+      fetchProvinceData("1"); // turkiye
+    }, 500);
   }, []);
 
    // Filtrelenmiş toplantı verileri

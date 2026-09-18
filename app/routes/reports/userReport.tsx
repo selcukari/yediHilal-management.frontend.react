@@ -134,6 +134,7 @@ export default function UserReport() {
 
   const handleExport = (type: 'pdf') => {
     setLoading(true);
+    
     const config: PdfConfig = {
       title: `YediHilal Kullanıcı Raporu`,
       fileName: `yediHilal-kullanici-raporu.pdf`,
