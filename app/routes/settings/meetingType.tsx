@@ -9,12 +9,10 @@ import MeetingTypeAdd, { type MeetingTypeAddDialogControllerRef } from '../../co
 import MeetingTypeEdit, { type MeetingTypeEditDialogControllerRef } from '../../components/meetingType/meetingTypEdit';
 import { useMeetingTypeService } from '../../services/meetingTypeService';
 import { toast } from '../../utils/toastMessages';
-
 interface Column {
   field: keyof MeetingType;
   header: string;
 }
-
 interface MeetingType {
   id: number;
   name: string;
