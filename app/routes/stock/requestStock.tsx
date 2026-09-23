@@ -69,8 +69,8 @@ export default function RequestStock() {
 
   useEffect(() => {
     setTimeout(() => {
-        fetchRequestStocks();
-      }, 500);
+      fetchRequestStocks();
+    }, 500);
   }, []);
 
   const fetchRequestStocks = async () => {
