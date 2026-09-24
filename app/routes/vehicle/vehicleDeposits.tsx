@@ -75,8 +75,8 @@ export default function VehicleDeposit() {
 
   useEffect(() => {
     setTimeout(() => {
-        fetchVehicleDeposit();
-      }, 1000);
+      fetchVehicleDeposit();
+    }, 1000);
   }, []);
   const diffDateTimeForColor = (date?: string) => {
     if (!date) return "red"; // Tarih yoksa kırmızı döner, teslin tarihi 30 gecer ise red

@@ -262,9 +262,7 @@ export default function HeadReport() {
     }));
   }, [rowHeaders]);
 
-  const reportTitle = (): string => {
-    return "Üniversite Başkan Görevli Rapor";
-  };
+  const reportTitle = (): string => "Üniversite Başkan Görevli Rapor";
 
    // raportdata
   const raportBranchData = useMemo(() => {
