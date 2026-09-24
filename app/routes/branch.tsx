@@ -21,7 +21,6 @@ interface Column {
   field: keyof BranchType;
   header: string;
 }
-
 interface BranchType {
   id: number;
   branchName: string;

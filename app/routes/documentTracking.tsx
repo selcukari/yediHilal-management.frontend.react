@@ -110,21 +110,21 @@ export default function DocumentTracking() {
   };
   const getFileNameWithoutUUID = (url: string) => {
     try {
-        const urlObj = new URL(url);
-        const pathParts = urlObj.pathname.split('/');
-        const fileNameWithExtension = pathParts[pathParts.length - 1];
-        const fileName = fileNameWithExtension.replace(/\.[^/.]+$/, "");
-        
-        // UUID'den önceki kısmı al (son _'ya kadar)
-        const lastUnderscoreIndex = fileName.lastIndexOf('_');
-        if (lastUnderscoreIndex !== -1) {
-          return fileName.substring(0, lastUnderscoreIndex);
-        }
+      const urlObj = new URL(url);
+      const pathParts = urlObj.pathname.split('/');
+      const fileNameWithExtension = pathParts[pathParts.length - 1];
+      const fileName = fileNameWithExtension.replace(/\.[^/.]+$/, "");
+      
+      // UUID'den önceki kısmı al (son _'ya kadar)
+      const lastUnderscoreIndex = fileName.lastIndexOf('_');
+      if (lastUnderscoreIndex !== -1) {
+        return fileName.substring(0, lastUnderscoreIndex);
+      }
 
-        return fileName;
+      return fileName;
     } catch (error) {
-        console.error('Geçersiz URL:', url);
-        return null;
+      console.error('Geçersiz URL:', url);
+      return null;
     }
   }
 
