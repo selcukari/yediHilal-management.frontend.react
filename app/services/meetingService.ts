@@ -47,21 +47,21 @@ export function useMeetingService(controller: string) {
     // FormData oluştur
     const formData = new FormData()
     try {
-        // Temel proje verilerini ekle
-        formData.append('name', params.name);
-        formData.append('participantCount', params.participantCount?.toString() || '0');
-        formData.append('responsibleFullName', params.responsibleFullName?.toString() || '');
-        formData.append('meetingTypeId', params.meetingTypeId?.toString() || '');
-        formData.append('provinceId', params.provinceId?.toString() || "");
-        formData.append('districtId', params.districtId?.toString() || "");
-        formData.append('agendas', params.agendas || '');
-        formData.append('time', params.time || '');
-        formData.append('notes', params.notes || '');
-        formData.append('participants', params.participants || '');
-        // Dosyaları ekle
-        (params.files || []).forEach((file: File) => {
-          formData.append('files', file);
-        });
+      // Temel proje verilerini ekle
+      formData.append('name', params.name);
+      formData.append('participantCount', params.participantCount?.toString() || '0');
+      formData.append('responsibleFullName', params.responsibleFullName?.toString() || '');
+      formData.append('meetingTypeId', params.meetingTypeId?.toString() || '');
+      formData.append('provinceId', params.provinceId?.toString() || "");
+      formData.append('districtId', params.districtId?.toString() || "");
+      formData.append('agendas', params.agendas || '');
+      formData.append('time', params.time || '');
+      formData.append('notes', params.notes || '');
+      formData.append('participants', params.participants || '');
+      // Dosyaları ekle
+      (params.files || []).forEach((file: File) => {
+        formData.append('files', file);
+      });
         
       const res = await api.post(`/${controller}/addMeeting`, formData);
 
