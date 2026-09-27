@@ -196,14 +196,14 @@ export default function User() {
   };
 
   const fetchUsers = async () => {
-     open();
+    open();
 
     const params = {
       ...filterModel,
       provinceIds: (filterModel.provinceIds && filterModel.provinceIds?.length > 0) ? filterModel.provinceIds?.join(",") : undefined,
       searchText: (filterModel.searchText && filterModel.searchText.length > 3 ? filterModel.searchText.trim() : undefined),
     }
-     try {
+    try {
 
       const getUsers = await service.users(params);
       if (getUsers) {
