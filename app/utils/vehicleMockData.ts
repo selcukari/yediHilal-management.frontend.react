@@ -1,9 +1,10 @@
 const mockDataFuelTypes =[
-   {id: "gasoline", name: "Benzin"},
-   {id: "diesel", name: "Dizel"},
-   {id: "electric", name: "Elektrik"},
-   {id: "hybrid", name: "Melez"},
+  {id: "gasoline", name: "Benzin"},
+  {id: "diesel", name: "Dizel"},
+  {id: "electric", name: "Elektrik"},
+  {id: "hybrid", name: "Melez"},
 ];
+
 const mockDataTransmissionTypes =[
   {id: "manual", name: "Manual"},
   {id: "automatic", name: "Otomatik"}
