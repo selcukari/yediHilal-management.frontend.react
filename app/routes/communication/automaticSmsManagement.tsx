@@ -99,6 +99,7 @@ export default function AutomaticSmsManagement() {
     try {
       open()
       const result = await service.updateAutomaticSmsFields(omit(['updateDate'], values));
+      
       if (result == true) {
         toast.success('İşlem başarılı!');
 

@@ -59,6 +59,7 @@ export default function Mail() {
     setTimeout(() => {
       fetchSms();
     }, 1000);
+    
     setSmsTypes(
       mockDataSmsTypes.map((c: any) => ({
         value: c.id,
