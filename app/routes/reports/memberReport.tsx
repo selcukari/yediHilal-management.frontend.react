@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { IconSearch, IconCalendar, IconDownload, IconFilter } from '@tabler/icons-react';
-import {  Container,  Grid,  TextInput, Stack,  Group,  Title,  Text,  Paper,  Table,  Button,  Badge,  LoadingOverlay,  Pagination,  Menu,
-} from '@mantine/core';
+import {  Container,  Grid,  TextInput, Stack,  Group,  Title,  Text,  Paper,  Table,  Button,  Badge,  LoadingOverlay,
+  Pagination,  Menu } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import 'dayjs/locale/tr';
 import { calculateColumnWidthUser } from '../../utils/repor/calculateColumnWidth';
