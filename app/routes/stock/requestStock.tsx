@@ -137,10 +137,7 @@ export default function RequestStock() {
       close();
     }
   }
-  const handleEdit = (value: RequestStockData[]) => {
-
-    requestStockEditRef.current?.openDialog(value);
-  }
+  const handleEdit = (value: RequestStockData[]) => requestStockEditRef.current?.openDialog(value);
 
     // Filtrelenmiş veriler
    const filteredStocks = useMemo<Record<string, RequestStockData[]>>(() => {
