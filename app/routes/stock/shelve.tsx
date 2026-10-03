@@ -63,8 +63,8 @@ export default function Stock() {
 
   useEffect(() => {
     setTimeout(() => {
-        fetchShelves();
-      }, 500);
+      fetchShelves();
+    }, 500);
   }, []);
 
   const fetchShelves = async () => {
