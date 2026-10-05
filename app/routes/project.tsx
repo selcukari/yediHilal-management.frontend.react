@@ -99,16 +99,17 @@ export default function Project() {
     try {
 
       const result = await service.deleteProject(id);
+      
       if (result == true) {
 
-      toast.success('İşlem başarılı!');
+        toast.success('İşlem başarılı!');
       
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
+        queryClient.invalidateQueries({ queryKey: ["projects"] });
       
-      close();
+        close();
 
-      return;
-    }
+        return;
+      }
     else if (result?.data == false && result?.errors?.length > 0) {
 
       toast.warning(result.errors[0]);

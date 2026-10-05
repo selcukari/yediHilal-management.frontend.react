@@ -116,7 +116,6 @@ const MemberEditPage = () => {
     try {
       setLoading(true);
       // Burada API'den üye verilerini çekme işlemi yapılacak
-      // Örnek:
       const memberData = await service.member(memberId);
       if (memberData) {
         form.reset();
