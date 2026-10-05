@@ -11,7 +11,7 @@ export function useDistrictService(controller: string) {
 
     try {
       const res = await api.get(`/${controller}/getDistrictsByProvince`, {
-         params: {
+        params: {
           ...(provinceId ? { provinceId: parseInt(provinceId)} : { provinceId: turkeyProvinceId }),
         }
       });
