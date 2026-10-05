@@ -67,10 +67,10 @@ export default function DocumentTracking() {
   }, []);
 
   const handleEdit = (item: PhoneCallTrackingType) => {
-     phoneCallTrackingEditRef.current?.openDialog({
+    phoneCallTrackingEditRef.current?.openDialog({
       ...item,
       responsibleId: item.responsibleId ? item.responsibleId.toString() : '',
-     });
+    });
   };
 
   const handleDelete = async (id: number) => {
