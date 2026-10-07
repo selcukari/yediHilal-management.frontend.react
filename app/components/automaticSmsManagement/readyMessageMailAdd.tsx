@@ -48,22 +48,22 @@ const ReadyMessageMailAdd = forwardRef<ReadyMessageAddDialogControllerRef, Sanca
     },
   });
 
-    // 2. SignalR Dinleyicisini Aktif Et
-    useEffect(() => {
+  // 2. SignalR Dinleyicisini Aktif Et
+  useEffect(() => {
   
-      if (!connection) return;
+    if (!connection) return;
   
-      connection.on('ReceiveValueUpdated', (data) => {
-      
-        // Toast veya state güncellemesi
-        toast.success('İşlem başarılı! ' + data.valueName);
-      });
+    connection.on('ReceiveValueUpdated', (data) => {
+    
+      // Toast veya state güncellemesi
+      toast.success('İşlem başarılı! ' + data.valueName);
+    });
   
-      // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
-      return () => {
-        connection.off('ReceiveValueUpdated');
-      };
-    }, [connection]);
+    // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+    return () => {
+      connection.off('ReceiveValueUpdated');
+    };
+  }, [connection]);
 
   const addReadyMessageMailMutation = useMutation({
     mutationFn: async (values: FormValues) => {
