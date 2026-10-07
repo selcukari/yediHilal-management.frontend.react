@@ -1,6 +1,5 @@
 import { Select } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
-import { useState, useEffect } from 'react';
 import type { UseFormReturnType } from '@mantine/form';
 import { useUserDutyService } from '../../services/userDutyService'; 
 interface MeetingTypeSelectProps {
