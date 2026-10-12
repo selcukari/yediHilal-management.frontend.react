@@ -109,19 +109,19 @@ const DocumentTrackingAdd = forwardRef<DocumentTrackingAddDialogControllerRef, D
     form.reset();
   };
 
-  const confirmDialogHandleCancel = () => {
-    toast.info('İşlem iptal edildi');
-  };
+  const confirmDialogHandleCancel = () => toast.info('İşlem iptal edildi');
+
   useEffect(() => {
     if (form.isDirty()) {
       setIsDisabledSubmit(false);
+
        return;
     }
-     setIsDisabledSubmit(true);
+    setIsDisabledSubmit(true);
   }, [form.values]);
 
   const dialogClose = () => {
-     if (!isEquals(form.getInitialValues(), form.getValues())) {
+    if (!isEquals(form.getInitialValues(), form.getValues())) {
 
       confirmModalRef.current?.open();
     } else {
