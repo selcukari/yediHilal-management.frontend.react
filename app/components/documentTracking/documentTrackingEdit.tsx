@@ -56,8 +56,8 @@ const BranchEdit = forwardRef<DocumentTrackingEditDialogControllerRef, DocumentT
   
     connection.on('ReceiveValueUpdated', (data) => {
       
-    // Toast veya state güncellemesi
-    toast.success('İşlem başarılı! ' + data.valueName);
+      // Toast veya state güncellemesi
+      toast.success('İşlem başarılı! ' + data.valueName);
     });
   
     // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
