@@ -11,6 +11,7 @@ import { toast } from '../../utils/toastMessages';
 import { useAuthStore } from '~/authContext';
 import type { VehicleData } from '../../routes/vehicle/vehicle';
 import { useSignalR } from '../../context/SignalRContext';
+
 interface VehicleDepositAddProps {
   onSaveSuccess?: () => void; // Yeni prop
 }
