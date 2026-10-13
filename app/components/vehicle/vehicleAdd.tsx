@@ -13,6 +13,7 @@ import stripSpecialCharacters from '../../utils/stripSpecialCharacters';
 import { mockDataFuelTypes, mockDataTransmissionTypes, mockDataFuelLevel } from '../../utils/vehicleMockData';
 import { DayRenderer } from '../../components';
 import { useSignalR } from '../../context/SignalRContext';
+
 interface VehicleAddProps {
   onSaveSuccess?: () => void; // Yeni prop
 }
