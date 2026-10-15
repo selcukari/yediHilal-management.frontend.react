@@ -2,8 +2,7 @@ import { useState, useRef, useMemo } from 'react';
 import { IconSearch, IconEdit, IconTrash, IconPlus } from '@tabler/icons-react';
 import {
   Container, Grid, TextInput, ActionIcon, Stack, Group, Title, Text, Paper, Table, LoadingOverlay, Button,
-  Tooltip,
-} from '@mantine/core';
+  Tooltip } from '@mantine/core';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"; // ✨ useMutation ve useQueryClient eklendi
 import { useDisclosure } from '@mantine/hooks';
 import UserDutyAdd, { type UserDutyAddDialogControllerRef } from '../../components/userDuty/userDutyAdd';
