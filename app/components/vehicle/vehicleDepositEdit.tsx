@@ -14,6 +14,7 @@ import { useAuthStore } from '~/authContext';
 import type { VehicleData } from '../../routes/vehicle/vehicle';
 import { DayRenderer } from '../../components';
 import { useSignalR } from '../../context/SignalRContext';
+
 interface VehicleDepositEditProps {
   onSaveSuccess?: () => void; // Yeni prop
 }
@@ -181,6 +182,7 @@ const VehicleDepositEdit = forwardRef<VehicleDepositEditDialogControllerRef, Veh
     openDialog,
     close,
   }));
+  
   const fetchVehicle = async () => {
     try {
       const params = {

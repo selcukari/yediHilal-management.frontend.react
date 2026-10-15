@@ -14,6 +14,7 @@ import { DayRenderer } from '../../components';
 import stripSpecialCharacters from '../../utils/stripSpecialCharacters';
 import { mockDataFuelTypes, mockDataTransmissionTypes, mockDataFuelLevel } from '../../utils/vehicleMockData';
 import { useSignalR } from '../../context/SignalRContext';
+
 interface VehicleEditProps {
   onSaveSuccess?: () => void; // Yeni prop
 }
