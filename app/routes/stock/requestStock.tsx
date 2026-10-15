@@ -100,7 +100,7 @@ export default function RequestStock() {
   };
 
   const handleDelete = async(items: RequestStockData[]) => {
-     open();
+    open();
 
     try {
 

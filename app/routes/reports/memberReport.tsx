@@ -37,6 +37,7 @@ export default function MemberReport() {
   const [loading, setLoading] = useState(false);
   const [updateDateReport, setUpdateDateReport] = useState("");
   const [memberReportData, setMemberReportData] = useState<MemberReportItem[]>([]);
+  
   const [filters, setFilters] = useState<FilterModels>({
     searchText: '',
     dateRange: [null, null]
@@ -74,8 +75,8 @@ export default function MemberReport() {
       }
         setLoading(false);
     } catch (error: any) {
-        toast.error(`Üye raporu alınırken hata oluştu: ${error.message}`);
-        setLoading(false);
+      toast.error(`Üye raporu alınırken hata oluştu: ${error.message}`);
+      setLoading(false);
     }
   };
 
