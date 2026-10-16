@@ -114,6 +114,7 @@ export default function Vehicle() {
       fetchVehicle();
     }, 1000);
   }, []);
+
   const diffDateTimeForColor = (date?: string) => {
     if (!date) return "green";
     const daysDiff = differenceInDays(date, new Date());
@@ -207,9 +208,7 @@ export default function Vehicle() {
       // İsteğe bağlı olarak genişlik ayarları ekleyebilirsiniz
     }));
   }, [rowHeaders]);
-  const reportTitle = (): string => {
-    return "Araç Ürünler Raporu";
-  }
+  const reportTitle = (): string => "Araç Ürünler Raporu";
 
   // raportdata
   const raportVehicleData = useMemo(() => {
