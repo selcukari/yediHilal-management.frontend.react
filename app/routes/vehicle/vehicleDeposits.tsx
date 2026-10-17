@@ -78,6 +78,7 @@ export default function VehicleDeposit() {
       fetchVehicleDeposit();
     }, 1000);
   }, []);
+
   const diffDateTimeForColor = (date?: string) => {
     if (!date) return "red"; // Tarih yoksa kırmızı döner, teslin tarihi 30 gecer ise red
     const daysDiff = differenceInDays(new Date(), date);
@@ -103,6 +104,7 @@ export default function VehicleDeposit() {
       statu: item.statu,
     });
   }
+  
   const handleDelete = async (id: number) => {
     open();
 
