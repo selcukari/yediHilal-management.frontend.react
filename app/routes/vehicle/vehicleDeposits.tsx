@@ -174,8 +174,10 @@ export default function VehicleDeposit() {
       // İsteğe bağlı olarak genişlik ayarları ekleyebilirsiniz
     }));
   }, [rowHeaders]);
-  
-  const reportTitle = (): string => "Araç Emanet/Zimbet Ürünler Raporu";
+
+  const reportTitle = (): string => {
+    return "Araç Emanet/Zimbet Ürünler Raporu";
+  };
 
   // raportdata
   const raportVehicleData = useMemo(() => {
