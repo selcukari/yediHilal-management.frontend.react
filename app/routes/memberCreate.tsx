@@ -2,8 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { useForm } from '@mantine/form';
 import {
   Container, Flex, Image, Grid, TextInput, Stack, Switch,
-  Group, Title, Text, Button, Paper,
-} from '@mantine/core';
+  Group, Title, Text, Button, Paper } from '@mantine/core';
 import { IconCheck, IconCancel } from '@tabler/icons-react';
 import ConfirmModal, { type ConfirmModalRef } from '../components/confirmModal';
 import ApprovedConfirmModal, { type ApprovedConfirmModalRef } from '../components/approvedConfirmModal';
@@ -78,7 +77,7 @@ export default function MemberCreate() {
   });
 
   const dialogClose = () => {
-     if (!isEquals(form.getInitialValues(), form.getValues())) {
+    if (!isEquals(form.getInitialValues(), form.getValues())) {
 
       confirmModalRef.current?.open();
     } else {
@@ -111,13 +110,14 @@ export default function MemberCreate() {
     }
 
     const result = await service.addExternalMember(newMemberValue);
-      if (result == true) {
-        approvedConfirmModalRef.current?.open();
-      
+    if (result == true) {
+      approvedConfirmModalRef.current?.open();
+    
       form.reset();
       form.setFieldValue('provinceId', null);
       setIsDisabledSelect(false);
-        return;
+
+      return;
     }
     if (result?.data == false && result?.errors?.length > 0) {
       toast.warning(result.errors[0]);
