@@ -88,7 +88,7 @@ export default function Duty() {
   const handleDelete = async (id: number) => {
     open();
 
-     try {
+    try {
 
       const result = await service.deleteUniversityBranch(id);
       if (result == true) {
