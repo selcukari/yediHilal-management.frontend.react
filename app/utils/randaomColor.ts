@@ -4,5 +4,5 @@ export  const randaomColor = () => {
 
   const index = Math.floor(Math.random() * colors.length);
 
-    return colors[index];
+  return colors[index];
 }
