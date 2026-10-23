@@ -76,6 +76,7 @@ export default function User() {
 
   const isUserAdmin = useMemo(() => {
     const result = currentUser?.userType === 'userLogin';
+    
     if (!result) {
       setFilterModel((prev) => ({
         ...prev,
