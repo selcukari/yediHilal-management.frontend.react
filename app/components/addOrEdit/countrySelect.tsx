@@ -18,9 +18,7 @@ export function CountrySelect({
   required = false,
   disabled = false,
 }: CountrySelectProps) {
-  const service = useCountryService(
-    import.meta.env.VITE_APP_API_BASE_CONTROLLER
-  );
+  const service = useCountryService(import.meta.env.VITE_APP_API_BASE_CONTROLLER);
 
   const { data: countries = [], isLoading, isError } = useQuery({
     queryKey: ["countries"],
