@@ -51,9 +51,7 @@ const MeetingTypeAdd = forwardRef<MeetingTypeAddDialogControllerRef, MeetingType
     });
 
     // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
-    return () => {
-      connection.off('ReceiveValueCreated');
-    };
+    return () => connection.off('ReceiveValueCreated');
   }, [connection]);
 
   const addMeetingTypeMutation = useMutation({
