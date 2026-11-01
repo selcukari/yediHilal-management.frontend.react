@@ -115,7 +115,7 @@ const DocumentTrackingAdd = forwardRef<DocumentTrackingAddDialogControllerRef, D
     if (form.isDirty()) {
       setIsDisabledSubmit(false);
 
-       return;
+      return;
     }
     setIsDisabledSubmit(true);
   }, [form.values]);
