@@ -64,11 +64,7 @@ export function MemberChatBotAi({onSaveSuccess}: {onSaveSuccess?: () => void}) {
         <Transition transition="scale-y" mounted={opened}>
           {(transitionStyles) => (
             <Paper
-              withBorder
-              shadow="xl"
-              p="md"
-              radius="md"
-              style={{ ...transitionStyles, width: 350, height: 250 }}
+              withBorder shadow="xl" p="md" radius="md" style={{ ...transitionStyles, width: 350, height: 250 }}
             >
               <Stack justify="space-between" h="100%">
                 <Group justify="space-between">
