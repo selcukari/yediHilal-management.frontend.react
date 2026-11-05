@@ -20,4 +20,4 @@ const mockDataFuelLevel =[
   {id: "1/4", name: "1/4"}
 ];
 
-export {mockDataFuelTypes, mockDataTransmissionTypes, mockDataFuelLevel};
+export { mockDataFuelTypes, mockDataTransmissionTypes, mockDataFuelLevel };
