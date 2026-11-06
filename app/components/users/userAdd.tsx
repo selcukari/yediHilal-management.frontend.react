@@ -119,9 +119,7 @@ const UserAdd = forwardRef<UserAddDialogControllerRef, UserAddProps>(({onSaveSuc
     });
 
     // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
-    return () => {
-      connection.off('ReceiveValueCreated');
-    };
+    return () => connection.off('ReceiveValueCreated');
   }, [connection]);
 
   // --- 1. MEMBRES FETCH (useQuery) ---
