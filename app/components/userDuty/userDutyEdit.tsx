@@ -68,7 +68,6 @@ const UserDutyEdit = forwardRef<UserDutyEditDialogControllerRef, BranchDutyEditP
       // Sonra form values'larını set et
 
       open();
-
     }
   }
 
