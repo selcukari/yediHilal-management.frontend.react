@@ -95,17 +95,17 @@ const BranchEdit = forwardRef<UniversityBranchEditDialogControllerRef, Universit
     },
   });
 
-    useEffect(() => {
-      if (!connection) return;
+  useEffect(() => {
+    if (!connection) return;
   
-      connection.on('ReceiveValueUpdated', (data) => {
-        // Ekrana anlık olarak listeye ekliyoruz (Kullanıcı sayfayı yenilemeden görür)
-        toast.success('İşlem başarılı! ' + data.valueName);
-      });
+    connection.on('ReceiveValueUpdated', (data) => {
+      // Ekrana anlık olarak listeye ekliyoruz (Kullanıcı sayfayı yenilemeden görür)
+      toast.success('İşlem başarılı! ' + data.valueName);
+    });
   
-      // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+    // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
       return () => connection.off('ReceiveValueUpdated');
-    }, [connection]);
+  }, [connection]);
 
   const isUserAdmin = useMemo(() => {
     return currentUser?.userType === 'userLogin';
