@@ -127,16 +127,17 @@ const UniversityBranchAdd = forwardRef<UniversityBranchAddDialogControllerRef, U
   const confirmDialogHandleCancel = () => {
     console.log('İşlem iptal edildi');
   };
+
   useEffect(() => {
     if (form.isDirty()) {
       setIsDisabledSubmit(false);
-       return;
+      return;
     }
-     setIsDisabledSubmit(true);
+    setIsDisabledSubmit(true);
   }, [form.values]);
 
   const dialogClose = () => {
-     if (!isEquals(form.getInitialValues(), form.getValues())) {
+    if (!isEquals(form.getInitialValues(), form.getValues())) {
 
       confirmModalRef.current?.open();
     } else {
