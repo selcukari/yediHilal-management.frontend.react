@@ -93,7 +93,7 @@ const RequestStockAdd = forwardRef<RequestStockAddDialogControllerRef, RequestSt
     { field: 'description', header: 'Not' },
     { field: 'actions', header: 'Seçim' },
   ]);
-   useEffect(() => {
+  useEffect(() => {
   
     if (!connection) return;
   
@@ -102,9 +102,9 @@ const RequestStockAdd = forwardRef<RequestStockAddDialogControllerRef, RequestSt
       toast.success('Talep başarıyla oluşturuldu!');
     });
   
-      // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
-      return () => connection.off('ReceiveValueCreated');
-    }, [connection]);
+    // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+    return () => connection.off('ReceiveValueCreated');
+  }, [connection]);
 
   useEffect(() => {
     if (form.isDirty()) {

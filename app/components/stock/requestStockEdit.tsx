@@ -52,7 +52,7 @@ const RequestStockEdit = forwardRef<RequestStockEditDialogControllerRef, Request
     validate: {
     },
   });
-   useEffect(() => {
+  useEffect(() => {
   
     if (!connection) return;
   
@@ -62,9 +62,9 @@ const RequestStockEdit = forwardRef<RequestStockEditDialogControllerRef, Request
     toast.success('İşlem başarılı! ' + data.valueName);
     });
   
-      // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
-      return () => connection.off('ReceiveValueUpdated');
-    }, [connection]);
+    // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+    return () => connection.off('ReceiveValueUpdated');
+  }, [connection]);
 
   const openDialog = (value: FormValues[]) => {
     if (value && value.length > 0) {
