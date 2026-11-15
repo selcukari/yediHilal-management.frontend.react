@@ -27,9 +27,7 @@ export const SignalRProvider = ({ children }: { children: React.ReactNode }) => 
         .catch((error) => console.error('SignalR Bağlantı Hatası: ❌', error));
 
       // Bileşen silindiğinde bağlantıyı temizle
-      return () => {
-        connection.stop();
-      };
+      return () => connection.stop();
     }
   }, [connection]);
 
