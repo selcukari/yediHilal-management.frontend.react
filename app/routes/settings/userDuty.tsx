@@ -9,6 +9,7 @@ import UserDutyAdd, { type UserDutyAddDialogControllerRef } from '../../componen
 import UserDutyEdit, { type UserDutyEditDialogControllerRef } from '../../components/userDuty/userDutyEdit';
 import { useUserDutyService } from '../../services/userDutyService';
 import { toast } from '../../utils/toastMessages';
+import { useAuthStore } from '~/authContext';
 
 interface Column {
   field: keyof UserDutyType;
