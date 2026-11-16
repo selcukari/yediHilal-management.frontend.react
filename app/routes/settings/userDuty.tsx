@@ -40,6 +40,8 @@ export default function UserDuty() {
 
   const service = useUserDutyService(import.meta.env.VITE_APP_API_USER_CONTROLLER);
 
+  const { isLoggedIn, currentUser } = useAuthStore();
+  
   // 1. VERİ ÇEKME (Query)
   const { data: resultData = [], isLoading: isQueryLoading } = useQuery({
     queryKey: ["duties"],
@@ -94,7 +96,13 @@ export default function UserDuty() {
   };
 
   const handleDelete = (id: number) => {
-    // Yazdığımız mutation'ı tetikliyoruz
+    const currentUserId = currentUser?.id;
+    const userAdminId = 1; // Admin kullanıcının ID'si (örnek olarak 1 alındı, gerçek ID'yi kullanın)
+
+    if (currentUserId == userAdminId) {
+      toast.warning('Yetkiniz yoktur!');
+      return;
+    }
     deleteMutation.mutate(id);
   };
 
