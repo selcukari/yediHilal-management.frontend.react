@@ -114,6 +114,13 @@ export default function User() {
   };
 
   const handleDelete = (id: number) => {
+    const currentUserId = currentUser?.id;
+    const userAdminId = 1; // Admin kullanıcının ID'si (örnek olarak 1 alındı, gerçek ID'yi kullanın)
+    
+    if (currentUserId != userAdminId && id == userAdminId) {
+      toast.error('Yetkisiz işlem! Admin kullanıcısını silemezsiniz.');
+      return;
+    }
     setSelectedItemId(id);
     confirmModalMessageRef.current?.open()
   };
