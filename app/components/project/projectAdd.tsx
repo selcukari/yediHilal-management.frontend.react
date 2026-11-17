@@ -80,9 +80,7 @@ const ProjectAdd = forwardRef<ProjectAddDialogControllerRef, UserAddProps>(({onS
     });
 
     // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
-    return () => {
-      connection.off('ReceiveValueCreated');
-    };
+    return () => connection.off('ReceiveValueCreated');
   }, [connection]);
 
   const isUserAdmin = useMemo(() => {
