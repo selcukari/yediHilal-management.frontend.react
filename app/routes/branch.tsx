@@ -95,9 +95,17 @@ export default function Branch() {
   };
 
   const handleDelete = async (id: number) => {
+    const currentUserId = currentUser?.id;
+    const userAdminId = 1;
+
+    if (currentUserId != userAdminId && id == userAdminId) {
+      toast.error('Yetkisiz işlem!');
+      return;
+    }
+
     open();
 
-     try {
+    try {
 
       const result = await service.deleteBranch(id);
       if (result == true) {
