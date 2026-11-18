@@ -144,7 +144,7 @@ export default function UserDuty() {
   ));
 
   return (
-      <Container size="xl">
+    <Container size="xl">
         <LoadingOverlay
           visible={visible || isQueryLoading} // Sayfa ilk açılırken veya silme yapılırken loader gösterir
           zIndex={1000}
@@ -199,6 +199,6 @@ export default function UserDuty() {
         </Stack>
         <UserDutyAdd ref={userDutyAddRef} onSaveSuccess={handleSaveSuccess} />
         <UserDutyEdit ref={userDutyEditRef} onSaveSuccess={handleSaveSuccess} />
-      </Container>
+    </Container>
   );
 }
