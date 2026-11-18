@@ -139,7 +139,7 @@ export default function MeetingType() {
   ));
 
   return (
-      <Container size="xl">
+    <Container size="xl">
         <LoadingOverlay
           visible={visible || isQueryLoading} // İlk yüklemede ve silme işlemlerinde loading tetiklenir
           zIndex={1000}
@@ -199,6 +199,6 @@ export default function MeetingType() {
         </Stack>
         <MeetingTypeEdit ref={meetingTypeEdit} onSaveSuccess={handleSaveSuccess} />
         <MeetingTypeAdd ref={meetingTypeAdd} onSaveSuccess={handleSaveSuccess} />
-      </Container>
+    </Container>
   );
 }
