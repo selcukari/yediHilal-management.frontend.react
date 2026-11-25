@@ -49,7 +49,7 @@ const MeetingTypeEdit = forwardRef<MeetingTypeEditDialogControllerRef, MeetingTy
 
     if (!connection) return;
 
-   connection.on('ReceiveValueUpdated', (data) => {
+    connection.on('ReceiveValueUpdated', (data) => {
     
     // Toast veya state güncellemesi
     toast.success('İşlem başarılı! ' + data.valueName);

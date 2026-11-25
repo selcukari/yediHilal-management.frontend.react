@@ -85,19 +85,19 @@ const MeetingAdd = forwardRef<MeetingAddDialogControllerRef, UserAddProps>(({onS
     setIsDisabledSubmit(true);
   }, [form.values]);
 
-   useEffect(() => {
+  useEffect(() => {
   
-      if (!connection) return;
+    if (!connection) return;
   
-     connection.on('ReceiveValueCreated', (data) => {
+    connection.on('ReceiveValueCreated', (data) => {
       
-      // Toast veya state güncellemesi
-      toast.success('İşlem başarılı! ' + data.valueName);
-    });
+    // Toast veya state güncellemesi
+    toast.success('İşlem başarılı! ' + data.valueName);
+  });
   
-      // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
-      return () => connection.off('ReceiveValueCreated');
-    }, [connection]);
+    // Bileşen kapandığında (unmount) dinleyiciyi kaldırmazsanız memory leak oluşur ve mükerrer dinler.
+    return () => connection.off('ReceiveValueCreated');
+  }, [connection]);
 
   const isUserAdmin = useMemo(() => {
     const result = currentUser?.userType === 'userLogin';
