@@ -153,13 +153,13 @@ const BranchAdd = forwardRef<BranchAddDialogControllerRef, UserAddProps>(({onSav
   useEffect(() => {
     if (form.isDirty()) {
       setIsDisabledSubmit(false);
-       return;
+      return;
     }
      setIsDisabledSubmit(true);
   }, [form.values]);
 
   const dialogClose = () => {
-     if (!isEquals(form.getInitialValues(), form.getValues())) {
+    if (!isEquals(form.getInitialValues(), form.getValues())) {
 
       confirmModalRef.current?.open();
     } else {
