@@ -128,7 +128,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
 
     if (!connection) return;
 
-   connection.on('ReceiveValueCreated', (data) => {
+    connection.on('ReceiveValueCreated', (data) => {
     
     // Toast veya state güncellemesi
     toast.success('İşlem başarılı! ' + data.valueName);
@@ -309,25 +309,17 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
           </Grid.Col>
 
           <Grid.Col span={6}> 
-            <ReferansMemberSelect
-              form={form}
-              countryId={form.values.countryId}
-              isDisabled={isDisabledReference}
+            <ReferansMemberSelect form={form} countryId={form.values.countryId} isDisabled={isDisabledReference}
             />
           </Grid.Col>
 
           <Grid.Col span={6}>
-            <TextInput
-              label="Doğum Tarih" placeholder="yıl giriniz(2000)"
-              type='number' {...form.getInputProps('dateOfBirth')}
+            <TextInput label="Doğum Tarih" placeholder="yıl giriniz(2000)" type='number' {...form.getInputProps('dateOfBirth')}
             />
           </Grid.Col>
 
           <Grid.Col span={6}>
-            <TextInput
-              label="Email"
-              placeholder="Email giriniz"
-              {...form.getInputProps('email')} 
+            <TextInput label="Email" placeholder="Email giriniz" {...form.getInputProps('email')} 
             />
           </Grid.Col>
           <Grid.Col span={6}>
@@ -348,28 +340,16 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
                   checked={form.values.isActive}
                   onChange={(event) => form.setFieldValue('isActive', event.currentTarget.checked)}
                 />
-                <Switch 
-                  label="Sms Durumu" 
-                  checked={form.values.isSms}
-                  onChange={(event) => form.setFieldValue('isSms', event.currentTarget.checked)}
+                <Switch label="Sms Durumu" checked={form.values.isSms} onChange={(event) => form.setFieldValue('isSms', event.currentTarget.checked)}
                 />
-                <Switch 
-                  label="Mail Durumu" 
-                  checked={form.values.isMail}
-                  onChange={(event) => form.setFieldValue('isMail', event.currentTarget.checked)}
+                <Switch label="Mail Durumu" checked={form.values.isMail} onChange={(event) => form.setFieldValue('isMail', event.currentTarget.checked)}
                 />
               </Group>
             </fieldset>
           </Grid.Col>
 
           <Grid.Col span={6}>
-            <Textarea
-              mt="md"
-              label="Silme nedeni"
-              placeholder="messaj..."
-              withAsterisk
-              disabled={form.values.isActive}
-              {...form.getInputProps('deleteMessageTitle')}
+            <Textarea mt="md" label="Silme nedeni" placeholder="messaj..." withAsterisk disabled={form.values.isActive} {...form.getInputProps('deleteMessageTitle')}
             />
           </Grid.Col>
           <Grid.Col span={6}>
@@ -392,9 +372,7 @@ const MemberAdd = forwardRef<MemberAddDialogControllerRef, MemberAddProps>(({onS
     </Modal>
       {/* confirm Dialog */}
     <ConfirmModal 
-      ref={confirmModalRef}
-      onConfirm={confirmDialogHandleConfirm}
-      onCancel={confirmDialogHandleCancel}
+      ref={confirmModalRef} onConfirm={confirmDialogHandleConfirm} onCancel={confirmDialogHandleCancel}
     />
   </>);
 });
