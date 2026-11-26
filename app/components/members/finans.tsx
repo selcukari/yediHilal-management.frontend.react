@@ -171,19 +171,8 @@ export const FinanceModal = ({ opened, onClose, memberId, memberFullName }: Fina
         overlayProps={{ radius: 'sm', blur: 2 }}
         loaderProps={{ color: 'pink', type: 'bars' }}
         />
-      <Modal
-        opened={opened}
-        onClose={onClose}
-        title={
-          <Group gap="xs">
-            <IconReceipt size={20} />
-            <Text fw={600}>Finansal Hareketler</Text>
-          </Group>
-        }
-        size="lg"
-        centered
-        overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
-      >
+      <Modal opened={opened} onClose={onClose} title={<Group gap="xs"> <IconReceipt size={20} /> <Text fw={600}>Finansal Hareketler</Text></Group>} size="lg" centered
+        overlayProps={{ backgroundOpacity: 0.55, blur: 3 }} >
         <ScrollArea h={300}>
           <Table highlightOnHover withTableBorder withColumnBorders>
             <Table.Thead>
@@ -200,9 +189,7 @@ export const FinanceModal = ({ opened, onClose, memberId, memberFullName }: Fina
               ) : (
                 <Table.Tr>
                   <Table.Td colSpan={4}>
-                    <Text c="dimmed" mt="md">
-                      Kayıtlı finans hareketi bulunamadı.
-                    </Text>
+                    <Text c="dimmed" mt="md">Kayıtlı finans hareketi bulunamadı.</Text>
                   </Table.Td>
                 </Table.Tr>
               )}
@@ -211,78 +198,39 @@ export const FinanceModal = ({ opened, onClose, memberId, memberFullName }: Fina
         </ScrollArea>
 
         <Group justify="flex-end" mt="md">
-          <Button 
-            size="xs" 
-            leftSection={<IconPlus size={14} />} 
-            color="blue"
-            onClick={openAddPayment}
-          >
+          <Button size="xs" leftSection={<IconPlus size={14} />} color="blue" onClick={openAddPayment}>
             Yeni Ödeme Ekle
           </Button>
-          <Button size="xs" variant="outline" color="gray" onClick={onClose}>
-            Kapat
-          </Button>
+          <Button size="xs" variant="outline" color="gray" onClick={onClose}>Kapat</Button>
         </Group>
       </Modal>
 
       {/* Yeni Ödeme Ekle Modal */}
       <Modal
-        opened={addPaymentOpened}
-        onClose={() => {
-          paymentForm.reset();
-          closeAddPayment();
-        }}
-        title={
-          <Group gap="xs">
-            <IconPlus size={18} />
-            <Text fw={600}>Yeni Ödeme Ekle</Text>
-          </Group>
-        }
-        size="sm"
-        centered
-        overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
+        opened={addPaymentOpened} onClose={() => { paymentForm.reset(); closeAddPayment(); }}
+        title={<Group gap="xs"><IconPlus size={18} /><Text fw={600}>Yeni Ödeme Ekle</Text></Group>}
+        size="sm" centered overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
       >
         <form onSubmit={paymentForm.onSubmit(handleAddPaymentSubmit)}>
           <Stack gap="sm">
-            <Select
-              label="İşlem Tipi"
-              placeholder="Tip seçiniz"
-              data={paymentTypes}
-              required
+            <Select label="İşlem Tipi" placeholder="Tip seçiniz" data={paymentTypes} required
               {...paymentForm.getInputProps('paymentType')}
             />
 
-            <NumberInput
-              label="Tutar (₺)"
-              placeholder="0.00"
-              min={0}
-              decimalScale={2}
-              suffix=" ₺"
-              required
+            <NumberInput label="Tutar (₺)" placeholder="0.00" min={0} decimalScale={2} suffix=" ₺" required
               {...paymentForm.getInputProps('amount')}
             />
 
-            <DateInput
-              label="İşlem Tarihi"
-              placeholder="Tarih seçiniz"
-              valueFormat="YYYY-MM-DD"
-              required
+            <DateInput label="İşlem Tarihi" placeholder="Tarih seçiniz" valueFormat="YYYY-MM-DD" required
               {...paymentForm.getInputProps('transactionDate')}
             />
 
-            <Select
-              label="Ödeme Durumu"
-              placeholder="Durum seçiniz"
-              data={mockDataPaymentTypeStatus}
-              required
+            <Select label="Ödeme Durumu" placeholder="Durum seçiniz" data={mockDataPaymentTypeStatus} required
               {...paymentForm.getInputProps('status')}
             />
 
             <Group justify="flex-end" mt="md">
-              <Button 
-                variant="outline" 
-                color="gray" 
-                size="xs" 
+              <Button variant="outline" color="gray" size="xs" 
                 leftSection={<IconCancel size={14} />}
                 onClick={() => {
                   paymentForm.reset();
@@ -291,12 +239,7 @@ export const FinanceModal = ({ opened, onClose, memberId, memberFullName }: Fina
               >
                 İptal
               </Button>
-              <Button 
-                type="submit" 
-                color="green" 
-                size="xs" 
-                leftSection={<IconCheck size={14} />}
-              >
+              <Button type="submit" color="green" size="xs" leftSection={<IconCheck size={14} />}>
                 Kaydet
               </Button>
             </Group>
